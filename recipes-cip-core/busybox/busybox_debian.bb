@@ -27,4 +27,6 @@ file://inittab \
 file://rcS \
 file://run-ptest \
 file://hwclock.sh \
+file://default.script \
+file://simple.script \
 "
