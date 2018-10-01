@@ -70,3 +70,5 @@ PACKAGES = " \
 FILES_${PN}-sstate = " \
     ${includedir}/uvcs_ioctl.h \
 "
+
+KERNEL_MODULE_AUTOLOAD = "${@base_conditional('USE_VIDEO_OMX', '1', 'uvcs_drv', '', d)}"
