@@ -1,7 +1,6 @@
 DESCRIPTION = "Memory Manager Kernel module for Renesas R-Car Gen3"
 
 require mmngr_drv.inc
-require include/dtv-dvd-control.inc
 
 DEPENDS = "linux-renesas"
 PN = "kernel-module-mmngr"
@@ -23,13 +22,7 @@ KERNEL_MODULE_PACKAGE_SUFFIX = ""
 
 do_compile() {
     export MMNGR_CONFIG=${MMNGR_CFG}
-
-    if [ "X${USE_DTV}" = "X1" ]; then
-        export MMNGR_SSP_CONFIG="MMNGR_SSP_ENABLE"
-    else
-        export MMNGR_SSP_CONFIG="MMNGR_SSP_DISABLE"
-    fi
-
+    export MMNGR_SSP_CONFIG="MMNGR_SSP_DISABLE"
     export MMNGR_IPMMU_MMU_CONFIG="IPMMU_MMU_DISABLE"
 
     cd ${S}/${MMNGR_DRV_DIR}/drv

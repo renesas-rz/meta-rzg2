@@ -146,13 +146,6 @@ Multimedia portions depend on GLES portions.
         " vp8enc_lib"        - for OMX Media Component VP8 Encoder Library for Linux
         " vp9dec_lib"        - for OMX Media Component VP9 Decoder Library for Linux
         " aaclcenc_mdw"      - for AAC-LC Encoder Middleware for Linux
-        " cmsbcm"            - for CMS Basic Color Management Middleware for Linux
-        " cmsblc"            - for CMS CMM3 Backlight Control Middleware for Linux
-        " cmsdgc"            - for CMS VSP2 Dynamic Gamma Correction Middleware for Linux
-        " dtv"               - for ISDB-T DTV Software Package for Linux
-        " dvd"               - for DVD Core-Middleware for Linux
-        " adsp"              - for ADSP driver, ADSP interface and ADSP framework for Linux
-        " avb"               - for AVB Software Package for Linux
 ```
 Ex:
 ```bash
@@ -168,14 +161,4 @@ Please add feature to DISTRO_FEATURES_append to local.conf:
     # Configuration for multimedia test package
 
         DISTRO_FEATURES_append = " mm-test"
-```
-
-## IV/ Enable Linux ICCOM driver and Linux ICCOM library
-
-For Linux ICCOM driver and Linux ICCOM library
-
-1. Please copy proprietary libraries to the directory of recipes.
-2. Please set local.conf the following.
-```bash
-        DISTRO_FEATURES_append = " iccom"
 ```
