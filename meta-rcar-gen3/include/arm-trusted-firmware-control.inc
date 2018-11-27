@@ -47,7 +47,7 @@ python do_extra_ipl_opt() {
     # For E3 SiP DDR 2GiB
     if soc == "r8a77990":
         d.setVar('EXTRA_ATFW_CONF', '4d')
-        d.setVar('EXTRA_ATFW_OPT', ' LSI=E3 RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 ')
+        d.setVar('EXTRA_ATFW_OPT', ' LSI=E3 RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none"')
         bb.build.exec_func('do_ipl_opt_compile', d)
         bb.build.exec_func('do_ipl_opt_deploy', d)
 }
