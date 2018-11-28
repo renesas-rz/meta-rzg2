@@ -7,7 +7,7 @@ PR = "r1"
 
 inherit debian-package
 PV = "1.0.1t"
-SRCREV = "cbff4ab26540579d65eaf9a52b9d26657ce4189c"
+SRCREV = "d5761b52f35cf9733eac1da1ca3060cb7ba4d5f8"
 
 # "openssl | SSLeay" dual license
 LICENSE = "openssl"
