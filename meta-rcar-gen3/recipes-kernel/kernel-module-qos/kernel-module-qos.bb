@@ -2,6 +2,8 @@ DESCRIPTION = "QoS driver for the R-Car Gen3"
 
 require include/rcar-gen3-modules-common.inc
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
+
 LICENSE = "GPLv2 & MIT"
 LIC_FILES_CHKSUM = " \
     file://GPL-COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
@@ -18,7 +20,9 @@ QOS_DRV_URL = "git://github.com/renesas-rcar/qos_drv.git"
 BRANCH = "rcar-gen3"
 SRCREV = "d32fbee4d7b76056c37935ff31102c3583801a29"
 
-SRC_URI = "${QOS_DRV_URL};branch=${BRANCH}"
+SRC_URI = "${QOS_DRV_URL};branch=${BRANCH} \
+  file://0001-qos_drv-include-mod_devicetable.h.patch \
+"
 
 S = "${WORKDIR}/git"
 QOS_DRV_DIR = "qos-module/files/qos/drv"
