@@ -21,6 +21,10 @@ SRCREV = "0d14c04f8a1dd7946c44e9e1041c62d054a741a5"
 
 SRC_URI = "${VSPMIF_DRV_URL};branch=${BRANCH}"
 
+SRC_URI_append = " \
+	file://0001-vspm_if_main-Add-missing-linux-header.patch \
+"
+
 S = "${WORKDIR}/git"
 VSPMIF_DRV_DIR = "vspm_if-module/files/vspm_if"
 
