@@ -14,6 +14,7 @@ FILESEXTRAPATHS_append := "${THISDIR}/qtwayland:"
 SRC_URI_append  = " \
     file://0001-Qt-qtwayland-recreate-qwaylandeventthread-to-fix-iss.patch \
     file://0002-Qt-qtwayland-re-add-qwaylandeventthread-to-qwayland.patch \
+    file://0003-qt5wayland-fix-hardwareintegration-client-xcomposite.patch \
 "
 
 DEP = " freetype fontconfig libwayland-egl"
