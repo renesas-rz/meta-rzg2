@@ -1,0 +1,26 @@
+From 3baf57067700dbd0fbacf86ed69577e63a5cc416 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Tue, 18 Dec 2018 14:00:11 +0700
+Subject: [PATCH] linux: add time.h header file to net_tstamp.h
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ include/uapi/linux/net_tstamp.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+index 97ff3c1..aafe0d1 100644
+--- a/include/uapi/linux/net_tstamp.h
++++ b/include/uapi/linux/net_tstamp.h
+@@ -13,6 +13,8 @@
+ #include <linux/types.h>
+ #include <linux/socket.h>   /* for SO_TIMESTAMPING */
+ 
++#include <time.h>
++
+ /* SO_TIMESTAMPING gets an integer bit field comprised of these values */
+ enum {
+ 	SOF_TIMESTAMPING_TX_HARDWARE = (1<<0),
+-- 
+1.9.1
+
