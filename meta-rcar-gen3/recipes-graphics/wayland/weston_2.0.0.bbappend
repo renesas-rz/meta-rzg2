@@ -16,6 +16,8 @@ SRC_URI_append = " \
     file://weston.ini \
     file://weston_v4l2.ini \
     file://weston.sh \
+    file://1001-Share-toytoolkit-lib.patch \
+    file://1008-larger-weston-bar-suitable-for-touch-screen.patch \
 "
 
 S = "${WORKDIR}/git"
