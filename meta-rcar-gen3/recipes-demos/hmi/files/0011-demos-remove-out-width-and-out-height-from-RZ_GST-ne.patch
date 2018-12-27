@@ -1,0 +1,25 @@
+From b86fe6faba801955cf0ee45ce62366b11914440c Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Thu, 30 Aug 2018 20:59:40 +0700
+Subject: [PATCH] demos: remove out-width and out-height from
+ RZ_GST-network-demo_receive-video.sh
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ RZ_GST-network-demo_receive-video.sh | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/RZ_GST-network-demo_receive-video.sh b/RZ_GST-network-demo_receive-video.sh
+index befd8c3..5c5f3e5 100755
+--- a/RZ_GST-network-demo_receive-video.sh
++++ b/RZ_GST-network-demo_receive-video.sh
+@@ -16,5 +16,4 @@ queue ! \
+ rtph264depay ! \
+ h264parse ! \
+ omxh264dec ! \
+-waylandsink max-lateness=-1 qos=false position_x=0 position_y=0 \
+-$scale_width $scale_height
++waylandsink max-lateness=-1 qos=false position_x=0 position_y=0
+-- 
+1.9.1
+
