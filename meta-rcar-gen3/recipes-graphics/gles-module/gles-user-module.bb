@@ -23,7 +23,7 @@ SRC_URI_append = " \
     file://rc.pvr.service \
 "
 
-inherit update-rc.d systemd
+inherit update-rc.d systemd autotools pkgconfig
 
 INITSCRIPT_NAME = "pvrinit"
 INITSCRIPT_PARAMS = "start 7 5 2 . stop 62 0 1 6 ."
@@ -106,8 +106,10 @@ FILES_${PN}-dev = " \
     ${libdir}/pkgconfig/* \
 "
 
-PROVIDES = "virtual/libgles2"
+PROVIDES = "virtual/libgles2 virtual/libegl virtual/egl"
 RPROVIDES_${PN} += " \
+    libegl \
+    libegl1 \
     ${GLES}-user-module \
     libgles2-mesa \
     libgles2-mesa-dev \
