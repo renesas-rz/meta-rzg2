@@ -22,6 +22,7 @@ KBUILD_DEFCONFIG = "defconfig"
 KCONFIG_MODE = "alldefconfig"
 SRC_URI_append = " \
     file://touch.cfg \
+    file://gsx.cfg \
 "
 
 # Add SCHED_DEBUG config fragment to support CAS
