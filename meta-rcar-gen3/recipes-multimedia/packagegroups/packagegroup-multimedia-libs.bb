@@ -2,7 +2,7 @@ SUMMARY = "Multimedia user libraries modules package groups"
 LICENSE = "MIT"
 
 DEPENDS = "mmngr-user-module mmngrbuf-user-module \
-    vspmif-user-module libalacdla-l libflacdla-l \
+    vspmif-user-module \
 "
 
 PR = "r0"
@@ -16,5 +16,4 @@ PACKAGES = " \
 RDEPENDS_packagegroup-multimedia-libs = " \
     mmngr-user-module mmngrbuf-user-module \
     vspmif-user-module \
-    libalacdla-l libflacdla-l \
 "
