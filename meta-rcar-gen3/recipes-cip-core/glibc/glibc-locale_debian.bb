@@ -28,7 +28,7 @@ do_package[depends] += "${BINUTILSDEP}"
 
 # default to disabled 
 ENABLE_BINARY_LOCALE_GENERATION ?= "0"
-ENABLE_BINARY_LOCALE_GENERATION_pn-nativesdk-glibc-locale = "0"
+ENABLE_BINARY_LOCALE_GENERATION_pn-nativesdk-glibc-locale = "1"
 
 #enable locale generation on these arches
 # BINARY_LOCALE_ARCHES is a space separated list of regular expressions
@@ -36,6 +36,7 @@ BINARY_LOCALE_ARCHES ?= "arm.* aarch64 i[3-6]86 x86_64 powerpc mips mips64"
 
 # set "1" to use cross-localedef for locale generation
 # set "0" for qemu emulation of native localedef for locale generation
+# Note: don't set to "1" since cross-localedef is not supported in cip-corE
 LOCALE_GENERATION_WITH_CROSS-LOCALEDEF = "0"
 
 PROVIDES = "virtual/libc-locale"
@@ -139,3 +140,68 @@ FILES_${PN}-dbg += "${libdir}/gconv/.debug"
 # since they redepends on glibc-binary-localedata-* but not depend.
 # These warning messages are harmless, suppress them here.
 do_package_qa[noexec] = "1"
+
+
+# Overwrite output_locale_binary function in libc-package class.
+# The original function has a mistake in the path for localedef
+# thus always error when LOCALE_GENERATION_WITH_CROSS-LOCALEDEF
+# is set to 0
+def output_locale_binary(name, pkgname, locale, encoding):
+    treedir = base_path_join(d.getVar("WORKDIR"), "locale-tree")
+    bindir = base_path_join(treedir, d.getVar("base_bindir"))
+    ldlibdir = base_path_join(treedir, d.getVar("base_libdir"))
+    path = d.getVar("PATH")
+    i18npath = base_path_join(treedir, datadir, "i18n")
+    gconvpath = base_path_join(treedir, "iconvdata")
+    outputpath = base_path_join(treedir, binary_locales_dir)
+
+    use_cross_localedef = d.getVar("LOCALE_GENERATION_WITH_CROSS-LOCALEDEF") or "0"
+    if use_cross_localedef == "1":
+        target_arch = d.getVar('TARGET_ARCH')
+        locale_arch_options = { \
+            "arm":     " --uint32-align=4 --little-endian ", \
+            "armeb":   " --uint32-align=4 --big-endian ",    \
+            "aarch64": " --uint32-align=4 --little-endian ",    \
+            "aarch64_be": " --uint32-align=4 --big-endian ",    \
+            "sh4":     " --uint32-align=4 --big-endian ",    \
+            "powerpc": " --uint32-align=4 --big-endian ",    \
+            "powerpc64": " --uint32-align=4 --big-endian ",  \
+            "mips":    " --uint32-align=4 --big-endian ",    \
+            "mipsisa32r6":    " --uint32-align=4 --big-endian ",    \
+            "mips64":  " --uint32-align=4 --big-endian ",    \
+            "mipsisa64r6":  " --uint32-align=4 --big-endian ",    \
+            "mipsel":  " --uint32-align=4 --little-endian ", \
+            "mipsisa32r6el":  " --uint32-align=4 --little-endian ", \
+            "mips64el":" --uint32-align=4 --little-endian ", \
+            "mipsisa64r6el":" --uint32-align=4 --little-endian ", \
+            "i586":    " --uint32-align=4 --little-endian ", \
+            "i686":    " --uint32-align=4 --little-endian ", \
+            "x86_64":  " --uint32-align=4 --little-endian "  }
+
+        if target_arch in locale_arch_options:
+            localedef_opts = locale_arch_options[target_arch]
+        else:
+            bb.error("locale_arch_options not found for target_arch=" + target_arch)
+            bb.fatal("unknown arch:" + target_arch + " for locale_arch_options")
+
+        localedef_opts += " --force  --no-archive --prefix=%s \
+            --inputfile=%s/%s/i18n/locales/%s --charmap=%s %s/%s" \
+            % (treedir, treedir, datadir, locale, encoding, outputpath, name)
+
+        cmd = "PATH=\"%s\" I18NPATH=\"%s\" GCONV_PATH=\"%s\" cross-localedef %s" % \
+            (path, i18npath, gconvpath, localedef_opts)
+    else: # earlier slower qemu way
+        qemu = qemu_target_binary(d)
+        localedef_opts = "--force --no-archive --prefix=%s \
+            --inputfile=%s/i18n/locales/%s --charmap=%s %s" \
+            % (treedir, datadir, locale, encoding, name)
+
+        qemu_options = d.getVar('QEMU_OPTIONS')
+
+        cmd = "PSEUDO_RELOADED=YES PATH=\"%s\" I18NPATH=\"%s\" %s -L %s \
+            -E LD_LIBRARY_PATH=%s %s %s/localedef %s" % \
+            (path, i18npath, qemu, treedir, ldlibdir, qemu_options, bindir, localedef_opts)
+
+    commands["%s/%s" % (outputpath, name)] = cmd
+
+    bb.note("generating locale %s (%s)" % (locale, encoding))
