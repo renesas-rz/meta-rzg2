@@ -5,8 +5,6 @@
 
 require glibc.inc
 
-PR = "r1"
-
 LICENSE = "GPLv2 & LGPLv2.1 & ISC"
 LIC_FILES_CHKSUM = " \
 file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
@@ -34,6 +32,7 @@ DEPENDS += "gperf-native"
 # correct-valencia-locale-supported_debian.patch:
 # 	This patch is fix "QA Issue: locale-base-ca-es is listed in PACKAGES multiple times"
 SRC_URI += " \
+	${NATIVESDKFIXES} \
 	file://eglibc-svn-arm-lowlevellock-include-tls.patch \
 	file://IO-acquire-lock-fix.patch \
 	file://etc/ld.so.conf \
@@ -44,12 +43,21 @@ SRC_URI += " \
 	file://ppc_slow_ieee754_sqrt.patch \
 	file://add_resource_h_to_wait_h.patch \
 	file://0001-R_ARM_TLS_DTPOFF32.patch \
-	file://0001-eglibc-run-libm-err-tab.pl-with-specific-dirs-in-S.patch \
 	file://ppce6500-32b_slow_ieee754_sqrt.patch \
 	file://grok_gold.patch \
 	file://0013-sysdeps-gnu-configure.ac-handle-correctly-libc_cv_ro.patch \
 	file://correct-valencia-locale-supported_debian.patch \
 	file://0001-Fix-error-undefined-reference-to-libgcc_s_resume.patch \
+	file://0010-eglibc-run-libm-err-tab.pl-with-specific-dirs-in-S.patch \
+	file://0023-Define-DUMMY_LOCALE_T-if-not-defined.patch \
+"
+
+NATIVESDKFIXES ?= ""
+NATIVESDKFIXES_class-nativesdk = "\
+	file://0001-nativesdk-glibc-Look-for-host-system-ld.so.cache-as-.patch \
+	file://0002-nativesdk-glibc-Fix-buffer-overrun-with-a-relocated-.patch \
+	file://0003-nativesdk-glibc-Raise-the-size-of-arrays-containing-.patch \
+	file://relocate-locales.patch \
 "
 
 B = "${WORKDIR}/build-${TARGET_SYS}"

@@ -5,8 +5,6 @@
 
 require glibc_${PV}.bb
 
-PR = "0"
-
 # main glibc recipes muck with TARGET_CPPFLAGS to point into
 # final target sysroot but we
 # are not there when building glibc-initial
