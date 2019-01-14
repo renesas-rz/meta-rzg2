@@ -31,6 +31,7 @@ This layer depends on:
     URI:http://git.yoctoproject.org/cgit.cgi/meta-gplv2/
     layers: meta-gplv2
     branch: rocko
+    revision: f875c60ecd6f30793b80a431a2423c4b98e51548
 
     (for core-image-qt)
     URI: https://github.com/meta-qt5/meta-qt5.git 
@@ -39,6 +40,12 @@ This layer depends on:
 ## Build Instructions
 
 The following instructions require a Poky installation (or equivalent).
+
+Below git configuration is required:
+```bash
+    $ git config --global user.email "you@example.com"
+    $ git config --global user.name "Your Name"
+```
 
 Download evaluation version of proprietary graphics and multimedia drivers from Renesas.
 
@@ -74,13 +81,13 @@ Build the target file system image using bitbake:
     $ bitbake core-image-weston
 ```
 After completing the images for the target machine will be available in the output
-directory _'tmp/deploy/images/<supported board name>'_.
+directory _'tmp/deploy/images/\<supported board name\>'_.
 
 Images generated:
 * Image (generic Linux Kernel binary image file)
-* Image-<machine name>.dtb (DTB for target machine)
-* core-image-weston-<machine name>.tar.bz2 (rootfs tar+bzip2)
-* core-image-weston-<machine name>.ext4  (rootfs ext4 format)
+* Image-\<machine name\>.dtb (DTB for target machine)
+* core-image-weston-\<machine name\>.tar.bz2 (rootfs tar+bzip2)
+* core-image-weston-\<machine name\>.ext4  (rootfs ext4 format)
 
 ## Build Instructions for SDK
 
