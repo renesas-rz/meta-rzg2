@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = " \
 require include/rcar-gen3-modules-common.inc
 
 inherit module
+require include/module_append.inc
 
 DEPENDS = "linux-renesas kernel-module-vspm"
 PN = "kernel-module-vsp2driver"

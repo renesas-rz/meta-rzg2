@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = " \
     file://MIT-COPYING;md5=8c2810fa6bfdc5ae5c15a0c1ade34054 \
 "
 inherit module
+require include/module_append.inc
 PN = "kernel-module-gles"
 PR = "r0"
 

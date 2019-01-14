@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = " \
 "
 
 inherit module
+require include/module_append.inc
 
 DEPENDS = "linux-renesas kernel-module-vspm"
 PN = "kernel-module-vspmif"
