@@ -18,12 +18,13 @@ IMAGE_INSTALL_append = " kernel-devsrc ltp"
 sdk_post_process () {
 	# Set up kernel for building kernel config now
 	echo "configuring scripts of kernel source for building .ko file..."
-	$SUDO_EXEC bash -c 'source "$0" && cd "${OECORE_TARGET_SYSROOT=}/usr/src/kernel" && make silentoldconfig scripts' $env_setup_script
+	$SUDO_EXEC bash -c 'source "$0" && cd "${OECORE_TARGET_SYSROOT=}/usr/src/kernel" && make scripts' $env_setup_script
 }
 SDK_POST_INSTALL_COMMAND_append = " ${sdk_post_process}"
 
-# Add below environments variables to support cross-compile kernel module
-toolchain_create_sdk_env_script_append() {
-	echo "export KERNELSRC=$sysroot/usr/src/kernel" >> $script
-	echo "export KERNELDIR=$sysroot/usr/src/kernel" >> $script
+export SOURCE_DIR="${THISDIR}/environment-setup"
+fakeroot append_setup () {
+    install -d ${SDK_OUTPUT}/${SDKPATH}/sysroots/${SDK_SYS}/environment-setup.d/
+    cp ${SOURCE_DIR}/environment-setup-append.sh ${SDK_OUTPUT}/${SDKPATH}/sysroots/${SDK_SYS}/environment-setup.d/
 }
+SDK_POSTPROCESS_COMMAND_prepend = " append_setup; "
