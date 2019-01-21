@@ -7,13 +7,13 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 COMPATIBLE_MACHINE = "salvator-x|ebisu"
 
 RENESAS_BSP_URL = "git://github.com/renesas-rz/renesas-cip.git"
-BRANCH = "rcar-gen3/v4.19"
-SRCREV = "28367215b1097736c4a091860d5a6373d6fc16d1"
+BRANCH = "rcar-gen3/v4.19.13-cip1"
+SRCREV = "c8f1e674723910e470d5aa2ea85f0d707b81e68b"
 
 SRC_URI = "${RENESAS_BSP_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
-LINUX_VERSION ?= "4.19.13"
+LINUX_VERSION ?= "4.19.13-cip1"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 PR = "r1"
