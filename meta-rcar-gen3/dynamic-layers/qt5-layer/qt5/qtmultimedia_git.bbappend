@@ -16,6 +16,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI_append = " \
     file://0001-qtmultimedia-Add-config-to-check-fd-for-dmabuf.patch \
+    file://0002-qtmultimedia-Add-render-by-EGLImage-for-video-playba.patch \
     file://0003-qtmultimedia-Fix-Internal-data-stream-error-error-wh.patch \
     file://0004-Add-camerarecordermode-service-for-using-omxh264enc.patch \
     file://0005-Fix-binding-loop-for-declarative-camera.patch \
