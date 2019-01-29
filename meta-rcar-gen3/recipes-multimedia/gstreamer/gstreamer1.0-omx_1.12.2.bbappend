@@ -4,6 +4,7 @@ SRC_URI_remove = "http://gstreamer.freedesktop.org/src/gst-omx/gst-omx-${PV}.tar
 SRC_URI_append = " \
     git://github.com/renesas-rcar/gst-omx.git;branch=RCAR-GEN3/1.12.2 \
     file://gstomx.conf \
+    file://0001-omxvideodec-don-t-drop-frame-if-it-contains-header-d.patch \
 "
 
 require include/rcar-gen3-path-common.inc
