@@ -4,6 +4,7 @@ IMAGE_INSTALL_append = " \
     v4l-utils \
     i2c-tools \
     coreutils \
+    audio-init \
 "
 
 # Support secure environment
