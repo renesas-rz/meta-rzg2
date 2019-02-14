@@ -1,0 +1,166 @@
+From 1c97e9f158ce6e1fc7579236cc8937f9566f3ea2 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Thu, 14 Feb 2019 19:24:01 +0700
+Subject: [PATCH] renesas: bl2: add ECC support for DRAM for Ebisu-4D
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ plat/renesas/rcar/bl2_fusa.c       | 101 +++++++++++++++++++++++++++++++++++++
+ plat/renesas/rcar/bl2_rcar_setup.c |   7 +++
+ plat/renesas/rcar/platform.mk      |   7 +++
+ 3 files changed, 115 insertions(+)
+ create mode 100644 plat/renesas/rcar/bl2_fusa.c
+
+diff --git a/plat/renesas/rcar/bl2_fusa.c b/plat/renesas/rcar/bl2_fusa.c
+new file mode 100644
+index 0000000..0487f6a
+--- /dev/null
++++ b/plat/renesas/rcar/bl2_fusa.c
+@@ -0,0 +1,101 @@
++/*
++ * bl2_ecc_setup.c -
++ *
++ * Copyright (C) 2018 Renesas Electronics Corporation.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stdint.h>
++#include <debug.h>
++#include <mmio.h>
++
++
++#define	FUSA_USE_HIMEM		0
++#define	FUSA_DRAM_CLEAR		1
++
++#define	FUSACR			0xE6784020	/* FuSa Ctrl */
++#define	DFUSAAREACR		0xE6785000	/* DRAM FuSa Area Conf */
++#define	DECCAREACR		0xE6785040	/* DRAM ECC Area Conf */
++#define	NUM_DAREA		16
++#define	SFUSAAREACR		0xE6785100	/* System RAM FuSa Area Conf */
++#define	SECCAREACR		0xE6785140	/* System RAM ECC Area Conf */
++#define	NUM_SAREA		8
++
++/* As the saddr, specify high-memory address (> 4 GB) */
++#define	FUSAAREACR(en, size, saddr)	\
++	(((uint32_t)en << 31) | ((uint32_t)size << 24) | (uint32_t)(((uintptr_t)saddr) >> 12))
++#define	ECCAREACR(ecc, saddr) \
++	(((uint32_t)ecc << 31) | (uint32_t)(((uintptr_t)saddr) >> 12))
++
++#ifndef ARRAY_SIZE
++#define	ARRAY_SIZE(a)		(sizeof(a) / sizeof(a[0]))
++#endif
++
++#if FUSA_USE_HIMEM
++#define	DRAM_ADDR(addr)		((uintptr_t)addr)
++#else
++#define	DRAM_ADDR(addr)		((uintptr_t)addr - (uintptr_t)0x3C0000000)
++#endif
++
++#define	EBISU_FUSAAREA		0x408000000
++#define	EBISU_FUSAAREA_TOTAL	((128+256+256+256+64)*1024*1024)
++#define	EBISU_ECCAREA		0x444000000
++#define	EBISU_ECCAREA_TOTAL	((128+256+256+256+64)*1024*1024)
++
++static const struct rzg2_ecc_conf {
++	uint32_t fusaareacr;
++	uint32_t eccareacr;
++} rzg2_ebisu_conf[] = {
++	{ FUSAAREACR(1, 7, 0x408000000),    ECCAREACR(0, 0x448000000)   }, /* 128+128 MB */
++	{ FUSAAREACR(1, 8, 0x410000000),    ECCAREACR(0, 0x450000000)   }, /* 256+256 MB */
++	{ FUSAAREACR(1, 8, 0x420000000),    ECCAREACR(0, 0x460000000)   }, /* 256+256 MB */
++	{ FUSAAREACR(1, 8, 0x430000000),    ECCAREACR(0, 0x470000000)   }, /* 256+256 MB */
++	{ FUSAAREACR(1, 6, 0x440000000),    ECCAREACR(0, 0x444000000)   }, /* 64+64 MB */
++};
++
++
++#if FUSA_DRAM_CLEAR
++/* Write zero-valued octa-byte words */
++static void bzero64(uintptr_t start, uint64_t size)
++{
++	/* start should be aligned on word boundary, size should be multiple of 8 */
++	volatile uint64_t *ptr = (volatile uint64_t *)start;
++	volatile uint64_t *end = ptr + (size / sizeof(uint64_t));
++
++	while (ptr < end)
++		*ptr++ = 0;
++}
++#endif
++
++/* Dump DRAM ECC area (for debug purpose) */
++extern void bl2_show_ecc(void)
++{
++}
++
++/* Setup DRAM ECC configuration registers */
++extern void bl2_enable_ecc(void)
++{
++	const struct rzg2_ecc_conf *conf;
++	int n;
++#if FUSA_DRAM_CLEAR
++	/* Clear DRAM ECC Area (for check) */
++	NOTICE("BL2: Clearing ECC area at %lx\n", DRAM_ADDR(EBISU_ECCAREA));
++	bzero64(DRAM_ADDR(EBISU_ECCAREA), (uint64_t)EBISU_ECCAREA_TOTAL);
++#endif
++	conf = rzg2_ebisu_conf;
++	for (n = 0; n < ARRAY_SIZE(rzg2_ebisu_conf); n++, conf++) {
++		mmio_write_32((uintptr_t)((uint32_t *)DFUSAAREACR + n), conf->fusaareacr);
++		mmio_write_32((uintptr_t)((uint32_t *)DECCAREACR + n), conf->eccareacr);
++		NOTICE("BL2: DRAM ECC area=%d, FuSa=0x%x ECC=0x%x, size=%d MB\n",
++			n, conf->fusaareacr, conf->eccareacr,
++			1 << ((conf->fusaareacr >> 24) & 0xf));
++	}
++
++#if FUSA_DRAM_CLEAR
++	/* Clear DRAM data area to initialize ECC area */
++	bzero64(EBISU_FUSAAREA, (uint64_t)EBISU_FUSAAREA_TOTAL);
++	*((volatile uint64_t *)DRAM_ADDR(EBISU_FUSAAREA));	/* dummy read as memory barrier */
++#endif
++	NOTICE("BL2: DRAM ECC Configured. 0x%lx,+0x%lx\n", EBISU_FUSAAREA, (uint64_t)EBISU_FUSAAREA_TOTAL);
++}
+diff --git a/plat/renesas/rcar/bl2_rcar_setup.c b/plat/renesas/rcar/bl2_rcar_setup.c
+index 0338335..b8efeaa 100644
+--- a/plat/renesas/rcar/bl2_rcar_setup.c
++++ b/plat/renesas/rcar/bl2_rcar_setup.c
+@@ -654,6 +654,13 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+ 		qos_init();
+ 	}
+ 
++#if (RCAR_DRAM_EBISU_4D_ECC == 1) /* RCAR-E3_EBISU_ECC */
++	{
++		extern void bl2_enable_ecc(void);
++		bl2_enable_ecc();
++	}
++#endif
++
+ 	if ((modemr_boot_dev == MODEMR_BOOT_DEV_EMMC_25X1) ||
+ 	    (modemr_boot_dev == MODEMR_BOOT_DEV_EMMC_50X8)) {
+ 		/* Initialize eMMC */
+diff --git a/plat/renesas/rcar/platform.mk b/plat/renesas/rcar/platform.mk
+index f33701b..2fcbbe6 100644
+--- a/plat/renesas/rcar/platform.mk
++++ b/plat/renesas/rcar/platform.mk
+@@ -33,6 +33,7 @@ BL2_SOURCES		+=	${RCAR_GIC_SOURCES}				\
+ 				plat/renesas/rcar/drivers/error/bl2_int_error.c	\
+ 				plat/renesas/rcar/aarch64/rcar_helpers.S	\
+ 				plat/renesas/rcar/bl2_rcar_setup.c		\
++				plat/renesas/rcar/bl2_fusa.c			\
+ 				plat/renesas/rcar/aarch64/rcar_common.c		\
+ 				plat/renesas/rcar/aarch64/rcar_drivers_common.c	\
+ 				plat/renesas/rcar/drivers/io/io_rcar.c		\
+@@ -317,6 +318,12 @@ RCAR_DRAM_DDR3L_MEMDUAL :=1
+ endif
+ $(eval $(call add_define,RCAR_DRAM_DDR3L_MEMDUAL))
+ 
++# Process RCAR_DRAM_EBISU_4D_ECC flag
++ifndef RCAR_DRAM_EBISU_4D_ECC
++RCAR_DRAM_EBISU_4D_ECC :=0
++endif
++$(eval $(call add_define,RCAR_DRAM_EBISU_4D_ECC))
++
+ # Process RCAR_BL33_ARG0 flag
+ ifdef RCAR_BL33_ARG0
+ $(eval $(call add_define,RCAR_BL33_ARG0))
+-- 
+2.7.4
+
