@@ -154,7 +154,7 @@ do_install_omx_video() {
     for omxmc in ${OMX_VIDEO_SRC_LIST}
     do
         src="${WORKDIR}/${omxmc}"
-        install -m 755 ${src}/${baselib}/lib*.so.* ${D}/${libdir}
+        install -m 755 ${src}/lib/lib*.so.* ${D}/${libdir}
         install -m 644 ${src}/include/*.h ${D}/${includedir}
         install -m 644 ${src}/config/*.txt ${D}/${sysconfdir}/omxr
     done
@@ -257,7 +257,7 @@ do_install_audio_middleware() {
     cd ${D}/${libdir}
 
     if [ "X${USE_AACPV2_MDW}" = "X1" ]; then
-        install -m 755 ${WORKDIR}/${AACPV2_MIDDLEWARE_SRC}/${baselib}/libRSACPDLA_L.so.2.0 \
+        install -m 755 ${WORKDIR}/${AACPV2_MIDDLEWARE_SRC}/lib/libRSACPDLA_L.so.2.0 \
             ${D}/${libdir}
         install -m 644 ${WORKDIR}/${AACPV2_MIDDLEWARE_SRC}/include/*.h ${D}/${includedir}
 
@@ -266,7 +266,7 @@ do_install_audio_middleware() {
     fi
 
     if [ "X${USE_MP3_MDW}" = "X1" ]; then
-        install -m 755 ${WORKDIR}/${MP3_MIDDLEWARE_SRC}/${baselib}/libMP3DLA_L.so.2.0 \
+        install -m 755 ${WORKDIR}/${MP3_MIDDLEWARE_SRC}/lib/libMP3DLA_L.so.2.0 \
             ${D}/${libdir}
         install -m 644 ${WORKDIR}/${MP3_MIDDLEWARE_SRC}/include/*.h ${D}/${includedir}
 
@@ -275,7 +275,7 @@ do_install_audio_middleware() {
     fi
 
     if [ "X${USE_WMA_MDW}" = "X1" ]; then
-        install -m 755 ${WORKDIR}/${WMA_MIDDLEWARE_SRC}/${baselib}/libWMASTDLA_L.so.2.0 \
+        install -m 755 ${WORKDIR}/${WMA_MIDDLEWARE_SRC}/lib/libWMASTDLA_L.so.2.0 \
             ${D}/${libdir}
         install -m 644 ${WORKDIR}/${WMA_MIDDLEWARE_SRC}/include/*.h ${D}/${includedir}
 
@@ -284,7 +284,7 @@ do_install_audio_middleware() {
     fi
 
     if [ "X${USE_DD_MDW}" = "X1" ]; then
-        install -m 755 ${WORKDIR}/${DD_MIDDLEWARE_SRC}/${baselib}/libRSDACDLA_L.so.2.0 \
+        install -m 755 ${WORKDIR}/${DD_MIDDLEWARE_SRC}/lib/libRSDACDLA_L.so.2.0 \
             ${D}/${libdir}
         install -m 644 ${WORKDIR}/${DD_MIDDLEWARE_SRC}/include/*.h ${D}/${includedir}
 
@@ -299,7 +299,7 @@ do_install_omx_audio() {
     for omxmc in ${OMX_AUDIO_SRC_LIST}
     do
         src="${WORKDIR}/${omxmc}/"
-        install -m 755 ${src}/${baselib}/lib*.so.* ${D}/${libdir}
+        install -m 755 ${src}/lib/lib*.so.* ${D}/${libdir}
         if [ -d ${src}/include ]; then
             install -m 644 ${src}/include/*.h ${D}/${includedir}
         fi
