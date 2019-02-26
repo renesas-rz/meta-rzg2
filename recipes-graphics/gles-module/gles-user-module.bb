@@ -53,7 +53,7 @@ do_install() {
 
     # Install pre-builded binaries
     install -d ${D}/${libdir}
-    install -m 755 ${S}/${libdir}/*.so ${D}/${libdir}/
+    install -m 755 ${S}/usr/lib/*.so ${D}/${libdir}/
     install -d ${D}${RENESAS_DATADIR}/bin
     install -m 755 ${S}/usr/local/bin/dlcsrv_REL ${D}${RENESAS_DATADIR}/bin/dlcsrv_REL
     install -d ${D}/lib/firmware
@@ -61,7 +61,7 @@ do_install() {
 
     # Install pkgconfig
     install -d ${D}/${libdir}/pkgconfig
-    install -m 644 ${S}/${libdir}/pkgconfig/*.pc ${D}/${libdir}/pkgconfig/
+    install -m 644 ${S}/usr/lib/pkgconfig/*.pc ${D}/${libdir}/pkgconfig/
 
     # Create symbolic link
     cd ${D}/${libdir}
