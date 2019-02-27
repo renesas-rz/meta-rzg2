@@ -40,8 +40,8 @@ S = "${WORKDIR}/git"
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
 do_configure() {
-    git -C ${WORKDIR}/git_official checkout -B official 3.1.0
-    git -C ${WORKDIR}/git_official cherry-pick ${SRCREV_officialgit}
+    (cd ${WORKDIR}/git_official && git checkout -B official 3.1.0)
+    (cd ${WORKDIR}/git_official && git cherry-pick ${SRCREV_officialgit})
     cp -rn ${WORKDIR}/git_official/core/lib/libtomcrypt ${B}/core/lib/.
 }
 
