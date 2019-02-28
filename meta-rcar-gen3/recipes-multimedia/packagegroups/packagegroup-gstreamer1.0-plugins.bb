@@ -23,10 +23,12 @@ PACKAGES = " \
     packagegroup-gstreamer1.0-plugins-video \
     ${@base_conditional("USE_OMX_COMMON", "1", "packagegroup-gstreamer1.0-omx", "", d)} \
     packagegroup-gstreamer1.0-plugins-debug \
+    packagegroup-gstreamer1.0-plugins-bad \
 "
 
 RDEPENDS_packagegroup-gstreamer1.0-plugins = " \
     packagegroup-gstreamer1.0-plugins-base \
+    packagegroup-gstreamer1.0-plugins-bad \
     packagegroup-gstreamer1.0-plugins-audio \
     packagegroup-gstreamer1.0-plugins-video \
     ${@base_conditional("USE_OMX_COMMON", "1", "packagegroup-gstreamer1.0-omx", "", d)} \
@@ -60,4 +62,9 @@ RDEPENDS_packagegroup-gstreamer1.0-omx = " \
 
 RDEPENDS_packagegroup-gstreamer1.0-plugins-debug = " \
     gstreamer1.0-meta-debug \
+"
+
+RDEPENDS_packagegroup-gstreamer1.0-plugins-bad = " \
+    gstreamer1.0-plugins-bad-faac \
+    gstreamer1.0-plugins-bad-faad \
 "
