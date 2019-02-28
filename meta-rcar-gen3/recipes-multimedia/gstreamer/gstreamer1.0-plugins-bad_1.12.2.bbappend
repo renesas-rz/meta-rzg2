@@ -27,3 +27,5 @@ do_configure_prepend() {
 }
 
 RDEPENDS_gstreamer1.0-plugins-bad += "libwayland-egl"
+
+PACKAGECONFIG_append = " faac faad"
