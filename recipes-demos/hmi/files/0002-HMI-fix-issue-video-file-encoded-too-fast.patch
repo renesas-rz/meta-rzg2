@@ -1,0 +1,38 @@
+From a73ed3a1fa47f1762720ca6d61b329b8fce2b389 Mon Sep 17 00:00:00 2001
+From: Nhan Nguyen <nhan.nguyen.yb@renesas.com>
+Date: Thu, 7 Sep 2017 11:48:44 +0700
+Subject: [PATCH] HMI: fix issue video file encoded too fast
+
+Signed-off-by: Nhan Nguyen <nhan.nguyen.yb@renesas.com>
+---
+ RZ_GST-demo_encoded-review.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index be2d4fd..2667d20 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -14,7 +14,7 @@ fi
+ function replay()
+ {
+ 	printf "\e[34mPlaying... $1\e[0m\n"
+-	gst-launch-1.0 -e filesrc location=$1 ! h264parse ! omxh264dec ! waylandsink position-x=900 position-y=100 out-width=800 out-height=480 qos=false
++	gst-launch-1.0 -e filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink position-x=900 position-y=100 out-width=800 out-height=480 qos=false
+ }
+ 
+ function record()
+@@ -26,9 +26,9 @@ function record()
+ 	tee name=t t. ! \
+ 	vspmfilter outbuf-alloc=true ! \
+ 	video/x-raw,format=NV12,width=640,height=480 ! \
+-	omxh264enc target-bitrate=10485760 ! \
++	omxh264enc target-bitrate=10485760 ! h264parse ! qtmux ! \
+ 	filesink location=$1 t. ! \
+-	vspmfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
++	queue ! vspmfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+ 	waylandsink position-x=100 position-y=100 qos=false
+ }
+ 
+-- 
+1.9.1
+

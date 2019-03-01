@@ -1,0 +1,63 @@
+From d3d9c6b1484c232922fed12a8fe86f1b12935eb5 Mon Sep 17 00:00:00 2001
+From: nhannguyen <nhan.nguyen.yb@renesas.com>
+Date: Thu, 12 Oct 2017 13:16:44 +0700
+Subject: [PATCH] HMI:encoding app support LVDS resolution
+
+Signed-off-by: nhannguyen <nhan.nguyen.yb@renesas.com>
+---
+ RZ_GST-demo_encoded-review.sh | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index 2667d20..516b9b6 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -11,10 +11,27 @@ else
+ 	TIME=$1
+ fi
+ 
++# calculate output size of video to fit with the main screen
++out_width=`expr $D_WIDTH \* 800 / 1920 / 32 \* 32`
++if [ $out_width -gt 800 ]; then
++	out_width=800
++fi
++out_height=`expr $out_width \* 3 / 5`
++if [ $out_height -le 240 ]; then
++	out_height=240
++else
++	out_height=480
++fi
++
++x_record=`expr $D_WIDTH / 2 - $out_width`
++y_record=$x_record
++x_replay=`expr $D_WIDTH / 2`
++y_replay=$y_record
++
+ function replay()
+ {
+ 	printf "\e[34mPlaying... $1\e[0m\n"
+-	gst-launch-1.0 -e filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink position-x=900 position-y=100 out-width=800 out-height=480 qos=false
++	gst-launch-1.0 -e filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink position-x=$x_replay position-y=$y_replay out-width=$out_width out-height=$out_height qos=false
+ }
+ 
+ function record()
+@@ -28,14 +45,11 @@ function record()
+ 	video/x-raw,format=NV12,width=640,height=480 ! \
+ 	omxh264enc target-bitrate=10485760 ! h264parse ! qtmux ! \
+ 	filesink location=$1 t. ! \
+-	queue ! vspmfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+-	waylandsink position-x=100 position-y=100 qos=false
++	queue ! vspmfilter ! video/x-raw, format=BGRA, width=$out_width, height=$out_height ! \
++	waylandsink position-x=$x_record position-y=$y_record qos=false
+ }
+ 
+-sync
+-
+ record recorded-video-1.h264
+ replay recorded-video-1.h264 &
+ record recorded-video-2.h264
+-
+ sync
+-- 
+1.9.1
+

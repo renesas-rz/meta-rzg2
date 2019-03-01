@@ -1,0 +1,27 @@
+From 33dcf6fd5b067fe4706ffdd3efc117a7e0c8c509 Mon Sep 17 00:00:00 2001
+From: TraHT <traht@fsoft.com.vn>
+Date: Wed, 27 Jun 2018 20:42:27 +0700
+Subject: Modify 1008-larger-weston-bar-suitable-for-touch-screen.patch to fix
+ hunk
+
+Signed-off-by: TraHT <traht@fsoft.com.vn>
+---
+ clients/desktop-shell.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
+index b133d86..3769d00 100644
+--- a/clients/desktop-shell.c
++++ b/clients/desktop-shell.c
+@@ -545,7 +545,7 @@ panel_configure(void *data,
+ 		}
+ 		break;
+ 	}
+-	window_schedule_resize(panel->window, width, height);
++	window_schedule_resize(panel->window, width, 50);
+ }
+ 
+ static void
+-- 
+2.7.4
+

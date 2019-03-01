@@ -1,0 +1,36 @@
+From 1baa36174bcbec9938fe00cccebf07435fc780fd Mon Sep 17 00:00:00 2001
+From: nhannguyen <nhan.nguyen.yb@renesas.com>
+Date: Sun, 17 Sep 2017 13:45:04 +0700
+Subject: [PATCH] Add CAM_DEV variable to camera encoding script
+
+Signed-off-by: nhannguyen <nhan.nguyen.yb@renesas.com>
+---
+ RZ_GST-demo_encoded-review.sh | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index 0567675..331f797 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -1,4 +1,9 @@
+ #!/bin/bash
++source /home/root/.bashrc
++
++if [ -z $CAM_DEV ]; then
++	CAM_DEV="/dev/video0"
++fi
+ 
+ if [ -z "$1" ]; then
+ 	TIME=10	#second
+@@ -16,7 +21,7 @@ function record()
+ {
+ 	printf "\e[34mRecording... $1\e[0m\n"
+ 	gst-launch-1.0 -e \
+-	v4l2src num-buffers=$((TIME*30)) ! \
++	v4l2src num-buffers=$((TIME*30)) device=$CAM_DEV ! \
+ 	video/x-raw,format=UYVY,width=720,height=480 ! \
+ 	tee name=t t. ! \
+ 	vspmfilter outbuf-alloc=true ! \
+-- 
+1.9.1
+

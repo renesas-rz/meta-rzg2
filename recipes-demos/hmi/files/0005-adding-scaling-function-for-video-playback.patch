@@ -1,0 +1,84 @@
+From e0197c9f53d0342fe6e0fc44fd0cef2dad8f73f8 Mon Sep 17 00:00:00 2001
+From: NamNguyen <nam.nguyen.xb@rvc.renesas.com>
+Date: Tue, 15 Nov 2016 15:31:50 +0700
+Subject: [PATCH 2/2] adding scaling function for video playback this change
+ add scaling function to RZ_GST-demo_video-playback.sh
+
+---
+ RZ_GST-demo_video-playback.sh | 50 ++++++++++++++++++++++++--------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
+
+diff --git a/RZ_GST-demo_video-playback.sh b/RZ_GST-demo_video-playback.sh
+index f4daabb..079f415 100755
+--- a/RZ_GST-demo_video-playback.sh
++++ b/RZ_GST-demo_video-playback.sh
+@@ -4,14 +4,17 @@ function f_help()
+ {
+ 	printf "\n"
+ 	printf "\e[32m[Usage]:\e[0m\n"
+-	printf "RZ_GST-demo_video-playback.sh \e[34m<video location> <x> <y>\e[0m\n"
++	printf "* RZ_GST-demo_video-playback.sh \e[34m<video location> <x> <y> <w> <h>\e[0m\n"
+ 	printf "	- \e[34mvideo location\e[0m: (string) (mandatory) is location of video file.\n"
+-	printf "	- \e[34mx, y\e[0m		: (int) (optional) are to set postion of displayed\n"
+-	printf "			  video. \e[31mNOTE: x and y must be set at the same time\e[0m\n"
++	printf "	- \e[34m<x>, <y>\e[0m: (int) (optional) are to set postion of displayed video.\n"
++	printf "	      \e[31mNOTE: <x> and <y> must be set at the same time\e[0m\n"	
++	printf "	- \e[34m<w>, <h>\e[0m: (int) (optional) are to set width and height of video.\n"
++	printf "	      \e[31mNOTE: <w> and <h> must be set at the same time\e[0m\n\n"
++	printf "	  \e[31mNOTE: It is posible to use <x>, <y> only\e[0m\n"
+ 	printf "\n"
+ 	printf "\e[32m[Example]:\e[0m\n"
+-	printf "Play video at /home/root/videos/video1.mp4 and display at (100, 200)\n"
+-	printf "\e[0mRZ_GST-demo_video-playback.sh \e[34m/home/root/videos/video1.mp4 100 200\e[0m\n"
++	printf "* Play video at /home/root/videos/video1.mp4 and display at (100, 200) and \nhave the display size is 800x480:\n\n"
++	printf "\e[0mRZ_GST-demo_video-playback.sh \e[34m/home/root/videos/video1.mp4 100 200 800 480\e[0m\n"
+ 	printf "\n"
+ }
+ 
+@@ -24,13 +27,36 @@ function f_error()
+ if [ "$1" = "--help" ] | [ -z "$1" ]; then
+ 	f_help
+ else
+-	if [ -n "$2" ]; then
+-		if [ -n "$3" ]; then
+-			gst-launch-1.0 -e --padprobe probed_pad:sink --timer filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink position-x=$2 position-y=$3 name=probed_pad qos=false
+-		else
+-			f_error
+-		fi
++	unset count_para
++	unset out_width
++	unset out_height
++	unset pos_x
++	unset pos_y
++	if [ -n "$5" ]; then
++		count_para=4
++		out_width=" out-width=$4"
++		out_height=" out-height=$5"
++		pos_x=" position-x=$2"
++		pos_y=" position-y=$3"
++	elif [ -n "$4" ]; then
++		count_para=3
++	elif [ -n "$3" ]; then
++		count_para=2
++		pos_x=" position-x=$2"
++                pos_y=" position-y=$3"
++	elif [ -n "$2" ]; then
++		count_para=1
++	else 
++		count_para=0 
++	fi
++	if [ `expr $count_para % 2` -eq 0 ]; then
++		gst-launch-1.0 -e --padprobe probed_pad:sink --timer \
++		filesrc location=$1 ! \
++		qtdemux ! omxh264dec ! \
++		waylandsink $out_width $out_height \
++		$pos_x $pos_y \
++		name=probed_pad qos=false
+ 	else
+-		gst-launch-1.0 -e --padprobe probed_pad:sink --timer filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink name=probed_pad qos=false
++		f_error
+ 	fi
+ fi
+-- 
+1.9.1
+

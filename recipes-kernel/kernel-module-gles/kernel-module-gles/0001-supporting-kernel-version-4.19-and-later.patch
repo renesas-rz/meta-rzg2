@@ -1,0 +1,49 @@
+From b3040c68dbb0e953f2b7c585efc93b12ef2bc71f Mon Sep 17 00:00:00 2001
+From: Loc Nguyen <loc.nguyen.ks@renesas.com>
+Date: Tue, 18 Dec 2018 09:46:03 +0700
+Subject: [PATCH] supporting kernel version 4.19 and later
+
+due to update in kernel to 4.19, modifying physmem_dmabuf.c
+- removing unused parameter in PVRDmaBufOpsAttach
+- .map_atomic was removed from kernel
+
+Signed-off-by: Loc Nguyen <loc.nguyen.ks@renesas.com>
+---
+ services/server/env/linux/physmem_dmabuf.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/services/server/env/linux/physmem_dmabuf.c b/services/server/env/linux/physmem_dmabuf.c
+index 8de1674..4624827 100644
+--- a/services/server/env/linux/physmem_dmabuf.c
++++ b/services/server/env/linux/physmem_dmabuf.c
+@@ -85,7 +85,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  * and using our dmabuf.
+  */
+ 
+-static int PVRDmaBufOpsAttach(struct dma_buf *psDmaBuf, struct device *psDev,
++static int PVRDmaBufOpsAttach(struct dma_buf *psDmaBuf,
+                            struct dma_buf_attachment *psAttachment)
+ {
+ 	return -ENOSYS;
+@@ -127,6 +127,8 @@ static const struct dma_buf_ops sPVRDmaBufOps =
+ 	.map_dma_buf   = PVRDmaBufOpsMap,
+ 	.unmap_dma_buf = PVRDmaBufOpsUnmap,
+ 	.release       = PVRDmaBufOpsRelease,
++
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0))
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0))
+ 	.map_atomic    = PVRDmaBufOpsKMap,
+ 	.map           = PVRDmaBufOpsKMap,
+@@ -134,6 +136,9 @@ static const struct dma_buf_ops sPVRDmaBufOps =
+ 	.kmap_atomic   = PVRDmaBufOpsKMap,
+ 	.kmap          = PVRDmaBufOpsKMap,
+ #endif
++#else
++	.map           = PVRDmaBufOpsKMap,
++#endif
+ 	.mmap          = PVRDmaBufOpsMMap,
+ };
+ 
+-- 
+2.7.4
+

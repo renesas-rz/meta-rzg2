@@ -1,0 +1,45 @@
+From 3965c5789ce8f541dc51b8c2e7ee3c3ba81a4c84 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Thu, 11 Oct 2018 15:31:22 +0700
+Subject: [PATCH] Add vspfilter replace videoconvert
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ gst/playback/Makefile.am   | 2 +-
+ gst/playback/gstplaysink.c | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gst/playback/Makefile.am b/gst/playback/Makefile.am
+index 9603dab..fe714d7 100644
+--- a/gst/playback/Makefile.am
++++ b/gst/playback/Makefile.am
+@@ -1,6 +1,6 @@
+ plugin_LTLIBRARIES = libgstplayback.la
+
+-csp_cflags = -DCOLORSPACE=\"videoconvert\"
++csp_cflags = -DCOLORSPACE=\"@DEFAULT_CNV@\"
+
+ libgstplayback_la_SOURCES = \
+	gstdecodebin2.c \
+diff --git a/gst/playback/gstplaysink.c b/gst/playback/gstplaysink.c
+index ead2e68..e393279 100644
+--- a/gst/playback/gstplaysink.c
++++ b/gst/playback/gstplaysink.c
+@@ -1849,12 +1849,12 @@ gen_video_chain (GstPlaySink * playsink, gboolean raw, gboolean async)
+     } else {
+       GST_DEBUG_OBJECT (playsink, "adding video filter");
+       chain->filter_conv =
+-          gst_element_factory_make ("videoconvert", "filter-convert");
++          gst_element_factory_make ("vspfilter", "filter-convert");
+       if (!chain->filter_conv) {
+-        post_missing_element_message (playsink, "videoconvert");
++        post_missing_element_message (playsink, "vspfilter");
+         GST_ELEMENT_WARNING (playsink, CORE, MISSING_PLUGIN,
+             (_("Missing element '%s' - check your GStreamer installation."),
+-                "videoconvert"),
++                "vspfilter"),
+             ("video playback and visualizations might not work"));
+       } else {
+         gst_bin_add (bin, chain->filter_conv);
+--
+2.7.4

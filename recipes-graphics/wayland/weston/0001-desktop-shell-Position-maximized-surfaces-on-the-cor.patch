@@ -1,0 +1,53 @@
+From c394179488e9c84f3f113570cf4079ebd5da8760 Mon Sep 17 00:00:00 2001
+From: Emmanuel Gil Peyrot <emmanuel.peyrot@collabora.com>
+Date: Tue, 4 Apr 2017 18:49:33 +0100
+Subject: [PATCH] desktop-shell: Position maximized surfaces on the correct
+ output.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+During a maximize event, a surface was previously always put back to
+the primary output after one frame on the correct output, while keeping
+its size.  This was caused by the shell surface’s last_{width,height}
+not being reset when it was either fullscreen or maximized, leading to
+the unmaximize/maximize dance being done at each commit.
+
+This was introduced in 8f9d90a84bb2888b074fea93c4a28778bc6439c6.
+
+Changes since v1:
+- Fix the actual issue instead of a symptom.
+
+Signed-off-by: Emmanuel Gil Peyrot <emmanuel.peyrot@collabora.com>
+Reviewed-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+---
+ desktop-shell/shell.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index c9058795..6b1876d2 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -2545,9 +2545,6 @@ desktop_surface_committed(struct weston_desktop_surface *desktop_surface,
+ 		if (shsurf->resize_edges & WL_SHELL_SURFACE_RESIZE_TOP)
+ 			sy = shsurf->last_height - surface->height;
+ 
+-		shsurf->last_width = surface->width;
+-		shsurf->last_height = surface->height;
+-
+ 		weston_view_to_global_float(shsurf->view, 0, 0, &from_x, &from_y);
+ 		weston_view_to_global_float(shsurf->view, sx, sy, &to_x, &to_y);
+ 		x = shsurf->view->geometry.x + to_x - from_x;
+@@ -2556,6 +2553,9 @@ desktop_surface_committed(struct weston_desktop_surface *desktop_surface,
+ 		weston_view_set_position(shsurf->view, x, y);
+ 	}
+ 
++	shsurf->last_width = surface->width;
++	shsurf->last_height = surface->height;
++
+ 	/* XXX: would a fullscreen surface need the same handling? */
+ 	if (surface->output) {
+ 		wl_list_for_each(view, &surface->views, surface_link)
+-- 
+2.17.1
+

@@ -1,0 +1,489 @@
+From 4b5104a4cea38fdbe87c39dd4483e08599ce8935 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Mon, 21 Jan 2019 15:37:03 +0700
+Subject: [PATCH 2/3] qtmultimedia: Add render by EGLImage for video playback
+
+Improve video playback peformance by creating EGLImage which wrap the
+video buffer.
+texturing by glEGLImageTargetTexture2DOES() can prvent buffer copy
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ src/gsttools/qgstutils.cpp                         |   5 +
+ src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp | 3 +--
+ .../qsgvideonode_p.h                               |   7 +
+ src/plugins/videonode/egl/qsgvideonode_egl.h       |   8 +-
+ .../qdeclarativevideooutput_render.cpp             |  13 ++
+ .../qdeclarativevideooutput_render_p.h             |   7 +
+ src/qtmultimediaquicktools/qsgvideonode_rgb.cpp    | 155 ++++++++++++++++++++-
+ src/qtmultimediaquicktools/qsgvideonode_rgb_p.h    |   7 +
+ .../qsgvideonode_texture_p.h                       |   7 +
+ src/qtmultimediaquicktools/qsgvideonode_yuv_p.h    |   7 +
+ .../qtmultimediaquicktools.pro                     |   4 +-
+ 11 files changed, 206 insertions(+), 7 deletions(-)
+
+diff --git a/src/gsttools/qgstutils.cpp b/src/gsttools/qgstutils.cpp
+index b9e04e3..9a44f09 100644
+--- a/src/gsttools/qgstutils.cpp
++++ b/src/gsttools/qgstutils.cpp
+@@ -58,6 +58,10 @@ template<typename T, int N> static int lengthOf(const T (&)[N]) { return N; }
+
+ #include "qgstreamervideoinputdevicecontrol_p.h"
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ //internal
+@@ -916,6 +920,7 @@ struct VideoFormat
+
+ static const VideoFormat qt_videoFormatLookup[] =
+ {
++    { QVideoFrame::Format_BGRA32 , GST_VIDEO_FORMAT_BGRA },
+     { QVideoFrame::Format_YUV420P, GST_VIDEO_FORMAT_I420 },
+     { QVideoFrame::Format_YV12   , GST_VIDEO_FORMAT_YV12 },
+     { QVideoFrame::Format_UYVY   , GST_VIDEO_FORMAT_UYVY },
+diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+index 3191795..9ece104 100644
+--- a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
++++ b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+@@ -440,8 +440,7 @@ QList<QVideoFrame::PixelFormat> QSGVideoItemSurface::supportedPixelFormats(
+             return formats;
+     }
+
+-    foreach (QSGVideoNodeFactoryInterface* factory, m_backend->m_videoNodeFactories)
+-        formats.append(factory->supportedPixelFormats(handleType));
++    formats << QVideoFrame::Format_BGRA32;
+
+     return formats;
+ }
+diff --git a/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h b/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h
+index 3024d13..45d9d67 100644
+--- a/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h
++++ b/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h
+@@ -52,6 +52,10 @@
+ #include <QtMultimedia/qvideosurfaceformat.h>
+ #include <QtGui/qopenglfunctions.h>
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ class Q_MULTIMEDIAQUICK_EXPORT QSGVideoNode : public QSGGeometryNode
+@@ -69,6 +73,9 @@ public:
+     virtual QAbstractVideoBuffer::HandleType handleType() const = 0;
+
+     void setTexturedRectGeometry(const QRectF &boundingRect, const QRectF &textureRect, int orientation);
++#ifdef EGLIMAGE_USING
++    virtual void destroyEglImage() = 0;
++#endif
+
+ private:
+     QRectF m_rect;
+diff --git a/src/plugins/videonode/egl/qsgvideonode_egl.h b/src/plugins/videonode/egl/qsgvideonode_egl.h
+index b721c67..b8ba7b4 100644
+--- a/src/plugins/videonode/egl/qsgvideonode_egl.h
++++ b/src/plugins/videonode/egl/qsgvideonode_egl.h
+@@ -46,6 +46,10 @@
+ #  undef Bool
+ #endif
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ class QSGVideoMaterial_EGL : public QSGMaterial
+@@ -77,7 +81,9 @@ public:
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
+     QVideoFrame::PixelFormat pixelFormat() const;
+     QAbstractVideoBuffer::HandleType handleType() const;
+-
++#ifdef EGLIMAGE_USING
++    virtual void destroyEglImage(){};
++#endif
+ private:
+     QSGVideoMaterial_EGL m_material;
+     QVideoFrame::PixelFormat m_pixelFormat;
+diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+index fbe8a62..3191795 100644
+--- a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
++++ b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+@@ -80,6 +80,9 @@ QDeclarativeVideoRendererBackend::QDeclarativeVideoRendererBackend(QDeclarativeV
+     m_videoNodeFactories.append(&m_i420Factory);
+     m_videoNodeFactories.append(&m_rgbFactory);
+     m_videoNodeFactories.append(&m_textureFactory);
++#ifdef EGLIMAGE_USING
++	m_videoNode = NULL;
++#endif
+ }
+
+ QDeclarativeVideoRendererBackend::~QDeclarativeVideoRendererBackend()
+@@ -356,6 +359,9 @@ QSGNode *QDeclarativeVideoRendererBackend::updatePaintNode(QSGNode *oldNode,
+         //don't keep the frame for more than really necessary
+         m_frameChanged = false;
+         m_frame = QVideoFrame();
++#ifdef EGLIMAGE_USING
++	m_videoNode = videoNode;
++#endif
+     }
+     return videoNode;
+ }
+@@ -399,6 +405,13 @@ void QDeclarativeVideoRendererBackend::present(const QVideoFrame &frame)
+ void QDeclarativeVideoRendererBackend::stop()
+ {
+     present(QVideoFrame());
++#ifdef EGLIMAGE_USING
++    if(m_videoNode != NULL) {
++        m_videoNode->destroyEglImage();
++        m_videoNode = NULL;
++    }
++#endif
++
+ }
+
+ QSGVideoItemSurface::QSGVideoItemSurface(QDeclarativeVideoRendererBackend *backend, QObject *parent)
+diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput_render_p.h b/src/qtmultimediaquicktools/qdeclarativevideooutput_render_p.h
+index e05adc3..b81359d 100644
+--- a/src/qtmultimediaquicktools/qdeclarativevideooutput_render_p.h
++++ b/src/qtmultimediaquicktools/qdeclarativevideooutput_render_p.h
+@@ -54,6 +54,10 @@
+ #include <QtCore/qmutex.h>
+ #include <QtMultimedia/qabstractvideosurface.h>
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ class QSGVideoItemSurface;
+@@ -111,6 +115,9 @@ private:
+         QVideoFilterRunnable *runnable;
+     };
+     QList<Filter> m_filters;
++#ifdef EGLIMAGE_USING
++    QSGVideoNode *m_videoNode;
++#endif
+ };
+
+ class QSGVideoItemSurface : public QAbstractVideoSurface
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp b/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
+index 1ba8f98..ff6934c 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
+@@ -37,6 +37,30 @@
+ #include <QtGui/QOpenGLContext>
+ #include <QtGui/QOpenGLFunctions>
+ #include <QtGui/QOpenGLShaderProgram>
++#include <QApplication>
++#include <qpa/qplatformintegration.h>
++#include <qpa/qplatformnativeinterface.h>
++#include "private/qguiapplication_p.h"
++#include <sys/time.h>
++#include <drm/drm_fourcc.h>
++extern "C"
++{
++       #include "GLES2/gl2.h"
++       #include "GLES2/gl2ext.h"
++       #include "EGL/egl.h"
++       #include "EGL/eglext.h"
++       #include "EGL/eglext_REL.h"
++}
++static int re_texture;
++
++#ifdef EGLIMAGE_USING
++struct EGLImage_arr {
++    struct EGLImage_arr * next;
++    EGLImageKHR eglimage;
++    void * buffer;
++    int fd;
++};
++#endif
+
+ QT_BEGIN_NAMESPACE
+
+@@ -58,6 +82,7 @@ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_RGB::supportedPixelFormats(
+
+ QSGVideoNode *QSGVideoNodeFactory_RGB::createNode(const QVideoSurfaceFormat &format)
+ {
++    re_texture = 1;
+     if (supportedPixelFormats(format.handleType()).contains(format.pixelFormat()))
+         return new QSGVideoNode_RGB(format);
+
+@@ -125,6 +150,17 @@ public:
+         m_width(1.0)
+     {
+         setFlag(Blending, false);
++#ifdef EGLIMAGE_USING
++        QPlatformNativeInterface* nativeInterface = QGuiApplicationPrivate::platformIntegration()->nativeInterface();
++        Q_ASSERT(nativeInterface);
++        eglCreateImageKHR  = (EGLCREATEIMAGEKHR)eglGetProcAddress("eglCreateImageKHR");
++        eglDestroyImageKHR = (EGLDESTROYIMAGEKHR)eglGetProcAddress("eglDestroyImageKHR");
++        glEGLImageTargetTexture2D = (GLEGLIMAGETARGETRENDERBUFFERSTORAGEOES)eglGetProcAddress("glEGLImageTargetTexture2DOES");
++        eglDisplay = nativeInterface->nativeResourceForIntegration("egldisplay");
++        if(eglDisplay == EGL_NO_DISPLAY) printf("eglGetDisplay failed.\n");
++
++        eglimage_arr = NULL;
++#endif
+     }
+
+     ~QSGVideoMaterial_RGB()
+@@ -160,6 +196,68 @@ public:
+         QMutexLocker lock(&m_frameMutex);
+         m_frame = frame;
+     }
++#ifdef EGLIMAGE_USING
++    struct EGLImage_arr * set_current_eglimage(struct EGLImage_arr * top)
++    {
++        struct EGLImage_arr *cur = top;
++        struct EGLImage_arr *tmp;
++
++        while (cur != NULL) {
++            if(cur->buffer == m_frame.bits() && cur->fd == m_frame.fd()) {
++                eglimage = cur->eglimage;
++                return top;
++            }
++            cur = cur->next;
++        }
++
++        int attrib[] = {
++                   EGL_WIDTH, m_textureSize.width(),
++                   EGL_HEIGHT, m_textureSize.height(),
++                   EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_ARGB8888,
++                   EGL_DMA_BUF_PLANE0_FD_EXT, m_frame.fd(),
++                   EGL_DMA_BUF_PLANE0_OFFSET_EXT, 0,
++                   EGL_DMA_BUF_PLANE0_PITCH_EXT, m_frame.bytesPerLine(),
++                   EGL_NONE
++        };
++
++        tmp = (struct EGLImage_arr *)malloc(sizeof (struct EGLImage_arr));
++        memset(tmp,0,sizeof (struct EGLImage_arr));
++
++        tmp->fd = m_frame.fd();
++        tmp->eglimage = eglCreateImageKHR(eglDisplay,
++                                            EGL_NO_CONTEXT,
++                                            EGL_LINUX_DMA_BUF_EXT,
++                                            NULL, attrib);
++        tmp->buffer = (void *)m_frame.bits();
++
++        if (tmp->eglimage == EGL_NO_IMAGE_KHR)
++        {
++            printf ("eglCreateImageKHR failed. %x\n", eglGetError());
++            free(tmp);
++            eglimage = top != NULL ? top->eglimage : EGL_NO_IMAGE_KHR;
++            return top;
++        }
++
++        eglimage = tmp->eglimage;
++        tmp->next = top;
++
++        return tmp;
++    }
++
++    void destroyEglImage()
++    {
++        struct EGLImage_arr *tmp;
++
++        while (eglimage_arr != NULL) {
++            if(eglimage_arr->eglimage) {
++                eglDestroyImageKHR(eglDisplay, eglimage_arr->eglimage);
++            }
++            tmp = eglimage_arr;
++            eglimage_arr = eglimage_arr->next;
++            free (tmp);
++        }
++    }
++#endif
+
+     void bind()
+     {
+@@ -187,7 +285,23 @@ public:
+                         functions->glDeleteTextures(1, &m_textureId);
+                     functions->glGenTextures(1, &m_textureId);
+                     m_textureSize = textureSize;
++#ifdef EGLIMAGE_USING
++                    eglimage_arr = set_current_eglimage(eglimage_arr);
++#endif
++                }
++#ifdef EGLIMAGE_USING
++                if (eglimage_arr != NULL) {
++                    eglimage_arr = set_current_eglimage(eglimage_arr);
++                    functions->glActiveTexture(GL_TEXTURE0);
++                    functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
++
++                    glEGLImageTargetTexture2D(GL_TEXTURE_2D, eglimage);
++                    GLint glerr = glGetError();
++                    if(glerr) printf("<ERROR name=\"CreateTextureEGLImage\" glerr=\"0x%x\"/>\n", glerr);
++
+                 }
++                else {
++#endif
+
+                 GLint dataType = GL_UNSIGNED_BYTE;
+                 GLint dataFormat = GL_RGBA;
+@@ -203,12 +317,26 @@ public:
+
+                 functions->glActiveTexture(GL_TEXTURE0);
+                 functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
+-                functions->glTexImage2D(GL_TEXTURE_2D, 0, dataFormat,
++		if (re_texture) {
++                       functions->glTexImage2D(GL_TEXTURE_2D, 0, dataFormat,
+                                         m_textureSize.width(), m_textureSize.height(),
+                                         0, dataFormat, dataType, m_frame.bits());
+-
++			re_texture = 0;
++		}
++			else{
++			functions->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
++					m_textureSize.width(), m_textureSize.height(),
++					dataFormat, dataType, m_frame.bits());
++			if (GL_NO_ERROR != functions->glGetError())
++			    functions->glTexImage2D(GL_TEXTURE_2D, 0, dataFormat,
++					m_textureSize.width(), m_textureSize.height(),
++					0, dataFormat, dataType, m_frame.bits());
++			}
++
+                 functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
+-
++#ifdef EGLIMAGE_USING
++		}
++#endif
+                 functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                 functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                 functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+@@ -236,6 +364,22 @@ private:
+         return m_format.pixelFormat() == QVideoFrame::Format_RGB32
+                 || m_format.pixelFormat() == QVideoFrame::Format_ARGB32;
+     }
++#ifdef EGLIMAGE_USING
++    EGLImageKHR        eglimage = EGL_NO_IMAGE_KHR;
++    EGLDisplay eglDisplay;
++    QPlatformNativeInterface* nativeInterface;
++
++    // /* EGL image function */
++    typedef EGLImageKHR (*EGLCREATEIMAGEKHR)(EGLDisplay dpy, EGLContext ctx, EGLenum target, EGLClientBuffer buffer, EGLint* attr_list);
++    typedef EGLBoolean (*EGLDESTROYIMAGEKHR)(EGLDisplay dpy, EGLImageKHR image);
++    EGLCREATEIMAGEKHR eglCreateImageKHR;
++    EGLDESTROYIMAGEKHR eglDestroyImageKHR;
++    // /* EGL image to texture image function */
++    typedef void (*GLEGLIMAGETARGETRENDERBUFFERSTORAGEOES)(GLenum target, GLeglImageOES image);
++    GLEGLIMAGETARGETRENDERBUFFERSTORAGEOES glEGLImageTargetTexture2D;
++    struct EGLImage_arr *eglimage_arr;
++#endif
++
+ };
+
+
+@@ -257,6 +401,11 @@ void QSGVideoNode_RGB::setCurrentFrame(const QVideoFrame &frame, FrameFlags)
+     markDirty(DirtyMaterial);
+ }
+
++void QSGVideoNode_RGB::destroyEglImage()
++{
++    m_material->destroyEglImage();
++}
++
+ void QSGVideoMaterialShader_RGB::updateState(const RenderState &state,
+                                                 QSGMaterial *newMaterial,
+                                                 QSGMaterial *oldMaterial)
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_rgb_p.h b/src/qtmultimediaquicktools/qsgvideonode_rgb_p.h
+index 501df9c..bd53127 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_rgb_p.h
++++ b/src/qtmultimediaquicktools/qsgvideonode_rgb_p.h
+@@ -48,6 +48,10 @@
+ #include <private/qsgvideonode_p.h>
+ #include <QtMultimedia/qvideosurfaceformat.h>
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ class QSGVideoMaterial_RGB;
+@@ -65,6 +69,9 @@ public:
+         return QAbstractVideoBuffer::NoHandle;
+     }
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
++#ifdef EGLIMAGE_USING
++    void destroyEglImage();
++#endif
+
+ private:
+     QVideoSurfaceFormat m_format;
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_texture_p.h b/src/qtmultimediaquicktools/qsgvideonode_texture_p.h
+index 0304b2e..e24bd2a 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_texture_p.h
++++ b/src/qtmultimediaquicktools/qsgvideonode_texture_p.h
+@@ -48,6 +48,10 @@
+ #include <private/qsgvideonode_p.h>
+ #include <QtMultimedia/qvideosurfaceformat.h>
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ class QSGVideoMaterial_Texture;
+@@ -65,6 +69,9 @@ public:
+         return QAbstractVideoBuffer::GLTextureHandle;
+     }
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
++#ifdef EGLIMAGE_USING
++    virtual void destroyEglImage(){};
++#endif
+
+ private:
+     QVideoSurfaceFormat m_format;
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h b/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h
+index 9c0a1f3..c2f98e0 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h
++++ b/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h
+@@ -48,6 +48,10 @@
+ #include <private/qsgvideonode_p.h>
+ #include <QtMultimedia/qvideosurfaceformat.h>
+
++#ifndef EGLIMAGE_USING
++#    define EGLIMAGE_USING
++#endif
++
+ QT_BEGIN_NAMESPACE
+
+ class QSGVideoMaterial_YUV;
+@@ -64,6 +68,9 @@ public:
+         return QAbstractVideoBuffer::NoHandle;
+     }
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
++#ifdef EGLIMAGE_USING
++    virtual void destroyEglImage(){};
++#endif
+
+ private:
+     void bindTexture(int id, int unit, int w, int h, const uchar *bits);
+diff --git a/src/qtmultimediaquicktools/qtmultimediaquicktools.pro b/src/qtmultimediaquicktools/qtmultimediaquicktools.pro
+index e1425c3..36fea30 100644
+--- a/src/qtmultimediaquicktools/qtmultimediaquicktools.pro
++++ b/src/qtmultimediaquicktools/qtmultimediaquicktools.pro
+@@ -1,6 +1,6 @@
+ TARGET = QtMultimediaQuick_p
+
+-QT = core quick multimedia-private
++QT = core core-private quick quick-private multimedia-private widgets widgets-private gui gui-private
+ CONFIG += internal_module
+
+ # Header files must go inside source directory of a module
+@@ -46,3 +46,5 @@ OTHER_FILES += \
+     shaders/triplanaryuvvideo.frag
+
+ load(qt_module)
++
++LIBS += -lEGL -lGLESv2
+--
+2.7.4

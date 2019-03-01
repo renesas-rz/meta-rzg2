@@ -1,0 +1,80 @@
+From aae68cfef0a10df9f3e760abd092d9d79c42fb19 Mon Sep 17 00:00:00 2001
+From: TraHT <traht@fsoft.com.vn>
+Date: Thu, 28 Jun 2018 16:05:14 +0700
+Subject: =?UTF-8?q?Modify=201001-Share-toytoolkit-lib.patch=0ANot=20apply:?=
+ =?UTF-8?q?=0A+=20=20=20protocol/text-cursor-position-protocol.c=20=20=20?=
+ =?UTF-8?q?=20\=0A+=20=20=20protocol/text-cursor-position-client-protocol.?=
+ =?UTF-8?q?h=20\=0A+=20=20=20protocol/scaler-protocol.c=20=20=20=20=20=20?=
+ =?UTF-8?q?=20=20=20=20\=0A+=20=20=20protocol/scaler-client-protocol.h=20?=
+ =?UTF-8?q?=20=20=20=20=20=20\=0A+=20=20=20protocol/workspaces-protocol.c?=
+ =?UTF-8?q?=20=20=20=20=20=20=20=20=20=20\=0A+=20=20=20protocol/workspaces?=
+ =?UTF-8?q?-client-protocol.h=20=20=20=20=20=20=20\=0A+=20=20=20protocol/x?=
+ =?UTF-8?q?dg-shell-protocol.c=20=20=20=20=20=20=20=20=20=20=20\=0A+=20=20?=
+ =?UTF-8?q?=20protocol/xdg-shell-client-protocol.h?=
+
+Signed-off-by: TraHT <traht@fsoft.com.vn>
+---
+ Makefile.am  | 19 +++++++++++++++++++
+ configure.ac |  2 +-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 4bd1c00..e52a06c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -8,6 +8,7 @@ module_LTLIBRARIES =
+ libweston_moduledir = $(libdir)/libweston-$(LIBWESTON_MAJOR)
+ libweston_module_LTLIBRARIES =
+ noinst_LTLIBRARIES =
++lib_LTLIBRARIES =
+ BUILT_SOURCES =
+ 
+ AM_DISTCHECK_CONFIGURE_FLAGS = --disable-setuid-install
+@@ -111,6 +112,7 @@ libweston_@LIBWESTON_MAJOR@_la_SOURCES =			\
+ 	shared/timespec-util.h				\
+ 	shared/zalloc.h					\
+ 	shared/platform.h				\
++	clients/window.h				\
+ 	shared/weston-egl-ext.h
+ 
+ lib_LTLIBRARIES += libweston-desktop-@LIBWESTON_MAJOR@.la
+@@ -709,6 +711,23 @@ libtoytoolkit_la_LIBADD =			\
+ 	libshared-cairo.la $(CLOCK_GETTIME_LIBS) -lm
+ libtoytoolkit_la_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS) $(CAIRO_EGL_CFLAGS)
+ 
++lib_LTLIBRARIES += libweston-toytoolkit.la
++
++libweston_toytoolkit_la_SOURCES =  \
++   clients/window.c                \
++   clients/window.h
++
++BUILT_SOURCES += $(libweston_toytoolkit_la_SOURCES)
++
++libweston_toytoolkit_la_CFLAGS = \
++   $(AM_CFLAGS) $(CLIENT_CFLAGS) $(CAIRO_EGL_CFLAGS) \
++   $(GCC_CFLAGS) -pthread -fvisibility=default
++libweston_toytoolkit_la_LIBADD =           \
++   $(CLIENT_LIBS)              \
++   $(CAIRO_EGL_LIBS)           \
++   libshared-cairo.la -lrt -lm
++libweston_toytoolkit_la_LDFLAGS = -version-info 1:0:1
++
+ weston_flower_SOURCES = clients/flower.c
+ weston_flower_LDADD = libtoytoolkit.la
+ weston_flower_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS)
+diff --git a/configure.ac b/configure.ac
+index e788201..a1a4814 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -77,7 +77,7 @@ AC_PROG_SED
+ 
+ # Initialize libtool
+ LT_PREREQ([2.2])
+-LT_INIT([disable-static])
++LT_INIT([shared static])
+ 
+ AC_ARG_VAR([WESTON_NATIVE_BACKEND],
+            [Set the native backend to use, if Weston is not running under Wayland nor X11. @<:@default=drm-backend.so@:>@])
+-- 
+2.7.4
+
