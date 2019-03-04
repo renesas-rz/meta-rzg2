@@ -1,0 +1,68 @@
+From 71f589e66ac552312aa3191844923ed9a19cd40a Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Wed, 20 Feb 2019 13:55:29 +0700
+Subject: [PATCH 2/9] PlayBack: Replace pipeline to compatible with RCar Gen3
+
+The old pipeline not compatible with RCar Gen3 due to some properties
+not available.
+Replace the new one. Also added changing size of display video by
+parameters
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_GST-demo_video-playback.sh | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/RZ_GST-demo_video-playback.sh b/RZ_GST-demo_video-playback.sh
+index f4daabb..698b594 100755
+--- a/RZ_GST-demo_video-playback.sh
++++ b/RZ_GST-demo_video-playback.sh
+@@ -4,14 +4,14 @@ function f_help()
+ {
+ 	printf "\n"
+ 	printf "\e[32m[Usage]:\e[0m\n"
+-	printf "RZ_GST-demo_video-playback.sh \e[34m<video location> <x> <y>\e[0m\n"
++	printf "RZ_GST-demo_video-playback.sh \e[34m<video location> <w> <h>\e[0m\n"
+ 	printf "	- \e[34mvideo location\e[0m: (string) (mandatory) is location of video file.\n"
+-	printf "	- \e[34mx, y\e[0m		: (int) (optional) are to set postion of displayed\n"
+-	printf "			  video. \e[31mNOTE: x and y must be set at the same time\e[0m\n"
++	printf "	- \e[34mw, h\e[0m		: (int) (optional) are to set size of displayed video\n"
++	printf "			  \e[31mNOTE: w and h must be set at the same time\e[0m\n"
+ 	printf "\n"
+ 	printf "\e[32m[Example]:\e[0m\n"
+-	printf "Play video at /home/root/videos/video1.mp4 and display at (100, 200)\n"
+-	printf "\e[0mRZ_GST-demo_video-playback.sh \e[34m/home/root/videos/video1.mp4 100 200\e[0m\n"
++	printf "Play video at /home/root/videos/video1.mp4 and size is 800x480\n"
++	printf "\e[0mRZ_GST-demo_video-playback.sh \e[34m/home/root/videos/video1.mp4 800 480\e[0m\n"
+ 	printf "\n"
+ }
+ 
+@@ -21,16 +21,19 @@ function f_error()
+ 	f_help
+ }
+ 
+-if [ "$1" = "--help" ] | [ -z "$1" ]; then
++if [ "$1" = "--help" ] || [ -z "$1" ]; then
+ 	f_help
+ else
+-	if [ -n "$2" ]; then
++	unset caps
++	if [ `expr $# % 2` -eq 1 ] && [ $# -le 3 ]; then
+ 		if [ -n "$3" ]; then
+-			gst-launch-1.0 -e --padprobe probed_pad:sink --timer filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink position-x=$2 position-y=$3 name=probed_pad qos=false
+-		else
+-			f_error
++			caps=" vspfilter ! video/x-raw,width=$2,height=$3 !"
+ 		fi
++		gst-launch-1.0 \
++		filesrc location=$1 ! \
++		qtdemux ! h264parse ! omxh264dec ! \
++		${caps} waylandsink qos=false
+ 	else
+-		gst-launch-1.0 -e --padprobe probed_pad:sink --timer filesrc location=$1 ! qtdemux ! omxh264dec ! waylandsink name=probed_pad qos=false
++		f_error
+ 	fi
+ fi
+-- 
+2.7.4
+

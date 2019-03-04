@@ -1,0 +1,28 @@
+From d62b8fd136d6fb3140ab598be84d256ac74b75e0 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Wed, 20 Feb 2019 14:49:46 +0700
+Subject: [PATCH 4/9] Network-transmit-video: Fix condition
+
+Fix "OR" condition when checking parameters
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_GST-network-demo_transmit-video.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RZ_GST-network-demo_transmit-video.sh b/RZ_GST-network-demo_transmit-video.sh
+index fb0a05b..f36d2e7 100755
+--- a/RZ_GST-network-demo_transmit-video.sh
++++ b/RZ_GST-network-demo_transmit-video.sh
+@@ -21,7 +21,7 @@ function f_error()
+ 	f_help
+ }
+ 
+-if [ -z "$1" ] | [ -z "$2" ] | [ "$1" = "--help" ]; then
++if [ -z "$1" ] || [ -z "$2" ] || [ "$1" = "--help" ]; then
+ 	f_help
+ else
+ 	gst-launch-1.0 -e \
+-- 
+2.7.4
+

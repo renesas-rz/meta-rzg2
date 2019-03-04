@@ -1,0 +1,26 @@
+From 293821d442748ddbae1c6931cabfa9a84902b58a Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Mon, 4 Mar 2019 10:05:12 +0700
+Subject: [PATCH 9/9] hmi: demos: setup wireless: Fix condition
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_Setup_Wireless_connection.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RZ_Setup_Wireless_connection.sh b/RZ_Setup_Wireless_connection.sh
+index d81d3d9..ee87e0f 100755
+--- a/RZ_Setup_Wireless_connection.sh
++++ b/RZ_Setup_Wireless_connection.sh
+@@ -16,7 +16,7 @@ function f_error()
+ 
+ if [ "$1" = "--help" ]; then
+ 	f_help
+-elif [ -z "$1" ] | [ -z "$2" ]; then
++elif [ -z "$1" ] || [ -z "$2" ]; then
+ 	f_error
+ else
+ 	wpa_passphrase $1 $2 >> /etc/wpa_supplicant.conf
+-- 
+2.7.4
+

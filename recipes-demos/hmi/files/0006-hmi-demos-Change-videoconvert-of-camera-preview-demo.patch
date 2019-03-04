@@ -1,0 +1,26 @@
+From 824aaae1e1957604ee3f94afac0e57dbb5aa2039 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Mon, 4 Mar 2019 09:56:44 +0700
+Subject: [PATCH 6/9] hmi: demos: Change videoconvert of camera preview demo
+
+RCar-Gen3 not support vspmfilter, switch to vspfilter
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_GST-demo_camera-preview.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RZ_GST-demo_camera-preview.sh b/RZ_GST-demo_camera-preview.sh
+index 370954c..5b70da3 100755
+--- a/RZ_GST-demo_camera-preview.sh
++++ b/RZ_GST-demo_camera-preview.sh
+@@ -3,5 +3,5 @@
+ gst-launch-1.0 -e \
+ v4l2src ! \
+ video/x-raw,format=UYVY,width=720,height=480 ! \
+-vspmfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
++vspfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+ waylandsink qos=false
+-- 
+2.7.4
+

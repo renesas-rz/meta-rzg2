@@ -1,0 +1,39 @@
+From 3dd4a36926797ed9482b2f3e93029448a7deeaee Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Mon, 4 Mar 2019 10:01:02 +0700
+Subject: [PATCH 7/9] hmi: demos: encoded review: Remove position on
+ waylandsink
+
+RCar-Gen3 not support set display position on waylandsink,
+remove them.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_GST-demo_encoded-review.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index be2d4fd..d5dd477 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -14,7 +14,7 @@ fi
+ function replay()
+ {
+ 	printf "\e[34mPlaying... $1\e[0m\n"
+-	gst-launch-1.0 -e filesrc location=$1 ! h264parse ! omxh264dec ! waylandsink position-x=900 position-y=100 out-width=800 out-height=480 qos=false
++	gst-launch-1.0 -e filesrc location=$1 ! h264parse ! omxh264dec ! waylandsink out-width=800 out-height=480 qos=false
+ }
+ 
+ function record()
+@@ -29,7 +29,7 @@ function record()
+ 	omxh264enc target-bitrate=10485760 ! \
+ 	filesink location=$1 t. ! \
+ 	vspmfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+-	waylandsink position-x=100 position-y=100 qos=false
++	waylandsink qos=false
+ }
+ 
+ sync
+-- 
+2.7.4
+

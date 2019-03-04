@@ -7,16 +7,14 @@ SRC_URI = " \
  file://RZ_scripts.tar.xz  \
  file://ATT93936.bashrc \
  file://0001-Add-CAM_DEV-variable-to-camera-encoding-script.patch \
- file://0002-HMI-fix-issue-video-file-encoded-too-fast.patch \
- file://0003-HMI-encoding-app-support-LVDS-resolution.patch \
- file://0004-HMI-network-previewing-app-support-LVDS-resolution.patch \
- file://0005-adding-scaling-function-for-video-playback.patch \
- file://0006-demos-Add-more-element-h264parse-to-video_playback-a.patch \
- file://0007-HMI-demos-demos-encoded-Change-the-properties-of-vspmfil.patch \
- file://0008-HMI-Video_Playback-Remove-properties-out-width-and-o.patch \
- file://0009-HMI-demos-demos-set-width-and-height-in-capsfilter-i.patch \
- file://0010-demos-streaming-add-h264parse-to-correct-pipeline-st.patch \
- file://0011-demos-remove-out-width-and-out-height-from-RZ_GST-ne.patch \
+ file://0002-PlayBack-Replace-pipeline-to-compatible-with-RCar-Ge.patch \
+ file://0003-Network-receive-streaming-Scale-fix-to-display.patch \
+ file://0004-Network-transmit-video-Fix-condition.patch \
+ file://0005-Network-video-wireless-streaming-Remove-unavailable-.patch \
+ file://0006-hmi-demos-Change-videoconvert-of-camera-preview-demo.patch \
+ file://0007-hmi-demos-encoded-review-Remove-position-on-waylands.patch \
+ file://0008-hmi-demos-encoded-preview-Change-videoconvert-to-com.patch \
+ file://0009-hmi-demos-setup-wireless-Fix-condition.patch \
 "
 
 do_patch () {
