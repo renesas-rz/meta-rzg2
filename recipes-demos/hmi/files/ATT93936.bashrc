@@ -8,6 +8,18 @@ getWestonHeight() {
 }
 #export -f getWestonHeight
 
+getUser() {
+	list_usr=$(who | grep tty | awk '{print $2}')
+	TTY=${list_usr[0]}
+	if [ -z $TTY ]; then
+		list_usr=$(who | awk '{print $2}')
+		TTY=${list_usr[0]}
+	fi
+	if [ -z $TTY ]; then
+		TTY=/null
+	fi
+	echo /dev/$TTY
+}
 export D_WIDTH=`getWestonWidth`
 export D_HEIGHT=`getWestonHeight`
 export CAM_DEV=/dev/video0
