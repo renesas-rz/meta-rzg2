@@ -2,8 +2,7 @@
 
 source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
 
-TTY=$(grep "\/sbin\/getty" /etc/inittab | grep 'ttyS' | awk '{ print $NF }')
-TTY=/dev/${TTY}
+TTY=`getUser`
 
 printf "\n\e[32m[Info]:\e[0m\n" > ${TTY}
 printf "\tRunning  Demo3D Graphics demo\n" > ${TTY}

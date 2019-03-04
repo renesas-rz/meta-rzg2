@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TTY=$(grep "\/bin\/start_getty" /etc/inittab | grep 'ttyS' | awk '{ print $3 }')
-TTY=/dev/${TTY}
+source /home/root/.bashrc
+TTY=`getUser`
 
 printf "\n\e[32m[Info]:\e[0m\n" > ${TTY}
 printf "\tStreaming file /home/root/videos/h264-wvga-30.mp4\n\

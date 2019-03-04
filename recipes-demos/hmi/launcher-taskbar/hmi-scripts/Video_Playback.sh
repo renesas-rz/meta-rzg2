@@ -1,8 +1,7 @@
 #!/bin/bash
 source /home/root/.bashrc
 
-TTY=$(grep "\/bin\/start_getty" /etc/inittab | grep 'ttyS' | awk '{ print $3 }')
-TTY=/dev/${TTY}
+TTY=`getUser`
 
 printf "\n\e[32m[Info]:\e[0m\n" > ${TTY}
 printf "\tYou are watching Video playback on screen\n\
