@@ -1,0 +1,29 @@
+From 9ddbf254ddd778c9f54be44a7d20b68e40341d63 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Tue, 5 Mar 2019 09:55:08 +0700
+Subject: [PATCH 2/3] Demo3D: Video: scale height to 480 to fix greenline issue
+
+Greenline issue with resolution 640x360 with Renesas.mp4 on appsink.
+Scale to 640x480 fix this issue.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ Demo3D.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index 99853b7..8599125 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -146,7 +146,7 @@ static int gv_update = 0;
+ static int gv_init = 1;
+ static void *gv_data ;
+ static int video_w = 640 ;
+-static int video_h = 360 ;
++static int video_h = 480 ;
+ static struct GStreamer gst_video = {0};
+ //////////////////////Framebuffer/////////////////////// 
+ static  GLuint g_fb;
+-- 
+2.7.4
+
