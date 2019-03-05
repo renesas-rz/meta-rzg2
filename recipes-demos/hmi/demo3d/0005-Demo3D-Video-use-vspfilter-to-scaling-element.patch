@@ -1,0 +1,29 @@
+From 6130179bdcef4045ee9ac5d29a37284fe557253c Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Tue, 5 Mar 2019 09:56:55 +0700
+Subject: [PATCH 3/3] Demo3D: Video: use vspfilter to scaling element.
+
+Due to some video maybe can't scale by appsink caps.
+Use vspfilter to fix this.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ Demo3D.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index 8599125..5457b12 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -792,7 +792,7 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+           if (gv_init) {            
+             /*initialie Gstreamer video pipeline*/
+             gv_init = 0;
+-            sprintf(gst_video.string, "filesrc location=/home/root/Demo3D/Renesas.mp4 ! qtdemux ! h264parse ! omxh264dec ! appsink caps=video/x-raw,format=NV12,width=%d,height=%d name=appsink", video_w, video_h);  
++            sprintf(gst_video.string, "filesrc location=/home/root/Demo3D/Renesas.mp4 ! qtdemux ! h264parse ! omxh264dec ! vspfilter ! video/x-raw,format=NV12,width=%d,height=%d ! appsink name=appsink", video_w, video_h);  
+             gst_video.gstapp_new_sample = gstapp_new_sample;
+             gst_video.gst_bus_message = gst_bus_message;
+             gst_video.type = 0; //video 
+-- 
+2.7.4
+
