@@ -8,6 +8,7 @@ SRC_URI = " \
  file://Renesas.mp4 \
  file://0001-HMI-demos-demo3d-Porting-demo3d-to-VLP2.1-and-HMI-de.patch \
  file://0002-demo3d-add-h264parse-to-correct-pipeline-play-video-.patch \
+ file://0003-Demo3D-Gst-change-sync-property-to-true.patch \
 "
 
 S = "${WORKDIR}/Demo3D"

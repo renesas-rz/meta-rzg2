@@ -1,0 +1,36 @@
+From 50ccd4d1d95dc60db9ef7f454a75e69415d89d74 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Tue, 5 Mar 2019 09:33:23 +0700
+Subject: [PATCH 1/3] Demo3D: Gst: change sync property to true
+
+If set sync is false, the decoder will transmit buffer continuos and not
+care about sink. So we will see that video play faster than origin.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ Gstreamer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Gstreamer.c b/Gstreamer.c
+index a7997e1..4c80bc4 100644
+--- a/Gstreamer.c
++++ b/Gstreamer.c
+@@ -113,7 +113,7 @@ void * gstreamer_init(struct GStreamer * gst){
+   appsink = gst_bin_get_by_name ((GstBin *)gst->pipeline, "appsink");
+   g_object_set (G_OBJECT (appsink), 
+                 "emit-signals", TRUE, 
+-                "sync", FALSE, 
++                "sync", TRUE, 
+                 NULL);
+   if(gst->gstapp_new_sample)
+     g_signal_connect (appsink, "new-sample",
+@@ -134,4 +134,4 @@ void * gstreamer_denit(struct GStreamer * gst)
+     gst_object_unref (gst->pipeline);
+   }   
+   return GST_FLOW_OK;
+-}
+\ No newline at end of file
++}
+-- 
+2.7.4
+
