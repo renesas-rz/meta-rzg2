@@ -16,7 +16,7 @@ printf "\n\e[31mNOTE:\n\
 /home/root/RZ_scripts/test-multicast2 &
 
 gst-launch-1.0 -e filesrc location=/home/root/videos/h264-hd-30.mp4 ! \
-qtdemux ! h264parse ! omxh264dec no-copy=true ! vspfilter ! \
+qtdemux ! h264parse ! omxh264dec ! vspfilter ! \
 video/x-raw,format=NV12,width=640,height=480 ! omxh264enc \
 target-bitrate=5242880 ! h264parse ! video/x-h264,\
 stream-format=avc,alignment=au ! rtph264pay pt=96 name=pay0 \
