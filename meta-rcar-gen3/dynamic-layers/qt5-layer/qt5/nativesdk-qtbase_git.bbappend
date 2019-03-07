@@ -75,3 +75,7 @@ do_configure() {
 
     bin/qmake ${OE_QMAKE_DEBUG_OUTPUT} ${S} -o Makefile || die "Configuring qt with qmake failed. PACKAGECONFIG_CONFARGS was ${PACKAGECONFIG_CONFARGS}"
 }
+
+# Avoid "Transaction check error" because of conflict in owner of directory
+# /opt/poky/*/sysroots/x86_64-pokysdk-linux/environment-setup.d
+DIRFILES=""
