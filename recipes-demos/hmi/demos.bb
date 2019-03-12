@@ -15,6 +15,8 @@ SRC_URI = " \
  file://0007-hmi-demos-encoded-review-Remove-position-on-waylands.patch \
  file://0008-hmi-demos-encoded-preview-Change-videoconvert-to-com.patch \
  file://0009-hmi-demos-setup-wireless-Fix-condition.patch \
+ file://0010-hmi-demos-encoded-preview-Add-h264parse-element-for-.patch \
+ file://0011-hmi-demos-encoded-preview-change-order-of-element-du.patch \
 "
 
 do_patch () {

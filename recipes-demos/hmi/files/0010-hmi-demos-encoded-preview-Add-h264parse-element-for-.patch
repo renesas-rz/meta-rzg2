@@ -1,0 +1,28 @@
+From 4edc83178928e59b9091a884c21f8250e8ac90b9 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Tue, 12 Mar 2019 16:08:11 +0700
+Subject: [PATCH 1/2] hmi: demos: encoded preview: Add h264parse element for
+ omxh264enc
+
+Fix issue that file can't play after record
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_GST-demo_encoded-review.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index bd2e724..0837cf1 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -27,6 +27,7 @@ function record()
+ 	vspfilter ! \
+ 	video/x-raw,format=NV12,width=640,height=480 ! \
+ 	omxh264enc target-bitrate=10485760 ! \
++	h264parse ! video/x-h264,stream-format=avc,aligment=au ! qtmux ! queue ! \
+ 	filesink location=$1 t. ! \
+ 	vspfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+ 	waylandsink qos=false
+-- 
+2.7.4
+
