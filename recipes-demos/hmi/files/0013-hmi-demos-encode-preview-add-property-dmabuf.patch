@@ -1,0 +1,36 @@
+From 90bc20f38e2c53da20c9c388c687dcf116647073 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+Date: Wed, 13 Mar 2019 10:02:07 +0700
+Subject: [PATCH 2/2] hmi: demos: encode preview: add property dmabuf
+
+Low performance appear since we use many process of mem for 2 display and 1
+encode.
+Use dmabuf for reduce process of mem to increase performance.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@rvc.renesas.com>
+---
+ RZ_GST-demo_encoded-review.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index 4519eac..b660ff1 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -21,13 +21,13 @@ function record()
+ {
+ 	printf "\e[34mRecording... $1\e[0m\n"
+ 	gst-launch-1.0 -e \
+-	v4l2src num-buffers=$((TIME*30)) device=$CAM_DEV ! \
++	v4l2src num-buffers=$((TIME*30)) device=$CAM_DEV io-mode=dmabuf no-resurect-buf=true ! \
+ 	video/x-raw,format=UYVY,width=720,height=480 ! \
+ 	vspfilter ! \
+ 	video/x-raw,format=NV12,width=640,height=480 ! \
+ 	queue ! tee name=t t. ! \
+ 	queue ! \
+-	omxh264enc target-bitrate=10485760 ! \
++	omxh264enc use-dmabuf=true target-bitrate=10485760 ! \
+ 	h264parse ! video/x-h264,stream-format=avc,aligment=au ! qtmux ! queue ! \
+ 	filesink location=$1 t. ! \
+ 	queue ! \
+--
+2.7.4+

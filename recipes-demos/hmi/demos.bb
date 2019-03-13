@@ -17,6 +17,8 @@ SRC_URI = " \
  file://0009-hmi-demos-setup-wireless-Fix-condition.patch \
  file://0010-hmi-demos-encoded-preview-Add-h264parse-element-for-.patch \
  file://0011-hmi-demos-encoded-preview-change-order-of-element-du.patch \
+ file://0012-hmi-demos-Encode-Preview-change-size-of-display-vide.patch \
+ file://0013-hmi-demos-encode-preview-add-property-dmabuf.patch \
 "
 
 do_patch () {
