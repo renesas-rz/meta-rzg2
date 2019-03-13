@@ -6,4 +6,5 @@ IMAGE_INSTALL_append = " \
     launcher-taskbar \
     demo-videos \
     demo3d \
+    opengl-apps \
 "
