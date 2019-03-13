@@ -1,0 +1,75 @@
+From 5bb439c318a8f5f43d00ac8063e309529f624b6f Mon Sep 17 00:00:00 2001
+From: Thuan Truong <thuan.truong.df@rvc.renesas.com>
+Date: Wed, 4 Oct 2017 13:51:18 +0700
+Subject: [PATCH 3/3] Wayland-patch-setting-position
+
+---
+ Shell/OS/LinuxWayland/PVRShellOS.cpp | 30 +++++++++++++++++++++++++++++-
+ Shell/OS/LinuxWayland/PVRShellOS.h   |  3 +++
+ 2 files changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/Shell/OS/LinuxWayland/PVRShellOS.cpp b/Shell/OS/LinuxWayland/PVRShellOS.cpp
+index 1b6b962..94a3735 100644
+--- a/Shell/OS/LinuxWayland/PVRShellOS.cpp
++++ b/Shell/OS/LinuxWayland/PVRShellOS.cpp
+@@ -202,7 +202,8 @@ DBG("[-> IN] %s\n" ,__func__);
+ 		window->fullscreen = 1;
+ 	//	xdg_surface_set_fullscreen(window->xdg_surface, NULL);
+ 	}
+-	set_fullscreen(window, window->fullscreen);
++	//set_fullscreen(window, window->fullscreen);
++	RVC_set_fullscreen(window, window->fullscreen, m_pShell->m_pShellData->nShellPosX, m_pShell->m_pShellData->nShellPosY);
+ 	wl_display_dispatch(display->display);
+ 
+ 	sigint.sa_handler = signal_int;
+@@ -529,6 +530,33 @@ DBG("[<-OUT] %s\n" ,__func__);
+ }
+ 
+ static void
++RVC_set_fullscreen(struct sWindow *window, int fullscreen, int posx, int posy)
++{
++DBG("[-> IN] %s\n" ,__func__);
++        struct wl_callback *callback;
++
++        window->fullscreen = fullscreen;
++        if (fullscreen) {
++                wl_shell_surface_set_fullscreen(window->shell_surface,
++                                                WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT,
++                                                0, NULL);
++                callback = wl_display_sync(window->display->display);
++                wl_callback_add_listener(callback,
++                                         &configure_callback_listener,
++                                         window);
++
++        } else {
++		wl_shell_surface_set_transient(window->shell_surface, window->surface, posx, posy, 0);
++                wl_shell_surface_set_toplevel(window->shell_surface);
++                handle_configure(window, window->shell_surface, 0,
++                                 window->window_size.width,
++                                 window->window_size.height);
++        }
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++
++static void
+ registry_handle_global(void *data, struct wl_registry *registry,
+ 		       uint32_t name, const char *interface, uint32_t version)
+ {
+diff --git a/Shell/OS/LinuxWayland/PVRShellOS.h b/Shell/OS/LinuxWayland/PVRShellOS.h
+index e7600a6..43b1060 100644
+--- a/Shell/OS/LinuxWayland/PVRShellOS.h
++++ b/Shell/OS/LinuxWayland/PVRShellOS.h
+@@ -109,6 +109,9 @@ static void
+ set_fullscreen(struct sWindow *window, int fullscreen);
+ 
+ static void
++RVC_set_fullscreen(struct sWindow *window, int fullscreen, int posx, int posy);
++
++static void
+ configure_callback(void *data, struct wl_callback *callback, uint32_t  time);
+ static void
+ registry_handle_global(void *data, struct wl_registry *registry,
+-- 
+1.9.1
+

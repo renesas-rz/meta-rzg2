@@ -1,0 +1,25 @@
+From ac83bbc3d0e855765d612a5bffb5fe3f96e5e707 Mon Sep 17 00:00:00 2001
+From: Quang Tran <quang.tran.vz@rvc.renesas.com>
+Date: Sat, 30 Dec 2017 16:56:05 +0700
+Subject: [PATCH 2/2] prevent error convert bool to void
+
+---
+ Shell/OS/LinuxWayland/PVRShellOS.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Shell/OS/LinuxWayland/PVRShellOS.cpp b/Shell/OS/LinuxWayland/PVRShellOS.cpp
+index 94a3735..9dd54c9 100644
+--- a/Shell/OS/LinuxWayland/PVRShellOS.cpp
++++ b/Shell/OS/LinuxWayland/PVRShellOS.cpp
+@@ -347,7 +347,7 @@ void *PVRShellInit::OsGetNativePixmapType()
+ {
+ DBG("[-> IN] %s\n" ,__func__);
+ DBG("[<-OUT] %s\n" ,__func__);
+-	return false;
++	return NULL;
+ }
+ 
+ /*!***********************************************************************
+-- 
+2.7.4
+

@@ -1,0 +1,1956 @@
+diff --git a/Builds/Linux/aarch64/api.mak b/Builds/Linux/aarch64/api.mak
+new file mode 100644
+index 0000000..41d79c8
+--- /dev/null
++++ b/Builds/Linux/aarch64/api.mak
+@@ -0,0 +1,7 @@
++ifneq (,$(filter OGLES OGLES2 OGLES3 OGLES31 OCL,$(APIS)))
++LIBDIR ?= "$(SDKDIR)/Builds/Linux/aarch64/Lib"
++endif
++
++ifneq (,$(filter PVRSHELL,$(DEPENDS)))
++SHELLAPI ?= KEGL
++endif
+diff --git a/Builds/Linux/aarch64/platform.mak b/Builds/Linux/aarch64/platform.mak
+new file mode 100644
+index 0000000..5e0dc91
+--- /dev/null
++++ b/Builds/Linux/aarch64/platform.mak
+@@ -0,0 +1,26 @@
++#
++# File			make_platform.mak
++# Title			Platform specific makefile
++# Author		PowerVR
++#
++# Copyright		Copyright (C) by Imagination Technologies Limited.
++#
++
++CROSS_COMPILE ?= aarch64-linux-gnu-
++
++ifdef TOOLCHAIN
++PLAT_CC  = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)gcc
++PLAT_CPP = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)g++
++PLAT_AR  = $(TOOLCHAIN)/bin/$(CROSS_COMPILE)ar
++else
++PLAT_CC  = $(CC)
++PLAT_CPP = $(CXX)
++PLAT_AR  = $(AR)
++endif
++
++ifneq (,$(filter PVRSHELL,$(DEPENDS)))
++PLAT_CFLAGS += -DKEYPAD_INPUT="\"/dev/input/event0\""
++endif
++
++PLAT_CFLAGS += -march=armv8-a -fpermissive
++PLAT_LINK += -march=armv8-a
+diff --git a/Builds/Linux/aarch64/ws.mak b/Builds/Linux/aarch64/ws.mak
+new file mode 100644
+index 0000000..d85d0bb
+--- /dev/null
++++ b/Builds/Linux/aarch64/ws.mak
+@@ -0,0 +1,47 @@
++ifeq "$(X11BUILD)" "1"
++
++WS_LIBS = -L$(X11ROOT)/lib -Wl,--rpath-link,$(X11ROOT)/lib -lX11 -lXau -ldl
++WS_INC  = $(X11ROOT)/include
++WS       = X11
++else
++
++ifeq "$(EWSBUILD)" "1"
++
++PLAT_CFLAGS += -DEWS
++WS_LIBS = -lews
++WS_INC =
++WS=EWS
++
++else
++
++ifeq "$(DRMBUILD)" "1"
++
++WS_LIBS = -L$(DRMROOT)/lib -ldrm -lgbm -ludev -ldl -Wl,--rpath-link,$(DRMROOT)/lib
++WS_INC = $(DRMROOT)/include $(DRMROOT)/include/libdrm $(DRMROOT)/include/gbm
++WS=DRM
++
++else
++
++ifeq "$(WAYLANDBUILD)" "1"
++PLAT_CFLAGS +=
++WS_LIBS =-lwayland-client -lwayland-egl 
++# $(SDKDIR)/Builds/Linux/aarch64/Lib/libtoytoolkit.a
++WS_INC  = 
++WS = Wayland
++LIBDIR ?= "$(LIBSHARED)"
++else
++
++WS_LIBS =
++WS_INC  =
++WS = NullWS
++
++endif
++
++endif
++
++endif
++
++endif
++
++PLAT_LINK += $(WS_LIBS)
++PLAT_INC  += $(WS_INC)
+diff --git a/Builds/Linux/armv7/ws.mak b/Builds/Linux/armv7/ws.mak
+index 16f63ed..74c737c 100644
+--- a/Builds/Linux/armv7/ws.mak
++++ b/Builds/Linux/armv7/ws.mak
+@@ -22,6 +22,14 @@ WS=DRM
+ 
+ else
+ 
++ifeq "$(WAYLANDBUILD)" "1"
++PLAT_CFLAGS +=
++WS_LIBS =-lwayland-client -lwayland-egl $(SDKDIR)/Builds/Linux/armv7/Lib/libtoytoolkit.a
++WS_INC  = $(BUILDDIR) $(HOME)/install/include  $(HOME)/install/work/weston/protocol/
++WS = Wayland
++LIBDIR ?= "$(LIBSHARED)"
++else
++
+ WS_LIBS =
+ WS_INC  =
+ WS = NullWS
+@@ -32,5 +40,7 @@ endif
+ 
+ endif
+ 
++endif
++
+ PLAT_LINK += $(WS_LIBS)
+-PLAT_INC  += $(WS_INC)
+\ No newline at end of file
++PLAT_INC  += $(WS_INC)
+diff --git a/Builds/Linux/make_example.mak b/Builds/Linux/make_example.mak
+index d8990b3..2d40695 100644
+--- a/Builds/Linux/make_example.mak
++++ b/Builds/Linux/make_example.mak
+@@ -26,8 +26,7 @@ SHELLAPIPATH = $(SDKDIR)/Shell/API/$(SHELLAPI)
+ OBJECTS := $(addprefix $(PLAT_OBJPATH)/, $(OBJECTS))
+ SOURCE_DEPENDENCIES := $(OBJECTS:.o=.d)
+ 
+-INCLUDES += -I$(SDKDIR)/Builds/Include 	\
+-			$(addprefix -I, $(PLAT_INC))
++INCLUDES += $(addprefix -I, $(PLAT_INC))
+ 			
+ INCLUDES := $(sort $(INCLUDES))
+ 			
+@@ -85,4 +84,4 @@ clean: print_info wrap_content_files build_tools
+ 
+ ifneq "$(MAKECMDGOALS)" "clean"
+ sinclude $(SOURCE_DEPENDENCIES)
+-endif
+\ No newline at end of file
++endif
+diff --git a/Builds/Linux/x86_64/ws.mak b/Builds/Linux/x86_64/ws.mak
+index 6e8ee8c..ae444e8 100644
+--- a/Builds/Linux/x86_64/ws.mak
++++ b/Builds/Linux/x86_64/ws.mak
+@@ -28,6 +28,14 @@ WS=DRM
+ 
+ else
+ 
++ifeq "$(WAYLANDBUILD)" "1"
++PLAT_CFLAGS +=
++WS_LIBS =-lwayland-client -lwayland-egl $(HOME)/install/work/weston/.libs/libtoytoolkit.a
++WS_INC  = $(HOME)/install/include  $(HOME)/install/work/weston/protocol/
++WS = Wayland
++LIBDIR = $(HOME)/install/lib
++else
++
+ WS_LIBS =
+ WS_INC  =
+ WS = NullWS
+@@ -38,5 +46,8 @@ endif
+ 
+ endif
+ 
++endif
++
+ PLAT_LINK += $(WS_LIBS)
+-PLAT_INC  += $(WS_INC)
+\ No newline at end of file
++PLAT_INC  += $(WS_INC)
++
+diff --git a/Shell/API/KEGL/PVRShellAPI.cpp b/Shell/API/KEGL/PVRShellAPI.cpp
+index fefecbb..f1f7197 100644
+--- a/Shell/API/KEGL/PVRShellAPI.cpp
++++ b/Shell/API/KEGL/PVRShellAPI.cpp
+@@ -347,9 +347,10 @@ bool PVRShellInit::ApiInitAPI()
+ 	eglQuerySurface(m_EGLDisplay, m_EGLWindow, EGL_WIDTH, (EGLint*)&m_pShell->m_pShellData->nShellDimX);
+ 	eglQuerySurface(m_EGLDisplay, m_EGLWindow, EGL_HEIGHT, (EGLint*)&m_pShell->m_pShellData->nShellDimY);
+ 
+-#if defined(ANDROID)
++//#if defined(ANDROID)
++//	m_pShell->PVRShellOutputDebug("<%s> call glViewport(%dx%d)\n",__func__, m_pShell->m_pShellData->nShellDimX,m_pShell->m_pShellData->nShellDimY);
+ 	glViewport(0, 0, m_pShell->m_pShellData->nShellDimX, m_pShell->m_pShellData->nShellDimY);
+-#endif
++//#endif
+ 	/*
+ 		Done - activate requested features
+ 	*/
+diff --git a/Shell/OS/LinuxNullWS/PVRShellOS.cpp b/Shell/OS/LinuxNullWS/PVRShellOS.cpp
+index 8404e03..c1a310c 100644
+--- a/Shell/OS/LinuxNullWS/PVRShellOS.cpp
++++ b/Shell/OS/LinuxNullWS/PVRShellOS.cpp
+@@ -131,6 +131,7 @@ void PVRShellInit::OsInit()
+ 	m_pShell->m_pShellData->bFullScreen= true;	// linux overrides default to use fullscreen
+ 
+ 	m_ui32NativeDisplay = 0;
++	m_ui32NativeWindow = ~0;
+ 
+ 	// Keyboard handling
+ 	if((devfd=open(CONNAME, O_RDWR|O_NDELAY)) <= 0)
+@@ -673,7 +674,10 @@ void *PVRShellInit::OsGetNativePixmapType()
+ *************************************************************************/
+ void *PVRShellInit::OsGetNativeWindowType()
+ {
++	if (m_ui32NativeWindow == ~0)
+ 	return 0;
++	else
++		return (void*) &m_ui32NativeWindow;
+ }
+ 
+ /*!***********************************************************************
+@@ -690,6 +694,9 @@ bool PVRShellInit::OsGet(const prefNameIntEnum prefName, int *pn)
+ 		case prefNativeDisplay:
+ 			*pn = m_ui32NativeDisplay;
+ 			return true;
++		case prefNativeWindow:
++			*pn = m_ui32NativeWindow;
++			return true;
+ 		default:
+ 			return false;
+ 	};
+@@ -778,6 +785,9 @@ bool PVRShellInit::OsSet(const prefNameIntEnum prefName, const int i32Value)
+ 	case prefNativeDisplay:
+ 		m_ui32NativeDisplay = i32Value;
+ 		return true;
++	case prefNativeWindow:
++		m_ui32NativeWindow = i32Value;
++		return true;
+ 	default:
+ 		return false;
+ 	};
+diff --git a/Shell/OS/LinuxNullWS/PVRShellOS.h b/Shell/OS/LinuxNullWS/PVRShellOS.h
+index 0b6fee7..ba16486 100644
+--- a/Shell/OS/LinuxNullWS/PVRShellOS.h
++++ b/Shell/OS/LinuxNullWS/PVRShellOS.h
+@@ -98,6 +98,7 @@ public:
+ 	timeval 	 m_StartTime;
+ 
+ 	unsigned int m_ui32NativeDisplay;
++	unsigned int m_ui32NativeWindow;
+ };
+ 
+ /*! @} */
+diff --git a/Shell/OS/LinuxWayland/PVRShellOS.cpp b/Shell/OS/LinuxWayland/PVRShellOS.cpp
+new file mode 100644
+index 0000000..1b6b962
+--- /dev/null
++++ b/Shell/OS/LinuxWayland/PVRShellOS.cpp
+@@ -0,0 +1,610 @@
++/******************************************************************************
++
++ @File         LinuxWayland/PVRShellOS.cpp
++
++ @Title        LinuxWayland/PVRShellOS
++
++ @Version      
++
++ @Copyright    Copyright (c) Imagination Technologies Limited.
++
++ @Platform     Wayland x86_64/armv7hf
++
++ @Description  Makes programming for 3D APIs easier by wrapping window creation
++               and other functions for use by a demo.
++               This file is based on X11 code.
++
++******************************************************************************/
++
++#include <sys/time.h>
++#include <stdio.h>
++#include <stdarg.h>
++#include <time.h>
++#include <unistd.h>
++#include <string.h>
++
++#include "PVRShell.h"
++#include "PVRShellAPI.h"
++#include "PVRShellOS.h"
++#include "PVRShellImpl.h"
++
++static int running = 1;
++
++// No Doxygen for CPP files, due to documentation duplication
++/// @cond NO_DOXYGEN
++
++/*!***************************************************************************
++	Defines
++*****************************************************************************/
++
++/*****************************************************************************
++	Declarations
++*****************************************************************************/
++//static Bool WaitForMapNotify( Display *d, XEvent *e, char *arg );
++
++/*!***************************************************************************
++	Class: PVRShellInit
++*****************************************************************************/
++
++/*!***********************************************************************
++@Function		PVRShellOutputDebug
++@Input			format			printf style format followed by arguments it requires
++@Description	Writes the resultant string to the debug output (e.g. using
++				printf(), OutputDebugString(), ...). Check the SDK release notes for
++				details on how the string is output.
++*************************************************************************/
++void PVRShell::PVRShellOutputDebug(char const * const format, ...) const
++{
++DBG("[-> IN] %s\n" ,__func__);
++	if(!format)
++		return;
++
++	va_list arg;
++	char	buf[1024];
++
++	va_start(arg, format);
++	vsnprintf(buf, 1024, format, arg);
++	va_end(arg);
++
++	// Passes the data to a platform dependant function
++	m_pShellInit->OsDisplayDebugString(buf);
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsInit
++ @description	Initialisation for OS-specific code.
++*************************************************************************/
++void PVRShellInit::OsInit()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct sDisplay *display = &m_wlDisplay;
++	struct sWindow * window  = &m_wlWindow;
++	window->display = display;
++	display->window = window;
++
++	// set values to negative to mark that these are default values
++	m_pShell->m_pShellData->nShellDimX = -240;
++	m_pShell->m_pShellData->nShellDimY = -320;
++
++	/*
++		Construct the binary path for GetReadPath() and GetWritePath()
++	*/
++	// Get PID (Process ID)
++	pid_t ourPid = getpid();
++	char *pszExePath, pszSrcLink[64];
++	int len = 64;
++	int res;
++
++	sprintf(pszSrcLink, "/proc/%d/exe", ourPid);
++	pszExePath = 0;
++
++	do
++	{
++		len *= 2;
++		delete[] pszExePath;
++		pszExePath = new char[len];
++		res = readlink(pszSrcLink, pszExePath, len);
++
++		if(res < 0)
++		{
++			m_pShell->PVRShellOutputDebug("Warning Readlink %s failed. The application name, read path and write path have not been set.\n", pszExePath);
++			break;
++		}
++	} while(res >= len);
++
++	if(res >= 0)
++	{
++		pszExePath[res] = '\0'; // Null-terminate readlink's result
++		SetReadPath(pszExePath);
++		SetWritePath(pszExePath);
++		SetAppName(pszExePath);
++	}
++
++	delete[] pszExePath;
++
++	m_u32ButtonState = 0;
++
++	gettimeofday(&m_StartTime,NULL);
++
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsInitOS
++ @description	Saves instance handle and creates main window
++				In this function, we save the instance handle in a global variable and
++				create and display the main program window.
++*************************************************************************/
++bool PVRShellInit::OsInitOS()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct sDisplay *display = &m_wlDisplay;
++	struct sWindow * window  = &m_wlWindow;
++	// temporary settings;
++	window->geometry.width  = 800;
++	window->geometry.height = 600;
++
++	if (m_pShell->m_pShellData->nShellDimX > 0)
++		window->geometry.width  = m_pShell->m_pShellData->nShellDimX;
++	if (m_pShell->m_pShellData->nShellDimY > 0)
++		window->geometry.height = m_pShell->m_pShellData->nShellDimY;
++
++	window->window_size = window->geometry;
++	
++	display->display = wl_display_connect(NULL);
++	if(!display->display)
++	{
++		m_pShell->PVRShellOutputDebug("Error: Unable to open wayland display\n");
++		return false;
++	}
++	
++	display->registry = wl_display_get_registry(display->display);
++	wl_registry_add_listener(display->registry,
++				 &registry_listener, display);
++
++	wl_display_dispatch(display->display);
++	window->surface = wl_compositor_create_surface(display->compositor);
++	if(! window->surface )
++		printf("Not create wl_surface :w->surface=%p\n", window->surface);
++	window->shell_surface = wl_shell_get_shell_surface(display->shell,
++							   window->surface);
++	if(! window->shell_surface)
++		printf("Not create wl_shell_surface :w->shell_surface=%p\n", window->shell_surface);
++
++	wl_shell_surface_add_listener(window->shell_surface,
++				      &shell_surface_listener, window);
++
++	window->native =
++		wl_egl_window_create(window->surface,
++				     window->geometry.width,
++				     window->geometry.height);
++	if(! window->native ){
++		printf("canot create native window w->native=%p\n",window->native);
++	}
++;
++	if (display->shell) {
++		wl_shell_surface_set_title(window->shell_surface, "simple-egl");
++	//	create_xdg_surface(window, display);
++//	} else if (display->ivi_application ) {
++//		create_ivi_surface(window, display);
++	} else {
++//		assert(0);
++	}
++
++	struct wl_region *region = wl_compositor_create_region(display->compositor);
++	wl_region_add(region, 0, 0, window->geometry.width, window->geometry.height);
++	wl_surface_set_opaque_region(window->surface, region);
++	wl_region_destroy(region);
++
++
++	if(m_pShell->m_pShellData->bFullScreen){
++		window->fullscreen = 1;
++	//	xdg_surface_set_fullscreen(window->xdg_surface, NULL);
++	}
++	set_fullscreen(window, window->fullscreen);
++	wl_display_dispatch(display->display);
++
++	sigint.sa_handler = signal_int;
++	sigemptyset(&sigint.sa_mask);
++	sigint.sa_flags = SA_RESETHAND;
++	sigaction(SIGINT, &sigint, NULL);
++	sigaction(SIGTERM, &sigint, NULL);
++
++DBG("[<-OUT] %s\n" ,__func__);
++	return true;
++}
++
++/*!***********************************************************************
++ @Function		OsReleaseOS
++ @description	Destroys main window
++*************************************************************************/
++void PVRShellInit::OsReleaseOS()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct sDisplay *display = &m_wlDisplay;
++	struct sWindow * window  = &m_wlWindow;
++	wl_egl_window_destroy(window->native);
++
++//	if (window->xdg_surface)
++//		xdg_surface_destroy(window->xdg_surface);
++//	if (window->display->ivi_application)
++//		ivi_surface_destroy(window->ivi_surface);
++	wl_surface_destroy(window->surface);
++
++	if (window->callback)
++		wl_callback_destroy(window->callback);
++
++//	if (display->shell)
++//		xdg_shell_destroy(display->shell);
++	if (display->shell)
++		wl_shell_destroy(display->shell);
++
++//	if (display->ivi_application)
++//		ivi_application_destroy(display->ivi_application);
++
++	if (display->compositor)
++		wl_compositor_destroy(display->compositor);
++
++	wl_registry_destroy(display->registry);
++	wl_display_flush(display->display);
++	wl_display_disconnect(display->display);
++
++#if X11
++	XCloseDisplay( m_X11Display );
++#endif
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsExit
++ @description	Destroys main window
++*************************************************************************/
++void PVRShellInit::OsExit()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	// Show the exit message to the user
++	m_pShell->PVRShellOutputDebug((const char*)m_pShell->PVRShellGet(prefExitMessage));
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsDoInitAPI
++ @Return		true on success
++ @description	Perform API initialisation and bring up window / fullscreen
++*************************************************************************/
++bool PVRShellInit::OsDoInitAPI()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	if(!ApiInitAPI())
++	{
++		return false;
++	}
++
++	// No problem occured
++DBG("[<-OUT] %s\n" ,__func__);
++	return true;
++}
++
++/*!***********************************************************************
++ @Function		OsDoReleaseAPI
++ @description	Clean up after we're done
++*************************************************************************/
++void PVRShellInit::OsDoReleaseAPI()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	ApiReleaseAPI();
++
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsRenderComplete
++ @Returns		false when the app should quit
++ @description	Main message loop / render loop
++*************************************************************************/
++void PVRShellInit::OsRenderComplete()
++{
++DBG("[-> IN] %s\n" ,__func__);
++		wl_display_dispatch_pending(m_wlDisplay.display);
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsPixmapCopy
++ @Return		true if the copy succeeded
++ @description	When using pixmaps, copy the render to the display
++*************************************************************************/
++bool PVRShellInit::OsPixmapCopy()
++{
++DBG("[-> IN] %s\n" ,__func__);
++#if X11
++	XCopyArea(m_X11Display,m_X11Pixmap,m_X11Window,m_X11GC,0,0,m_pShell->m_pShellData->nShellDimX,m_pShell->m_pShellData->nShellDimY,0,0);
++#endif
++DBG("[<-OUT] %s\n" ,__func__);
++	return true;
++}
++
++/*!***********************************************************************
++ @Function		OsGetNativeDisplayType
++ @Return		The 'NativeDisplayType' for EGL
++ @description	Called from InitAPI() to get the NativeDisplayType
++*************************************************************************/
++void *PVRShellInit::OsGetNativeDisplayType()
++{
++DBG("[-> IN] %s\n" ,__func__);
++DBG("[<-OUT] %s\n" ,__func__);
++	return m_wlDisplay.display;
++}
++
++/*!***********************************************************************
++ @Function		OsGetNativePixmapType
++ @Return		The 'NativePixmapType' for EGL
++ @description	Called from InitAPI() to get the NativePixmapType
++*************************************************************************/
++void *PVRShellInit::OsGetNativePixmapType()
++{
++DBG("[-> IN] %s\n" ,__func__);
++DBG("[<-OUT] %s\n" ,__func__);
++	return false;
++}
++
++/*!***********************************************************************
++ @Function		OsGetNativeWindowType
++ @Return		The 'NativeWindowType' for EGL
++ @description	Called from InitAPI() to get the NativeWindowType
++*************************************************************************/
++void *PVRShellInit::OsGetNativeWindowType()
++{
++DBG("[-> IN] %s\n" ,__func__);
++DBG("[<-OUT] %s\n" ,__func__);
++	return m_wlWindow.native;
++}
++
++/*!***********************************************************************
++ @Function		OsGet
++ @Input			prefName	Name of value to get
++ @Modified		pn A pointer set to the value asked for
++ @Returns		true on success
++ @Description	Retrieves OS-specific data
++*************************************************************************/
++bool PVRShellInit::OsGet(const prefNameIntEnum prefName, int *pn)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	switch( prefName )
++	{
++	case prefButtonState:
++		*pn = m_u32ButtonState;
++		return true;
++	default:
++		return false;
++	};
++
++DBG("[<-OUT] %s\n" ,__func__);
++	return false;
++}
++
++/*!***********************************************************************
++ @Function		OsGet
++ @Input			prefName	Name of value to get
++ @Modified		pp A pointer set to the value asked for
++ @Returns		true on success
++ @Description	Retrieves OS-specific data
++*************************************************************************/
++bool PVRShellInit::OsGet(const prefNamePtrEnum prefName, void **pp)
++{
++DBG("[-> IN] %s\n" ,__func__);
++DBG("[<-OUT] %s\n" ,__func__);
++	return false;
++}
++
++/*!***********************************************************************
++ @Function		OsSet
++ @Input			prefName				Name of preference to set to value
++ @Input			value					Value
++ @Return		true for success
++ @Description	Sets OS-specific data
++*************************************************************************/
++bool PVRShellInit::OsSet(const prefNameBoolEnum prefName, const bool value)
++{
++DBG("[-> IN] %s\n" ,__func__);
++DBG("[<-OUT] %s\n" ,__func__);
++	return false;
++}
++
++/*!***********************************************************************
++ @Function		OsSet
++ @Input			prefName	Name of value to set
++ @Input			i32Value 	The value to set our named value to
++ @Returns		true on success
++ @Description	Sets OS-specific data
++*************************************************************************/
++bool PVRShellInit::OsSet(const prefNameIntEnum prefName, const int i32Value)
++{
++DBG("[-> IN] %s\n" ,__func__);
++DBG("[<-OUT] %s\n" ,__func__);
++	return false;
++}
++
++/*!***********************************************************************
++ @Function		OsDisplayDebugString
++ @Input			str		string to output
++ @Description	Prints a debug string
++*************************************************************************/
++void PVRShellInit::OsDisplayDebugString(char const * const str)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	fprintf(stderr, "%s", str);
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***********************************************************************
++ @Function		OsGetTime
++ @Return		An incrementing time value measured in milliseconds
++ @Description	Returns an incrementing time value measured in milliseconds
++*************************************************************************/
++unsigned long PVRShellInit::OsGetTime()
++{
++DBG("[-> IN] %s\n" ,__func__);
++	timeval tv;
++	gettimeofday(&tv,NULL);
++
++	if(tv.tv_sec < m_StartTime.tv_sec)
++		m_StartTime.tv_sec = 0;
++
++	unsigned long sec = tv.tv_sec - m_StartTime.tv_sec;
++	return (unsigned long)((sec*(unsigned long)1000) + (tv.tv_usec/1000.0));
++}
++
++/*****************************************************************************
++ Class: PVRShellInitOS
++*****************************************************************************/
++
++/*****************************************************************************
++ Global code
++*****************************************************************************/
++PVRShellInit * gInit;
++
++static void
++signal_int(int signum)
++{
++	gInit->gShellDone = true;
++}
++
++static void
++handle_ping(void *data, struct wl_shell_surface *shell_surface,
++	    uint32_t serial)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	wl_shell_surface_pong(shell_surface, serial);
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++static void
++handle_configure(void *data, struct wl_shell_surface *shell_surface,
++		 uint32_t edges, int32_t width, int32_t height)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct sWindow *window = (struct sWindow*) data;
++
++	if (window->native)
++		wl_egl_window_resize(window->native, width, height, 0, 0);
++
++	window->geometry.width = width;
++	window->geometry.height = height;
++
++	if (!window->fullscreen)
++		window->window_size = window->geometry;
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++static void
++handle_popup_done(void *data, struct wl_shell_surface *shell_surface)
++{
++}
++
++static void
++set_fullscreen(struct sWindow *window, int fullscreen)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct wl_callback *callback;
++
++	window->fullscreen = fullscreen;
++	if (fullscreen) {
++		wl_shell_surface_set_fullscreen(window->shell_surface,
++						WL_SHELL_SURFACE_FULLSCREEN_METHOD_DEFAULT,
++						0, NULL);
++		callback = wl_display_sync(window->display->display);
++		wl_callback_add_listener(callback,
++					 &configure_callback_listener,
++					 window);
++
++	} else {
++		wl_shell_surface_set_toplevel(window->shell_surface);
++		handle_configure(window, window->shell_surface, 0,
++				 window->window_size.width,
++				 window->window_size.height);
++	}
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++static void
++registry_handle_global(void *data, struct wl_registry *registry,
++		       uint32_t name, const char *interface, uint32_t version)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct sDisplay *d = (sDisplay*)data;
++
++	if (strcmp(interface, "wl_compositor") == 0) {
++		d->compositor = (wl_compositor *)
++			wl_registry_bind(registry, name,
++					 &wl_compositor_interface, 1);
++	} else if (strcmp(interface, "wl_shell") == 0) {
++		d->shell = (wl_shell*) wl_registry_bind(registry, name,
++					    &wl_shell_interface, 1);
++//	} else if (strcmp(interface, "xdg_shell") == 0) {
++//		d->shell = (xdg_shell*) wl_registry_bind(registry, name, &xdg_shell_interface, 1);
++//		xdg_shell_add_listener(d->shell , &_xdg_shell_listener , d);
++//		xdg_shell_use_unstable_version(d->shell, XDG_VERSION);
++	} else if (strcmp(interface, "wl_seat") == 0) {
++//		d->seat = (wl_seat*)wl_registry_bind(registry, name,
++//					   &wl_seat_interface, 1);
++//		wl_seat_add_listener(d->seat, &seat_listener, d);
++	} else if (strcmp(interface, "wl_shm") == 0) {
++		d->shm = (wl_shm*) wl_registry_bind(registry, name, &wl_shm_interface, 1);
++//		d->cursor_theme = wl_cursor_theme_load(NULL, 32, d->shm);
++//		d->default_cursor =
++//			wl_cursor_theme_get_cursor(d->cursor_theme, "left_ptr");
++	}
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++static void
++registry_handle_global_remove(void *data, struct wl_registry *registry,
++			      uint32_t name)
++{
++}
++
++static void
++configure_callback(void *data, struct wl_callback *callback, uint32_t  time)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	struct sWindow *window = (sWindow *)data;
++
++	wl_callback_destroy(callback);
++
++DBG("[<-OUT] %s\n" ,__func__);
++}
++
++/*!***************************************************************************
++@function		main
++@input			argc	count of args from OS
++@input			argv	array of args from OS
++@returns		result code to OS
++@description	Main function of the program
++*****************************************************************************/
++int main(int argc, char **argv)
++{
++DBG("[-> IN] %s\n" ,__func__);
++	PVRShellInit init;
++	gInit = &init;
++
++	// Initialise the demo, process the command line, create the OS initialiser.
++	if(!init.Init())
++		return EXIT_ERR_CODE;
++
++	init.CommandLine((argc-1),&argv[1]);
++
++	// Initialise/run/shutdown
++	while(init.Run());
++
++DBG("[<-OUT] %s\n" ,__func__);
++	return EXIT_NOERR_CODE;
++}
++
++/// @endcond
++
++/*****************************************************************************
++ End of file (PVRShellOS.cpp)
++*****************************************************************************/
++
+diff --git a/Shell/OS/LinuxWayland/PVRShellOS.h b/Shell/OS/LinuxWayland/PVRShellOS.h
+new file mode 100644
+index 0000000..e7600a6
+--- /dev/null
++++ b/Shell/OS/LinuxWayland/PVRShellOS.h
+@@ -0,0 +1,150 @@
++/*!****************************************************************************
++
++ @file         LinuxWayland/PVRShellOS.h
++ @ingroup      OS_LinuxWayland
++ @copyright    Copyright (c) Imagination Technologies Limited.
++ @brief        Initialization for the shell for LinuxWayland.
++ @details      Makes programming for 3D APIs easier by wrapping surface
++               initialization, Texture allocation and other functions for use by a demo.
++               This file is based on X11 code.
++
++******************************************************************************/
++#ifndef _PVRSHELLOS_
++#define _PVRSHELLOS_
++
++#include <wayland-client.h>
++#include <wayland-egl.h>
++//#include "xdg-shell-client-protocol.h"
++#include <signal.h>
++
++#ifdef BUILD_OGL
++#include "X11/extensions/xf86vmode.h"
++#endif
++
++#define PVRSHELL_DIR_SYM	'/'
++#define _stricmp strcasecmp
++
++// debug macro
++#if DEBUG
++ #define DBG(...)  printf(__VA_ARGS__)
++#else
++ #define DBG(...)
++#endif
++
++/*!
++ @addtogroup OS_LinuxX11 
++ @brief      LinuxX11 OS
++ @details    The following table illustrates how key codes are mapped in LinuxX11:
++             <table>
++             <tr><th> Key code    </th><th> nLastKeyPressed (PVRShell) </th></tr>
++             <tr><td> Esc	      </td><td> PVRShellKeyNameQUIT	       </td></tr>
++             <tr><td> F11	      </td><td> PVRShellKeyNameScreenshot  </td></tr>
++             <tr><td> Enter	      </td><td> PVRShellKeyNameSELECT 	   </td></tr>
++             <tr><td> '1'	      </td><td> PVRShellKeyNameACTION1	   </td></tr>
++             <tr><td> '2'	      </td><td> PVRShellKeyNameACTION2     </td></tr>
++             <tr><td> Up arrow    </td><td> m_eKeyMapUP		           </td></tr>
++             <tr><td> Down arrow  </td><td> m_eKeyMapDOWN 		       </td></tr>
++             <tr><td> Left arrow  </td><td> m_eKeyMapLEFT 		       </td></tr>
++             <tr><td> Right arrow </td><td> m_eKeyMapRIGHT		       </td></tr>
++             </table>
++ @{
++*/
++
++struct sWindow;
++
++struct sDisplay {
++	struct wl_display *display;
++	struct wl_registry *registry;
++	struct wl_compositor *compositor;
++	struct wl_shell *shell;
++	//struct xdg_shell *shell;
++	struct wl_seat *seat;
++	struct wl_pointer *pointer;
++	struct wl_keyboard *keyboard;
++	struct wl_shm *shm;
++	struct wl_cursor_theme *cursor_theme;
++	struct wl_cursor *default_cursor;
++	struct wl_surface *cursor_surface;
++	struct sWindow *window;
++};
++
++struct geometry {
++	int width, height;
++};
++
++struct sWindow {
++	struct sDisplay *display;
++	struct geometry geometry, window_size;
++
++	uint32_t benchmark_time, frames;
++	struct wl_egl_window *native;
++	struct wl_surface *surface;
++	struct wl_shell_surface *shell_surface;
++	//struct xdg_surface *xdg_surface;
++	//struct ivi_surface *ivi_surface;
++	struct wl_callback *callback;
++	int fullscreen, opaque, buffer_size, frame_sync;
++};
++
++/*!***************************************************************************
++ @class PVRShellInitOS
++ @brief Interface with specific Operative System.
++*****************************************************************************/
++class PVRShellInitOS
++{
++public:
++	struct sDisplay       m_wlDisplay;
++	struct sWindow        m_wlWindow;
++	struct sigaction	sigint;
++	timeval 	 m_StartTime;
++
++	unsigned int m_u32ButtonState; // 1 = left, 2 = right, 4 = middle
++
++public:
++};
++
++static void signal_int(int signum);
++
++static void
++set_fullscreen(struct sWindow *window, int fullscreen);
++
++static void
++configure_callback(void *data, struct wl_callback *callback, uint32_t  time);
++static void
++registry_handle_global(void *data, struct wl_registry *registry,
++		       uint32_t name, const char *interface, uint32_t version);
++static void
++registry_handle_global_remove(void *data, struct wl_registry *registry,
++			      uint32_t name);
++static const struct wl_registry_listener registry_listener = {
++	registry_handle_global,
++	registry_handle_global_remove
++};
++static struct wl_callback_listener configure_callback_listener = {
++	configure_callback,
++};
++static void
++handle_ping(void *data, struct wl_shell_surface *shell_surface,
++	    uint32_t serial);
++static void
++handle_configure(void *data, struct wl_shell_surface *shell_surface,
++		 uint32_t edges, int32_t width, int32_t height);
++
++static void
++handle_popup_done(void *data, struct wl_shell_surface *shell_surface);
++
++static const struct wl_shell_surface_listener shell_surface_listener = {
++	handle_ping,
++	handle_configure,
++	handle_popup_done
++};
++
++//static void create_xdg_surface(struct sWindow *window, struct sDisplay *display); 
++
++/*! @} */
++
++#endif /* _PVRSHELLOS_ */
++/*****************************************************************************
++ End of file (PVRShellOS.h)
++*****************************************************************************/
++
+diff --git a/Shell/OS/LinuxWayland/wl_code.c b/Shell/OS/LinuxWayland/wl_code.c
+new file mode 100644
+index 0000000..55c6a88
+--- /dev/null
++++ b/Shell/OS/LinuxWayland/wl_code.c
+@@ -0,0 +1,387 @@
++#include "xdg-shell-client-protocol.h"
++
++#if 0
++static void
++pointer_handle_enter(void *data, struct wl_pointer *pointer,
++		     uint32_t serial, struct wl_surface *surface,
++		     wl_fixed_t sx, wl_fixed_t sy)
++{
++	struct display *display = data;
++	struct wl_buffer *buffer;
++	struct wl_cursor *cursor = display->default_cursor;
++	struct wl_cursor_image *image;
++
++	if (display->window->fullscreen)
++		wl_pointer_set_cursor(pointer, serial, NULL, 0, 0);
++	else if (cursor) {
++		image = display->default_cursor->images[0];
++		buffer = wl_cursor_image_get_buffer(image);
++		if (!buffer)
++			return;
++		wl_pointer_set_cursor(pointer, serial,
++				      display->cursor_surface,
++				      image->hotspot_x,
++				      image->hotspot_y);
++		wl_surface_attach(display->cursor_surface, buffer, 0, 0);
++		wl_surface_damage(display->cursor_surface, 0, 0,
++				  image->width, image->height);
++		wl_surface_commit(display->cursor_surface);
++	}
++}
++
++static void
++pointer_handle_leave(void *data, struct wl_pointer *pointer,
++		     uint32_t serial, struct wl_surface *surface)
++{
++}
++
++static void
++pointer_handle_motion(void *data, struct wl_pointer *pointer,
++		      uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
++{
++}
++
++static void
++pointer_handle_button(void *data, struct wl_pointer *wl_pointer,
++		      uint32_t serial, uint32_t time, uint32_t button,
++		      uint32_t state)
++{
++	struct display *display = data;
++
++	if (!display->window->xdg_surface)
++		return;
++
++	if (button == BTN_LEFT && state == WL_POINTER_BUTTON_STATE_PRESSED)
++		xdg_surface_move(display->window->xdg_surface,
++						 display->seat, serial);
++}
++
++static void
++pointer_handle_axis(void *data, struct wl_pointer *wl_pointer,
++		    uint32_t time, uint32_t axis, wl_fixed_t value)
++{
++}
++
++static const struct wl_pointer_listener pointer_listener = {
++	pointer_handle_enter,
++	pointer_handle_leave,
++	pointer_handle_motion,
++	pointer_handle_button,
++	pointer_handle_axis,
++};
++
++static void
++touch_handle_down(void *data, struct wl_touch *wl_touch,
++		  uint32_t serial, uint32_t time, struct wl_surface *surface,
++		  int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
++{
++	struct display *d = (struct display *)data;
++
++	if (!d->shell)
++		return;
++
++	xdg_surface_move(d->window->xdg_surface, d->seat, serial);
++}
++
++static void
++touch_handle_up(void *data, struct wl_touch *wl_touch,
++		uint32_t serial, uint32_t time, int32_t id)
++{
++}
++
++static void
++touch_handle_motion(void *data, struct wl_touch *wl_touch,
++		    uint32_t time, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
++{
++}
++
++static void
++touch_handle_frame(void *data, struct wl_touch *wl_touch)
++{
++}
++
++static void
++touch_handle_cancel(void *data, struct wl_touch *wl_touch)
++{
++}
++
++static const struct wl_touch_listener touch_listener = {
++	touch_handle_down,
++	touch_handle_up,
++	touch_handle_motion,
++	touch_handle_frame,
++	touch_handle_cancel,
++};
++
++static void
++keyboard_handle_keymap(void *data, struct wl_keyboard *keyboard,
++		       uint32_t format, int fd, uint32_t size)
++{
++}
++
++static void
++keyboard_handle_enter(void *data, struct wl_keyboard *keyboard,
++		      uint32_t serial, struct wl_surface *surface,
++		      struct wl_array *keys)
++{
++}
++
++static void
++keyboard_handle_leave(void *data, struct wl_keyboard *keyboard,
++		      uint32_t serial, struct wl_surface *surface)
++{
++}
++
++static void
++keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
++		    uint32_t serial, uint32_t time, uint32_t key,
++		    uint32_t state)
++{
++	struct display *d = data;
++
++	if (!d->shell)
++		return;
++
++	if (key == KEY_F11 && state) {
++		if (d->window->fullscreen)
++			xdg_surface_unset_fullscreen(d->window->xdg_surface);
++		else
++			xdg_surface_set_fullscreen(d->window->xdg_surface, NULL);
++	} else if (key == KEY_ESC && state)
++		running = 0;
++}
++
++static void
++keyboard_handle_modifiers(void *data, struct wl_keyboard *keyboard,
++			  uint32_t serial, uint32_t mods_depressed,
++			  uint32_t mods_latched, uint32_t mods_locked,
++			  uint32_t group)
++{
++}
++
++static const struct wl_keyboard_listener keyboard_listener = {
++	keyboard_handle_keymap,
++	keyboard_handle_enter,
++	keyboard_handle_leave,
++	keyboard_handle_key,
++	keyboard_handle_modifiers,
++};
++
++static void
++seat_handle_capabilities(void *data, struct wl_seat *seat,
++			 enum wl_seat_capability caps)
++{
++	struct display *d = data;
++
++	if ((caps & WL_SEAT_CAPABILITY_POINTER) && !d->pointer) {
++		d->pointer = wl_seat_get_pointer(seat);
++		wl_pointer_add_listener(d->pointer, &pointer_listener, d);
++	} else if (!(caps & WL_SEAT_CAPABILITY_POINTER) && d->pointer) {
++		wl_pointer_destroy(d->pointer);
++		d->pointer = NULL;
++	}
++
++	if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !d->keyboard) {
++		d->keyboard = wl_seat_get_keyboard(seat);
++		wl_keyboard_add_listener(d->keyboard, &keyboard_listener, d);
++	} else if (!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && d->keyboard) {
++		wl_keyboard_destroy(d->keyboard);
++		d->keyboard = NULL;
++	}
++
++	if ((caps & WL_SEAT_CAPABILITY_TOUCH) && !d->touch) {
++		d->touch = wl_seat_get_touch(seat);
++		wl_touch_set_user_data(d->touch, d);
++		wl_touch_add_listener(d->touch, &touch_listener, d);
++	} else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && d->touch) {
++		wl_touch_destroy(d->touch);
++		d->touch = NULL;
++	}
++}
++
++static const struct wl_seat_listener seat_listener = {
++	seat_handle_capabilities,
++};
++#endif
++
++#if 1 /* if weston1.5, set 0 */
++static void
++handle_surface_configure(void *data, struct xdg_surface *surface,
++			 int32_t width, int32_t height,
++			 struct wl_array *states, uint32_t serial)
++#else
++static void
++handle_surface_configure(void *data, struct xdg_surface *surface,
++			 int32_t width, int32_t height)
++#endif
++{
++	struct sWindow *window = (struct sWindow*) data;
++	uint32_t *p;
++
++#if 1 /* if weston1.5, set 0 */
++	window->fullscreen = 0;
++	//wl_array_for_each(p, states) {
++	for ( p = (uint32_t*)states->data;(const char *) p < ((const char*) (states)->data + states->size);p++) {
++		uint32_t state = *p;
++		switch (state) {
++		case XDG_SURFACE_STATE_FULLSCREEN:
++DBG(":%s : fullscren\n",__func__);
++			window->fullscreen = 1;
++			break;
++		}
++	}
++#endif
++
++	if (width > 0 && height > 0) {
++		if (!window->fullscreen) {
++			window->window_size.width = width;
++			window->window_size.height = height;
++		}
++		window->geometry.width = width;
++		window->geometry.height = height;
++DBG(":%s : size = %dx%d\n",__func__,width,height);
++	} else if (!window->fullscreen) {
++		window->geometry = window->window_size;
++	}
++
++	if (window->native)
++		wl_egl_window_resize(window->native,
++				     window->geometry.width,
++				     window->geometry.height, 0, 0);
++
++	xdg_surface_ack_configure(surface, serial);
++}
++#if 0
++static void
++handle_surface_change_state(void *data, struct xdg_surface *xdg_surface,
++			    uint32_t state,
++			    uint32_t value,
++			    uint32_t serial)
++{
++	struct sWindow *window = (struct sWindow*) data;
++
++	switch (state) {
++	case XDG_SURFACE_STATE_FULLSCREEN:
++		window->fullscreen = value;
++
++		if (!value)
++			handle_surface_configure(window, window->xdg_surface,
++						 window->window_size.width,
++						 window->window_size.height);
++		break;
++	}
++
++	xdg_surface_ack_change_state(xdg_surface, state, value, serial);
++}
++
++static void
++handle_surface_activated(void *data, struct xdg_surface *xdg_surface)
++{
++}
++
++static void
++handle_surface_deactivated(void *data, struct xdg_surface *xdg_surface)
++{
++}
++#endif
++
++static void
++handle_surface_delete(void *data, struct xdg_surface *xdg_surface)
++{
++	running = 0;
++}
++
++static const struct xdg_surface_listener xdg_surface_listener = {
++	handle_surface_configure,
++#if 0 /* need weston 1.5 */
++	handle_surface_change_state,
++	handle_surface_activated,
++	handle_surface_deactivated,
++#endif /* need weston 1.5 */
++	handle_surface_delete,
++};
++
++static void
++xdg_shell_ping(void *data, struct xdg_shell *shell, uint32_t serial)
++{
++	xdg_shell_pong(shell, serial);
++}
++
++static const struct xdg_shell_listener _xdg_shell_listener = {
++	xdg_shell_ping,
++};
++
++#define XDG_VERSION 4 /* The version of xdg-shell that we implement */
++#ifdef static_assert
++static_assert(XDG_VERSION == XDG_SHELL_VERSION_CURRENT,
++	      "Interface version doesn't match implementation version");
++#endif
++
++
++static void
++registry_handle_global(void *data, struct wl_registry *registry,
++		       uint32_t name, const char *interface, uint32_t version)
++{
++	struct sDisplay *d = (sDisplay*)data;
++
++	if (strcmp(interface, "wl_compositor") == 0) {
++		d->compositor = (wl_compositor *)
++			wl_registry_bind(registry, name,
++					 &wl_compositor_interface, 1);
++	} else if (strcmp(interface, "wl_shell") == 0) {
++	
++	} else if (strcmp(interface, "xdg_shell") == 0) {
++		d->shell = (xdg_shell*) wl_registry_bind(registry, name, &xdg_shell_interface, 1);
++		xdg_shell_add_listener(d->shell , &_xdg_shell_listener , d);
++		xdg_shell_use_unstable_version(d->shell, XDG_VERSION);
++//	} else if (strcmp(interface, "wl_seat") == 0) {
++//		d->seat = (wl_seat*)wl_registry_bind(registry, name,
++//					   &wl_seat_interface, 1);
++//		wl_seat_add_listener(d->seat, &seat_listener, d);
++	} else if (strcmp(interface, "wl_shm") == 0) {
++		d->shm = (wl_shm*) wl_registry_bind(registry, name, &wl_shm_interface, 1);
++#if 0
++		d->cursor_theme = (wl_cursor*)wl_cursor_theme_load(NULL, 32, d->shm);
++		if (!d->cursor_theme) {
++			fprintf(stderr, "unable to load default theme\n");
++			return;
++		}
++		d->default_cursor =
++			wl_cursor_theme_get_cursor(d->cursor_theme, "left_ptr");
++		if (!d->default_cursor) {
++			fprintf(stderr, "unable to load default left pointer\n");
++			// TODO: abort ?
++		}
++#endif
++#if 0
++	} else if (strcmp(interface, "ivi_application") == 0) {
++		d->ivi_application =
++			wl_registry_bind(registry, name,
++					 &ivi_application_interface, 1);
++#endif
++	}
++}
++
++static void
++registry_handle_global_remove(void *data, struct wl_registry *registry,
++			      uint32_t name)
++{
++}
++
++static const struct wl_registry_listener registry_listener = {
++	registry_handle_global,
++	registry_handle_global_remove
++};
++
++static void
++create_xdg_surface(struct sWindow *window, struct sDisplay *display)
++{
++	window->xdg_surface = xdg_shell_get_xdg_surface(display->shell,
++							window->surface);
++
++	xdg_surface_add_listener(window->xdg_surface,
++				 &xdg_surface_listener, window);
++
++	xdg_surface_set_title(window->xdg_surface, "simple-egl");
++}
++
+diff --git a/Shell/OS/LinuxWayland/xdg-shell-client-protocol.h b/Shell/OS/LinuxWayland/xdg-shell-client-protocol.h
+new file mode 100644
+index 0000000..66dc5d8
+--- /dev/null
++++ b/Shell/OS/LinuxWayland/xdg-shell-client-protocol.h
+@@ -0,0 +1,496 @@
++/* 
++ * Copyright © 2008-2013 Kristian Høgsberg
++ * Copyright © 2013      Rafael Antognolli
++ * Copyright © 2013      Jasper St. Pierre
++ * Copyright © 2010-2013 Intel Corporation
++ * 
++ * Permission to use, copy, modify, distribute, and sell this
++ * software and its documentation for any purpose is hereby granted
++ * without fee, provided that the above copyright notice appear in
++ * all copies and that both that copyright notice and this permission
++ * notice appear in supporting documentation, and that the name of
++ * the copyright holders not be used in advertising or publicity
++ * pertaining to distribution of the software without specific,
++ * written prior permission.  The copyright holders make no
++ * representations about the suitability of this software for any
++ * purpose.  It is provided "as is" without express or implied
++ * warranty.
++ * 
++ * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
++ * SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
++ * FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
++ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
++ * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
++ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
++ * THIS SOFTWARE.
++ */
++
++#ifndef XDG_SHELL_CLIENT_PROTOCOL_H
++#define XDG_SHELL_CLIENT_PROTOCOL_H
++
++#ifdef  __cplusplus
++extern "C" {
++#endif
++
++#include <stdint.h>
++#include <stddef.h>
++#include "wayland-client.h"
++
++struct wl_client;
++struct wl_resource;
++
++struct xdg_shell;
++struct xdg_surface;
++struct xdg_popup;
++
++extern const struct wl_interface xdg_shell_interface;
++extern const struct wl_interface xdg_surface_interface;
++extern const struct wl_interface xdg_popup_interface;
++
++#ifndef XDG_SHELL_VERSION_ENUM
++#define XDG_SHELL_VERSION_ENUM
++/**
++ * xdg_shell_version - latest protocol version
++ * @XDG_SHELL_VERSION_CURRENT: Always the latest version
++ *
++ * The 'current' member of this enum gives the version of the protocol.
++ * Implementations can compare this to the version they implement using
++ * static_assert to ensure the protocol and implementation versions match.
++ */
++enum xdg_shell_version {
++	XDG_SHELL_VERSION_CURRENT = 4,
++};
++#endif /* XDG_SHELL_VERSION_ENUM */
++
++/**
++ * xdg_shell - create desktop-style surfaces
++ * @ping: check if the client is alive
++ *
++ * This interface is implemented by servers that provide desktop-style
++ * user interfaces.
++ *
++ * It allows clients to associate a xdg_surface with a basic surface.
++ */
++struct xdg_shell_listener {
++	/**
++	 * ping - check if the client is alive
++	 * @serial: pass this to the callback
++	 *
++	 * The ping event asks the client if it's still alive. Pass the
++	 * serial specified in the event back to the compositor by sending
++	 * a "pong" request back with the specified serial.
++	 *
++	 * Compositors can use this to determine if the client is still
++	 * alive. It's unspecified what will happen if the client doesn't
++	 * respond to the ping request, or in what timeframe. Clients
++	 * should try to respond in a reasonable amount of time.
++	 */
++	void (*ping)(void *data,
++		     struct xdg_shell *xdg_shell,
++		     uint32_t serial);
++};
++
++static inline int
++xdg_shell_add_listener(struct xdg_shell *xdg_shell,
++		       const struct xdg_shell_listener *listener, void *data)
++{
++	return wl_proxy_add_listener((struct wl_proxy *) xdg_shell,
++				     (void (**)(void)) listener, data);
++}
++
++#define XDG_SHELL_USE_UNSTABLE_VERSION	0
++#define XDG_SHELL_GET_XDG_SURFACE	1
++#define XDG_SHELL_GET_XDG_POPUP	2
++#define XDG_SHELL_PONG	3
++
++static inline void
++xdg_shell_set_user_data(struct xdg_shell *xdg_shell, void *user_data)
++{
++	wl_proxy_set_user_data((struct wl_proxy *) xdg_shell, user_data);
++}
++
++static inline void *
++xdg_shell_get_user_data(struct xdg_shell *xdg_shell)
++{
++	return wl_proxy_get_user_data((struct wl_proxy *) xdg_shell);
++}
++
++static inline void
++xdg_shell_destroy(struct xdg_shell *xdg_shell)
++{
++	wl_proxy_destroy((struct wl_proxy *) xdg_shell);
++}
++
++static inline void
++xdg_shell_use_unstable_version(struct xdg_shell *xdg_shell, int32_t version)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_shell,
++			 XDG_SHELL_USE_UNSTABLE_VERSION, version);
++}
++
++static inline struct xdg_surface *
++xdg_shell_get_xdg_surface(struct xdg_shell *xdg_shell, struct wl_surface *surface)
++{
++	struct wl_proxy *id;
++
++	id = wl_proxy_marshal_constructor((struct wl_proxy *) xdg_shell,
++			 XDG_SHELL_GET_XDG_SURFACE, &xdg_surface_interface, NULL, surface);
++
++	return (struct xdg_surface *) id;
++}
++
++static inline struct xdg_popup *
++xdg_shell_get_xdg_popup(struct xdg_shell *xdg_shell, struct wl_surface *surface, struct wl_surface *parent, struct wl_seat *seat, uint32_t serial, int32_t x, int32_t y, uint32_t flags)
++{
++	struct wl_proxy *id;
++
++	id = wl_proxy_marshal_constructor((struct wl_proxy *) xdg_shell,
++			 XDG_SHELL_GET_XDG_POPUP, &xdg_popup_interface, NULL, surface, parent, seat, serial, x, y, flags);
++
++	return (struct xdg_popup *) id;
++}
++
++static inline void
++xdg_shell_pong(struct xdg_shell *xdg_shell, uint32_t serial)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_shell,
++			 XDG_SHELL_PONG, serial);
++}
++
++#ifndef XDG_SURFACE_RESIZE_EDGE_ENUM
++#define XDG_SURFACE_RESIZE_EDGE_ENUM
++/**
++ * xdg_surface_resize_edge - edge values for resizing
++ * @XDG_SURFACE_RESIZE_EDGE_NONE: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_TOP: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_BOTTOM: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_LEFT: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_TOP_LEFT: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_BOTTOM_LEFT: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_RIGHT: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_TOP_RIGHT: (none)
++ * @XDG_SURFACE_RESIZE_EDGE_BOTTOM_RIGHT: (none)
++ *
++ * These values are used to indicate which edge of a surface is being
++ * dragged in a resize operation. The server may use this information to
++ * adapt its behavior, e.g. choose an appropriate cursor image.
++ */
++enum xdg_surface_resize_edge {
++	XDG_SURFACE_RESIZE_EDGE_NONE = 0,
++	XDG_SURFACE_RESIZE_EDGE_TOP = 1,
++	XDG_SURFACE_RESIZE_EDGE_BOTTOM = 2,
++	XDG_SURFACE_RESIZE_EDGE_LEFT = 4,
++	XDG_SURFACE_RESIZE_EDGE_TOP_LEFT = 5,
++	XDG_SURFACE_RESIZE_EDGE_BOTTOM_LEFT = 6,
++	XDG_SURFACE_RESIZE_EDGE_RIGHT = 8,
++	XDG_SURFACE_RESIZE_EDGE_TOP_RIGHT = 9,
++	XDG_SURFACE_RESIZE_EDGE_BOTTOM_RIGHT = 10,
++};
++#endif /* XDG_SURFACE_RESIZE_EDGE_ENUM */
++
++#ifndef XDG_SURFACE_STATE_ENUM
++#define XDG_SURFACE_STATE_ENUM
++/**
++ * xdg_surface_state - types of state on the surface
++ * @XDG_SURFACE_STATE_MAXIMIZED: the surface is maximized
++ * @XDG_SURFACE_STATE_FULLSCREEN: the surface is fullscreen
++ * @XDG_SURFACE_STATE_RESIZING: (none)
++ * @XDG_SURFACE_STATE_ACTIVATED: (none)
++ *
++ * The different state values used on the surface. This is designed for
++ * state values like maximized, fullscreen. It is paired with the configure
++ * event to ensure that both the client and the compositor setting the
++ * state can be synchronized.
++ *
++ * States set in this way are double-buffered. They will get applied on the
++ * next commit.
++ *
++ * Desktop environments may extend this enum by taking up a range of values
++ * and documenting the range they chose in this description. They are not
++ * required to document the values for the range that they chose. Ideally,
++ * any good extensions from a desktop environment should make its way into
++ * standardization into this enum.
++ *
++ * The current reserved ranges are:
++ *
++ * 0x0000 - 0x0FFF: xdg-shell core values, documented below. 0x1000 -
++ * 0x1FFF: GNOME
++ */
++enum xdg_surface_state {
++	XDG_SURFACE_STATE_MAXIMIZED = 1,
++	XDG_SURFACE_STATE_FULLSCREEN = 2,
++	XDG_SURFACE_STATE_RESIZING = 3,
++	XDG_SURFACE_STATE_ACTIVATED = 4,
++};
++#endif /* XDG_SURFACE_STATE_ENUM */
++
++/**
++ * xdg_surface - desktop-style metadata interface
++ * @configure: suggest a surface change
++ * @close: surface wants to be closed
++ *
++ * An interface that may be implemented by a wl_surface, for
++ * implementations that provide a desktop-style user interface.
++ *
++ * It provides requests to treat surfaces like windows, allowing to set
++ * properties like maximized, fullscreen, minimized, and to move and resize
++ * them, and associate metadata like title and app id.
++ *
++ * On the server side the object is automatically destroyed when the
++ * related wl_surface is destroyed. On client side, xdg_surface.destroy()
++ * must be called before destroying the wl_surface object.
++ */
++struct xdg_surface_listener {
++	/**
++	 * configure - suggest a surface change
++	 * @width: (none)
++	 * @height: (none)
++	 * @states: (none)
++	 * @serial: (none)
++	 *
++	 * The configure event asks the client to resize its surface.
++	 *
++	 * The width and height arguments specify a hint to the window
++	 * about how its surface should be resized in window geometry
++	 * coordinates. The states listed in the event specify how the
++	 * width/height arguments should be interpreted.
++	 *
++	 * A client should arrange a new surface, and then send a
++	 * ack_configure request with the serial sent in this configure
++	 * event before attaching a new surface.
++	 *
++	 * If the client receives multiple configure events before it can
++	 * respond to one, it is free to discard all but the last event it
++	 * received.
++	 */
++	void (*configure)(void *data,
++			  struct xdg_surface *xdg_surface,
++			  int32_t width,
++			  int32_t height,
++			  struct wl_array *states,
++			  uint32_t serial);
++	/**
++	 * close - surface wants to be closed
++	 *
++	 * The close event is sent by the compositor when the user wants
++	 * the surface to be closed. This should be equivalent to the user
++	 * clicking the close button in client-side decorations, if your
++	 * application has any...
++	 *
++	 * This is only a request that the user intends to close your
++	 * window. The client may choose to ignore this request, or show a
++	 * dialog to ask the user to save their data...
++	 */
++	void (*close)(void *data,
++		      struct xdg_surface *xdg_surface);
++};
++
++static inline int
++xdg_surface_add_listener(struct xdg_surface *xdg_surface,
++			 const struct xdg_surface_listener *listener, void *data)
++{
++	return wl_proxy_add_listener((struct wl_proxy *) xdg_surface,
++				     (void (**)(void)) listener, data);
++}
++
++#define XDG_SURFACE_DESTROY	0
++#define XDG_SURFACE_SET_PARENT	1
++#define XDG_SURFACE_SET_TITLE	2
++#define XDG_SURFACE_SET_APP_ID	3
++#define XDG_SURFACE_SHOW_WINDOW_MENU	4
++#define XDG_SURFACE_MOVE	5
++#define XDG_SURFACE_RESIZE	6
++#define XDG_SURFACE_ACK_CONFIGURE	7
++#define XDG_SURFACE_SET_WINDOW_GEOMETRY	8
++#define XDG_SURFACE_SET_MAXIMIZED	9
++#define XDG_SURFACE_UNSET_MAXIMIZED	10
++#define XDG_SURFACE_SET_FULLSCREEN	11
++#define XDG_SURFACE_UNSET_FULLSCREEN	12
++#define XDG_SURFACE_SET_MINIMIZED	13
++
++static inline void
++xdg_surface_set_user_data(struct xdg_surface *xdg_surface, void *user_data)
++{
++	wl_proxy_set_user_data((struct wl_proxy *) xdg_surface, user_data);
++}
++
++static inline void *
++xdg_surface_get_user_data(struct xdg_surface *xdg_surface)
++{
++	return wl_proxy_get_user_data((struct wl_proxy *) xdg_surface);
++}
++
++static inline void
++xdg_surface_destroy(struct xdg_surface *xdg_surface)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_DESTROY);
++
++	wl_proxy_destroy((struct wl_proxy *) xdg_surface);
++}
++
++static inline void
++xdg_surface_set_parent(struct xdg_surface *xdg_surface, struct wl_surface *parent)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_PARENT, parent);
++}
++
++static inline void
++xdg_surface_set_title(struct xdg_surface *xdg_surface, const char *title)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_TITLE, title);
++}
++
++static inline void
++xdg_surface_set_app_id(struct xdg_surface *xdg_surface, const char *app_id)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_APP_ID, app_id);
++}
++
++static inline void
++xdg_surface_show_window_menu(struct xdg_surface *xdg_surface, struct wl_seat *seat, uint32_t serial, int32_t x, int32_t y)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SHOW_WINDOW_MENU, seat, serial, x, y);
++}
++
++static inline void
++xdg_surface_move(struct xdg_surface *xdg_surface, struct wl_seat *seat, uint32_t serial)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_MOVE, seat, serial);
++}
++
++static inline void
++xdg_surface_resize(struct xdg_surface *xdg_surface, struct wl_seat *seat, uint32_t serial, uint32_t edges)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_RESIZE, seat, serial, edges);
++}
++
++static inline void
++xdg_surface_ack_configure(struct xdg_surface *xdg_surface, uint32_t serial)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_ACK_CONFIGURE, serial);
++}
++
++static inline void
++xdg_surface_set_window_geometry(struct xdg_surface *xdg_surface, int32_t x, int32_t y, int32_t width, int32_t height)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_WINDOW_GEOMETRY, x, y, width, height);
++}
++
++static inline void
++xdg_surface_set_maximized(struct xdg_surface *xdg_surface)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_MAXIMIZED);
++}
++
++static inline void
++xdg_surface_unset_maximized(struct xdg_surface *xdg_surface)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_UNSET_MAXIMIZED);
++}
++
++static inline void
++xdg_surface_set_fullscreen(struct xdg_surface *xdg_surface, struct wl_output *output)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_FULLSCREEN, output);
++}
++
++static inline void
++xdg_surface_unset_fullscreen(struct xdg_surface *xdg_surface)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_UNSET_FULLSCREEN);
++}
++
++static inline void
++xdg_surface_set_minimized(struct xdg_surface *xdg_surface)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_surface,
++			 XDG_SURFACE_SET_MINIMIZED);
++}
++
++/**
++ * xdg_popup - desktop-style metadata interface
++ * @popup_done: popup interaction is done
++ *
++ * An interface that may be implemented by a wl_surface, for
++ * implementations that provide a desktop-style popups/menus. A popup
++ * surface is a transient surface with an added pointer grab.
++ *
++ * An existing implicit grab will be changed to owner-events mode, and the
++ * popup grab will continue after the implicit grab ends (i.e. releasing
++ * the mouse button does not cause the popup to be unmapped).
++ *
++ * The popup grab continues until the window is destroyed or a mouse button
++ * is pressed in any other clients window. A click in any of the clients
++ * surfaces is reported as normal, however, clicks in other clients
++ * surfaces will be discarded and trigger the callback.
++ *
++ * The x and y arguments specify the locations of the upper left corner of
++ * the surface relative to the upper left corner of the parent surface, in
++ * surface local coordinates.
++ *
++ * xdg_popup surfaces are always transient for another surface.
++ */
++struct xdg_popup_listener {
++	/**
++	 * popup_done - popup interaction is done
++	 * @serial: serial of the implicit grab on the pointer
++	 *
++	 * The popup_done event is sent out when a popup grab is broken,
++	 * that is, when the users clicks a surface that doesn't belong to
++	 * the client owning the popup surface.
++	 */
++	void (*popup_done)(void *data,
++			   struct xdg_popup *xdg_popup,
++			   uint32_t serial);
++};
++
++static inline int
++xdg_popup_add_listener(struct xdg_popup *xdg_popup,
++		       const struct xdg_popup_listener *listener, void *data)
++{
++	return wl_proxy_add_listener((struct wl_proxy *) xdg_popup,
++				     (void (**)(void)) listener, data);
++}
++
++#define XDG_POPUP_DESTROY	0
++
++static inline void
++xdg_popup_set_user_data(struct xdg_popup *xdg_popup, void *user_data)
++{
++	wl_proxy_set_user_data((struct wl_proxy *) xdg_popup, user_data);
++}
++
++static inline void *
++xdg_popup_get_user_data(struct xdg_popup *xdg_popup)
++{
++	return wl_proxy_get_user_data((struct wl_proxy *) xdg_popup);
++}
++
++static inline void
++xdg_popup_destroy(struct xdg_popup *xdg_popup)
++{
++	wl_proxy_marshal((struct wl_proxy *) xdg_popup,
++			 XDG_POPUP_DESTROY);
++
++	wl_proxy_destroy((struct wl_proxy *) xdg_popup);
++}
++
++#ifdef  __cplusplus
++}
++#endif
++
++#endif
+diff --git a/Shell/PVRShell.cpp b/Shell/PVRShell.cpp
+index 6a4db51..4b0cb50 100644
+--- a/Shell/PVRShell.cpp
++++ b/Shell/PVRShell.cpp
+@@ -1128,6 +1128,10 @@ void PVRShellCommandLine::Apply(PVRShell &shell)
+ 			{
+ 				shell.PVRShellSet(prefNativeDisplay, atoi(val));
+ 			}
++			else if(_stricmp(arg, "-window") == 0)
++			{
++				shell.PVRShellSet(prefNativeWindow, atoi(val));
++			}
+ 			else if(_stricmp(arg, "-forceframetime") == 0 || _stricmp(arg, "-fft") == 0)
+ 			{
+ 				shell.PVRShellSet(prefForceFrameTime, true);
+diff --git a/Shell/PVRShell.h b/Shell/PVRShell.h
+index 91b57a7..b565ec1 100644
+--- a/Shell/PVRShell.h
++++ b/Shell/PVRShell.h
+@@ -187,7 +187,7 @@
+  
+ ******************************************************************************/
+ // Uncomment to enable the -fps command-line option
+-// #define PVRSHELL_FPS_OUTPUT
++ #define PVRSHELL_FPS_OUTPUT
+ 
+ /*****************************************************************************
+ ** Includes
+@@ -313,6 +313,7 @@ enum prefNameIntEnum
+     prefConfig,             /*!< EGL: Get the chosen EGL config. */
+     prefRequestedConfig,    /*!< EGL: Force the shell to use a particular EGL config. */
+     prefNativeDisplay,      /*!< EGL: Allows you to specify the native display to use if the device has more that one. */
++    prefNativeWindow,       /*!< EGL: Allows you to specify the native window to use if the device has more that one. */
+     prefFrameTimeValue,     /*!< An integer value to say how long you wish one frame to last for (in ms) when force frame time is enabled. */
+     prefDisplayConnector    /*!< DRM: Display connector to use. Default: first connector. */
+ };
+-- 
+1.9.1
+
