@@ -16,7 +16,11 @@ SRC_URI = "git://github.com/renesas-rcar/arm-trusted-firmware.git;branch=${BRANC
 SRCREV = "7f126e2e718a69bec850c87bd05c4c168b32c4df"
 
 SRC_URI += "file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch \
-            file://0001-renesas-bl2-add-ECC-support-for-DRAM-for-Ebisu-4D.patch \
+"
+
+# Check If ECC enabled
+SRC_URI_append = " \
+    ${@base_conditional("USE_ECC", "1", " file://0001-renesas-bl2-add-ECC-support-for-DRAM-for-Ebisu-4D.patch", "",d)} \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"

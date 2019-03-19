@@ -4,6 +4,8 @@
 EXTRA_ATFW_OPT ?= ""
 EXTRA_ATFW_CONF ?= ""
 
+require include/ecc-control.inc
+
 do_ipl_opt_compile () {
     oe_runmake distclean
     oe_runmake bl2 bl31 dummytool PLAT=${PLATFORM} ${EXTRA_ATFW_OPT} ${ATFW_OPT_LOSSY}
@@ -47,7 +49,8 @@ python do_extra_ipl_opt() {
     # For E3 SiP DDR 2GiB
     if soc == "r8a77990":
         d.setVar('EXTRA_ATFW_CONF', '4d')
-        d.setVar('EXTRA_ATFW_OPT', ' LSI=E3 RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none" LIFEC_DBSC_PROTECT_ENABLE=0 RCAR_DRAM_EBISU_4D_ECC=1')
+        d.setVar('EXTRA_ATFW_OPT', ' LSI=E3 RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none" ')
+        d.setVar('EXTRA_ATFW_OPT_append', ' ${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RCAR_DRAM_EBISU_4D_ECC=1", "",d)} ')
         bb.build.exec_func('do_ipl_opt_compile', d)
         bb.build.exec_func('do_ipl_opt_deploy', d)
 }
