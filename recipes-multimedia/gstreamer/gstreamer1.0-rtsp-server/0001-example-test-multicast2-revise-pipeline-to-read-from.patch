@@ -1,0 +1,77 @@
+diff --git a/examples/test-multicast2.c b/examples/test-multicast2.c
+index 1d8e6f2..84133e2 100644
+--- a/examples/test-multicast2.c
++++ b/examples/test-multicast2.c
+@@ -35,10 +35,11 @@ timeout (GstRTSPServer * server, gboolean ignored)
+ }
+ 
+ static void
+-media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media)
++media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media, gpointer user_data)
+ {
+   guint i, n_streams;
+ 
++  /* Config for multicast */
+   n_streams = gst_rtsp_media_n_streams (media);
+ 
+   for (i = 0; i < n_streams; i++) {
+@@ -51,8 +52,8 @@ media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media)
+     /* make a new address pool */
+     pool = gst_rtsp_address_pool_new ();
+ 
+-    min = g_strdup_printf ("224.3.0.%d", (2 * i) + 1);
+-    max = g_strdup_printf ("224.3.0.%d", (2 * i) + 2);
++    min = g_strdup_printf ("192.168.1.%d", (2 * i) + 1);
++    max = g_strdup_printf ("192.168.1.%d", (2 * i) + 2);
+     gst_rtsp_address_pool_add_range (pool, min, max,
+         5000 + (10 * i), 5010 + (10 * i), 1);
+     g_free (min);
+@@ -71,6 +72,16 @@ main (int argc, char *argv[])
+   GstRTSPMountPoints *mounts;
+   GstRTSPMediaFactory *factory;
+ 
++  gchar *pipeline;
++
++  pipeline = g_strdup_printf ("( "
++		"udpsrc port=5000 caps=\"application/x-rtp\" ! "
++		"rtph264depay ! h264parse ! "
++		"video/x-h264,stream-format=avc,alignment=au ! "
++		"queue ! rtph264pay name=pay0 pt=96 config-interval=3 "
++		")"
++			);
++
+   gst_init (&argc, &argv);
+ 
+   loop = g_main_loop_new (NULL, FALSE);
+@@ -87,11 +98,8 @@ main (int argc, char *argv[])
+    * any launch line works as long as it contains elements named pay%d. Each
+    * element with pay%d names will be a stream */
+   factory = gst_rtsp_media_factory_new ();
+-  gst_rtsp_media_factory_set_launch (factory, "( "
+-      "videotestsrc ! video/x-raw,width=352,height=288,framerate=15/1 ! "
+-      "x264enc ! rtph264pay name=pay0 pt=96 "
+-      "audiotestsrc ! audio/x-raw,rate=8000 ! "
+-      "alawenc ! rtppcmapay name=pay1 pt=97 " ")");
++  gst_rtsp_media_factory_set_launch (factory, pipeline);
++  g_free (pipeline);
+ 
+   gst_rtsp_media_factory_set_shared (factory, TRUE);
+ 
+@@ -99,7 +107,7 @@ main (int argc, char *argv[])
+       media_constructed, NULL);
+ 
+   /* attach the test factory to the /test url */
+-  gst_rtsp_mount_points_add_factory (mounts, "/test", factory);
++  gst_rtsp_mount_points_add_factory (mounts, "/stream", factory);
+ 
+   /* don't need the ref to the mapper anymore */
+   g_object_unref (mounts);
+@@ -111,7 +119,7 @@ main (int argc, char *argv[])
+   g_timeout_add_seconds (2, (GSourceFunc) timeout, server);
+ 
+   /* start serving */
+-  g_print ("stream ready at rtsp://127.0.0.1:8554/test\n");
++  g_print ("stream ready at rtsp://<board wireless ip>:8554/stream\n");
+   g_main_loop_run (loop);
+ 
+   return 0;
