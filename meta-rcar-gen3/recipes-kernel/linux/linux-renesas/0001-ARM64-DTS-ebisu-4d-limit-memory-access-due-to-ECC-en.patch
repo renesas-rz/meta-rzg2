@@ -1,0 +1,30 @@
+From 01e22a29fc0220bae3ea043dafdd372ae0b41e3b Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Tue, 19 Mar 2019 21:45:45 +0700
+Subject: [PATCH] ARM64: DTS: ebisu-4d: limit memory access due to ECC enabled
+
+Linux should not access to ECC area to guarantee operation
+This commit limit the memory access by linux to prevent issue
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a77990-ebisu-4d.dts | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a77990-ebisu-4d.dts b/arch/arm64/boot/dts/renesas/r8a77990-ebisu-4d.dts
+index f1ff301..53abea4 100644
+--- a/arch/arm64/boot/dts/renesas/r8a77990-ebisu-4d.dts
++++ b/arch/arm64/boot/dts/renesas/r8a77990-ebisu-4d.dts
+@@ -15,7 +15,8 @@ compatible = "renesas,ebisu", "renesas,r8a77990";
+ 	memory@48000000 {
+ 		device_type = "memory";
+ 		/* first 128MB is reserved for secure area. */
+-		reg = <0x0 0x48000000 0x0 0x78000000>;
++		/* Only 960MB is usable, the rest is used for ECC */
++		reg = <0x0 0x48000000 0x0 0x3C000000>;
+ 	};
+ 
+ 	reserved-memory {
+-- 
+2.7.4
+

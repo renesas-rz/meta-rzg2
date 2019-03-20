@@ -2,6 +2,7 @@ DESCRIPTION = "Linux kernel for the R-Car Generation 3 based board"
 
 require recipes-kernel/linux/linux-yocto.inc
 require include/cas-control.inc
+require include/ecc-control.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 COMPATIBLE_MACHINE = "salvator-x|ebisu"
@@ -23,6 +24,11 @@ KCONFIG_MODE = "alldefconfig"
 SRC_URI_append = " \
     file://touch.cfg \
     file://gsx.cfg \
+"
+
+# Check If ECC enabled
+SRC_URI_append = " \
+    ${@base_conditional("USE_ECC", "1", " file://0001-ARM64-DTS-ebisu-4d-limit-memory-access-due-to-ECC-en.patch", "",d)} \
 "
 
 # Add SCHED_DEBUG config fragment to support CAS
