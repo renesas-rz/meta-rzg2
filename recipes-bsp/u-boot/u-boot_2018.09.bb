@@ -3,11 +3,11 @@ require u-boot.inc
 
 DEPENDS += "bc-native dtc-native"
 
-UBOOT_URL = "git://github.com/renesas-rcar/u-boot.git"
-BRANCH = "v2018.09/rcar-3.8.0"
+UBOOT_URL = "git://github.com/renesas-rz/renesas-u-boot-cip.git"
+BRANCH = "v2018.09/rzg2"
 
 SRC_URI = "${UBOOT_URL};branch=${BRANCH}"
-SRCREV = "70206a1b84e6e35c33b3760fae6a2a6dbe6ce534"
+SRCREV = "ed8b045fefacbd6337a4a4f4ad2ef411342f0c93"
 PV = "v2018.09+git${SRCPV}"
 
 UBOOT_SREC_SUFFIX = "srec"
