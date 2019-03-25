@@ -1,7 +1,7 @@
 # meta-rzg2
 
 This layer provides that evaluation board is mounted ARM SoCs of Renesas
-Electronics, called the R-Car Generation 3. Currently, this supports
+Electronics, called the RZG2. Currently, this supports
 board and the SoCs of the following:
 - Board: EK874 / SoC: R8A774C0 (RZG2E)
 
@@ -50,7 +50,7 @@ Below git configuration is required:
 Download evaluation version of proprietary graphics and multimedia drivers from Renesas.
 
 To download Multimedia and Graphics library and related Linux drivers, please use the following link:
-https://www.renesas.com/us/en/solutions/automotive/rcar-download/rcar-demoboard.html
+TBD
 
 Graphic drivers are required for Wayland. Multimedia drivers are optional.
 
@@ -75,13 +75,15 @@ Prepare default configuration files. :
 ```bash
     $ cp $WORK/meta-rzg2/docs/sample/conf/<board>/<toolchain>/*.conf ./conf/
 ```
-<board> : ek874
-<toolchain> : poky-gcc, linaro-gcc
+\<board\> : ek874
+
+\<toolchain\> : poky-gcc, linaro-gcc
+
 Build the target file system image using bitbake:
 ```bash
     $ bitbake core-image-<target>
 ```
-<target>:minimal, bsp, weston, qt, hmi
+\<target\>:minimal, bsp, weston, qt, hmi
 
 After completing the images for the target machine will be available in the output
 directory _'tmp/deploy/images/\<supported board name\>'_.
@@ -89,8 +91,8 @@ directory _'tmp/deploy/images/\<supported board name\>'_.
 Images generated:
 * Image (generic Linux Kernel binary image file)
 * Image-\<machine name\>.dtb (DTB for target machine)
-* core-image-<target>-\<machine name\>.tar.bz2 (rootfs tar+bzip2)
-* core-image-<target>-\<machine name\>.ext4  (rootfs ext4 format)
+* core-image-\<target\>-\<machine name\>.tar.bz2 (rootfs tar+bzip2)
+* core-image-\<target\>-\<machine name\>.ext4  (rootfs ext4 format)
 
 ## Build Instructions for SDK
 
@@ -101,7 +103,7 @@ For 64-bit target SDK (aarch64):
 ```
 The SDK can be found in the output directory _'tmp/deploy/sdk'_
 
-    poky-glibc-x86_64-core-image-weston-aarch64-toolchain-x.x.sh
+    poky-glibc-x86_64-core-image-weston(|qt)-aarch64-toolchain-x.x.sh
 
 Usage of toolchain SDK: Install the SDK to the default: _/opt/poky/x.x_
 For 64-bit target SDK:
