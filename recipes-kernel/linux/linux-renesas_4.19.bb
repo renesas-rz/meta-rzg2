@@ -40,8 +40,20 @@ SRC_URI_append = " \
     ${@bb.utils.contains('MACHINE_FEATURES','usb3','file://usb3.cfg','',d)} \
 "
 
+# Install regulatory database firmware to rootfs
+REGULATORY_DB = "https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git/plain/regulatory.db;md5sum=c989b1b7a0582fe91ca8a18ffa88e2be"
+REGULATORY_DB_P7S = "https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git/plain/regulatory.db.p7s;md5sum=18222c356c4cd67b6de010526f7d7804"
+
+SRC_URI_append = " \
+    ${REGULATORY_DB} \
+    ${REGULATORY_DB_P7S} \
+    file://wifi.cfg \
+"
+
+
 do_download_firmware () {
     install -m 755 ${WORKDIR}/r8a779x_usb3_v*.dlmem ${STAGING_KERNEL_DIR}/firmware
+    install -m 755 ${WORKDIR}/regulatory* ${STAGING_KERNEL_DIR}/firmware
 }
 
 addtask do_download_firmware after do_configure before do_compile
