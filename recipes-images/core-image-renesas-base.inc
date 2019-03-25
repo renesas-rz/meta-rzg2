@@ -16,6 +16,7 @@ IMAGE_INSTALL_append = " \
     init-wl18xx \
     iw \
     wpa-supplicant \
+    kernel-module-wlcore-sdio \
 "
 
 # Add overrides for selection 32 bit or 64 bit target
