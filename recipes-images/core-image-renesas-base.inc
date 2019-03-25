@@ -10,6 +10,12 @@ IMAGE_INSTALL_append = " \
 # Support secure environment
 IMAGE_INSTALL_append = " \
     optee-client \
+    linux-firmware \
+    init-ifupdown \
+    wlconf \
+    init-wl18xx \
+    iw \
+    wpa-supplicant \
 "
 
 # Add overrides for selection 32 bit or 64 bit target
