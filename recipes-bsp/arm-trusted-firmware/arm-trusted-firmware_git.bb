@@ -7,6 +7,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit deploy
 require include/multimedia-control.inc
+require include/ecc-control.inc
 
 S = "${WORKDIR}/git"
 
@@ -18,12 +19,17 @@ SRC_URI += "file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch
             file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
 "
 
+SRC_URI_append_r8a774c0 += "\
+  ${@base_conditional("USE_ECC", "1", " file://0003-plat-renesas-bl2-add-ECC-support-for-DRAM.patch ", "",d)} \
+"
+
 PV = "v1.5+renesas+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(ek874)"
 PLATFORM = "rcar"
 ATFW_OPT_LOSSY = "${@base_conditional("USE_MULTIMEDIA", "1", "RCAR_LOSSY_ENABLE=1", "", d)}"
 ATFW_OPT_r8a774c0 = "LSI=G2E RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RZG_EK874=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none""
+ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_EK874_ECC=1 ", "",d)}"
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
