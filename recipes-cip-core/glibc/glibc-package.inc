@@ -109,6 +109,20 @@ do_install_append () {
 	fi
 }
 
+do_install_append_aarch64 () {
+        if [ "${base_libdir}" != "${nonarch_base_libdir}" ]; then
+                # The aarch64 ABI says the dynamic linker -must- be /lib/ld-linux-aarch64[_be].so.1
+                install -d ${D}${nonarch_base_libdir}
+                if [ -e ${D}${base_libdir}/ld-linux-aarch64.so.1 ]; then
+                        ln -s ${@base_path_relative('${nonarch_base_libdir}', '${base_libdir}')}/ld-linux-aarch64.so.1 \
+                                ${D}${nonarch_base_libdir}/ld-linux-aarch64.so.1
+                elif [ -e ${D}${base_libdir}/ld-linux-aarch64_be.so.1 ]; then
+                        ln -s ${@base_path_relative('${nonarch_base_libdir}', '${base_libdir}')}/ld-linux-aarch64_be.so.1 \
+                                ${D}${nonarch_base_libdir}/ld-linux-aarch64_be.so.1
+                fi
+        fi
+}
+
 do_install_locale () {
 	dest=${D}/${includedir}/glibc-locale-internal-${MULTIMACH_TARGET_SYS}
 	install -d ${dest}${base_libdir} ${dest}${bindir} ${dest}${libdir} ${dest}${datadir}
