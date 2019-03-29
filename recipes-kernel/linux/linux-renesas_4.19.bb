@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE = "ek874"
 
 RENESAS_BSP_URL = "git://github.com/renesas-rz/renesas-cip.git"
 BRANCH = "v4.19.13-cip1"
-SRCREV = "8392851962b980fc406de9be9bd7ef14fd6f68b0"
+SRCREV = "62365eba8f2a1b25cef715d9890f48667d6187a5"
 
 SRC_URI = "${RENESAS_BSP_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
