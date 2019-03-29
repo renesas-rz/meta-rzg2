@@ -15,3 +15,7 @@ SRC_URI_append = " \
 S = "${WORKDIR}/git"
 
 DEPENDS = "bison-native flex-native"
+
+do_install_armmultilib_append () {
+	oe_multilib_header asm/bpf_perf_event.h asm/kvm_para.h
+}
