@@ -19,9 +19,6 @@ python __anonymous () {
                                    d.getVar('TARGET_OS', True))
 }
 
-# Set this to zero if you don't want ldconfig in the output package
-USE_LDCONFIG ?= "1"
-
 INHIBIT_SYSROOT_STRIP = "1"
 
 PACKAGES = "${PN}-dbg catchsegv sln nscd ldd ${PN}-utils glibc-thread-db ${PN}-pic libcidn libmemusage libsegfault ${PN}-pcprofile libsotruss ${PN} glibc-extra-nss ${PN}-dev ${PN}-staticdev ${PN}-doc"
@@ -39,8 +36,10 @@ RPROVIDES_glibc-thread-db = "eglibc-thread-db"
 RPROVIDES_${PN}-pcprofile = "eglibc-pcprofile"
 RPROVIDES_${PN}-dbg = "eglibc-dbg"
 libc_baselibs = "${base_libdir}/libcrypt*.so.* ${base_libdir}/libcrypt-*.so ${base_libdir}/libc.so.* ${base_libdir}/libc-*.so ${base_libdir}/libm*.so.* ${base_libdir}/libm-*.so ${base_libdir}/ld*.so.* ${base_libdir}/ld-*.so ${base_libdir}/libpthread*.so.* ${base_libdir}/libpthread-*.so ${base_libdir}/libresolv*.so.* ${base_libdir}/libresolv-*.so ${base_libdir}/librt*.so.* ${base_libdir}/librt-*.so ${base_libdir}/libutil*.so.* ${base_libdir}/libutil-*.so ${base_libdir}/libnsl*.so.* ${base_libdir}/libnsl-*.so ${base_libdir}/libnss_files*.so.* ${base_libdir}/libnss_files-*.so ${base_libdir}/libnss_compat*.so.* ${base_libdir}/libnss_compat-*.so ${base_libdir}/libnss_dns*.so.* ${base_libdir}/libnss_dns-*.so ${base_libdir}/libdl*.so.* ${base_libdir}/libdl-*.so ${base_libdir}/libanl*.so.* ${base_libdir}/libanl-*.so ${base_libdir}/libBrokenLocale*.so.* ${base_libdir}/libBrokenLocale-*.so"
+libc_baselibs_append_aarch64 = " /lib/ld-linux-aarch64*.so.1"
+INSANE_SKIP_${PN}_append_aarch64 = " libdir"
 
-FILES_${PN} = "${libc_baselibs} ${libexecdir}/* ${@base_conditional('USE_LDCONFIG', '1', '${base_sbindir}/ldconfig ${sysconfdir}/ld.so.conf', '', d)}"
+FILES_${PN} = "${libc_baselibs} ${libexecdir}/* ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', '${base_sbindir}/ldconfig ${sysconfdir}/ld.so.conf', '', d)}"
 FILES_ldd = "${bindir}/ldd"
 FILES_libsegfault = "${base_libdir}/libSegFault*"
 FILES_libcidn = "${base_libdir}/libcidn-*.so ${base_libdir}/libcidn.so.*"
@@ -97,7 +96,7 @@ do_install_append () {
 		rm -f ${D}${infodir}/dir
 	fi
 
-	if [ "${USE_LDCONFIG}" != "1" ]; then
+	if ! ${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', 'true', 'false', d)}; then
 		# We won't ship this file (see FILES above) so let's not install it
 		rm -f ${D}${sysconfdir}/ld.so.conf
 		rm -f ${D}${base_sbindir}/ldconfig
@@ -121,6 +120,26 @@ do_install_append_aarch64 () {
                                 ${D}${nonarch_base_libdir}/ld-linux-aarch64_be.so.1
                 fi
         fi
+        do_install_armmultilib
+}
+
+do_install_append_arm () {
+        do_install_armmultilib
+}
+
+do_install_append_armeb () {
+        do_install_armmultilib
+}
+
+do_install_armmultilib () {
+
+        oe_multilib_header bits/endian.h bits/fcntl.h bits/fenv.h bits/hwcap.h bits/ipc.h bits/mathdef.h bits/link.h
+        oe_multilib_header bits/wordsize.h bits/local_lim.h bits/mman.h bits/msq.h bits/pthreadtypes.h bits/sem.h bits/semaphore.h
+        oe_multilib_header bits/setjmp.h bits/shm.h bits/sigstack.h bits/stat.h bits/statfs.h bits/typesizes.h
+
+        oe_multilib_header fpu_control.h gnu/lib-names.h gnu/stubs.h ieee754.h
+
+        oe_multilib_header sys/elf.h sys/procfs.h sys/ptrace.h sys/ucontext.h sys/user.h
 }
 
 do_install_locale () {
