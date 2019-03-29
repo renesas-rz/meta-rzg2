@@ -3,7 +3,7 @@ require recipes-kernel/linux-libc-headers/linux-libc-headers.inc
 RENESAS_BSP_URL = " \
     git://github.com/renesas-rz/renesas-cip.git"
 BRANCH = "rcar-gen3/v4.19.13-cip1"
-SRCREV = "2864e83c8d5443035e75a02c60c803146b65ce92"
+SRCREV = "410d6362b81650a8e8c19c34e2c4fe4efd1d27db"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 SRC_URI = "${RENESAS_BSP_URL};branch=${BRANCH}"

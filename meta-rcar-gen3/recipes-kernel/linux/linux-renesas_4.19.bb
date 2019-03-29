@@ -9,7 +9,7 @@ COMPATIBLE_MACHINE = "salvator-x|ebisu"
 
 RENESAS_BSP_URL = "git://github.com/renesas-rz/renesas-cip.git"
 BRANCH = "rcar-gen3/v4.19.13-cip1"
-SRCREV = "2864e83c8d5443035e75a02c60c803146b65ce92"
+SRCREV = "410d6362b81650a8e8c19c34e2c4fe4efd1d27db"
 
 SRC_URI = "${RENESAS_BSP_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
