@@ -12,6 +12,9 @@ SRCREV = "8392851962b980fc406de9be9bd7ef14fd6f68b0"
 
 SRC_URI = "${RENESAS_BSP_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
+SRC_URI_append_r8a774c0 += "\
+  ${@base_conditional("USE_ECC", "1", " file://0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \
+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 LINUX_VERSION ?= "4.19.13-cip1"
 
