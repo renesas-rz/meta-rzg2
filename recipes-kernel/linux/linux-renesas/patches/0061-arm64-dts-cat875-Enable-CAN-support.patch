@@ -1,0 +1,49 @@
+From 6e3ce32ef7d5f604f7ac53d73c8a3576b927d11d Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@rvc.renesas.com>
+Date: Wed, 13 Mar 2019 17:34:13 +0700
+Subject: [PATCH 061/175] arm64: dts: cat875: Enable CAN support
+
+This patch enables CAN support to the sub board
+
+Signed-off-by: Son Lam <son.lam.ym@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat875.dtsi | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+index a41d0d8..848199b 100644
+--- a/arch/arm64/boot/dts/renesas/cat875.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -8,3 +8,29 @@
+ / {
+ 	model = "Silicon Linux sub board for CAT874 (CAT875)";
+ };
++
++&pfc {
++	can0_pins: can0 {
++		groups = "can0_data";
++		function = "can0";
++	};
++
++	can1_pins: can1 {
++		groups = "can1_data";
++		function = "can1";
++	};
++};
++
++&can0 {
++	pinctrl-0 = <&can0_pins>;
++	pinctrl-names = "default";
++	renesas,can-clock-select = <0x0>;
++	status = "okay";
++};
++
++&can1 {
++	pinctrl-0 = <&can1_pins>;
++	pinctrl-names = "default";
++	renesas,can-clock-select = <0x0>;
++	status = "okay";
++};
+-- 
+2.7.4
+

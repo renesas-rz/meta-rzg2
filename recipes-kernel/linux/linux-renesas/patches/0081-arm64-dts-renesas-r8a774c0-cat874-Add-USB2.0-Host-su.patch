@@ -1,0 +1,54 @@
+From 3ada69ac995f9cf9130154dc3a914b21a9926295 Mon Sep 17 00:00:00 2001
+From: Tung Vo <tung.vo.eb@renesas.com>
+Date: Mon, 4 Mar 2019 03:27:45 +0700
+Subject: [PATCH 081/175] arm64: dts: renesas: r8a774c0-cat874: Add USB2.0 Host
+ support
+
+This patch adds USB2.0 Host support to the RZ/G2E board on the
+R8A774C0 SoC.
+
+Signed-off-by: Tung Vo <tung.vo.eb@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 72ea412..7709097 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -74,6 +74,11 @@
+ 		function = "sdhi0";
+ 		power-source= <1800>;
+ 	};
++
++	usb0_pins: usb {
++		groups = "usb0_b";
++		function = "usb0";
++	};
+ };
+ 
+ &scif2 {
+@@ -102,3 +107,20 @@
+ 	non-removable;
+ 	status = "okay";
+ };
++
++&ehci0 {
++	dr_mode = "host";
++	status = "okay";
++};
++
++&ohci0 {
++	dr_mode = "host";
++	status = "okay";
++};
++
++&usb2_phy0 {
++	pinctrl-0 = <&usb0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

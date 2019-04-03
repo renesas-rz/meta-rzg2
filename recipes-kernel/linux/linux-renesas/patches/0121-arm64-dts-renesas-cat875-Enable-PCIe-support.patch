@@ -1,0 +1,27 @@
+From 25e4e539a6757c651854c0de8ad0d917cb814ff5 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@rvc.renesas.com>
+Date: Tue, 5 Mar 2019 22:58:18 +0700
+Subject: [PATCH 121/175] arm64: dts: renesas: cat875: Enable PCIe support
+
+This patch enables PCIEC0 PCI express controller on the sub board.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat875.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+index 83c962c..0c631f7 100644
+--- a/arch/arm64/boot/dts/renesas/cat875.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -63,3 +63,7 @@
+ 	renesas,can-clock-select = <0x0>;
+ 	status = "okay";
+ };
++
++&pciec0 {
++	status = "okay";
++};
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From a21d75e28cb33b4baf4fd117a0f345fc388733cc Mon Sep 17 00:00:00 2001
+From: Tung Vo <tung.vo.eb@renesas.com>
+Date: Wed, 27 Feb 2019 03:46:25 +0700
+Subject: [PATCH 078/175] dt-bindings: rcar-gen3-phy-usb2: Add r8a774c0 support
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Tung Vo <tung.vo.eb@renesas.com>
+---
+ Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb2.txt | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb2.txt b/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb2.txt
+index fb4a204..4941800 100644
+--- a/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb2.txt
++++ b/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb2.txt
+@@ -14,7 +14,10 @@ Required properties:
+ 	      R8A77990 SoC.
+ 	      "renesas,usb2-phy-r8a77995" if the device is a part of an
+ 	      R8A77995 SoC.
+-	      "renesas,rcar-gen3-usb2-phy" for a generic R-Car Gen3 compatible device.
++	      "renesas,usb2-phy-r8a774c0" if the device is a part of an
++	      R8A774C0 SoC.
++	      "renesas,rcar-gen3-usb2-phy" for a generic R-Car Gen3 or RZ/G2
++	      compatible device.
+ 
+ 	      When compatible with the generic version, nodes must list the
+ 	      SoC-specific version corresponding to the platform first
+-- 
+2.7.4
+

@@ -1,0 +1,78 @@
+From 031718602558983de1bb89d92e6b0f2659c006af Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Thu, 14 Mar 2019 14:01:02 +0700
+Subject: [PATCH 123/175] arm64: dts: renesas: r8a774c0-cat874: Add Wifi
+ Support.
+
+This patch enables Wifi for RZ/G2E (R8A774C0 SoC).
+
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 40 +++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 11ab35d..e09eb90 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -66,6 +66,18 @@
+ 		states = <3300000 1
+ 			1800000 0>;
+ 	};
++
++	wlan_en_reg: fixedregulator {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <70000>;
++
++		/* WLAN_EN GPIO for this board - Bank2, pin25 */
++		gpio = <&gpio2 25 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
+ };
+ 
+ &extal_clk {
+@@ -99,6 +111,12 @@
+ 		groups = "usb30", "usb30_id";
+ 		function = "usb30";
+ 	};
++
++	sdhi3_pins_uhs: sd3_uhs {
++		groups = "sdhi3_data4", "sdhi3_ctrl";
++		function = "sdhi3";
++		power-source = <1800>;
++	};
+ };
+ 
+ &scif2 {
+@@ -188,3 +206,25 @@
+ 	/* Map all possible DDR as inbound ranges */
+ 	dma-ranges = <0x42000000 0 0x40000000 0 0x40000000 0 0x80000000>;
+ };
++
++&sdhi3 {
++	/* used for on-board WIFI */
++	status = "okay";
++	pinctrl-0 = <&sdhi3_pins_uhs>;
++	pinctrl-names = "default";
++
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	non-removable;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@2 {
++		compatible = "ti,wl1837";
++		reg = <2>;
++		interrupt-parent = <&gpio1>;
++		interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
++	};
++};
+-- 
+2.7.4
+

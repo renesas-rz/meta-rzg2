@@ -1,0 +1,29 @@
+From 7a0e3ccb518b927763bd4eec32c0185fc446133e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 20 Feb 2019 15:21:11 +0700
+Subject: [PATCH 001/175] dt-bindings: arm: Document RZ/G2E SoC DT bindings
+
+Add device tree bindings documentation for Renesas RZ/G2E (r8a774c0)
+SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/arm/shmobile.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/arm/shmobile.txt b/Documentation/devicetree/bindings/arm/shmobile.txt
+index 89b4a38..f902527 100644
+--- a/Documentation/devicetree/bindings/arm/shmobile.txt
++++ b/Documentation/devicetree/bindings/arm/shmobile.txt
+@@ -23,6 +23,8 @@ SoCs:
+     compatible = "renesas,r8a7745"
+   - RZ/G1C (R8A77470)
+     compatible = "renesas,r8a77470"
++  - RZ/G2E (R8A774C0)
++    compatible = "renesas,r8a774c0"
+   - R-Car M1A (R8A77781)
+     compatible = "renesas,r8a7778"
+   - R-Car H1 (R8A77790)
+-- 
+2.7.4
+

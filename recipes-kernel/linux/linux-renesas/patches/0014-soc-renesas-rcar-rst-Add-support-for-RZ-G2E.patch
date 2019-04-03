@@ -1,0 +1,57 @@
+From 70ff2811bc0cdff220d1c5b492852af6f0c7556e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 20 Feb 2019 19:41:20 +0700
+Subject: [PATCH 014/175] soc: renesas: rcar-rst: Add support for RZ/G2E
+
+Reference upstreams commit id:
+<91e95ecd4b4ff35624ac48bdf6dcf2d855f0b63e>
+
+This patch adds support for RZ/G2E.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Biju Das <biju.das@bp.renesas.com>
+Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig    | 6 +++---
+ drivers/soc/renesas/rcar-rst.c | 4 +++-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 0f5e617..ed71663 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -3,9 +3,9 @@ config SOC_RENESAS
+ 	default y if ARCH_RENESAS
+ 	select SOC_BUS
+ 	select RST_RCAR if ARCH_RCAR_GEN1 || ARCH_RCAR_GEN2 || \
+-			   ARCH_R8A7795 || ARCH_R8A7796 || ARCH_R8A77965 || \
+-			   ARCH_R8A77970 || ARCH_R8A77980 || ARCH_R8A77990 || \
+-			   ARCH_R8A77995
++			   ARCH_R8A774C0 || ARCH_R8A7795 || ARCH_R8A7796 || \
++			   ARCH_R8A77965 || ARCH_R8A77970 || ARCH_R8A77980 || \
++			   ARCH_R8A77990 || ARCH_R8A77995
+ 	select SYSC_R8A7743 if ARCH_R8A7743
+ 	select SYSC_R8A7745 if ARCH_R8A7745
+ 	select SYSC_R8A77470 if ARCH_R8A77470
+diff --git a/drivers/soc/renesas/rcar-rst.c b/drivers/soc/renesas/rcar-rst.c
+index d9c1034..7138af6 100644
+--- a/drivers/soc/renesas/rcar-rst.c
++++ b/drivers/soc/renesas/rcar-rst.c
+@@ -41,10 +41,12 @@ static const struct rst_config rcar_rst_gen3 __initconst = {
+ };
+ 
+ static const struct of_device_id rcar_rst_matches[] __initconst = {
+-	/* RZ/G is handled like R-Car Gen2 */
++	/* RZ/G1 is handled like R-Car Gen2 */
+ 	{ .compatible = "renesas,r8a7743-rst", .data = &rcar_rst_gen2 },
+ 	{ .compatible = "renesas,r8a7745-rst", .data = &rcar_rst_gen2 },
+ 	{ .compatible = "renesas,r8a77470-rst", .data = &rcar_rst_gen2 },
++	/* RZ/G2 is handled like R-Car Gen3 */
++	{ .compatible = "renesas,r8a774c0-rst", .data = &rcar_rst_gen3 },
+ 	/* R-Car Gen1 */
+ 	{ .compatible = "renesas,r8a7778-reset-wdt", .data = &rcar_rst_gen1 },
+ 	{ .compatible = "renesas,r8a7779-reset-wdt", .data = &rcar_rst_gen1 },
+-- 
+2.7.4
+

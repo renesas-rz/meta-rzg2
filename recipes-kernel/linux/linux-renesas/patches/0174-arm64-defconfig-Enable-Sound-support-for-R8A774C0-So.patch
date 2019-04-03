@@ -1,0 +1,35 @@
+From 8c36e44f61596b1ca3e163d70ff33291021cad26 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 11 Apr 2019 09:27:13 +0700
+Subject: [PATCH 174/175] arm64: defconfig: Enable Sound support for R8A774C0
+ SoC
+
+This patch enables config needed for Sound support in R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 3d8ef64..d31ee4a 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -486,7 +486,7 @@ CONFIG_SND_SOC_RL6231=m
+ CONFIG_SND_SOC_RT5514=m
+ CONFIG_SND_SOC_RT5514_SPI=m
+ CONFIG_SND_SOC_RT5645=m
+-CONFIG_SND_SIMPLE_CARD=m
++CONFIG_SND_SIMPLE_CARD=y
+ CONFIG_SND_AUDIO_GRAPH_CARD=y
+ CONFIG_I2C_HID=m
+ CONFIG_USB=y
+@@ -753,3 +753,5 @@ CONFIG_HAS_IOMEM=y
+ CONFIG_PTP_1588_CLOCK=y
+ CONFIG_DRM_TILCDC=y
+ CONFIG_DRM_I2C_NXP_TDA998X=y
++CONFIG_SND_SOC_ALL_CODECS=y
++CONFIG_COMPILE_TEST=y
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From 2629c4f8cc78d94a6f1536f09ecbeaa883a262a0 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 11 Mar 2019 10:10:26 +0700
+Subject: [PATCH 107/175] dt-bindings: timer: renesas: cmt: document R-Car gen3
+ support
+
+Document support for the R-Car gen3 CMT types 0/1 bindings.
+They seem to be the same CMT types 0/1 as in the R-Car gen2 SoCs.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/timer/renesas,cmt.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/timer/renesas,cmt.txt b/Documentation/devicetree/bindings/timer/renesas,cmt.txt
+index b40add2..d0ae979 100644
+--- a/Documentation/devicetree/bindings/timer/renesas,cmt.txt
++++ b/Documentation/devicetree/bindings/timer/renesas,cmt.txt
+@@ -41,6 +41,9 @@ Required Properties:
+ 		and RZ/G1.
+ 		These are fallbacks for r8a73a4, R-Car Gen2 and RZ/G1 entries
+ 		listed above.
++    - "renesas,rcar-gen3-cmt0" for 32-bit CMT0 devices included in R-Car Gen3.
++    - "renesas,rcar-gen3-cmt1" for 48-bit CMT1 devices included in R-Car Gen3.
++		These are fallbacks for R-Car Gen3 entries listed above.
+ 
+   - reg: base address and length of the registers block for the timer module.
+   - interrupts: interrupt-specifier for the timer, one per channel.
+-- 
+2.7.4
+

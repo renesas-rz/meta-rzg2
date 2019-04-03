@@ -1,0 +1,59 @@
+From 3c9739eae61b72d8fe5b7aae27cf4a0b5a6234e3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 28 Feb 2019 14:19:30 +0700
+Subject: [PATCH 033/175] clk: renesas: cpg-mssr: Add support for fixed rate
+ clocks
+
+Add support for defining fixed rate clocks, to be used for on-chip
+oscillators.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+(cherry picked from commit 0d2602d750152f9fcf3d9af9466f3d67b60aa646)
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/renesas-cpg-mssr.c | 5 +++++
+ drivers/clk/renesas/renesas-cpg-mssr.h | 3 +++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/drivers/clk/renesas/renesas-cpg-mssr.c b/drivers/clk/renesas/renesas-cpg-mssr.c
+index 0db0adf..537d537 100644
+--- a/drivers/clk/renesas/renesas-cpg-mssr.c
++++ b/drivers/clk/renesas/renesas-cpg-mssr.c
+@@ -313,6 +313,11 @@ static void __init cpg_mssr_register_core_clk(const struct cpg_core_clk *core,
+ 		}
+ 		break;
+ 
++	case CLK_TYPE_FR:
++			clk = clk_register_fixed_rate(NULL, core->name, NULL, 0,
++							core->mult);
++		break;
++
+ 	default:
+ 		if (info->cpg_clk_register)
+ 			clk = info->cpg_clk_register(dev, core, info,
+diff --git a/drivers/clk/renesas/renesas-cpg-mssr.h b/drivers/clk/renesas/renesas-cpg-mssr.h
+index b36782d..4a62b67 100644
+--- a/drivers/clk/renesas/renesas-cpg-mssr.h
++++ b/drivers/clk/renesas/renesas-cpg-mssr.h
+@@ -38,6 +38,7 @@ enum clk_types {
+ 	CLK_TYPE_FF,		/* Fixed Factor Clock */
+ 	CLK_TYPE_DIV6P1,	/* DIV6 Clock with 1 parent clock */
+ 	CLK_TYPE_DIV6_RO,	/* DIV6 Clock read only with extra divisor */
++	CLK_TYPE_FR,		/* Fixed Rate Clock */
+ 
+ 	/* Custom definitions start here */
+ 	CLK_TYPE_CUSTOM,
+@@ -56,6 +57,8 @@ enum clk_types {
+ 	DEF_BASE(_name, _id, CLK_TYPE_DIV6P1, _parent, .offset = _offset)
+ #define DEF_DIV6_RO(_name, _id, _parent, _offset, _div)	\
+ 	DEF_BASE(_name, _id, CLK_TYPE_DIV6_RO, _parent, .offset = _offset, .div = _div, .mult = 1)
++#define DEF_RATE(_name, _id, _rate)			\
++	DEF_TYPE(_name, _id, CLK_TYPE_FR, .mult = _rate)
+ 
+     /*
+      * Definitions of Module Clocks
+-- 
+2.7.4
+

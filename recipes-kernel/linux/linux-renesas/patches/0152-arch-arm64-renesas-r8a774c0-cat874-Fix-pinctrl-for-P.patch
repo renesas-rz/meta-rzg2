@@ -1,0 +1,37 @@
+From b0b1094e3274fbd074872cf8253b9d08b1c5b4da Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 29 Mar 2019 15:43:24 +0700
+Subject: [PATCH 152/175] arch: arm64: renesas: r8a774c0-cat874: Fix pinctrl
+ for PWM
+
+Wrong define name of property, so pwm can't get pinctrl.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 932a6c7..d33b6e8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -280,14 +280,14 @@
+ };
+ 
+ &pwm5 {
+-	princtrl-0 = <&pwm5_pins>;
++	pinctrl-0 = <&pwm5_pins>;
+ 	pinctrl-name = "default";
+ 
+ 	status = "okay";
+ };
+ 
+ &pwm6 {
+-	princtrl-0 = <&pwm6_pins>;
++	pinctrl-0 = <&pwm6_pins>;
+ 	pinctrl-name = "default";
+ 
+ 	status = "okay";
+-- 
+2.7.4
+

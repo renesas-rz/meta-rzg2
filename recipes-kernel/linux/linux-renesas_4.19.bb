@@ -6,11 +6,16 @@ require include/cas-control.inc
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 COMPATIBLE_MACHINE = "ek874"
 
-RENESAS_BSP_URL = "git://github.com/renesas-rz/renesas-cip.git"
-BRANCH = "v4.19.13-cip1"
-SRCREV = "62365eba8f2a1b25cef715d9890f48667d6187a5"
+KERNEL_URL = " \
+    git://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git"
+BRANCH = "linux-4.19.y-cip"
+SRCREV = "c312fd1d432e36f9012127fe3c1d2b7023afae48"
 
-SRC_URI = "${RENESAS_BSP_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
+SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
+
+SRC_URI_append += "\
+  file://patches/Add-EK874-support.scc \
+"
 
 SRC_URI_append_r8a774c0 += "\
   ${@base_conditional("USE_ECC", "1", " file://0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \

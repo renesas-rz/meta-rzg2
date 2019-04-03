@@ -1,0 +1,86 @@
+From 0be1226d5d017e2a2ab9fd67c6cbaa85028360f7 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 15 Mar 2019 16:16:22 +0700
+Subject: [PATCH 075/175] arm64: dts: r8a774c0-cat874: Enable SDHI0 node
+
+This patch enable micro SD card connected to SDHI0
+for the RZ/G2E board on the R8A774C0 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 41 +++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index d30ce51..eb84aa4 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -7,6 +7,7 @@
+ 
+ /dts-v1/;
+ #include "r8a774c0.dtsi"
++#include <dt-bindings/gpio/gpio.h>
+ 
+ / {
+ 	model = "Silicon Linux RZ/G2E 96board platform (CAT874)";
+@@ -26,6 +27,30 @@
+ 		/* first 128MB is reserved for secure area. */
+ 		reg = <0x0 0x48000000 0x0 0x78000000>;
+ 	};
++
++	vcc_sdhi0: regulator-vcc-sdhi0 {
++		compatible = "regulator-fixed";
++
++		regulator-name = "SDHI0 Vcc";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vccq_sdhi0: regulator-vccq-sdhi0 {
++		compatible = "regulator-gpio";
++
++		regulator-name = "SDHI0 VccQ";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++
++		gpios = <&gpio3 13 GPIO_ACTIVE_HIGH>;
++		gpios-states = <1>;
++		states = <3300000 1
++			1800000 0>;
++	};
+ };
+ 
+ &extal_clk {
+@@ -37,6 +62,11 @@
+ 		groups = "scif2_data_a";
+ 		function = "scif2";
+ 	};
++
++	sdhi0_pins: sd0 {
++		groups = "sdhi0_data4", "sdhi0_ctrl";
++		function = "sdhi0";
++	};
+ };
+ 
+ &scif2 {
+@@ -50,3 +80,14 @@
+ 	timeout-sec = <60>;
+ 	status = "okay";
+ };
++
++&sdhi0 {
++	pinctrl-0 = <&sdhi0_pins>;
++	pinctrl-names = "default";
++
++	vmmc-supply = <&vcc_sdhi0>;
++	vqmmc-supply = <&vccq_sdhi0>;
++	cd-gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
++	bus-width = <4>;
++	status = "okay";
++};
+-- 
+2.7.4
+

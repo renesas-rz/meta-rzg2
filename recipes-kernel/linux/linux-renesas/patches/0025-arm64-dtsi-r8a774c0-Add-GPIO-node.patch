@@ -1,0 +1,131 @@
+From 0d8dff31e38c93f7f30d0ee5c3dc2e2edda4bfe0 Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Tue, 26 Feb 2019 08:37:12 +0700
+Subject: [PATCH 025/175] arm64: dtsi: r8a774c0: Add GPIO node
+
+This patch adds GPIO node for R8A774C0 SoC
+
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 106 ++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index a8ba68e..062e3bc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -141,5 +141,111 @@
+ 			resets = <&cpg 310>;
+ 			status = "disabled";
+ 		};
++
++		gpio0: gpio@e6050000 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6050000 0 0x50>;
++			interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 0 18>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 912>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 912>;
++		};
++
++		gpio1: gpio@e6051000 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6051000 0 0x50>;
++			interrupts = <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 32 23>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 911>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 911>;
++		};
++
++		gpio2: gpio@e6052000 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6052000 0 0x50>;
++			interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 64 26>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 910>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 910>;
++		};
++
++		gpio3: gpio@e6053000 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6053000 0 0x50>;
++			interrupts = <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 96 16>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 909>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 909>;
++		};
++
++		gpio4: gpio@e6054000 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6054000 0 0x50>;
++			interrupts = <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 128 11>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 908>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 908>;
++		};
++
++		gpio5: gpio@e6055000 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6055000 0 0x50>;
++			interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 160 20>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 907>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 907>;
++		};
++
++		gpio6: gpio@e6055400 {
++			compatible = "renesas,gpio-r8a774c0",
++				     "renesas,rcar-gen3-gpio";
++			reg = <0 0xe6055400 0 0x50>;
++			interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
++			#gpio-cells = <2>;
++			gpio-controller;
++			gpio-ranges = <&pfc 0 192 18>;
++			#interrupt-cells = <2>;
++			interrupt-controller;
++			clocks = <&cpg CPG_MOD 906>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 906>;
++		};
++
+ 	};
+ };
+-- 
+2.7.4
+

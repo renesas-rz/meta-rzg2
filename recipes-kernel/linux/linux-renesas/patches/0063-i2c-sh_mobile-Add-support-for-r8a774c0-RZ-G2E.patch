@@ -1,0 +1,33 @@
+From 2aa4342f9cbb5e3f4c2590dbc0ec917e27996ff7 Mon Sep 17 00:00:00 2001
+From: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Date: Mon, 11 Mar 2019 08:16:26 +0700
+Subject: [PATCH 063/175] i2c: sh_mobile: Add support for r8a774c0 (RZ/G2E)
+
+Similarly to R-Car E3, RZ/G2E doesn't come with automatic
+transmission registers, as such it is not considered compatible
+with the existing fallback bindings.
+
+Add SoC specific binding compatibility to allow for later
+support for automatic transmission.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ drivers/i2c/busses/i2c-sh_mobile.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/i2c/busses/i2c-sh_mobile.c b/drivers/i2c/busses/i2c-sh_mobile.c
+index 818cab1..f31e91e 100644
+--- a/drivers/i2c/busses/i2c-sh_mobile.c
++++ b/drivers/i2c/busses/i2c-sh_mobile.c
+@@ -805,6 +805,7 @@ static const struct of_device_id sh_mobile_i2c_dt_ids[] = {
+ 	{ .compatible = "renesas,iic-r8a7792", .data = &fast_clock_dt_config },
+ 	{ .compatible = "renesas,iic-r8a7793", .data = &fast_clock_dt_config },
+ 	{ .compatible = "renesas,iic-r8a7794", .data = &fast_clock_dt_config },
++	{ .compatible = "renesas,iic-r8a774c0", .data = &fast_clock_dt_config },
+ 	{ .compatible = "renesas,rcar-gen2-iic", .data = &fast_clock_dt_config },
+ 	{ .compatible = "renesas,iic-r8a7795", .data = &fast_clock_dt_config },
+ 	{ .compatible = "renesas,rcar-gen3-iic", .data = &fast_clock_dt_config },
+-- 
+2.7.4
+

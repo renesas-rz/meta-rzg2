@@ -1,0 +1,150 @@
+From 11e9b6c8d4f1ed2badcef605309d60d351e7e022 Mon Sep 17 00:00:00 2001
+From: Chinh Nguyen <chinh.nguyen.jg@renesas.com>
+Date: Thu, 14 Mar 2019 16:03:15 +0700
+Subject: [PATCH 098/175] iommu/ipmmu-vmsa: Whitelist devices for r8a774c0
+
+This adds whitelist devices support for r8a774c0 (RZG2E)
+
+- For unsupported SoCs, IPMMU will probe error.
+- For unsupported IPMMU cache devices or unsupported master devices,
+IPMMU will not do address translation.
+
+Signed-off-by: Hai Nguyen Pham <hai.pham.ud@renesas.com>
+Signed-off-by: Chinh Nguyen <chinh.nguyen.jg@renesas.com>
+---
+ drivers/iommu/ipmmu-vmsa-whitelist.h | 39 ++++++++++++++++++++++++++
+ drivers/iommu/ipmmu-vmsa.c           | 54 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 92 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/iommu/ipmmu-vmsa-whitelist.h b/drivers/iommu/ipmmu-vmsa-whitelist.h
+index 4966e5c..0e35f83 100644
+--- a/drivers/iommu/ipmmu-vmsa-whitelist.h
++++ b/drivers/iommu/ipmmu-vmsa-whitelist.h
+@@ -137,6 +137,45 @@
+ #define M_SDHI2		BIT(34)
+ #define M_SDHI3		BIT(35)
+ 
++/* Support masters for r8a774c0 */
++#define E3_IPMMU_VI0_MASTER	(M_VIN_4_5 | M_FCPVD_0 | M_FCPVD_1)
++#define E3_IPMMU_HC_MASTER	(M_PCIE_0 | M_USB2H_0 | M_USB_DMAC_0 | \
++				 M_USB_DMAC_1 | M_USB3H_0 | M_USB3F_0)
++#define E3_IPMMU_MP_MASTER	(M_AUDIO_DMAC_0 | M_AUDIO_DMAC_1 | \
++				 M_AUDIO_DMAC_2 | M_AUDIO_DMAC_3 | \
++				 M_AUDIO_DMAC_4 | M_AUDIO_DMAC_5 | \
++				 M_AUDIO_DMAC_6 | M_AUDIO_DMAC_7 | \
++				 M_AUDIO_DMAC_8 | M_AUDIO_DMAC_9 | \
++				 M_AUDIO_DMAC_10 | M_AUDIO_DMAC_11 | \
++				 M_AUDIO_DMAC_12 | M_AUDIO_DMAC_13 | \
++				 M_AUDIO_DMAC_14 | M_AUDIO_DMAC_15)
++#define E3_IPMMU_DS0_MASTER	(M_SYS_DMAC_0 | M_SYS_DMAC_1 | \
++				 M_SYS_DMAC_2 | M_SYS_DMAC_3 | \
++				 M_SYS_DMAC_4 | M_SYS_DMAC_5 | \
++				 M_SYS_DMAC_6 | M_SYS_DMAC_7 | \
++				 M_SYS_DMAC_8 | M_SYS_DMAC_9 | \
++				 M_SYS_DMAC_10 | M_SYS_DMAC_11 | \
++				 M_SYS_DMAC_12 | M_SYS_DMAC_13 | \
++				 M_SYS_DMAC_14 | M_SYS_DMAC_15 | \
++				 M_ETHERNET)
++#define E3_IPMMU_DS1_MASTER	(M_SYS_DMAC_16 | M_SYS_DMAC_17 | \
++				 M_SYS_DMAC_18 | M_SYS_DMAC_19 | \
++				 M_SYS_DMAC_20 | M_SYS_DMAC_21 | \
++				 M_SYS_DMAC_22 | M_SYS_DMAC_23 | \
++				 M_SYS_DMAC_24 | M_SYS_DMAC_25 | \
++				 M_SYS_DMAC_26 | M_SYS_DMAC_27 | \
++				 M_SYS_DMAC_28 | M_SYS_DMAC_29 | \
++				 M_SYS_DMAC_30 | M_SYS_DMAC_31 | \
++				 M_SYS_DMAC_32 | M_SYS_DMAC_33 | \
++				 M_SYS_DMAC_34 | M_SYS_DMAC_35 | \
++				 M_SYS_DMAC_36 | M_SYS_DMAC_37 | \
++				 M_SYS_DMAC_38 | M_SYS_DMAC_39 | \
++				 M_SYS_DMAC_40 | M_SYS_DMAC_41 | \
++				 M_SYS_DMAC_42 | M_SYS_DMAC_43 | \
++				 M_SYS_DMAC_44 | M_SYS_DMAC_45 | \
++				 M_SYS_DMAC_46 | M_SYS_DMAC_47 | \
++				 M_SDHI0 | M_SDHI1 | M_SDHI3)
++
+ struct ipmmu_whitelist {
+ 	const char *ipmmu_name;
+ 	unsigned int base_addr;
+diff --git a/drivers/iommu/ipmmu-vmsa.c b/drivers/iommu/ipmmu-vmsa.c
+index faab5c8..5b47ae5 100644
+--- a/drivers/iommu/ipmmu-vmsa.c
++++ b/drivers/iommu/ipmmu-vmsa.c
+@@ -94,6 +94,48 @@ static struct ipmmu_vmsa_device *to_ipmmu(struct device *dev)
+ 	return dev->iommu_fwspec ? dev->iommu_fwspec->iommu_priv : NULL;
+ }
+ 
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++/* RZG2E (R8A774c0) */
++static struct ipmmu_whitelist r8a774c0_ipmmu_vi0 = {
++	.ipmmu_name	= "febd0000.mmu",
++	.base_addr	= IPMMU_VI0_BASE,
++	.ip_masters	= E3_IPMMU_VI0_MASTER,
++};
++
++static struct ipmmu_whitelist r8a774c0_ipmmu_hc = {
++	.ipmmu_name	= "e6570000.mmu",
++	.base_addr	= IPMMU_HC_BASE,
++	.ip_masters	= E3_IPMMU_HC_MASTER,
++};
++
++static struct ipmmu_whitelist r8a774c0_ipmmu_mp = {
++	.ipmmu_name	= "ec670000.mmu",
++	.base_addr	= IPMMU_MP_BASE,
++	.ip_masters	= E3_IPMMU_MP_MASTER,
++};
++
++static struct ipmmu_whitelist r8a774c0_ipmmu_ds0 = {
++	.ipmmu_name	= "e6740000.mmu",
++	.base_addr	= IPMMU_DS0_BASE,
++	.ip_masters	= E3_IPMMU_DS0_MASTER,
++};
++
++static struct ipmmu_whitelist r8a774c0_ipmmu_ds1 = {
++	.ipmmu_name	= "e7740000.mmu",
++	.base_addr	= IPMMU_DS1_BASE,
++	.ip_masters	= E3_IPMMU_DS1_MASTER,
++};
++
++static struct ipmmu_whitelist *r8a774c0_whitelist[] = {
++	&r8a774c0_ipmmu_vi0,
++	&r8a774c0_ipmmu_hc,
++	&r8a774c0_ipmmu_mp,
++	&r8a774c0_ipmmu_ds0,
++	&r8a774c0_ipmmu_ds1,
++	NULL, /* Terminator */
++};
++#endif /* CONFIG_IPMMU_VMSA_WHITELIST */
++
+ #define TLB_LOOP_TIMEOUT		100	/* 100us */
+ 
+ /* -----------------------------------------------------------------------------
+@@ -826,6 +868,13 @@ static const struct soc_device_attribute soc_rcar_gen3[] = {
+ 	{ /* sentinel */ }
+ };
+ 
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++static const struct soc_device_attribute r8a774c0[]  = {
++	{ .soc_id = "r8a774c0" },
++	{ /* sentinel */ }
++};
++#endif /* CONFIG_IPMMU_VMSA_WHITELIST */
++
+ static int ipmmu_of_xlate(struct device *dev,
+ 			  struct of_phandle_args *spec)
+ {
+@@ -1077,7 +1126,10 @@ static int ipmmu_whitelist_init(struct ipmmu_vmsa_device *mmu)
+ {
+ 	/* Whitelist set up depend per SoC */
+ 
+-	mmu->whitelist = NULL;
++	if (soc_device_match(r8a774c0))
++		mmu->whitelist = r8a774c0_whitelist;
++	else
++		mmu->whitelist = NULL;
+ 
+ 	if (!mmu->whitelist[0])
+ 		return -1;
+-- 
+2.7.4
+

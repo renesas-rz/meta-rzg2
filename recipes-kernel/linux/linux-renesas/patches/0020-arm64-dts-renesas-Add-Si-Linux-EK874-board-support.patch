@@ -1,0 +1,73 @@
+From b509056c840a7548c83700c4f8fbd5a4e4c444ae Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Feb 2019 11:49:23 +0700
+Subject: [PATCH 020/175] arm64: dts: renesas: Add Si-Linux EK874 board support
+
+Reference commit id:
+<4e8776657dd92854d063658b42440673edd995ae>
+
+The EK874 development kit from Silicon Linux is made of CAT874
+(the main board) and CAT875 (the sub board that goes on top of CAT874).
+
+Signed-off-by: Biju Das <biju.das@bp.renesas.com>
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Chris Paterson <Chris.Paterson2@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile           |  2 +-
+ arch/arm64/boot/dts/renesas/cat875.dtsi        | 10 ++++++++++
+ arch/arm64/boot/dts/renesas/r8a774c0-ek874.dts | 14 ++++++++++++++
+ 3 files changed, 25 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/cat875.dtsi
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774c0-ek874.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 3744f8d..1b98e6b 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+-dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb
++dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb r8a774c0-ek874.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-x.dtb r8a7795-h3ulcb.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-h3ulcb-kf.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-xs.dtb
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+new file mode 100644
+index 0000000..a41d0d8
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -0,0 +1,10 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the Silicon Linux sub board for CAT874 (CAT875)
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++/ {
++	model = "Silicon Linux sub board for CAT874 (CAT875)";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-ek874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-ek874.dts
+new file mode 100644
+index 0000000..e7b6619
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-ek874.dts
+@@ -0,0 +1,14 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the Silicon Linux RZ/G2E evaluation kit (EK874)
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include "r8a774c0-cat874.dts"
++#include "cat875.dtsi"
++
++/ {
++	model = "Silicon Linux RZ/G2E evaluation kit EK874 (CAT874 + CAT875)";
++	compatible = "si-linux,cat875", "si-linux,cat874", "renesas,r8a774c0";
++};
+-- 
+2.7.4
+

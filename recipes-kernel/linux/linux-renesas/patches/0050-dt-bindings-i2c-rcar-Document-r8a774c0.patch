@@ -1,0 +1,27 @@
+From 749082e76c06f9eb8c23810a7b6c34678d245327 Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Tue, 26 Feb 2019 13:42:16 +0700
+Subject: [PATCH 050/175] dt-bindings: i2c: rcar: Document r8a774c0
+
+This patch documents RZ/G2E (a.k.a R8A774C0) bindings for I2C driver
+
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ Documentation/devicetree/bindings/i2c/i2c-rcar.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/i2c/i2c-rcar.txt b/Documentation/devicetree/bindings/i2c/i2c-rcar.txt
+index 39cd21d..390e15a 100644
+--- a/Documentation/devicetree/bindings/i2c/i2c-rcar.txt
++++ b/Documentation/devicetree/bindings/i2c/i2c-rcar.txt
+@@ -4,6 +4,7 @@ Required properties:
+ - compatible:
+ 	"renesas,i2c-r8a7743" if the device is a part of a R8A7743 SoC.
+ 	"renesas,i2c-r8a7745" if the device is a part of a R8A7745 SoC.
++	"renesas,i2c-r8a774c0" if the device is a part of a R8A774C0 SoC.
+ 	"renesas,i2c-r8a774a1" if the device is a part of a R8A774A1 SoC.
+ 	"renesas,i2c-r8a7778" if the device is a part of a R8A7778 SoC.
+ 	"renesas,i2c-r8a7779" if the device is a part of a R8A7779 SoC.
+-- 
+2.7.4
+

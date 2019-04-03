@@ -1,0 +1,37 @@
+From d4a443b736a9a89de9cbee51b269844e7322e193 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 1 Apr 2019 14:00:06 +0700
+Subject: [PATCH 162/175] arch: arm64: r8a774c0-cat874: Correct name of
+ property "pinctrl-names"
+
+Wrong name of property make module can't detect pin send signal out.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 42edbea..afd965b 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -301,14 +301,14 @@
+ 
+ &pwm5 {
+ 	pinctrl-0 = <&pwm5_pins>;
+-	pinctrl-name = "default";
++	pinctrl-names = "default";
+ 
+ 	status = "okay";
+ };
+ 
+ &pwm6 {
+ 	pinctrl-0 = <&pwm6_pins>;
+-	pinctrl-name = "default";
++	pinctrl-names = "default";
+ 
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

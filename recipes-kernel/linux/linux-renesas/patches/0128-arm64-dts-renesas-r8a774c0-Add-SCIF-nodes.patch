@@ -1,0 +1,124 @@
+From 679cd5ac8482dd1854c3f9d9e33ae95203458c55 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@rvc.renesas.com>
+Date: Thu, 28 Mar 2019 14:18:12 +0700
+Subject: [PATCH 128/175] arm64: dts: renesas: r8a774c0: Add SCIF nodes
+
+Add the device nodes for RZ/G2E SCIF channels.
+
+Signed-off-by: Son Lam <son.lam.ym@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 88 ++++++++++++++++++++++++++++++-
+ 1 file changed, 86 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index a855c38..d7821aa 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -480,18 +480,102 @@
+ 			status = "disabled";
+ 		};
+ 
++		scif0: serial@e6e60000 {
++			compatible = "renesas,scif-r8a774c0",
++				     "renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6e60000 0 64>;
++			interrupts = <GIC_SPI 152 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 207>,
++				 <&cpg CPG_CORE R8A774C0_CLK_S3D1C>,
++				 <&scif_clk>;
++			clock-names = "fck", "brg_int", "scif_clk";
++			dmas = <&dmac1 0x51>, <&dmac1 0x50>,
++			       <&dmac2 0x51>, <&dmac2 0x50>;
++			dma-names = "tx", "rx", "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 207>;
++			status = "disabled";
++		};
++
++		scif1: serial@e6e68000 {
++			compatible = "renesas,scif-r8a774c0",
++				     "renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6e68000 0 64>;
++			interrupts = <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 206>,
++				 <&cpg CPG_CORE R8A774C0_CLK_S3D1C>,
++				 <&scif_clk>;
++			clock-names = "fck", "brg_int", "scif_clk";
++			dmas = <&dmac1 0x53>, <&dmac1 0x52>,
++			       <&dmac2 0x53>, <&dmac2 0x52>;
++			dma-names = "tx", "rx", "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 206>;
++			status = "disabled";
++		};
++
+ 		scif2: serial@e6e88000 {
+ 			compatible = "renesas,scif-r8a774c0",
+ 				"renesas,rcar-gen3-scif", "renesas,scif";
+ 			reg = <0 0xe6e88000 0 64>;
+ 			interrupts = <GIC_SPI 164 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 310>;
+-			clock-names = "fck";
++			clocks = <&cpg CPG_MOD 310>,
++				 <&cpg CPG_CORE R8A774C0_CLK_S3D1C>,
++				 <&scif_clk>;
++			clock-names = "fck", "brg_int", "scif_clk";
+ 			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
+ 			resets = <&cpg 310>;
+ 			status = "disabled";
+ 		};
+ 
++		scif3: serial@e6c50000 {
++			compatible = "renesas,scif-r8a774c0",
++				     "renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6c50000 0 64>;
++			interrupts = <GIC_SPI 23 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 204>,
++				 <&cpg CPG_CORE R8A774C0_CLK_S3D1C>,
++				 <&scif_clk>;
++			clock-names = "fck", "brg_int", "scif_clk";
++			dmas = <&dmac0 0x57>, <&dmac0 0x56>;
++			dma-names = "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 204>;
++			status = "disabled";
++		};
++
++		scif4: serial@e6c40000 {
++			compatible = "renesas,scif-r8a774c0",
++				     "renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6c40000 0 64>;
++			interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 203>,
++				 <&cpg CPG_CORE R8A774C0_CLK_S3D1C>,
++				 <&scif_clk>;
++			clock-names = "fck", "brg_int", "scif_clk";
++			dmas = <&dmac0 0x59>, <&dmac0 0x58>;
++			dma-names = "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 203>;
++			status = "disabled";
++		};
++
++		scif5: serial@e6f30000 {
++			compatible = "renesas,scif-r8a774c0",
++				     "renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6f30000 0 64>;
++			interrupts = <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 202>,
++				 <&cpg CPG_CORE R8A774C0_CLK_S3D1C>,
++				 <&scif_clk>;
++			clock-names = "fck", "brg_int", "scif_clk";
++			dmas = <&dmac0 0x5b>, <&dmac0 0x5a>;
++			dma-names = "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 202>;
++			status = "disabled";
++		};
++
+ 		gpio0: gpio@e6050000 {
+ 			compatible = "renesas,gpio-r8a774c0",
+ 				     "renesas,rcar-gen3-gpio";
+-- 
+2.7.4
+

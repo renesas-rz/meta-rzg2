@@ -1,0 +1,34 @@
+From 56039d9e8dd5009e3cdaa33b710f604d5a4487d8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 20 Feb 2019 16:07:05 +0700
+Subject: [PATCH 006/175] dt-bindings: power: rcar-sysc: Document r8a774c0 sysc
+
+Reference upstreams commit id:
+<39dc9a103bc587d32a0416c5a47483a6e9ef88e2>
+
+Document bindings for the RZ/G2E (a.k.a. R8A774C0) system
+controller.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Biju Das <biju.das@bp.renesas.com>
+Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt b/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt
+index 180ae65..7ecab7a 100644
+--- a/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt
++++ b/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt
+@@ -10,6 +10,7 @@ Required properties:
+       - "renesas,r8a7743-sysc" (RZ/G1M)
+       - "renesas,r8a7745-sysc" (RZ/G1E)
+       - "renesas,r8a77470-sysc" (RZ/G1C)
++      - "renesas,r8a774c0-sysc" (RZ/G2E)
+       - "renesas,r8a7779-sysc" (R-Car H1)
+       - "renesas,r8a7790-sysc" (R-Car H2)
+       - "renesas,r8a7791-sysc" (R-Car M2-W)
+-- 
+2.7.4
+

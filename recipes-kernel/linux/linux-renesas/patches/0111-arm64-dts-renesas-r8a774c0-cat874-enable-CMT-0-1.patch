@@ -1,0 +1,31 @@
+From 021dc7e7f85acb7b26b5e718f76030cd5699de50 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Mar 2019 15:26:49 +0700
+Subject: [PATCH 111/175] arm64: dts: renesas: r8a774c0-cat874: enable CMT{0,1}
+
+This patch enables CMT{0,1} support to the CAT874 board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index d37fe14..075dde6 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -136,3 +136,11 @@
+ 
+ 	status = "okay";
+ };
++
++&cmt0 {
++	status = "okay";
++};
++
++&cmt1 {
++	status = "okay";
++};
+-- 
+2.7.4
+

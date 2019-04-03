@@ -1,0 +1,173 @@
+From c296f49ba73293ea4ed30cdc2fb4914e1cc86a2f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Feb 2019 10:05:45 +0700
+Subject: [PATCH 018/175] arm64: dts: renesas: Add Renesas R8A774C0 SoC support
+
+This patch adds basic support for the RZG2E (R8A774C0) SoC:
+	- PSCI
+	- CPU
+	- Cache controller
+	- Main clocks and controller
+	- Interrupt controller
+	- Timer
+	- PMU
+	- Reset controller
+	- Product register
+	- System controller
+	- UART for console
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 140 ++++++++++++++++++++++++++++++
+ 1 file changed, 140 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+new file mode 100644
+index 0000000..8959b3e
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -0,0 +1,140 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the r8a774a1 SoC
++ *
++ * Copyright (C) 2018 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/clock/r8a774c0-cpg-mssr.h>
++#include <dt-bindings/interrupt-controller/arm-gic.h>
++#include <dt-bindings/power/r8a774c0-sysc.h>
++
++/ {
++	compatible = "renesas,r8a774c0";
++	#address-cells = <2>;
++	#size-cells = <2>;
++
++	psci {
++		compatible = "arm,psci-1.0", "arm,psci-0.2";
++		method = "smc";
++	};
++
++	cpus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		a53_0: cpu@0 {
++			compatible = "arm,cortex-a53", "arm,armv8";
++			reg = <0x0>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774C0_PD_CA53_CPU0>;
++			next-level-cache = <&L2_CA53>;
++			enable-method = "psci";
++		};
++
++		a53_1: cpu@1 {
++			compatible = "arm,cortex-a53", "arm,armv8";
++			reg = <0x1>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774C0_PD_CA53_CPU1>;
++			next-level-cache = <&L2_CA53>;
++			enable-method = "psci";
++		};
++
++		L2_CA53: cache-controller-0 {
++			compatible = "cache";
++			power-domains = <&sysc R8A774C0_PD_CA53_SCU>;
++			cache-unified;
++			cache-level = <2>;
++		};
++	};
++
++	extal_clk: extal {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		/* This value must be overridden by the board */
++		clock-frequency = <0>;
++	};
++
++	soc {
++		compatible = "simple-bus";
++		interrupt-parent = <&gic>;
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		gic: interrupt-controller@f1010000 {
++			compatible = "arm,gic-400";
++			#interrupt-cells = <3>;
++			#address-cells = <0>;
++			interrupt-controller;
++			reg =	<0x0 0xf1010000 0 0x1000>,
++				<0x0 0xf1020000 0 0x20000>,
++				<0x0 0xf1040000 0 0x20000>,
++				<0x0 0xf1060000 0 0x20000>;
++			interrupts = <GIC_PPI 9
++				(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_HIGH)>;
++			clocks = <&cpg CPG_MOD 408>;
++			clock-names = "clk";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 408>;
++		};
++
++		timer {
++			compatible = "arm,armv8-timer";
++			interrupts = <GIC_PPI 13
++			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
++			<GIC_PPI 14
++			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
++			<GIC_PPI 11
++			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
++			<GIC_PPI 10
++			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>;
++		};
++
++		pmu_a53 {
++			compatible = "arm,cortex-a53-pmu";
++			interrupts =	<GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-affinity = <&a53_0>, <&a53_1>;
++		};
++
++		cpg: clock-controller@e6150000 {
++			compatible = "renesas,r8a774c0-cpg-mssr";
++			reg = <0 0xe6150000 0 0x1000>;
++			clocks = <&extal_clk>;
++			clock-names = "extal";
++			#clock-cells = <2>;
++			#power-domain-cells = <0>;
++			#reset-cells = <1>;
++		};
++
++		rst: reset-controller@e6160000 {
++			compatible = "renesas,r8a774c0-rst";
++			reg = <0 0xe6160000 0 0x0200>;
++		};
++
++		prr: chipid@fff00044 {
++			compatible = "renesas,prr";
++			reg = <0 0xfff00044 0 4>;
++		};
++
++		sysc: system-controller@e6180000 {
++			compatible = "renesas,r8a774c0-sysc";
++			reg = <0 0xe6180000 0 0x0400>;
++			#power-domain-cells = <1>;
++		};
++
++		scif2: serial@e6e88000 {
++			compatible = "renesas,scif-r8a774c0",
++				"renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6e88000 0 64>;
++			interrupts = <GIC_SPI 164 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 310>;
++			clock-names = "fck";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 310>;
++			status = "disabled";
++		};
++	};
++};
+-- 
+2.7.4
+

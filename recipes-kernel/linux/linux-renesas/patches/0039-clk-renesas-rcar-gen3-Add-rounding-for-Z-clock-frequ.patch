@@ -1,0 +1,57 @@
+From 4a1509de5470c5352ce017d3f4ba56d27dfb1a97 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 25 Feb 2019 15:47:47 +0700
+Subject: [PATCH 039/175] clk: renesas: rcar-gen3: Add rounding for Z-clock
+ frequency
+
+To avoid updating many code lines, using Z_CLK_ROUND macro
+to do rounding for ignoring the difference.
+
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/rcar-gen3-cpg.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/clk/renesas/rcar-gen3-cpg.c b/drivers/clk/renesas/rcar-gen3-cpg.c
+index 862065a..b6c8430 100644
+--- a/drivers/clk/renesas/rcar-gen3-cpg.c
++++ b/drivers/clk/renesas/rcar-gen3-cpg.c
+@@ -206,6 +206,8 @@ static struct clk * __init cpg_pll_clk_register(const char *name,
+ #define CPG_FRQCRC_ZFC_MASK		GENMASK(12, 8)
+ #define CPG_FRQCRC_Z2FC_MASK		GENMASK(4, 0)
+ 
++#define Z_CLK_ROUND(f)	(100000000 * DIV_ROUND_CLOSEST_ULL((f), 100000000))
++
+ struct cpg_z_clk {
+ 	struct clk_hw hw;
+ 	void __iomem *reg;
+@@ -221,14 +223,14 @@ static unsigned long cpg_z_clk_recalc_rate(struct clk_hw *hw,
+ 					   unsigned long parent_rate)
+ {
+ 	struct cpg_z_clk *zclk = to_z_clk(hw);
++	unsigned long prate = parent_rate / zclk->fixed_div;
+ 	unsigned int mult;
+ 	u32 val;
+ 
+ 	val = readl(zclk->reg) & zclk->mask;
+ 	mult = 32 - (val >> __ffs(zclk->mask));
+ 
+-	/* Factor of 2 is for fixed divider */
+-	return DIV_ROUND_CLOSEST_ULL((u64)parent_rate * mult, 32 * 2);
++	return Z_CLK_ROUND(prate * mult / 32);
+ }
+ 
+ static long cpg_z_clk_round_rate(struct clk_hw *hw, unsigned long rate,
+@@ -249,7 +251,7 @@ static long cpg_z_clk_round_rate(struct clk_hw *hw, unsigned long rate,
+ 	mult = clamp(mult, 1U, 32U);
+ 	*parent_rate = prate * zclk->fixed_div;
+ 
+-	return (u64)prate * mult / 32;
++	return Z_CLK_ROUND(prate * mult / 32);
+ }
+ 
+ static int cpg_z_clk_set_rate(struct clk_hw *hw, unsigned long rate,
+-- 
+2.7.4
+

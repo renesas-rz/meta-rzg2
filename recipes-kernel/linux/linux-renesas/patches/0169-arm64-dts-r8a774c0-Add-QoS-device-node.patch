@@ -1,0 +1,31 @@
+From 514be364ac2b1be5566c52be223da83da5df6b19 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
+Date: Thu, 21 Mar 2019 08:04:57 +0700
+Subject: [PATCH 169/175] arm64: dts: r8a774c0: Add QoS device node.
+
+This patch adds QoS device node for the R8A774C0 SoC.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index c73e007..4caeba7 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -466,6 +466,11 @@
+ 			#iommu-cells = <1>;
+ 		};
+ 
++		qos@e67e0000 {
++			compatible = "renesas,qos";
++			reg = <0 0xe67e0000 0 0x10090>;
++		};
++
+ 		avb: ethernet@e6800000 {
+ 			compatible = "renesas,etheravb-r8a774c0",
+ 				     "renesas,etheravb-rcar-gen3";
+-- 
+2.7.4
+

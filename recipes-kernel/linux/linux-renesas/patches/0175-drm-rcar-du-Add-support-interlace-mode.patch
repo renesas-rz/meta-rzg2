@@ -1,0 +1,38 @@
+From 3ca2cc6cd9dc356536194f9d1c93c55ec0b78dfc Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Fri, 12 Apr 2019 14:20:46 +0700
+Subject: [PATCH 175/175] drm: rcar-du: Add support interlace mode
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c | 1 +
+ drivers/gpu/drm/rcar-du/rcar_du_vsp.c  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+index 15dc9ca..b52b3e8 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+@@ -289,6 +289,7 @@ static void rcar_du_crtc_set_display_timing(struct rcar_du_crtc *rcrtc)
+ 	/* Signal polarities */
+ 	value = ((mode->flags & DRM_MODE_FLAG_PVSYNC) ? DSMR_VSL : 0)
+ 	      | ((mode->flags & DRM_MODE_FLAG_PHSYNC) ? DSMR_HSL : 0)
++	      | ((mode->flags & DRM_MODE_FLAG_INTERLACE) ? DSMR_ODEV : 0)
+ 	      | DSMR_DIPM_DISP | DSMR_CSPM;
+ 	rcar_du_crtc_write(rcrtc, DSMR, value);
+ 
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_vsp.c b/drivers/gpu/drm/rcar-du/rcar_du_vsp.c
+index 72eebed..a042f11 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_vsp.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_vsp.c
+@@ -52,6 +52,7 @@ void rcar_du_vsp_enable(struct rcar_du_crtc *crtc)
+ 	struct vsp1_du_lif_config cfg = {
+ 		.width = mode->hdisplay,
+ 		.height = mode->vdisplay,
++		.interlaced = mode->flags & DRM_MODE_FLAG_INTERLACE,
+ 		.callback = rcar_du_vsp_complete,
+ 		.callback_data = crtc,
+ 	};
+-- 
+2.7.4
+

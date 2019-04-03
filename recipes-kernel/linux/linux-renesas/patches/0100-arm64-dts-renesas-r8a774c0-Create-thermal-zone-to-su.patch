@@ -1,0 +1,72 @@
+From d1473fa40a73a0974da5c86db107664196f519e0 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Mar 2019 14:43:00 +0700
+Subject: [PATCH 100/175] arm64: dts: renesas: r8a774c0: Create thermal zone to
+ support IPA
+
+This patch creates thermal zone to support IPA for R8A774C0 SOC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 34 +++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index 0b8a6b8..a42396f 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -93,6 +93,10 @@
+ 			power-domains = <&sysc R8A774C0_PD_CA53_CPU0>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <277>;
++			cooling-min-level = <0>;
++			cooling-max-level = <2>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			clocks =<&cpg CPG_CORE R8A774C0_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+@@ -871,16 +875,34 @@
+ 				polling-delay-passive = <250>;
+ 				polling-delay = <1000>;
+ 				thermal-sensors = <&thermal>;
++				sustainable-power = <717>;
+ 
+-						trips {
+-						cpu-crit {
+-							temperature = <120000>;
+-							hysteresis = <2000>;
+-							type = "critical";
+-						};
++				trips {
++					threshold: trip-point0 {
++						temperature = <90000>;
++						hysteresis = <2000>;
++						type = "passive";
+ 					};
+ 
++					target: trip-point1 {
++						temperature = <100000>;
++						hysteresis = <2000>;
++						type = "passive";
++					};
++
++					cpu-crit {
++						temperature = <120000>;
++						hysteresis = <2000>;
++						type = "critical";
++					};
++				};
++
+ 				cooling-maps {
++					map0 {
++						trip = <&target>;
++						cooling-device = <&a53_0 0 2>;
++						contribution = <1024>;
++					};
+ 				};
+ 			};
+ 		};
+-- 
+2.7.4
+

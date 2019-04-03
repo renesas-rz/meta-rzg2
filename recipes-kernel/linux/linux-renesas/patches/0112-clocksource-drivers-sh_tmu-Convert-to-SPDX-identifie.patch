@@ -1,0 +1,45 @@
+From 5bc3dacb95e1f3010ee362b7b977be2fdb8530e2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 11 Mar 2019 14:24:59 +0700
+Subject: [PATCH 112/175] clocksource/drivers/sh_tmu: Convert to SPDX
+ identifiers
+
+Refer upstream commit id:
+<0b9294fe8dca4ab500e955cf06445134d228e493>
+
+This patch updates license to use SPDX-License-Identifier instead of
+verbose license text.
+
+Signed-off-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clocksource/sh_tmu.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/drivers/clocksource/sh_tmu.c b/drivers/clocksource/sh_tmu.c
+index c74a6c54..49f1c80 100644
+--- a/drivers/clocksource/sh_tmu.c
++++ b/drivers/clocksource/sh_tmu.c
+@@ -1,16 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * SuperH Timer Support - TMU
+  *
+  *  Copyright (C) 2009 Magnus Damm
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+  */
+ 
+ #include <linux/clk.h>
+-- 
+2.7.4
+

@@ -1,0 +1,65 @@
+From e4c1268b74296807e2f642841c0446b67eede296 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Fri, 15 Mar 2019 11:18:54 +0700
+Subject: [PATCH 067/175] arm64: dts: renesas: cat875: Add ethernet support
+
+This patch adds ethernet support to the sub board.
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat875.dtsi | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+index 848199b..83c962c 100644
+--- a/arch/arm64/boot/dts/renesas/cat875.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -4,9 +4,31 @@
+  *
+  * Copyright (C) 2019 Renesas Electronics Corp.
+  */
++#include <dt-bindings/gpio/gpio.h>
+ 
+ / {
+ 	model = "Silicon Linux sub board for CAT874 (CAT875)";
++
++	aliases {
++		ethernet0 = &avb;
++	};
++};
++
++&avb {
++	pinctrl-0 = <&avb_pins>;
++	pinctrl-names = "default";
++	renesas,no-ether-link;
++	phy-handle = <&phy0>;
++	phy-mode = "rgmii";
++	status = "okay";
++
++	phy0: ethernet-phy@0 {
++		rxc-skew-ps = <1500>;
++		reg = <0>;
++		interrupt-parent = <&gpio2>;
++		interrupts = <21 IRQ_TYPE_LEVEL_LOW>;
++		reset-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
++	};
+ };
+ 
+ &pfc {
+@@ -19,6 +41,13 @@
+ 		groups = "can1_data";
+ 		function = "can1";
+ 	};
++
++	avb_pins: avb {
++		mux {
++			groups = "avb_mii";
++			function = "avb";
++		};
++	};
+ };
+ 
+ &can0 {
+-- 
+2.7.4
+

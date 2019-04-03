@@ -1,0 +1,74 @@
+From e393f939bf77ac64807b5b4e8522973db49182cd Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 26 Feb 2019 13:12:48 +0700
+Subject: [PATCH 036/175] clk: renesas: rcar-gen3: Fix SD divider setting
+
+This patch fixed the SD divider settiing for corresponding to the
+change in the HS200/HS400 mode.
+
+NOTE:
+- In H3/M3, the clock in HS400 mode refers to SDnH clock
+(others are SDn clock). Therefore, only the division value of SD
+is set as struct sd_div_table.div of cpg_sd_div_table[].
+- In M3N, HS400 mode and HS200 mode use the same clock setting.
+
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/rcar-gen3-cpg.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/clk/renesas/rcar-gen3-cpg.c b/drivers/clk/renesas/rcar-gen3-cpg.c
+index a2c5fcc..be5f937 100644
+--- a/drivers/clk/renesas/rcar-gen3-cpg.c
++++ b/drivers/clk/renesas/rcar-gen3-cpg.c
+@@ -232,32 +232,32 @@ struct sd_clock {
+ };
+ 
+ /* SDn divider
+- *                     sd_srcfc   sd_fc   div
+- * stp_hck   stp_ck    (div)      (div)     = sd_srcfc x sd_fc
++ *                     sd_srcfc   sd_fc		div
++ * stp_hck   stp_ck    (div)      (div)		= sd_srcfc x sd_fc div
+  *-------------------------------------------------------------------
+- *  0         0         0 (1)      1 (4)      4
+- *  0         0         1 (2)      1 (4)      8
+- *  1         0         2 (4)      1 (4)     16
+- *  1         0         3 (8)      1 (4)     32
+- *  1         0         4 (16)     1 (4)     64
+- *  0         0         0 (1)      0 (2)      2
+- *  0         0         1 (2)      0 (2)      4
+- *  1         0         2 (4)      0 (2)      8
+- *  1         0         3 (8)      0 (2)     16
+- *  1         0         4 (16)     0 (2)     32
++ *	0	0	1 (2)	0 (no refs)	2 : HS400 (H3/M3)
++ *	0	0	0 (1)	1 (4)		4 : SDR104 / HS200 / HS400 (M3N)
++ *	0	0	1 (2)	1 (4)		8 : SDR50
++ *	1	0	2 (4)	1 (4)		16 : HS / SDR25
++ *	1	0	3 (8)	1 (4)		32 : NS / SDR12
++ *	0	0	0 (1)	0 (2)		2 : (no case)
++ *	1	0	2 (4)	0 (2)		8 : (no case)
++ *	1	0	3 (8)	0 (2)		16 : (no case)
++ *	1	0	4 (16)	0 (2)		32 : (no case)
++ *	1	0	4 (16)	1 (4)		64 : (no case)
+  */
+ static const struct sd_div_table cpg_sd_div_table[] = {
+ /*	CPG_SD_DIV_TABLE_DATA(stp_hck,  stp_ck,   sd_srcfc,   sd_fc,  sd_div) */
++	CPG_SD_DIV_TABLE_DATA(0,        0,        1,          0,        2),
+ 	CPG_SD_DIV_TABLE_DATA(0,        0,        0,          1,        4),
+ 	CPG_SD_DIV_TABLE_DATA(0,        0,        1,          1,        8),
+ 	CPG_SD_DIV_TABLE_DATA(1,        0,        2,          1,       16),
+ 	CPG_SD_DIV_TABLE_DATA(1,        0,        3,          1,       32),
+-	CPG_SD_DIV_TABLE_DATA(1,        0,        4,          1,       64),
+ 	CPG_SD_DIV_TABLE_DATA(0,        0,        0,          0,        2),
+-	CPG_SD_DIV_TABLE_DATA(0,        0,        1,          0,        4),
+ 	CPG_SD_DIV_TABLE_DATA(1,        0,        2,          0,        8),
+ 	CPG_SD_DIV_TABLE_DATA(1,        0,        3,          0,       16),
+ 	CPG_SD_DIV_TABLE_DATA(1,        0,        4,          0,       32),
++	CPG_SD_DIV_TABLE_DATA(1,        0,        4,          1,       64),
+ };
+ 
+ #define to_sd_clock(_hw) container_of(_hw, struct sd_clock, hw)
+-- 
+2.7.4
+

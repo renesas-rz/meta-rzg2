@@ -1,0 +1,45 @@
+From b6c112453ff06383bd9316be924ca9309c7c8712 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 11 Mar 2019 09:33:10 +0700
+Subject: [PATCH 103/175] clocksource/drivers/sh_cmt: Convert to SPDX
+ identifiers
+
+Refer upstream commit id:
+<efad01173717b0d0ad8a7dc91cc447f19d8447f3>
+
+This patch updates license to use SPDX-License-Identifier instead of
+verbose license text.
+
+Signed-off-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clocksource/sh_cmt.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/drivers/clocksource/sh_cmt.c b/drivers/clocksource/sh_cmt.c
+index bbbf37c..6f65cf8 100644
+--- a/drivers/clocksource/sh_cmt.c
++++ b/drivers/clocksource/sh_cmt.c
+@@ -1,16 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * SuperH Timer Support - CMT
+  *
+  *  Copyright (C) 2008 Magnus Damm
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+  */
+ 
+ #include <linux/clk.h>
+-- 
+2.7.4
+

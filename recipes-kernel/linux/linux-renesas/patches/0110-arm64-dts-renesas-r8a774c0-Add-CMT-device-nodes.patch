@@ -1,0 +1,57 @@
+From 1c48c9b424d32bce2a660f66895a4561b7952506 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Mar 2019 15:25:25 +0700
+Subject: [PATCH 110/175] arm64: dts: renesas: r8a774c0: Add CMT device nodes
+
+This patch adds CMT{0|1} device nodes for R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 32 +++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index b471bd0..4989a08 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -914,5 +914,37 @@
+ 				};
+ 			};
+ 		};
++
++		cmt0: timer@e60f0000 {
++			compatible =	"renesas,r8a774c0-cmt0",
++					"renesas,rcar-gen3-cmt0";
++			reg = <0 0xe60f0000 0 0x1004>;
++			interrupts =	<GIC_SPI 142 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 303>;
++			clock-names = "fck";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 303>;
++			status = "disabled";
++		};
++
++		cmt1: timer@e6130000 {
++			compatible =	"renesas,r8a774c0-cmt1",
++					"renesas,rcar-gen3-cmt1";
++			reg = <0 0xe6130000 0 0x1004>;
++			interrupts =	<GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 302>;
++			clock-names = "fck";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 302>;
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.7.4
+

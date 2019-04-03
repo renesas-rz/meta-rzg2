@@ -1,0 +1,43 @@
+From aed798285549d83249860ed5accf8e7386afc0de Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Feb 2019 11:52:00 +0700
+Subject: [PATCH 022/175] arm64: dts: renesas: r8a774c0-cat874: Add pincontrol
+ support to scif2
+
+Reference commit id:
+<4cf1f6cec1e99410b5cdc0b865b93bebf68b3fdb>
+
+This patch adds pincontrol support to scif2.
+
+Signed-off-by: Biju Das <biju.das@bp.renesas.com>
+Reviewed-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Chris Paterson <Chris.Paterson2@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 6eababc..c545ce5 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -32,6 +32,16 @@
+ 	clock-frequency = <48000000>;
+ };
+ 
++&pfc {
++	scif2_pins: scif2 {
++		groups = "scif2_data_a";
++		function = "scif2";
++	};
++};
++
+ &scif2 {
++	pinctrl-0 = <&scif2_pins>;
++	pinctrl-names = "default";
++
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

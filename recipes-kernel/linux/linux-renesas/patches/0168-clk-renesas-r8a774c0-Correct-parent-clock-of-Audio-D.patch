@@ -1,0 +1,30 @@
+From 6839cd375f2111275525155f2c635b66100a169d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Apr 2019 18:36:41 +0700
+Subject: [PATCH 168/175] clk: renesas: r8a774c0: Correct parent clock of
+ Audio-DMAC
+
+According to Hardware Manual, correct parent clock of Audio-DMAC
+into S1D2 on R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774c0-cpg-mssr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/renesas/r8a774c0-cpg-mssr.c b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+index 10f5b1e..b091243 100644
+--- a/drivers/clk/renesas/r8a774c0-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+@@ -163,7 +163,7 @@ static const struct mssr_mod_clk r8a774c0_mod_clks[] __initconst = {
+ 	DEF_MOD("intc-ex",		 407,	R8A774C0_CLK_CP),
+ 	DEF_MOD("intc-ap",		 408,	R8A774C0_CLK_S0D3),
+ 
+-	DEF_MOD("audmac0",		 502,	R8A774C0_CLK_S3D4),
++	DEF_MOD("audmac0",		 502,	R8A774C0_CLK_S1D2),
+ 	DEF_MOD("hscif4",		 516,	R8A774C0_CLK_S3D1C),
+ 	DEF_MOD("hscif3",		 517,	R8A774C0_CLK_S3D1C),
+ 	DEF_MOD("hscif2",		 518,	R8A774C0_CLK_S3D1C),
+-- 
+2.7.4
+

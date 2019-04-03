@@ -1,0 +1,57 @@
+From 0c5e7bc1bf35853ab7a181b1a565e937b0ad5373 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@rvc.renesas.com>
+Date: Tue, 5 Mar 2019 22:52:42 +0700
+Subject: [PATCH 119/175] arm64: dts: renesas: r8a774c0: Add PCIe device node
+
+This patch adds PCI express channel 0 device tree node to the
+
+RZ/G2E (a.k.a. R8A774C0) SoC dtsi.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index 1b68845..61b9a91 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -1011,5 +1011,35 @@
+ 			resets = <&cpg 121>;
+ 			status = "disabled";
+ 		};
++
++		pciec0: pcie@fe000000 {
++			compatible = "renesas,pcie-r8a774c0",
++					"renesas,pcie-rcar-gen3";
++			reg = <0 0xfe000000 0 0x80000>;
++			#address-cells = <3>;
++			#size-cells = <2>;
++			bus-range = <0x00 0xff>;
++			device_type = "pci";
++			ranges =
++			  <0x01000000 0 0x00000000 0 0xfe100000 0 0x00100000
++			   0x02000000 0 0xfe200000 0 0xfe200000 0 0x00200000
++			   0x02000000 0 0x30000000 0 0x30000000 0 0x08000000
++			   0x42000000 0 0x38000000 0 0x38000000 0 0x08000000>;
++			/* Map all possible DDR as inbound ranges */
++			dma-ranges =
++			  <0x42000000 0 0x40000000 0 0x40000000 0 0x40000000>;
++			interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
++			#interrupt-cells = <1>;
++			interrupt-map-mask = <0 0 0 0>;
++			interrupt-map =
++				<0 0 0 0 &gic GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 319>, <&pcie_bus_clk>;
++			clock-names = "pcie", "pcie_bus";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 319>;
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.7.4
+

@@ -1,0 +1,29 @@
+From 9facb436f0c91419ac923a7870fe6caf55bc2f69 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Feb 2019 11:28:06 +0700
+Subject: [PATCH 015/175] dt-bindings: Add vendor prefix for Silicon Linux
+
+Add Silicon Linux to the list of devicetree vendor prefixes.
+
+Website: http://www.si-linux.co.jp
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+index 2c3fc51..b77f359 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.txt
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -338,6 +338,7 @@ sgx	SGX Sensortech
+ sharp	Sharp Corporation
+ shimafuji	Shimafuji Electric, Inc.
+ si-en	Si-En Technology Ltd.
++si-linux	Silicon Linux Corporation
+ sifive	SiFive, Inc.
+ sigma	Sigma Designs, Inc.
+ sii	Seiko Instruments, Inc.
+-- 
+2.7.4
+

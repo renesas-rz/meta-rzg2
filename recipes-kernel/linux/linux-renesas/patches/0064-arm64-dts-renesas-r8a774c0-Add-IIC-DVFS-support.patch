@@ -1,0 +1,49 @@
+From 7df42bfade2aaf13ca8d951bd2ef8b5b094e34cb Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Tue, 26 Feb 2019 13:57:19 +0700
+Subject: [PATCH 064/175] arm64: dts: renesas: r8a774c0: Add IIC-DVFS support
+
+Add IIC Bus Interface for DVFS (IIC for DVFS) devices nodes
+to the r8a774c0 device tree.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index 5f356cc..367993ea 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -22,6 +22,7 @@
+ 		i2c4 = &i2c4;
+ 		i2c5 = &i2c5;
+ 		i2c6 = &i2c6;
++		i2c7 = &i2c_dvfs;
+ 		i2c8 = &i2c7;
+ 	};
+ 
+@@ -636,5 +637,19 @@
+ 			resets = <&cpg 402>;
+ 			status = "disabled";
+ 		};
++
++		i2c_dvfs: i2c@e60b0000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "renesas,iic-r8a774c0";
++			reg = <0 0xe60b0000 0 0x15>;
++			interrupts = <GIC_SPI 173 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 926>;
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 926>;
++			dmas = <&dmac0 0x11>, <&dmac0 0x10>;
++			dma-names = "tx", "rx";
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.7.4
+

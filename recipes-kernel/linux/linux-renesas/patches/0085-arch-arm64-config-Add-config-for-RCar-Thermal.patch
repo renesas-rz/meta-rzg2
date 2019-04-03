@@ -1,0 +1,28 @@
+From 9a75c01e55c544a7cf64e1e71d603687edc888d7 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 21 Mar 2019 10:43:39 +0700
+Subject: [PATCH 085/175] arch: arm64: config: Add config for RCar Thermal
+
+RZ/G2E use thermal driver follow rcar_thermal.c,
+we add more config for this file.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 2db474e..032a8a2 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -368,6 +368,7 @@ CONFIG_THERMAL_GOV_POWER_ALLOCATOR=y
+ CONFIG_CPU_THERMAL=y
+ CONFIG_THERMAL_EMULATION=y
+ CONFIG_ROCKCHIP_THERMAL=m
++CONFIG_RCAR_THERMAL=y
+ CONFIG_RCAR_GEN3_THERMAL=y
+ CONFIG_ARMADA_THERMAL=y
+ CONFIG_BRCMSTB_THERMAL=m
+-- 
+2.7.4
+

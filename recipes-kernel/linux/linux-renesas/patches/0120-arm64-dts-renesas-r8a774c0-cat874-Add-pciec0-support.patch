@@ -1,0 +1,36 @@
+From 2ced640fc93611eb5ea5aa61732af63dba99b34a Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@rvc.renesas.com>
+Date: Tue, 5 Mar 2019 22:56:40 +0700
+Subject: [PATCH 120/175] arm64: dts: renesas: r8a774c0-cat874: Add pciec0
+ support
+
+Silicon Linux CAT 874 board has 2GB DDR memory.
+Update the dma-ranges mapping for pciec0 node.
+Also declare pcie bus clock
+Because it is generated on the CAT874 main board.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 40cded9..b1cb776 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -164,3 +164,12 @@
+ &tmu4 {
+ 	status = "okay";
+ };
++
++&pcie_bus_clk {
++	clock-frequency = <100000000>;
++};
++
++&pciec0 {
++	/* Map all possible DDR as inbound ranges */
++	dma-ranges = <0x42000000 0 0x40000000 0 0x40000000 0 0x80000000>;
++};
+-- 
+2.7.4
+

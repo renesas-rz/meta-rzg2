@@ -1,0 +1,29 @@
+From 79a174d5b641e92344ea75185d0e6a6f9321cfe5 Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Tue, 26 Feb 2019 13:19:20 +0700
+Subject: [PATCH 052/175] dt-bindings: watchdog: renesas-wdt: Document r8a774c0
+ support
+
+RZ/G2E (R8A774C0) watchdog implementation is compatible with R-Car
+Gen3, therefore add relevant documentation.
+
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ Documentation/devicetree/bindings/watchdog/renesas-wdt.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/watchdog/renesas-wdt.txt b/Documentation/devicetree/bindings/watchdog/renesas-wdt.txt
+index 9407212..34a6ab7 100644
+--- a/Documentation/devicetree/bindings/watchdog/renesas-wdt.txt
++++ b/Documentation/devicetree/bindings/watchdog/renesas-wdt.txt
+@@ -7,6 +7,7 @@ Required properties:
+ 	       Examples with soctypes are:
+ 		 - "renesas,r8a7743-wdt" (RZ/G1M)
+ 		 - "renesas,r8a7745-wdt" (RZ/G1E)
++		 - "renesas,r8a774c0-wdt" (RZ/G2E)
+ 		 - "renesas,r8a774a1-wdt" (RZ/G2M)
+ 	         - "renesas,r8a7790-wdt" (R-Car H2)
+ 	         - "renesas,r8a7791-wdt" (R-Car M2-W)
+-- 
+2.7.4
+

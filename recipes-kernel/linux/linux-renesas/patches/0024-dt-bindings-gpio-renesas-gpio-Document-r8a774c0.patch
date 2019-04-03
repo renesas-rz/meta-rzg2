@@ -1,0 +1,27 @@
+From 4782d3fa461665c9c9b58d2a0c6702506ecf0757 Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Tue, 26 Feb 2019 08:50:57 +0700
+Subject: [PATCH 024/175] dt-bindings: gpio: renesas: gpio: Document r8a774c0
+
+This path documents RZ/G2E (a.k.a R8A774C0) bindings for GPIO driver
+
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ Documentation/devicetree/bindings/gpio/renesas,gpio-rcar.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/gpio/renesas,gpio-rcar.txt b/Documentation/devicetree/bindings/gpio/renesas,gpio-rcar.txt
+index 4018ee5..aad3675 100644
+--- a/Documentation/devicetree/bindings/gpio/renesas,gpio-rcar.txt
++++ b/Documentation/devicetree/bindings/gpio/renesas,gpio-rcar.txt
+@@ -6,6 +6,7 @@ Required Properties:
+     - "renesas,gpio-r8a7743": for R8A7743 (RZ/G1M) compatible GPIO controller.
+     - "renesas,gpio-r8a7745": for R8A7745 (RZ/G1E) compatible GPIO controller.
+     - "renesas,gpio-r8a77470": for R8A77470 (RZ/G1C) compatible GPIO controller.
++    - "renesas,gpio-r8a774c0": for R8A774C0 (RZ/G2E) compatible GPIO controller.
+     - "renesas,gpio-r8a7778": for R8A7778 (R-Car M1) compatible GPIO controller.
+     - "renesas,gpio-r8a7779": for R8A7779 (R-Car H1) compatible GPIO controller.
+     - "renesas,gpio-r8a7790": for R8A7790 (R-Car H2) compatible GPIO controller.
+-- 
+2.7.4
+

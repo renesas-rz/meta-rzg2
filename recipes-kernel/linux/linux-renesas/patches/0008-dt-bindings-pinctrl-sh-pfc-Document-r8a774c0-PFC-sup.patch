@@ -1,0 +1,34 @@
+From 404f49c646afcf82de07b32d62a7fdb6eb133358 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 20 Feb 2019 16:24:55 +0700
+Subject: [PATCH 008/175] dt-bindings: pinctrl: sh-pfc: Document r8a774c0 PFC
+ support
+
+Reference upstreams commit id:
+<c382e8ba7c33b6dd64850a7d0f3ae19038f2fb1a>
+
+Document PFC support for the R8A774C0 SoC.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Biju Das <biju.das@bp.renesas.com>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/pinctrl/renesas,pfc-pinctrl.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/pinctrl/renesas,pfc-pinctrl.txt b/Documentation/devicetree/bindings/pinctrl/renesas,pfc-pinctrl.txt
+index abd8fbc..e1a8fb0 100644
+--- a/Documentation/devicetree/bindings/pinctrl/renesas,pfc-pinctrl.txt
++++ b/Documentation/devicetree/bindings/pinctrl/renesas,pfc-pinctrl.txt
+@@ -16,6 +16,7 @@ Required Properties:
+     - "renesas,pfc-r8a7743": for R8A7743 (RZ/G1M) compatible pin-controller.
+     - "renesas,pfc-r8a7745": for R8A7745 (RZ/G1E) compatible pin-controller.
+     - "renesas,pfc-r8a77470": for R8A77470 (RZ/G1C) compatible pin-controller.
++    - "renesas,pfc-r8a774c0": for R8A774C0 (RZ/G2E) compatible pin-controller.
+     - "renesas,pfc-r8a7778": for R8A7778 (R-Car M1) compatible pin-controller.
+     - "renesas,pfc-r8a7779": for R8A7779 (R-Car H1) compatible pin-controller.
+     - "renesas,pfc-r8a7790": for R8A7790 (R-Car H2) compatible pin-controller.
+-- 
+2.7.4
+

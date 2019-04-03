@@ -1,0 +1,69 @@
+From fe94611b73997abd905953af5ebf8d58cfc05010 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@rvc.renesas.com>
+Date: Thu, 28 Mar 2019 14:23:01 +0700
+Subject: [PATCH 131/175] arm64: dts: renesas: r8a774c0-cat874: Add pincontrol
+ support to HSCIF{2,3}
+
+This patch adds pincontrol support to HSCIF{2,3}
+
+Signed-off-by: Son Lam <son.lam.ym@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 28 +++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 09d6624..76a057c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -15,6 +15,8 @@
+ 
+ 	aliases {
+ 		serial0 = &scif2;
++		serial1 = &hscif2;
++		serial2 = &hscif3;
+ 	};
+ 
+ 	chosen {
+@@ -90,6 +92,16 @@
+ 		function = "scif2";
+ 	};
+ 
++	hscif2_pins: hscif2 {
++		groups = "hscif2_data_a", "hscif2_ctrl_a";
++		function = "hscif2";
++	};
++
++	hscif3_pins: hscif3 {
++		groups = "hscif3_data_c", "hscif3_ctrl_c";
++		function = "hscif3";
++	};
++
+ 	sdhi0_pins: sd0 {
+ 		groups = "sdhi0_data4", "sdhi0_ctrl";
+ 		function = "sdhi0";
+@@ -136,6 +148,22 @@
+ 	status = "okay";
+ };
+ 
++&hscif2 {
++	pinctrl-0 = <&hscif2_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
++&hscif3 {
++	pinctrl-0 = <&hscif3_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
+ &rwdt {
+ 	timeout-sec = <60>;
+ 	status = "okay";
+-- 
+2.7.4
+

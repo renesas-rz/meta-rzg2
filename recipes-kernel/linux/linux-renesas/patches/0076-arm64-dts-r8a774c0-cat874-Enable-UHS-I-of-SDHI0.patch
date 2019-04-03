@@ -1,0 +1,49 @@
+From 20546b1e105f01ae0bd3eb7b0bf93d823972116d Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 18 Mar 2019 11:18:48 +0700
+Subject: [PATCH 076/175] arm64: dts: r8a774c0-cat874: Enable UHS-I of SDHI0
+
+This patch supports UHS-I SDR50 and SD104 of SDHI0 on RZ/G2E
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index eb84aa4..2908545 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -66,6 +66,13 @@
+ 	sdhi0_pins: sd0 {
+ 		groups = "sdhi0_data4", "sdhi0_ctrl";
+ 		function = "sdhi0";
++		power-source = <3300>;
++	};
++
++	sdhi0_pins_uhs: sd0_uhs {
++		groups = "sdhi0_data4", "sdhi0_ctrl";
++		function = "sdhi0";
++		power-source= <1800>;
+ 	};
+ };
+ 
+@@ -83,11 +90,14 @@
+ 
+ &sdhi0 {
+ 	pinctrl-0 = <&sdhi0_pins>;
+-	pinctrl-names = "default";
++	pinctrl-1 = <&sdhi0_pins_uhs>;
++	pinctrl-names = "default", "state_uhs";
+ 
+ 	vmmc-supply = <&vcc_sdhi0>;
+ 	vqmmc-supply = <&vccq_sdhi0>;
+ 	cd-gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
+ 	bus-width = <4>;
++	sd-uhs-sdr50;
++	sd-uhs-sdr104;
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

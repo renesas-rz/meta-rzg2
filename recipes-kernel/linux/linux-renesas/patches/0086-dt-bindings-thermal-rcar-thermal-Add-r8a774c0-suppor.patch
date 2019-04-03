@@ -1,0 +1,28 @@
+From 10af0610f8da4366b63abc9f23b2bbfe75bbadd3 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 7 Mar 2019 09:03:39 +0700
+Subject: [PATCH 086/175] dt-bindings: thermal: rcar-thermal: Add r8a774c0
+ support
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/thermal/rcar-thermal.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/rcar-thermal.txt b/Documentation/devicetree/bindings/thermal/rcar-thermal.txt
+index 67c563f..ae1193a 100644
+--- a/Documentation/devicetree/bindings/thermal/rcar-thermal.txt
++++ b/Documentation/devicetree/bindings/thermal/rcar-thermal.txt
+@@ -14,6 +14,7 @@ Required properties:
+ 			    - "renesas,thermal-r8a7792" (R-Car V2H)
+ 			    - "renesas,thermal-r8a7793" (R-Car M2-N)
+ 			    - "renesas,thermal-r8a77995" (R-Car D3)
++			    - "renesas,thermal-r8a774c0" (RZ/G2E)
+ - reg			: Address range of the thermal registers.
+ 			  The 1st reg will be recognized as common register
+ 			  if it has "interrupts".
+-- 
+2.7.4
+

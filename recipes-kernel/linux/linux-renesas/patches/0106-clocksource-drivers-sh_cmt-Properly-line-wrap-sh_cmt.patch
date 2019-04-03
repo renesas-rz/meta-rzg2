@@ -1,0 +1,48 @@
+From 7f79962595d6a59f5e489c59618bc9aaba365058 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 11 Mar 2019 10:05:51 +0700
+Subject: [PATCH 106/175] clocksource/drivers/sh_cmt: Properly line-wrap
+ sh_cmt_of_table[] initializer
+
+Refer upstream commit id:
+<eceb4c49aed0fafbc4967e788231b1eba42b7606>
+
+There's no good reason for the sh_cmt_of_table[] initializer to
+violate the 80-column limit, especially after the commit:
+<8d50e9476bb4>
+("clocksource/drivers/sh_cmt: Mark "renesas,cmt-48-gen2" deprecated")
+partially fixed it -- fix the R-Car gen2 related entries as well.
+
+Signed-off-by: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Reviewed-by: Chris Paterson <chris.paterson2@renesas.com>
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clocksource/sh_cmt.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/clocksource/sh_cmt.c b/drivers/clocksource/sh_cmt.c
+index 0c74489..71624dc 100644
+--- a/drivers/clocksource/sh_cmt.c
++++ b/drivers/clocksource/sh_cmt.c
+@@ -927,8 +927,14 @@ static const struct of_device_id sh_cmt_of_table[] __maybe_unused = {
+ 		.compatible = "renesas,cmt-48-gen2",
+ 		.data = &sh_cmt_info[SH_CMT0_RCAR_GEN2]
+ 	},
+-	{ .compatible = "renesas,rcar-gen2-cmt0", .data = &sh_cmt_info[SH_CMT0_RCAR_GEN2] },
+-	{ .compatible = "renesas,rcar-gen2-cmt1", .data = &sh_cmt_info[SH_CMT1_RCAR_GEN2] },
++	{
++		.compatible = "renesas,rcar-gen2-cmt0",
++		.data = &sh_cmt_info[SH_CMT0_RCAR_GEN2]
++	},
++	{
++		.compatible = "renesas,rcar-gen2-cmt1",
++		.data = &sh_cmt_info[SH_CMT1_RCAR_GEN2]
++	},
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, sh_cmt_of_table);
+-- 
+2.7.4
+

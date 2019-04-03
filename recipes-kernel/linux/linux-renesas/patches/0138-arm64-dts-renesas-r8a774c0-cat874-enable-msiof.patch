@@ -1,0 +1,43 @@
+From 63dd11222d2963dd67c2cd0d526482e05aa41b0a Mon Sep 17 00:00:00 2001
+From: Tung Vo <tung.vo.eb@renesas.com>
+Date: Mon, 11 Mar 2019 19:44:51 +0700
+Subject: [PATCH 138/175] arm64: dts: renesas: r8a774c0-cat874: enable msiof
+
+This patch enables MSIOF for the CAT874 board on the R8A774C0 SoC.
+
+Signed-off-by: Tung Vo <tung.vo.eb@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 76a057c..cbced69 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -139,6 +139,12 @@
+ 		groups = "pwm6_a";
+ 		function = "pwm6";
+ 	};
++
++	msiof0_pins: spi0 {
++		groups = "msiof0_clk", "msiof0_sync",
++			 "msiof0_rxd", "msiof0_txd";
++		function = "msiof0";
++	};
+ };
+ 
+ &scif2 {
+@@ -280,3 +286,10 @@
+ 
+ 	status = "okay";
+ };
++
++&msiof0 {
++	pinctrl-0 = <&msiof0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

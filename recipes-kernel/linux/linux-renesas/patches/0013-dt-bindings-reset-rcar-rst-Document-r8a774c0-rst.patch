@@ -1,0 +1,36 @@
+From 85c7b62feccc4de92f6dfafc18b8885a999a73df Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 20 Feb 2019 19:36:46 +0700
+Subject: [PATCH 013/175] dt-bindings: reset: rcar-rst: Document r8a774c0 rst
+
+Reference upstreams commit id:
+<fe46b8229f287e912b8c8d28bf8dde4cd704c17e>
+
+Document bindings for the RZ/G2E (a.k.a. R8A774C0) reset
+module.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Biju Das <biju.das@bp.renesas.com>
+Acked-by: Philipp Zabel <p.zabel@pengutronix.de>
+Reviewed-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/reset/renesas,rst.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/reset/renesas,rst.txt b/Documentation/devicetree/bindings/reset/renesas,rst.txt
+index 67e83b0..8c70a60 100644
+--- a/Documentation/devicetree/bindings/reset/renesas,rst.txt
++++ b/Documentation/devicetree/bindings/reset/renesas,rst.txt
+@@ -18,6 +18,7 @@ Required properties:
+ 		  - "renesas,r8a7743-rst" (RZ/G1M)
+ 		  - "renesas,r8a7745-rst" (RZ/G1E)
+ 		  - "renesas,r8a77470-rst" (RZ/G1C)
++		  - "renesas,r8a774c0-rst" (RZ/G2E)
+ 		  - "renesas,r8a7778-reset-wdt" (R-Car M1A)
+ 		  - "renesas,r8a7779-reset-wdt" (R-Car H1)
+ 		  - "renesas,r8a7790-rst" (R-Car H2)
+-- 
+2.7.4
+

@@ -1,0 +1,38 @@
+From de16622ad163a43fa76e7fc79a3716c73bb8f3e8 Mon Sep 17 00:00:00 2001
+From: Khanh Luu <khanh.luu.xw@renesas.com>
+Date: Thu, 28 Mar 2019 17:51:00 +0700
+Subject: [PATCH 142/175] dt-bindings: display: renesas: cmt: document RZG2E
+ support
+
+Document support for the RZG2E
+
+Signed-off-by: Khanh Luu <khanh.luu.xw@renesas.com>
+---
+ Documentation/devicetree/bindings/display/renesas,du.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/display/renesas,du.txt b/Documentation/devicetree/bindings/display/renesas,du.txt
+index ec9d34be..d993f4b 100644
+--- a/Documentation/devicetree/bindings/display/renesas,du.txt
++++ b/Documentation/devicetree/bindings/display/renesas,du.txt
+@@ -16,6 +16,7 @@ Required Properties:
+     - "renesas,du-r8a77965" for R8A77965 (R-Car M3-N) compatible DU
+     - "renesas,du-r8a77970" for R8A77970 (R-Car V3M) compatible DU
+     - "renesas,du-r8a77995" for R8A77995 (R-Car D3) compatible DU
++    - "renesas,du-r8a774c0" for R8A774C0 (RZ/G2E) compatible DU
+ 
+   - reg: the memory-mapped I/O registers base address and length
+ 
+@@ -61,8 +62,7 @@ corresponding to each DU output.
+  R8A7796 (R-Car M3-W)   DPAD 0         HDMI 0         LVDS 0         -
+  R8A77965 (R-Car M3-N)  DPAD 0         HDMI 0         LVDS 0         -
+  R8A77970 (R-Car V3M)   DPAD 0         LVDS 0         -              -
+- R8A77995 (R-Car D3)    DPAD 0         LVDS 0         LVDS 1         -
+-
++ R8A77995 (R-Car D3)    DPAD 0         LVDS 0         LVDS 1         -R8A77995 (R-Car D3)    DPAD 0         LVDS 0         LVDS 1         -
+ 
+ Example: R8A7795 (R-Car H3) ES2.0 DU
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,421 @@
+From 0c0795bf469a2cca835aa279f4b227dd8d9c11f8 Mon Sep 17 00:00:00 2001
+From: Chinh Nguyen <chinh.nguyen.jg@renesas.com>
+Date: Thu, 14 Mar 2019 14:31:38 +0700
+Subject: [PATCH 097/175] iommu/ipmmu-vmsa: Add IPMMU whitelist support
+
+This implements base whitelist function for IPMMU based on matching
+supported IPMMU utlb bitmap and be enabled by default.
+
+Target support SoCs are H3/M3/M3N/E3 will be added in follow-up patches.
+
+- For unsupported R-Car Gen3 SoCs, IPMMU will probe error.
+- For unsupported IPMMU cache devices or unsupported master devices,
+IPMMU will not do address translation.
+
+The ipmmu_of_xlate() function is reworked since this implementation
+requires present IPMMU cache devices info.
+
+SoCs, which is not R-Car Gen3, have no affect from whitelist support.
+
+Signed-off-by: Hai Nguyen Pham <hai.pham.ud@renesas.com>
+Signed-off-by: Chinh Nguyen <chinh.nguyen.jg@renesas.com>
+---
+ drivers/iommu/Kconfig                |  12 +++
+ drivers/iommu/ipmmu-vmsa-whitelist.h | 147 +++++++++++++++++++++++++++++++++++
+ drivers/iommu/ipmmu-vmsa.c           | 132 +++++++++++++++++++++++++++++--
+ 3 files changed, 286 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/iommu/ipmmu-vmsa-whitelist.h
+
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index b9c8b0e..25bca44 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -333,6 +333,18 @@ config IPMMU_VMSA_CTX_NUM
+ 	  The specified number of MMU contexts are used for the Renesas
+ 	  IPMMU driver and the remaining contexts are unused.
+ 
++config IPMMU_VMSA_WHITELIST
++	bool "IPMMU Whitelist Support"
++	depends on IPMMU_VMSA
++	def_bool y
++	help
++	  Support whitelisting the devices for the Renesas VMSA-compatible
++	  IPMMU found in the R-Car Gen3 SoCs.
++
++	  For unsupported devices, IPMMU will not do address translation.
++
++	  If unsure, say N here.
++
+ config SPAPR_TCE_IOMMU
+ 	bool "sPAPR TCE IOMMU Support"
+ 	depends on PPC_POWERNV || PPC_PSERIES
+diff --git a/drivers/iommu/ipmmu-vmsa-whitelist.h b/drivers/iommu/ipmmu-vmsa-whitelist.h
+new file mode 100644
+index 0000000..4966e5c
+--- /dev/null
++++ b/drivers/iommu/ipmmu-vmsa-whitelist.h
+@@ -0,0 +1,147 @@
++/* SPDX-License-Identifier: GPL-2.0*/
++/*
++ * Copyright (C) 2018 Renesas Electronics Corporation
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2 of the License.
++ */
++
++#ifndef IPMMU_VMSA_WHITELIST_H
++#define IPMMU_VMSA_WHITELIST_H
++
++#include <linux/bitmap.h>
++
++#define IPMMU_UTLB_MAX 48
++#define IPMMU_CACHE_MAX 16
++
++#define IPMMU_VI0_BASE	(0xFEBD0000UL)
++#define IPMMU_VI1_BASE	(0xFEBE0000UL)
++#define IPMMU_HC_BASE	(0xE6570000UL)
++#define IPMMU_MP_BASE	(0xEC670000UL)
++#define IPMMU_DS0_BASE	(0xE6740000UL)
++#define IPMMU_DS1_BASE	(0xE7740000UL)
++
++/* Support masters for IPMMU_VI0 and IPMMU_VI1 */
++#define M_VIN_0_3	BIT(0)
++#define M_VIN_4_7	BIT(1)
++#define M_VIN_4_5	BIT(1)
++#define M_FCPVD_0	BIT(8)
++#define M_FCPVD_1	BIT(9)
++#define M_FCPVD_2	BIT(10)
++#define M_FCPVD_3	BIT(11)
++
++/* Support masters for IPMMU_HC */
++#define M_PCIE_0	BIT(0)
++#define M_PCIE_1	BIT(1)
++#define M_SATA		BIT(2)
++#define M_USB2H_0	BIT(4)
++#define M_USB2H_1	BIT(5)
++#define M_USB2H_2	BIT(6)
++#define M_USB2H_3	BIT(7)
++#define M_USB_DMAC_0	BIT(9)
++#define M_USB_DMAC_1	BIT(10)
++#define M_USB3H_0	BIT(12)
++#define M_USB3F_0	BIT(13)
++#define M_USB_DMAC_2	BIT(14)
++#define M_USB_DMAC_3	BIT(15)
++
++/* Support masters for IPMMU_MP */
++#define M_AUDIO_DMAC_0	BIT(0)
++#define M_AUDIO_DMAC_1	BIT(1)
++#define M_AUDIO_DMAC_2	BIT(2)
++#define M_AUDIO_DMAC_3	BIT(3)
++#define M_AUDIO_DMAC_4	BIT(4)
++#define M_AUDIO_DMAC_5	BIT(5)
++#define M_AUDIO_DMAC_6	BIT(6)
++#define M_AUDIO_DMAC_7	BIT(7)
++#define M_AUDIO_DMAC_8	BIT(8)
++#define M_AUDIO_DMAC_9	BIT(9)
++#define M_AUDIO_DMAC_10	BIT(10)
++#define M_AUDIO_DMAC_11	BIT(11)
++#define M_AUDIO_DMAC_12	BIT(12)
++#define M_AUDIO_DMAC_13	BIT(13)
++#define M_AUDIO_DMAC_14	BIT(14)
++#define M_AUDIO_DMAC_15	BIT(15)
++#define M_AUDIO_DMAC_16	BIT(16)
++#define M_AUDIO_DMAC_17	BIT(17)
++#define M_AUDIO_DMAC_18	BIT(18)
++#define M_AUDIO_DMAC_19	BIT(19)
++#define M_AUDIO_DMAC_20	BIT(20)
++#define M_AUDIO_DMAC_21	BIT(21)
++#define M_AUDIO_DMAC_22	BIT(22)
++#define M_AUDIO_DMAC_23	BIT(23)
++#define M_AUDIO_DMAC_24	BIT(24)
++#define M_AUDIO_DMAC_25	BIT(25)
++#define M_AUDIO_DMAC_26	BIT(26)
++#define M_AUDIO_DMAC_27	BIT(27)
++#define M_AUDIO_DMAC_28	BIT(28)
++#define M_AUDIO_DMAC_29	BIT(29)
++#define M_AUDIO_DMAC_30	BIT(30)
++#define M_AUDIO_DMAC_31	BIT(31)
++
++/* Support masters for IPMMU_DS0 */
++#define M_SYS_DMAC_0	BIT(0)
++#define M_SYS_DMAC_1	BIT(1)
++#define M_SYS_DMAC_2	BIT(2)
++#define M_SYS_DMAC_3	BIT(3)
++#define M_SYS_DMAC_4	BIT(4)
++#define M_SYS_DMAC_5	BIT(5)
++#define M_SYS_DMAC_6	BIT(6)
++#define M_SYS_DMAC_7	BIT(7)
++#define M_SYS_DMAC_8	BIT(8)
++#define M_SYS_DMAC_9	BIT(9)
++#define M_SYS_DMAC_10	BIT(10)
++#define M_SYS_DMAC_11	BIT(11)
++#define M_SYS_DMAC_12	BIT(12)
++#define M_SYS_DMAC_13	BIT(13)
++#define M_SYS_DMAC_14	BIT(14)
++#define M_SYS_DMAC_15	BIT(15)
++#define M_ETHERNET	BIT(16)
++
++/* Support masters for IPMMU_DS1 */
++#define M_SYS_DMAC_16	BIT(0)
++#define M_SYS_DMAC_17	BIT(1)
++#define M_SYS_DMAC_18	BIT(2)
++#define M_SYS_DMAC_19	BIT(3)
++#define M_SYS_DMAC_20	BIT(4)
++#define M_SYS_DMAC_21	BIT(5)
++#define M_SYS_DMAC_22	BIT(6)
++#define M_SYS_DMAC_23	BIT(7)
++#define M_SYS_DMAC_24	BIT(8)
++#define M_SYS_DMAC_25	BIT(9)
++#define M_SYS_DMAC_26	BIT(10)
++#define M_SYS_DMAC_27	BIT(11)
++#define M_SYS_DMAC_28	BIT(12)
++#define M_SYS_DMAC_29	BIT(13)
++#define M_SYS_DMAC_30	BIT(14)
++#define M_SYS_DMAC_31	BIT(15)
++#define M_SYS_DMAC_32	BIT(16)
++#define M_SYS_DMAC_33	BIT(17)
++#define M_SYS_DMAC_34	BIT(18)
++#define M_SYS_DMAC_35	BIT(19)
++#define M_SYS_DMAC_36	BIT(20)
++#define M_SYS_DMAC_37	BIT(21)
++#define M_SYS_DMAC_38	BIT(22)
++#define M_SYS_DMAC_39	BIT(23)
++#define M_SYS_DMAC_40	BIT(24)
++#define M_SYS_DMAC_41	BIT(25)
++#define M_SYS_DMAC_42	BIT(26)
++#define M_SYS_DMAC_43	BIT(27)
++#define M_SYS_DMAC_44	BIT(28)
++#define M_SYS_DMAC_45	BIT(29)
++#define M_SYS_DMAC_46	BIT(30)
++#define M_SYS_DMAC_47	BIT(31)
++#define M_SDHI0		BIT(32)
++#define M_SDHI1		BIT(33)
++#define M_SDHI2		BIT(34)
++#define M_SDHI3		BIT(35)
++
++struct ipmmu_whitelist {
++	const char *ipmmu_name;
++	unsigned int base_addr;
++	unsigned long ip_masters;
++	DECLARE_BITMAP(ultb, IPMMU_UTLB_MAX);
++};
++
++#endif /* IPMMU_VMSA_WHITELIST_H */
+diff --git a/drivers/iommu/ipmmu-vmsa.c b/drivers/iommu/ipmmu-vmsa.c
+index 3493308..faab5c8 100644
+--- a/drivers/iommu/ipmmu-vmsa.c
++++ b/drivers/iommu/ipmmu-vmsa.c
+@@ -36,6 +36,10 @@
+ 
+ #include "io-pgtable.h"
+ 
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++#include "ipmmu-vmsa-whitelist.h"
++#endif
++
+ #define IPMMU_CTX_MAX 8
+ 
+ struct ipmmu_features {
+@@ -45,6 +49,9 @@ struct ipmmu_features {
+ 	bool setup_imbuscr;
+ 	bool twobit_imttbcr_sl0;
+ 	bool reserved_context;
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	bool whitelist;
++#endif
+ };
+ 
+ struct ipmmu_vmsa_device {
+@@ -61,6 +68,9 @@ struct ipmmu_vmsa_device {
+ 
+ 	struct iommu_group *group;
+ 	struct dma_iommu_mapping *mapping;
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	struct ipmmu_whitelist **whitelist;
++#endif
+ };
+ 
+ struct ipmmu_vmsa_domain {
+@@ -761,15 +771,51 @@ static int ipmmu_init_platform_device(struct device *dev,
+ 		return -ENODEV;
+ 
+ 	dev->iommu_fwspec->iommu_priv = platform_get_drvdata(ipmmu_pdev);
++
+ 	return 0;
+ }
+ 
+-static bool ipmmu_slave_whitelist(struct device *dev)
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++static bool ipmmu_slave_whitelist(struct device *dev, u32 *ids)
+ {
++	struct ipmmu_vmsa_device *mmu = to_ipmmu(dev);
++	int i;
++	int ret;
++
++	if (!mmu) {
++		pr_debug("%s Cannot get mmu for %s\n", __func__, dev_name(dev));
++		goto exit;
++	}
++
++	if (!mmu->whitelist[0]) {
++		pr_debug("%s Whitelist not found on %s!!!\n",
++			 __func__, dev_name(mmu->dev));
++		goto exit;
++	}
++
++	for (i = 0; i < IPMMU_CACHE_MAX; i++) {
++		if (!mmu->whitelist[i])
++			break;
++
++		if (!strcmp(dev_name(mmu->dev),
++			    mmu->whitelist[i]->ipmmu_name)) {
++			ret = test_bit(ids[0], mmu->whitelist[i]->ultb);
++
++			pr_debug("%s: %s whitelist for %s <utlb %d>\n",
++				 __func__, mmu->whitelist[i]->ipmmu_name,
++				 dev_name(dev), ids[0]);
++
++			if (ret)
++				return true;
++		}
++	}
++
++exit:
+ 	/* By default, do not allow use of IPMMU */
++	pr_info("IPMMU support is not available for %s\n", dev_name(dev));
+ 	return false;
+ }
+-
++#endif
+ static const struct soc_device_attribute soc_rcar_gen3[] = {
+ 	{ .soc_id = "r8a774c0", },
+ 	{ .soc_id = "r8a7795", },
+@@ -783,9 +829,17 @@ static const struct soc_device_attribute soc_rcar_gen3[] = {
+ static int ipmmu_of_xlate(struct device *dev,
+ 			  struct of_phandle_args *spec)
+ {
+-	/* For R-Car Gen3 use a white list to opt-in slave devices */
+-	if (soc_device_match(soc_rcar_gen3) && !ipmmu_slave_whitelist(dev))
++
++	int ret;
++
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	/* Use a white list to opt-in slave devices
++	 * Whitelist needs mmu info to get the corresponding whitelist bitmap
++	 * In case of no mmu is available, whitelist will check later
++	 */
++	if (to_ipmmu(dev) && !ipmmu_slave_whitelist(dev, spec->args))
+ 		return -ENODEV;
++#endif
+ 
+ 	iommu_fwspec_add_ids(dev, spec->args, 1);
+ 
+@@ -793,7 +847,16 @@ static int ipmmu_of_xlate(struct device *dev,
+ 	if (to_ipmmu(dev))
+ 		return 0;
+ 
+-	return ipmmu_init_platform_device(dev, spec);
++	ret = ipmmu_init_platform_device(dev, spec);
++	if (ret)
++		return ret;
++
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	/* For the first initialzation when mmu info is available */
++	if (!ipmmu_slave_whitelist(dev, spec->args))
++		return -ENODEV;
++#endif
++	return 0;
+ }
+ 
+ static int ipmmu_init_arm_mapping(struct device *dev)
+@@ -936,6 +999,9 @@ static const struct ipmmu_features ipmmu_features_default = {
+ 	.setup_imbuscr = true,
+ 	.twobit_imttbcr_sl0 = false,
+ 	.reserved_context = false,
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	.whitelist = false,
++#endif
+ };
+ 
+ static const struct ipmmu_features ipmmu_features_rcar_gen3 = {
+@@ -945,6 +1011,9 @@ static const struct ipmmu_features ipmmu_features_rcar_gen3 = {
+ 	.setup_imbuscr = false,
+ 	.twobit_imttbcr_sl0 = true,
+ 	.reserved_context = true,
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	.whitelist = true,
++#endif
+ };
+ 
+ static const struct of_device_id ipmmu_of_ids[] = {
+@@ -976,6 +1045,47 @@ static const struct of_device_id ipmmu_of_ids[] = {
+ 
+ MODULE_DEVICE_TABLE(of, ipmmu_of_ids);
+ 
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++static int ipmmu_bm_init(struct ipmmu_vmsa_device *mmu)
++{
++	bool found = false;
++	int i;
++
++	for (i = 0; i < IPMMU_CACHE_MAX; i++) {
++		if (!mmu->whitelist[i])
++			break;
++
++		if (!strcmp(dev_name(mmu->dev),
++			    mmu->whitelist[i]->ipmmu_name)) {
++			pr_debug("%s, match found with mmu %s\n",
++				 __func__, dev_name(mmu->dev));
++			bitmap_from_u64(mmu->whitelist[i]->ultb,
++					mmu->whitelist[i]->ip_masters);
++			found = true;
++			break;
++		}
++	}
++
++	if (!found)
++		pr_warn("IPMMU whitelist support is not available for %s\n",
++			dev_name(mmu->dev));
++
++	return 0;
++}
++
++static int ipmmu_whitelist_init(struct ipmmu_vmsa_device *mmu)
++{
++	/* Whitelist set up depend per SoC */
++
++	mmu->whitelist = NULL;
++
++	if (!mmu->whitelist[0])
++		return -1;
++
++	return ipmmu_bm_init(mmu);
++}
++#endif /* CONFIG_IPMMU_VMSA_WHITELIST */
++
+ static int ipmmu_probe(struct platform_device *pdev)
+ {
+ 	struct ipmmu_vmsa_device *mmu;
+@@ -1084,6 +1194,18 @@ static int ipmmu_probe(struct platform_device *pdev)
+ 			bus_set_iommu(&platform_bus_type, &ipmmu_ops);
+ #endif
+ 	}
++#ifdef CONFIG_IPMMU_VMSA_WHITELIST
++	/*
++	 * Set up whitelist
++	 */
++	if (mmu->features->whitelist && !ipmmu_is_root(mmu)) {
++		ret = ipmmu_whitelist_init(mmu);
++		if (ret) {
++			dev_err(&pdev->dev, "no valid IPMMU whitelist found\n");
++			return ret;
++		}
++	}
++#endif
+ 
+ 	/*
+ 	 * We can't create the ARM mapping here as it requires the bus to have
+-- 
+2.7.4
+

@@ -1,0 +1,37 @@
+From c44c6c620772d497fb9d90f5aca6589ece9c308d Mon Sep 17 00:00:00 2001
+From: Chinh Nguyen <chinh.nguyen.jg@renesas.com>
+Date: Wed, 13 Mar 2019 19:07:41 +0700
+Subject: [PATCH 095/175] iommu/ipmmu-vmsa: Clean up unncessary micro-TLB
+ invalidation
+
+Since the micro-TLB is automatically invalidated by hardware when:
+  - MMU Page Table entry is updated or released
+  - ASID is updated
+  - MMU register values are updated,
+do not need to flush again in software.
+
+Clean up these unncessary invalidation.
+
+Signed-off-by: Hai Nguyen Pham <hai.pham.ud@renesas.com>
+Signed-off-by: Kazuya Mizuguchi <kazuya.mizuguchi.ks@renesas.com>
+Signed-off-by: Chinh Nguyen <chinh.nguyen.jg@renesas.com>
+---
+ drivers/iommu/ipmmu-vmsa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/iommu/ipmmu-vmsa.c b/drivers/iommu/ipmmu-vmsa.c
+index 972e6ae..d49afd7 100644
+--- a/drivers/iommu/ipmmu-vmsa.c
++++ b/drivers/iommu/ipmmu-vmsa.c
+@@ -336,7 +336,7 @@ static void ipmmu_utlb_enable(struct ipmmu_vmsa_domain *domain,
+ 	ipmmu_write(mmu, IMUCTR(utlb),
+ 		    ipmmu_read(mmu, IMUCTR(utlb)) |
+ 		    IMUCTR_TTSEL_MMU(domain->context_id) |
+-		    IMUCTR_FLUSH | IMUCTR_MMUEN);
++		    IMUCTR_MMUEN);
+ }
+ 
+ /*
+-- 
+2.7.4
+

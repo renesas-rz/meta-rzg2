@@ -1,0 +1,41 @@
+From af981581de2274017a1f68a1eeb21e940497edb0 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 11 Mar 2019 10:12:21 +0700
+Subject: [PATCH 108/175] clocksource/drivers/sh_cmt: Add R-Car gen3 support
+
+Refer upstream commit id:
+<ac142a7fd291f4230923f221a594ce0281a96a72>
+
+Add support for the R-Car gen3 CMT types 0/1.
+They seem to be the same CMT types 0/1 as in R-Car gen2 SoCs.
+
+Signed-off-by: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Daniel Lezcano <daniel.lezcano@linaro.org>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clocksource/sh_cmt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/clocksource/sh_cmt.c b/drivers/clocksource/sh_cmt.c
+index 71624dc..55d3e03 100644
+--- a/drivers/clocksource/sh_cmt.c
++++ b/drivers/clocksource/sh_cmt.c
+@@ -935,6 +935,14 @@ static const struct of_device_id sh_cmt_of_table[] __maybe_unused = {
+ 		.compatible = "renesas,rcar-gen2-cmt1",
+ 		.data = &sh_cmt_info[SH_CMT1_RCAR_GEN2]
+ 	},
++	{
++		.compatible = "renesas,rcar-gen3-cmt0",
++		.data = &sh_cmt_info[SH_CMT0_RCAR_GEN2]
++	},
++	{
++		.compatible = "renesas,rcar-gen3-cmt1",
++		.data = &sh_cmt_info[SH_CMT1_RCAR_GEN2]
++	},
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, sh_cmt_of_table);
+-- 
+2.7.4
+

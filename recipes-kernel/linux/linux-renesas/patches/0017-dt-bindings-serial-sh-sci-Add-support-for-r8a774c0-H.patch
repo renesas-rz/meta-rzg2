@@ -1,0 +1,30 @@
+From 79e078f2ee79acdf4901634268bdc61596633d9d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Feb 2019 14:21:49 +0700
+Subject: [PATCH 017/175] dt-bindings: serial: sh-sci: Add support for r8a774c0
+ (H)SCIF
+
+Document support for the (H)SCIF serial ports in the RZ/G2E
+(r8a774c0) SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/serial/renesas,sci-serial.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/serial/renesas,sci-serial.txt b/Documentation/devicetree/bindings/serial/renesas,sci-serial.txt
+index eaca9da..2286a8d 100644
+--- a/Documentation/devicetree/bindings/serial/renesas,sci-serial.txt
++++ b/Documentation/devicetree/bindings/serial/renesas,sci-serial.txt
+@@ -20,6 +20,8 @@ Required properties:
+     - "renesas,hscif-r8a7745" for R8A7745 (RZ/G1E) HSCIF compatible UART.
+     - "renesas,scif-r8a77470" for R8A77470 (RZ/G1C) SCIF compatible UART.
+     - "renesas,hscif-r8a77470" for R8A77470 (RZ/G1C) HSCIF compatible UART.
++    - "renesas,scif-r8a774c0" for R8A774C0 (RZ/G2E) SCIF compatible UART.
++    - "renesas,hscif-r8a774c0" for R8A774C0 (RZ/G2E) HSCIF compatible UART.
+     - "renesas,scif-r8a7778" for R8A7778 (R-Car M1) SCIF compatible UART.
+     - "renesas,scif-r8a7779" for R8A7779 (R-Car H1) SCIF compatible UART.
+     - "renesas,scif-r8a7790" for R8A7790 (R-Car H2) SCIF compatible UART.
+-- 
+2.7.4
+

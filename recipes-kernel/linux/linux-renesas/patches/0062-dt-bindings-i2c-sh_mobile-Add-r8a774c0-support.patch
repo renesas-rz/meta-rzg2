@@ -1,0 +1,40 @@
+From 4800e3bfdc75966c043d2346bc9e0f0a3b6b1caa Mon Sep 17 00:00:00 2001
+From: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Date: Thu, 14 Mar 2019 10:53:48 +0700
+Subject: [PATCH 062/175] dt-bindings: i2c: sh_mobile: Add r8a774c0 support
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt b/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt
+index 872673a..0392c64 100644
+--- a/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt
++++ b/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt
+@@ -7,6 +7,7 @@ Required properties:
+ 			- "renesas,iic-r8a7743" (RZ/G1M)
+ 			- "renesas,iic-r8a7745" (RZ/G1E)
+ 			- "renesas,iic-r8a774a1" (RZ/G2M)
++			- "renesas,iic-r8a774c0" (RZ/G2E)
+ 			- "renesas,iic-r8a7790" (R-Car H2)
+ 			- "renesas,iic-r8a7791" (R-Car M2-W)
+ 			- "renesas,iic-r8a7792" (R-Car V2H)
+@@ -27,7 +28,10 @@ Required properties:
+ 			the platform first followed by the generic R-Car
+ 			version.
+ 
+-			renesas,rmobile-iic must always follow.
++			The r8a77990 (R-Car E3) and r8a774c0 (RZ/G2E)
++			controllers are not considered compatible with
++			"renesas,rcar-gen3-iic" or "renesas,rmobile-iic"
++			due to the absence of automatic transmission registers.
+ 
+ - reg             : address start and address range size of device
+ - interrupts      : interrupt of device
+-- 
+2.7.4
+

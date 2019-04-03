@@ -1,0 +1,29 @@
+From bc2f620dd56f3436b5bf8e0ce1d882e706cf168a Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@rvc.renesas.com>
+Date: Mon, 4 Mar 2019 08:32:29 +0700
+Subject: [PATCH 054/175] arm64: dts: renesas: r8a774c0-cat874: Add RWDT
+ support
+
+This patch enables RWDT and use 60 seconds as default timeout.
+
+Signed-off-by: Tri Luong <tri.luong.te@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index c545ce5..d30ce51 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -45,3 +45,8 @@
+ 
+ 	status = "okay";
+ };
++
++&rwdt {
++	timeout-sec = <60>;
++	status = "okay";
++};
+-- 
+2.7.4
+

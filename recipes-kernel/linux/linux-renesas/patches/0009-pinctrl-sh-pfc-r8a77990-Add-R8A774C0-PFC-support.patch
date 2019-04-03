@@ -1,0 +1,317 @@
+From 3919d8813835c63ca235fdee9b580e8e29832d36 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Feb 2019 09:54:20 +0700
+Subject: [PATCH 009/175] pinctrl: sh-pfc: r8a77990: Add R8A774C0 PFC support
+
+Reference upstreams commit id:
+<9f2b76a2db3c43872048cbca1269f3fc5fbcd75d>
+
+Renesas RZ/G2E (a.k.a. r8a774c0) is pin compatible with R-Car
+E3 (a.k.a. r8a77990), however it doesn't have several automotive
+specific peripherals. Add a r8a77990 specific pin groups/functions
+along with common pin groups/functions for supporting both r8a77990
+and r8a774c0 SoCs.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Reviewed-by: Biju Das <biju.das@bp.renesas.com>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/Kconfig        |   5 +
+ drivers/pinctrl/sh-pfc/Makefile       |   1 +
+ drivers/pinctrl/sh-pfc/core.c         |   6 ++
+ drivers/pinctrl/sh-pfc/pfc-r8a77990.c | 195 ++++++++++++++++++++--------------
+ drivers/pinctrl/sh-pfc/sh_pfc.h       |   1 +
+ 5 files changed, 129 insertions(+), 79 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/Kconfig b/drivers/pinctrl/sh-pfc/Kconfig
+index 43d950c1..4368134 100644
+--- a/drivers/pinctrl/sh-pfc/Kconfig
++++ b/drivers/pinctrl/sh-pfc/Kconfig
+@@ -49,6 +49,11 @@ config PINCTRL_PFC_R8A77470
+         depends on ARCH_R8A77470
+         select PINCTRL_SH_PFC
+ 
++config PINCTRL_PFC_R8A774C0
++        def_bool y
++        depends on ARCH_R8A774C0
++        select PINCTRL_SH_PFC
++
+ config PINCTRL_PFC_R8A7778
+ 	def_bool y
+ 	depends on ARCH_R8A7778
+diff --git a/drivers/pinctrl/sh-pfc/Makefile b/drivers/pinctrl/sh-pfc/Makefile
+index d0b29c5..94f169f 100644
+--- a/drivers/pinctrl/sh-pfc/Makefile
++++ b/drivers/pinctrl/sh-pfc/Makefile
+@@ -7,6 +7,7 @@ obj-$(CONFIG_PINCTRL_PFC_R8A7740)	+= pfc-r8a7740.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A7743)	+= pfc-r8a7791.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A7745)	+= pfc-r8a7794.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A77470)	+= pfc-r8a77470.o
++obj-$(CONFIG_PINCTRL_PFC_R8A774C0)	+= pfc-r8a77990.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A7778)	+= pfc-r8a7778.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A7779)	+= pfc-r8a7779.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A7790)	+= pfc-r8a7790.o
+diff --git a/drivers/pinctrl/sh-pfc/core.c b/drivers/pinctrl/sh-pfc/core.c
+index c671c3c..6ef4a1a 100644
+--- a/drivers/pinctrl/sh-pfc/core.c
++++ b/drivers/pinctrl/sh-pfc/core.c
+@@ -509,6 +509,12 @@ static const struct of_device_id sh_pfc_of_table[] = {
+ 		.data = &r8a77470_pinmux_info,
+ 	},
+ #endif
++#ifdef CONFIG_PINCTRL_PFC_R8A774C0
++	{
++		.compatible = "renesas,pfc-r8a774c0",
++		.data = &r8a774c0_pinmux_info,
++	},
++#endif
+ #ifdef CONFIG_PINCTRL_PFC_R8A7778
+ 	{
+ 		.compatible = "renesas,pfc-r8a7778",
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+index b81c807..959e90c 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+@@ -1831,64 +1831,69 @@ static const unsigned int usb30_id_mux[] = {
+ 	USB3HS0_ID_MARK,
+ };
+ 
+-static const struct sh_pfc_pin_group pinmux_groups[] = {
+-	SH_PFC_PIN_GROUP(avb_link),
+-	SH_PFC_PIN_GROUP(avb_magic),
+-	SH_PFC_PIN_GROUP(avb_phy_int),
+-	SH_PFC_PIN_GROUP(avb_mii),
+-	SH_PFC_PIN_GROUP(avb_avtp_pps),
+-	SH_PFC_PIN_GROUP(avb_avtp_match_a),
+-	SH_PFC_PIN_GROUP(avb_avtp_capture_a),
+-	SH_PFC_PIN_GROUP(i2c1_a),
+-	SH_PFC_PIN_GROUP(i2c1_b),
+-	SH_PFC_PIN_GROUP(i2c1_c),
+-	SH_PFC_PIN_GROUP(i2c1_d),
+-	SH_PFC_PIN_GROUP(i2c2_a),
+-	SH_PFC_PIN_GROUP(i2c2_b),
+-	SH_PFC_PIN_GROUP(i2c2_c),
+-	SH_PFC_PIN_GROUP(i2c2_d),
+-	SH_PFC_PIN_GROUP(i2c2_e),
+-	SH_PFC_PIN_GROUP(i2c4),
+-	SH_PFC_PIN_GROUP(i2c5),
+-	SH_PFC_PIN_GROUP(i2c6_a),
+-	SH_PFC_PIN_GROUP(i2c6_b),
+-	SH_PFC_PIN_GROUP(i2c7_a),
+-	SH_PFC_PIN_GROUP(i2c7_b),
+-	SH_PFC_PIN_GROUP(scif0_data_a),
+-	SH_PFC_PIN_GROUP(scif0_clk_a),
+-	SH_PFC_PIN_GROUP(scif0_ctrl_a),
+-	SH_PFC_PIN_GROUP(scif0_data_b),
+-	SH_PFC_PIN_GROUP(scif0_clk_b),
+-	SH_PFC_PIN_GROUP(scif1_data),
+-	SH_PFC_PIN_GROUP(scif1_clk),
+-	SH_PFC_PIN_GROUP(scif1_ctrl),
+-	SH_PFC_PIN_GROUP(scif2_data_a),
+-	SH_PFC_PIN_GROUP(scif2_clk_a),
+-	SH_PFC_PIN_GROUP(scif2_data_b),
+-	SH_PFC_PIN_GROUP(scif3_data_a),
+-	SH_PFC_PIN_GROUP(scif3_clk_a),
+-	SH_PFC_PIN_GROUP(scif3_ctrl_a),
+-	SH_PFC_PIN_GROUP(scif3_data_b),
+-	SH_PFC_PIN_GROUP(scif3_data_c),
+-	SH_PFC_PIN_GROUP(scif3_clk_c),
+-	SH_PFC_PIN_GROUP(scif4_data_a),
+-	SH_PFC_PIN_GROUP(scif4_clk_a),
+-	SH_PFC_PIN_GROUP(scif4_ctrl_a),
+-	SH_PFC_PIN_GROUP(scif4_data_b),
+-	SH_PFC_PIN_GROUP(scif4_clk_b),
+-	SH_PFC_PIN_GROUP(scif4_data_c),
+-	SH_PFC_PIN_GROUP(scif4_ctrl_c),
+-	SH_PFC_PIN_GROUP(scif5_data_a),
+-	SH_PFC_PIN_GROUP(scif5_clk_a),
+-	SH_PFC_PIN_GROUP(scif5_data_b),
+-	SH_PFC_PIN_GROUP(scif5_data_c),
+-	SH_PFC_PIN_GROUP(scif_clk_a),
+-	SH_PFC_PIN_GROUP(scif_clk_b),
+-	SH_PFC_PIN_GROUP(usb0_a),
+-	SH_PFC_PIN_GROUP(usb0_b),
+-	SH_PFC_PIN_GROUP(usb0_id),
+-	SH_PFC_PIN_GROUP(usb30),
+-	SH_PFC_PIN_GROUP(usb30_id),
++static const struct {
++	struct sh_pfc_pin_group common[57];
++	struct sh_pfc_pin_group r8a77990[0];
++} pinmux_groups = {
++	.common = {
++		SH_PFC_PIN_GROUP(avb_link),
++		SH_PFC_PIN_GROUP(avb_magic),
++		SH_PFC_PIN_GROUP(avb_phy_int),
++		SH_PFC_PIN_GROUP(avb_mii),
++		SH_PFC_PIN_GROUP(avb_avtp_pps),
++		SH_PFC_PIN_GROUP(avb_avtp_match_a),
++		SH_PFC_PIN_GROUP(avb_avtp_capture_a),
++		SH_PFC_PIN_GROUP(i2c1_a),
++		SH_PFC_PIN_GROUP(i2c1_b),
++		SH_PFC_PIN_GROUP(i2c1_c),
++		SH_PFC_PIN_GROUP(i2c1_d),
++		SH_PFC_PIN_GROUP(i2c2_a),
++		SH_PFC_PIN_GROUP(i2c2_b),
++		SH_PFC_PIN_GROUP(i2c2_c),
++		SH_PFC_PIN_GROUP(i2c2_d),
++		SH_PFC_PIN_GROUP(i2c2_e),
++		SH_PFC_PIN_GROUP(i2c4),
++		SH_PFC_PIN_GROUP(i2c5),
++		SH_PFC_PIN_GROUP(i2c6_a),
++		SH_PFC_PIN_GROUP(i2c6_b),
++		SH_PFC_PIN_GROUP(i2c7_a),
++		SH_PFC_PIN_GROUP(i2c7_b),
++		SH_PFC_PIN_GROUP(scif0_data_a),
++		SH_PFC_PIN_GROUP(scif0_clk_a),
++		SH_PFC_PIN_GROUP(scif0_ctrl_a),
++		SH_PFC_PIN_GROUP(scif0_data_b),
++		SH_PFC_PIN_GROUP(scif0_clk_b),
++		SH_PFC_PIN_GROUP(scif1_data),
++		SH_PFC_PIN_GROUP(scif1_clk),
++		SH_PFC_PIN_GROUP(scif1_ctrl),
++		SH_PFC_PIN_GROUP(scif2_data_a),
++		SH_PFC_PIN_GROUP(scif2_clk_a),
++		SH_PFC_PIN_GROUP(scif2_data_b),
++		SH_PFC_PIN_GROUP(scif3_data_a),
++		SH_PFC_PIN_GROUP(scif3_clk_a),
++		SH_PFC_PIN_GROUP(scif3_ctrl_a),
++		SH_PFC_PIN_GROUP(scif3_data_b),
++		SH_PFC_PIN_GROUP(scif3_data_c),
++		SH_PFC_PIN_GROUP(scif3_clk_c),
++		SH_PFC_PIN_GROUP(scif4_data_a),
++		SH_PFC_PIN_GROUP(scif4_clk_a),
++		SH_PFC_PIN_GROUP(scif4_ctrl_a),
++		SH_PFC_PIN_GROUP(scif4_data_b),
++		SH_PFC_PIN_GROUP(scif4_clk_b),
++		SH_PFC_PIN_GROUP(scif4_data_c),
++		SH_PFC_PIN_GROUP(scif4_ctrl_c),
++		SH_PFC_PIN_GROUP(scif5_data_a),
++		SH_PFC_PIN_GROUP(scif5_clk_a),
++		SH_PFC_PIN_GROUP(scif5_data_b),
++		SH_PFC_PIN_GROUP(scif5_data_c),
++		SH_PFC_PIN_GROUP(scif_clk_a),
++		SH_PFC_PIN_GROUP(scif_clk_b),
++		SH_PFC_PIN_GROUP(usb0_a),
++		SH_PFC_PIN_GROUP(usb0_b),
++		SH_PFC_PIN_GROUP(usb0_id),
++		SH_PFC_PIN_GROUP(usb30),
++		SH_PFC_PIN_GROUP(usb30_id),
++	},
+ };
+ 
+ static const char * const avb_groups[] = {
+@@ -1996,23 +2001,28 @@ static const char * const usb30_groups[] = {
+ 	"usb30_id",
+ };
+ 
+-static const struct sh_pfc_function pinmux_functions[] = {
+-	SH_PFC_FUNCTION(avb),
+-	SH_PFC_FUNCTION(i2c1),
+-	SH_PFC_FUNCTION(i2c2),
+-	SH_PFC_FUNCTION(i2c4),
+-	SH_PFC_FUNCTION(i2c5),
+-	SH_PFC_FUNCTION(i2c6),
+-	SH_PFC_FUNCTION(i2c7),
+-	SH_PFC_FUNCTION(scif0),
+-	SH_PFC_FUNCTION(scif1),
+-	SH_PFC_FUNCTION(scif2),
+-	SH_PFC_FUNCTION(scif3),
+-	SH_PFC_FUNCTION(scif4),
+-	SH_PFC_FUNCTION(scif5),
+-	SH_PFC_FUNCTION(scif_clk),
+-	SH_PFC_FUNCTION(usb0),
+-	SH_PFC_FUNCTION(usb30),
++static const struct {
++	struct sh_pfc_function common[16];
++	struct sh_pfc_function r8a77990[0];
++} pinmux_functions = {
++	.common = {
++		SH_PFC_FUNCTION(avb),
++		SH_PFC_FUNCTION(i2c1),
++		SH_PFC_FUNCTION(i2c2),
++		SH_PFC_FUNCTION(i2c4),
++		SH_PFC_FUNCTION(i2c5),
++		SH_PFC_FUNCTION(i2c6),
++		SH_PFC_FUNCTION(i2c7),
++		SH_PFC_FUNCTION(scif0),
++		SH_PFC_FUNCTION(scif1),
++		SH_PFC_FUNCTION(scif2),
++		SH_PFC_FUNCTION(scif3),
++		SH_PFC_FUNCTION(scif4),
++		SH_PFC_FUNCTION(scif5),
++		SH_PFC_FUNCTION(scif_clk),
++		SH_PFC_FUNCTION(usb0),
++		SH_PFC_FUNCTION(usb30),
++	},
+ };
+ 
+ static const struct pinmux_cfg_reg pinmux_config_regs[] = {
+@@ -2738,6 +2748,30 @@ static const struct sh_pfc_soc_operations r8a77990_pinmux_ops = {
+ 	.set_bias = r8a77990_pinmux_set_bias,
+ };
+ 
++#ifdef CONFIG_PINCTRL_PFC_R8A774C0
++const struct sh_pfc_soc_info r8a774c0_pinmux_info = {
++	.name = "r8a774c0_pfc",
++	.ops = &r8a77990_pinmux_ops,
++	.unlock_reg = 0xe6060000, /* PMMR */
++
++	.function = { PINMUX_FUNCTION_BEGIN, PINMUX_FUNCTION_END },
++
++	.pins = pinmux_pins,
++	.nr_pins = ARRAY_SIZE(pinmux_pins),
++	.groups = pinmux_groups.common,
++	.nr_groups = ARRAY_SIZE(pinmux_groups.common),
++	.functions = pinmux_functions.common,
++	.nr_functions = ARRAY_SIZE(pinmux_functions.common),
++
++	.cfg_regs = pinmux_config_regs,
++	.bias_regs = pinmux_bias_regs,
++
++	.pinmux_data = pinmux_data,
++	.pinmux_data_size = ARRAY_SIZE(pinmux_data),
++};
++#endif
++
++#ifdef CONFIG_PINCTRL_PFC_R8A77990
+ const struct sh_pfc_soc_info r8a77990_pinmux_info = {
+ 	.name = "r8a77990_pfc",
+ 	.ops = &r8a77990_pinmux_ops,
+@@ -2747,10 +2781,12 @@ const struct sh_pfc_soc_info r8a77990_pinmux_info = {
+ 
+ 	.pins = pinmux_pins,
+ 	.nr_pins = ARRAY_SIZE(pinmux_pins),
+-	.groups = pinmux_groups,
+-	.nr_groups = ARRAY_SIZE(pinmux_groups),
+-	.functions = pinmux_functions,
+-	.nr_functions = ARRAY_SIZE(pinmux_functions),
++	.groups = pinmux_groups.common,
++	.nr_groups = ARRAY_SIZE(pinmux_groups.common) +
++		ARRAY_SIZE(pinmux_groups.r8a77990),
++	.functions = pinmux_functions.common,
++	.nr_functions = ARRAY_SIZE(pinmux_functions.common) +
++		ARRAY_SIZE(pinmux_functions.r8a77990),
+ 
+ 	.cfg_regs = pinmux_config_regs,
+ 	.bias_regs = pinmux_bias_regs,
+@@ -2758,3 +2794,4 @@ const struct sh_pfc_soc_info r8a77990_pinmux_info = {
+ 	.pinmux_data = pinmux_data,
+ 	.pinmux_data_size = ARRAY_SIZE(pinmux_data),
+ };
++#endif
+diff --git a/drivers/pinctrl/sh-pfc/sh_pfc.h b/drivers/pinctrl/sh-pfc/sh_pfc.h
+index 3d0b316..459f632 100644
+--- a/drivers/pinctrl/sh-pfc/sh_pfc.h
++++ b/drivers/pinctrl/sh-pfc/sh_pfc.h
+@@ -275,6 +275,7 @@ extern const struct sh_pfc_soc_info r8a7740_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a7743_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a7745_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a77470_pinmux_info;
++extern const struct sh_pfc_soc_info r8a774c0_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a7778_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a7779_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a7790_pinmux_info;
+-- 
+2.7.4
+

@@ -1,0 +1,32 @@
+From a7a09e7636aa83d6c79b3efce2070097c29f8c6c Mon Sep 17 00:00:00 2001
+From: Tung Vo <tung.vo.eb@renesas.com>
+Date: Wed, 27 Feb 2019 03:50:21 +0700
+Subject: [PATCH 139/175] usb: gadget: udc: renesas_usb3: Add bindings for
+ r8a774c0
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Tung Vo <tung.vo.eb@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas_usb3.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas_usb3.txt b/Documentation/devicetree/bindings/usb/renesas_usb3.txt
+index 2c071bb5..be069b5a 100644
+--- a/Documentation/devicetree/bindings/usb/renesas_usb3.txt
++++ b/Documentation/devicetree/bindings/usb/renesas_usb3.txt
+@@ -5,8 +5,9 @@ Required properties:
+ 	- "renesas,r8a7795-usb3-peri"
+ 	- "renesas,r8a7796-usb3-peri"
+ 	- "renesas,r8a77965-usb3-peri"
+-	- "renesas,rcar-gen3-usb3-peri" for a generic R-Car Gen3 compatible
+-	  device
++	- "renesas,r8a774c0-usb3-peri"
++	- "renesas,rcar-gen3-usb3-peri" for a generic R-Car Gen3 or RZ/G2
++	compatible device
+ 
+     When compatible with the generic version, nodes must list the
+     SoC-specific version corresponding to the platform first
+-- 
+2.7.4
+

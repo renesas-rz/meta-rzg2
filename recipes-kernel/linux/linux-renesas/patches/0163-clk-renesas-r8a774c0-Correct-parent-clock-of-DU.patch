@@ -1,0 +1,31 @@
+From b8ff7068fcfa1aeb4a22009431b3d8c9c3f03c74 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Apr 2019 14:26:43 +0700
+Subject: [PATCH 163/175] clk: renesas: r8a774c0: Correct parent clock of DU
+
+According to the Hardware Manual, the parent clock of the DU
+module clocks on RZ/G2E is S1D1.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774c0-cpg-mssr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/clk/renesas/r8a774c0-cpg-mssr.c b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+index f24fe4a..65065ff 100644
+--- a/drivers/clk/renesas/r8a774c0-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+@@ -186,8 +186,8 @@ static const struct mssr_mod_clk r8a774c0_mod_clks[] __initconst = {
+ 	DEF_MOD("ehci0",		 703,	R8A774C0_CLK_S3D4),
+ 	DEF_MOD("hsusb",		 704,	R8A774C0_CLK_S3D4),
+ 	DEF_MOD("csi40",		 716,	R8A774C0_CLK_CSI0),
+-	DEF_MOD("du1",			 723,	R8A774C0_CLK_S2D1),
+-	DEF_MOD("du0",			 724,	R8A774C0_CLK_S2D1),
++	DEF_MOD("du1",			 723,	R8A774C0_CLK_S1D1),
++	DEF_MOD("du0",			 724,	R8A774C0_CLK_S1D1),
+ 	DEF_MOD("lvds",			 727,	R8A774C0_CLK_S2D1),
+ 
+ 	DEF_MOD("vin5",			 806,	R8A774C0_CLK_S1D2),
+-- 
+2.7.4
+

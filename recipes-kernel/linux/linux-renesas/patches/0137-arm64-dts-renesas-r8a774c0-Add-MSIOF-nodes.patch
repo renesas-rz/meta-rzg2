@@ -1,0 +1,116 @@
+From 9fc5bbfd79b29c5e42ca587c51c6916d165ee69a Mon Sep 17 00:00:00 2001
+From: Tung Vo <tung.vo.eb@renesas.com>
+Date: Mon, 11 Mar 2019 19:41:45 +0700
+Subject: [PATCH 137/175] arm64: dts: renesas: r8a774c0: Add MSIOF nodes
+
+Add the device nodes for all MSIOF SPI controllers on R8A774C0 SoC.
+
+Signed-off-by: Tung Vo <tung.vo.eb@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 77 +++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index 204bd1f..3006087 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -24,6 +24,10 @@
+ 		i2c6 = &i2c6;
+ 		i2c7 = &i2c_dvfs;
+ 		i2c8 = &i2c7;
++		spi0 = &msiof0;
++		spi1 = &msiof1;
++		spi2 = &msiof2;
++		spi3 = &msiof3;
+ 	};
+ 
+ 	/*
+@@ -56,6 +60,13 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	/* MSIOF reference clock - to be overridden by boards that provide it */
++	msiof_ref_clk: msiof-ref-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
+ 	psci {
+ 		compatible = "arm,psci-1.0", "arm,psci-0.2";
+ 		method = "smc";
+@@ -1328,5 +1339,71 @@
+ 			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
+ 			status = "disabled";
+ 		};
++
++		msiof0: spi@e6e90000 {
++			compatible = "renesas,msiof-r8a774c0",
++				     "renesas,rcar-gen3-msiof";
++			reg = <0 0xe6e90000 0 0x0064>;
++			interrupts = <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 211>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
++			dmas = <&dmac1 0x41>, <&dmac1 0x40>,
++			       <&dmac2 0x41>, <&dmac2 0x40>;
++			dma-names = "tx", "rx", "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 211>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
++
++		msiof1: spi@e6ea0000 {
++			compatible = "renesas,msiof-r8a774c0",
++				     "renesas,rcar-gen3-msiof";
++			reg = <0 0xe6ea0000 0 0x0064>;
++			interrupts = <GIC_SPI 157 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 210>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
++			dmas = <&dmac1 0x43>, <&dmac1 0x42>,
++			       <&dmac2 0x43>, <&dmac2 0x42>;
++			dma-names = "tx", "rx", "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 210>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
++
++		msiof2: spi@e6c00000 {
++			compatible = "renesas,msiof-r8a774c0",
++				     "renesas,rcar-gen3-msiof";
++			reg = <0 0xe6c00000 0 0x0064>;
++			interrupts = <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 209>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
++			dmas = <&dmac0 0x45>, <&dmac0 0x44>;
++			dma-names = "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 209>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
++
++		msiof3: spi@e6c10000 {
++			compatible = "renesas,msiof-r8a774c0",
++				     "renesas,rcar-gen3-msiof";
++			reg = <0 0xe6c10000 0 0x0064>;
++			interrupts = <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 208>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
++			dmas = <&dmac0 0x47>, <&dmac0 0x46>;
++			dma-names = "tx", "rx";
++			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
++			resets = <&cpg 208>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+From bbf228f319532197022292d22878c2c22a6daa72 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@rvc.renesas.com>
+Date: Wed, 13 Mar 2019 16:04:47 +0700
+Subject: [PATCH 059/175] dt-bindings: can: rcar_can: Add r8a774c0 support
+
+Document RZ/G2E (r8a774c0) SoC specific bindings.
+
+Signed-off-by: Son Lam <son.lam.ym@rvc.renesas.com>
+---
+ Documentation/devicetree/bindings/net/can/rcar_can.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/can/rcar_can.txt b/Documentation/devicetree/bindings/net/can/rcar_can.txt
+index 94a7f33..7f8dcd5 100644
+--- a/Documentation/devicetree/bindings/net/can/rcar_can.txt
++++ b/Documentation/devicetree/bindings/net/can/rcar_can.txt
+@@ -4,6 +4,7 @@ Renesas R-Car CAN controller Device Tree Bindings
+ Required properties:
+ - compatible: "renesas,can-r8a7743" if CAN controller is a part of R8A7743 SoC.
+ 	      "renesas,can-r8a7745" if CAN controller is a part of R8A7745 SoC.
++	      "renesas,can-r8a774c0" if CAN controller is a part of R8A774C0 SoC.
+ 	      "renesas,can-r8a7778" if CAN controller is a part of R8A7778 SoC.
+ 	      "renesas,can-r8a7779" if CAN controller is a part of R8A7779 SoC.
+ 	      "renesas,can-r8a7790" if CAN controller is a part of R8A7790 SoC.
+-- 
+2.7.4
+
