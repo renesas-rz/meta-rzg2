@@ -7,4 +7,5 @@ IMAGE_INSTALL_append = " \
     demo-videos \
     demo3d \
     opengl-apps \
+    ipshow \
 "
