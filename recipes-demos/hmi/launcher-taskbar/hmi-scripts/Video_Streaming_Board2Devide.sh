@@ -12,6 +12,7 @@ printf "\n\e[31mNOTE:\n\
 \t* Please Click on IP icon to show the path of streaming\n\
 \t* Click on Exit icon to exit from running applications\e[0m\n\n" > ${TTY}
 
+/home/root/IPShow/IPShow &
 /home/root/RZ_scripts/test-multicast2 &
 
 gst-launch-1.0 -e filesrc location=/home/root/videos/h264-wvga-30.mp4 ! \
@@ -22,3 +23,4 @@ stream-format=avc,alignment=au ! rtph264pay pt=96 name=pay0 \
 config-interval=3 ! udpsink host=127.255.255.255 port=5000
 
 killall -9 -q test-multicast2
+killall -9 -q IPShow
