@@ -11,9 +11,9 @@ printf "\n\e[31mNOTE: Click on Exit icon to exit from running applications\e[0m\
 out_width=`expr $D_WIDTH`
 out_height=`expr $D_HEIGHT`
 
-glmark2-es2-wayland -b :show-fps=true -s ${out_width}x${out_height}  &> /dev/null &
+OGLES3ColourGrading  &> /dev/null &
 
 sleep 15s
 
-killall -9 -q glmark2-es2-wayland &> /dev/null
+killall -9 -q OGLES3ColourGrading &> /dev/null
 sync
