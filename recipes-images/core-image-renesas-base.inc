@@ -18,6 +18,7 @@ IMAGE_INSTALL_append = " \
     wpa-supplicant \
     kernel-module-wlcore-sdio \
     bt-fw \
+    obexftp \
 "
 
 # Add overrides for selection 32 bit or 64 bit target
