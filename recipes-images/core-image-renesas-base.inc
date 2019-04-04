@@ -17,6 +17,7 @@ IMAGE_INSTALL_append = " \
     iw \
     wpa-supplicant \
     kernel-module-wlcore-sdio \
+    bt-fw \
 "
 
 # Add overrides for selection 32 bit or 64 bit target
