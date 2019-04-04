@@ -56,6 +56,7 @@ SRC_URI_append = " \
     ${REGULATORY_DB} \
     ${REGULATORY_DB_P7S} \
     file://wifi.cfg \
+    file://bluetooth.cfg \
 "
 
 
