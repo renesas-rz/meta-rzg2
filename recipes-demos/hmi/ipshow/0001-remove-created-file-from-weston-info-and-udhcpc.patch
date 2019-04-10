@@ -1,0 +1,39 @@
+From c4add511b138cf00a1d0e991b1f1c83b5f88f35e Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 10 Apr 2019 21:02:41 +0700
+Subject: [PATCH] remove created file from weston-info and udhcpc
+
+Application genarated files but not remove files.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ ipshow.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/ipshow.c b/ipshow.c
+index 30218a8..25e618c 100755
+--- a/ipshow.c
++++ b/ipshow.c
+@@ -89,6 +89,9 @@ get_resolution_from_weston_info (uint *available_width_screen,
+ 
+   /* Close the file */
+   fclose (fp);
++
++  /* Remove created file*/
++  remove(LOCATION_FILE_WESTON_INFO);
+ }
+ 
+ static void getIP()
+@@ -116,6 +119,9 @@ static void getIP()
+     printf("Can't open file \n");
+   }
+   fclose(fp);
++
++  /* Remove created file */
++  remove(LOCATION_FILE_IP_INFO);
+ }
+ 
+ static void handle_terminal()
+-- 
+2.7.4
+

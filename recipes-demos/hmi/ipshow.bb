@@ -5,6 +5,7 @@ DEPENDS += " libegl gles-user-module weston wayland cairo"
 
 SRC_URI = " \
  file://IPShow.tar \
+ file://0001-remove-created-file-from-weston-info-and-udhcpc.patch \
 "
 
 S = "${WORKDIR}/IPShow"
@@ -15,6 +16,12 @@ inherit pkgconfig
 
 INSANE_SKIP_${PN} = "already-stripped ldflags"
 RDEPENDS_libweston-2_append = " gles-user-module "
+
+do_patch() {
+  cd ${WORKDIR}/IPShow
+  git init
+  git apply ../*.patch
+}
 
 do_compile() {
   cd ${WORKDIR}/IPShow
