@@ -23,6 +23,7 @@ SRC_URI = " \
 
 do_patch () {
 	cd ${S}/../RZ_scripts
+	git init
 	git apply ../*.patch
 	chmod 755 ${S}/../RZ_scripts -Rf
 }
