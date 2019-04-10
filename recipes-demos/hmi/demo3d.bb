@@ -12,6 +12,7 @@ SRC_URI = " \
  file://0004-Demo3D-Video-scale-height-to-480-to-fix-greenline-is.patch \
  file://0005-Demo3D-Video-use-vspfilter-to-scaling-element.patch \
  file://0006-Demo3D-Change-detect-camera-input.patch \
+ file://0007-Check-input-size-before-set-to-window.patch \
 "
 
 S = "${WORKDIR}/Demo3D"

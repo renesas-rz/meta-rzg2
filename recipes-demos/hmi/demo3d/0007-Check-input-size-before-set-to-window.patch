@@ -1,0 +1,46 @@
+From f1d56c25e1b45412806d7e242ea98728a9e877d2 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 10 Apr 2019 20:43:14 +0700
+Subject: [PATCH] Check input size before set to window
+
+If not check the input size with the window size, application will
+render with 0x0 size and set window size to 0x0.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Wayland_implement.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/Wayland_implement.c b/Wayland_implement.c
+index 0c1f30c..0007cb3 100644
+--- a/Wayland_implement.c
++++ b/Wayland_implement.c
+@@ -35,14 +35,19 @@ handle_surface_configure(void *data, struct xdg_surface *surface,
+ {
+ 	struct window *window = data;
+ 
++	if (width > 0 && height > 0) {
++		if (!window->fullscreen) {
++			window->window_size.width = width;
++			window->window_size.height = height;
++		}
++		window->geometry.width = width;
++		window->geometry.height = height;
++	} else if (!window->fullscreen) {
++		window->geometry = window->window_size;
++	}
++
+ 	if (window->native)
+ 		wl_egl_window_resize(window->native, width, height, 0, 0);
+-
+-	window->geometry.width = width;
+-	window->geometry.height = height;
+-
+-	if (!window->fullscreen)
+-		window->window_size = window->geometry;
+ }
+ 
+ static void
+-- 
+2.7.4
+
