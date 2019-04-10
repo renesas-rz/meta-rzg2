@@ -1,0 +1,47 @@
+From 450ec98d6d8adc6b9d208356e311493405139dce Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 10 Apr 2019 21:22:18 +0700
+Subject: [PATCH] Change offset to fix with text debug
+
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Demo3D.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index 5cea09b..649d11a 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -513,11 +513,11 @@ redraw(void *data, struct wl_callback *callback, uint32_t time)
+     char text2screen[128];
+     glUseProgram(g_gl_text->program_id);
+     sprintf (text2screen,"CPU : %.1f %%",CPU_Usage);
+-    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.5, 0.8, &triangles);    
++    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.45, 0.8, &triangles);    
+     sprintf (text2screen,"Framerate : %.1f fps",framerate);
+-    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.53, 0.8, &triangles);
++    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.48, 0.8, &triangles);
+     sprintf (text2screen,"Triangles : %.0f triangles/s", nb_triangles);
+-    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.56, 0.8, &triangles);
++    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.51, 0.8, &triangles);
+     sprintf (text2screen,"Parameter buffer used : %.2f / %.2f KB",
+                     parambufferinfo.used_size/ 1024.0,
+                     (parambufferinfo.used_size + parambufferinfo.free_size)/ 1024.0);
+@@ -525,11 +525,11 @@ redraw(void *data, struct wl_callback *callback, uint32_t time)
+       sprintf (text2screen,"Parameter buffer used : %.2f / %.2f KB (Overflowed)",
+                     parambufferinfo.used_size/ 1024.0,
+                     (parambufferinfo.used_size + parambufferinfo.free_size)/ 1024.0);
+-    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.59, 0.8, &triangles);
++    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.54, 0.8, &triangles);
+     sprintf (text2screen,"Fragment buffer used : %.2f / %.2f KB",
+                     pdsfragbufferinfo.used_size / 1024.0,
+                     (pdsfragbufferinfo.used_size + pdsfragbufferinfo.free_size)/ 1024.0);
+-    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.62, 0.8, &triangles);   
++    gles_draw_text (g_gl_text, g_object3Ds_text, text2screen, -0.5, -0.59, 0.8, &triangles);   
+   }  
+ 
+   window->frames++;  
+-- 
+2.7.4
+
