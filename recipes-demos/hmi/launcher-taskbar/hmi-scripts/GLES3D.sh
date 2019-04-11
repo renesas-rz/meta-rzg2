@@ -4,7 +4,7 @@ source /home/root/.bashrc
 TTY=`getUser`
 
 printf "\n\e[32m[Info]:\e[0m\n" > ${TTY}
-printf "\tRunning Glmask 3D Graphics demo\n" > ${TTY}
+printf "\tRunning PowerVR 3D Graphics demo\n" > ${TTY}
 printf "\n\e[31mNOTE: Click on Exit icon to exit from running applications\e[0m\n\n" > ${TTY}
 
 out_width=`expr $D_WIDTH`
