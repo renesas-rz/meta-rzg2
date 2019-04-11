@@ -4,8 +4,6 @@ DESCRIPTION = "launcher taskbar"
 SRC_URI = " \	
  file://hmi-icons/* \
  file://hmi-scripts/* \
- file://Demo3D.png \
- file://Demo3D.sh \
 "
 
 INSANE_SKIP_${PN} = "already-stripped"
@@ -17,9 +15,6 @@ do_install() {
 
     cp -Rf ${S}/../hmi-icons/* ${D}/home/root/launcher-taskbar/hmi-icons/
     cp -Rf ${S}/../hmi-scripts/* ${D}/home/root/launcher-taskbar/hmi-scripts/
-
-    install ${WORKDIR}/Demo3D.png ${D}/home/root/launcher-taskbar/hmi-icons/
-    install ${WORKDIR}/Demo3D.sh ${D}/home/root/launcher-taskbar/hmi-scripts/
 
 }
 
