@@ -11,7 +11,6 @@ SRC_URI = " \
  file://0003-Demo3D-Gst-change-sync-property-to-true.patch \
  file://0004-Demo3D-Video-scale-height-to-480-to-fix-greenline-is.patch \
  file://0005-Demo3D-Video-use-vspfilter-to-scaling-element.patch \
- file://0006-Demo3D-Change-detect-camera-input.patch \
  file://0007-Check-input-size-before-set-to-window.patch \
  file://0008-Change-offset-to-fix-with-text.patch \
 "
