@@ -50,19 +50,21 @@ Below git configuration is required:
 Download evaluation version of proprietary graphics and multimedia drivers from Renesas.
 
 To download Multimedia and Graphics library and related Linux drivers, please use the following link:
-TBD
+
+    America: https://mp.renesas.com/en-us/rzg/marketplace/linux_package/index.html
+    Europe : https://mp.renesas.com/en-eu/rzg/marketplace/linux_package/index.html
+    Asia : https://mp.renesas.com/en-sg/rzg/marketplace/linux_package/index.html
+    Japan : https://mp.renesas.com/ja-jp/rzg/marketplace/linux_package/index.html
 
 Graphic drivers are required for Wayland. Multimedia drivers are optional.
 
-After downloading the proprietary package, use copy script as below:
+After downloading the proprietary package, please put the package at $WORK then use copy script as below:
 
 ```bash
-    $ ls -1 $WORK/proprietary/*.zip
-    RZG2_Series_Evaluation_Software_Package_for_Linux-xxx.zip
-    RZG2_Series_Evaluation_Software_Package_of_Linux_Drivers-xxx.zip
+    $ tar -C $WORK -zxf $WORK/RZG2_Group_*_Software_Package_for_Linux_*.tar.gz
     $ export PKGS_DIR=$WORK/proprietary
     $ cd $WORK/meta-rzg2
-    $ sh docs/sample/copyscript/copy_evaproprietary_softwares.sh -f $PKGS_DIR
+    $ sh docs/sample/copyscript/copy_proprietary_softwares.sh -f $PKGS_DIR
     $ unset PKGS_DIR
 ```
 
