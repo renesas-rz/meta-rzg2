@@ -9,4 +9,5 @@ IMAGE_INSTALL_append = " \
     demo3d \
     opengl-apps \
     ipshow \
+    kernel-module-uvcvideo \
 "
