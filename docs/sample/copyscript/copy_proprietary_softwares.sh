@@ -412,7 +412,7 @@ func_list_search_and_md5check ()
 
         func_search_and_md5check "${pkg_name}" "${copyfile_name}" "${md5_val}" "${_src_full}"
         if [ -z "${_find_filename}" ]; then
-            echo "${sw_name} not found!"
+            echo "${sw_name} skipped!"
             # rigid flag = TRUE. Not found = ERROR
             if [ "X$2" = "X1" ]; then
                 return 0
@@ -474,7 +474,7 @@ func_list_search_and_install_wo_md5check()
         # file search
         func_search_file_in_package "${pkg_name}" "${copyfile_name}" "${_src_full}"
         if [ -z "${_find_filename}" ]; then
-            echo "${sw_name} not found!"
+            echo "${sw_name} skipped!"
         else
             find_flag=1
 
@@ -536,7 +536,7 @@ func_list_search_and_install()
         # seach & MD5 check
         func_search_and_md5check "${pkg_name}" "${copyfile_name}" "${md5_val}" "${_src_full}"
         if [ -z "${_find_filename}" ]; then
-            echo "${sw_name} not found!"
+            echo "${sw_name} skipped!"
         else
             find_flag=1
 
@@ -589,7 +589,7 @@ func_gfx()
         func_search_and_md5check "${user_pkg_name}" "${user_copyfile_name}" "${user_md5_val}" "${_src_full}"
 
         if [ -z "${_find_filename}" ]; then
-            echo "${user_pkg_name} not found!"
+            echo "${user_pkg_name} skipped!"
             continue
         fi
 
@@ -665,7 +665,7 @@ func_video_decoder_lib()
     # MD5 check: Decoder Common Library (rigid flag=TRUE)
     func_list_search_and_md5check "${_video_dec_common_list}" "1"
     if [ $? -eq 0 ]; then
-        echo "OMX Video Decoder Common Library not found!"
+        echo "OMX Video Decoder Common Library skipped!"
         return 0
     fi
 
@@ -707,7 +707,7 @@ func_video_encoder_lib()
     # MD5 check Encoder Common Library (rigid flag=TRUE)
     func_list_search_and_md5check "${_video_enc_common_list}" "1"
     if [ $? -eq 0 ]; then
-        echo "OMX Video Encoder Common Library not found!"
+        echo "OMX Video Encoder Common Library skipped!"
         return 0
     fi
     _video_encoder_common_install=0
@@ -752,7 +752,7 @@ func_video_decoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_omx_common_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "OMX Common Library not found!"
+            echo "OMX Common Library skipped!"
             echo ""
             return
         fi
@@ -765,7 +765,7 @@ func_video_decoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_uvcs_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "UVCS driver not found!"
+            echo "UVCS driver skipped!"
             echo ""
             return
         fi
@@ -799,7 +799,7 @@ func_video_encoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_omx_common_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "OMX Common Library not found!"
+            echo "OMX Common Library skipped!"
             echo ""
             return
         fi
@@ -812,7 +812,7 @@ func_video_encoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_uvcs_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "UVCS driver not found!"
+            echo "UVCS driver skipped!"
             echo ""
             return
         fi
@@ -838,7 +838,7 @@ func_video_encoder()
 ################################
 # Copy Script Main routine
 ################################
-echo "Copyscript for R-Car Gen3"
+echo "Copyscript for RZ/G2"
 echo
 #### 1) Checking current directory
 if [ ! -d ../meta-rzg2 ]; then

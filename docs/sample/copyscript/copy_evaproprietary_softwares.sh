@@ -374,7 +374,7 @@ func_list_search_and_md5check ()
 
         func_search_and_md5check "${pkg_name}" "${copyfile_name}" "${md5_val}" "${_src_full}"
         if [ -z "${_find_filename}" ]; then
-            echo "${sw_name} not found!"
+            echo "${sw_name} skipped!"
             # rigid flag = TRUE. Not found = ERROR
             if [ "X$2" = "X1" ]; then
                 return 0
@@ -436,7 +436,7 @@ func_list_search_and_install_wo_md5check()
         # file search
         func_search_file_in_package "${pkg_name}" "${copyfile_name}" "${_src_full}"
         if [ -z "${_find_filename}" ]; then
-            echo "${sw_name} not found!"
+            echo "${sw_name} skipped!"
         else
             find_flag=1
 
@@ -498,7 +498,7 @@ func_list_search_and_install()
         # seach & MD5 check
         func_search_and_md5check "${pkg_name}" "${copyfile_name}" "${md5_val}" "${_src_full}"
         if [ -z "${_find_filename}" ]; then
-            echo "${sw_name} not found!"
+            echo "${sw_name} skipped!"
         else
             find_flag=1
 
@@ -551,7 +551,7 @@ func_gfx()
         func_search_and_md5check "${user_pkg_name}" "${user_copyfile_name}" "${user_md5_val}" "${_src_full}"
 
         if [ -z "${_find_filename}" ]; then
-            echo "${user_pkg_name} not found!"
+            echo "${user_pkg_name} skipped!"
             continue
         fi
 
@@ -628,14 +628,14 @@ func_video_decoder_lib()
     # MD5 check: Decoder Common Library (rigid flag=TRUE)
     func_list_search_and_md5check "${_video_dec_common_list}" "1"
     if [ $? -eq 0 ]; then
-        echo "OMX Video Decoder Common Library not found!"
+        echo "OMX Video Decoder Common Library skipped!"
         return 0
     fi
 
     # MD5 check: Video Decoder Library
     func_list_search_and_md5check "${_video_dec_list}"
     if [ $? -eq 0 ]; then
-        # library not found.
+        # Library skipped.
         return 0
     fi
 
@@ -670,7 +670,7 @@ func_video_encoder_lib()
     # MD5 check Encoder Common Library (rigid flag=TRUE)
     func_list_search_and_md5check "${_video_enc_common_list}" "1"
     if [ $? -eq 0 ]; then
-        echo "OMX Video Encoder Common Library not found!"
+        echo "OMX Video Encoder Common Library skipped!"
         return 0
     fi
     _video_encoder_common_install=0
@@ -679,7 +679,7 @@ func_video_encoder_lib()
     # MD5 check
     func_list_search_and_md5check "${_video_enc_list}"
     if [ $? -eq 0 ]; then
-        # library not found.
+        # Library skipped.
         return 0
     fi
 
@@ -715,7 +715,7 @@ func_video_decoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_omx_common_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "OMX Common Library not found!"
+            echo "OMX Common Library skipped!"
             echo ""
             return
         fi
@@ -728,7 +728,7 @@ func_video_decoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_uvcs_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "UVCS driver not found!"
+            echo "UVCS driver skipped!"
             echo ""
             return
         fi
@@ -762,7 +762,7 @@ func_video_encoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_omx_common_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "OMX Common Library not found!"
+            echo "OMX Common Library skipped!"
             echo ""
             return
         fi
@@ -775,7 +775,7 @@ func_video_encoder()
         # MD5 check (rigid flag=TRUE)
         func_list_search_and_md5check "${_uvcs_list}" "1"
         if [ $? -eq 0 ]; then
-            echo "UVCS driver not found!"
+            echo "UVCS driver skipped!"
             echo ""
             return
         fi
@@ -834,35 +834,32 @@ done
 
 #### 3) Checking ClickThrough present
 
-COUNTFILE=$(ls ${_src_full}/R-Car_Gen3_Series_Evaluation_Software_Package_for_Linux-*.zip  2>/dev/null | wc --lines)
+COUNTFILE=$(ls ${_src_full}/RZG2_Group_Evaluation_Software_Package_for_Linux_*.tar.gz  2>/dev/null | wc --lines)
 if [ ${COUNTFILE} -eq 0 ]; then
-    echo "R-Car_Gen3_Series_Evaluation_Software_Package_for_Linux-*.zip not found!"
+    echo "RZG2_Group_Evaluation_Software_Package_for_Linux_*.tar.gz not found!"
     usage
     exit 1
 fi
 if [ ${COUNTFILE} -gt 1 ]; then
-    echo "More than one (${COUNTFILE}) R-Car_Gen3_Series_Evaluation_Software_Package_for_Linux-*.zip file found!"
+    echo "More than one (${COUNTFILE}) RZG2_Group_Evaluation_Software_Package_for_Linux_*.tar.gz file found!"
     echo "Clean your directory \"${_src_full}\""
     exit 1
 fi
 
-COUNTFILE=$(ls ${_src_full}/R-Car_Gen3_Series_Evaluation_Software_Package_of_Linux_Drivers-*.zip  2>/dev/null | wc --lines)
+COUNTFILE=$(ls ${_src_full}/RZG2_Group_Evaluation_Software_Package_of_Linux_Drivers_*.tar.gz  2>/dev/null | wc --lines)
 if [ ${COUNTFILE} -eq 0 ]; then
-    echo "R-Car_Gen3_Series_Evaluation_Software_Package_of_Linux_Drivers-*.zip not found!"
+    echo "RZG2_Group_Evaluation_Software_Package_of_Linux_Drivers_*.tar.gz not found!"
     exit 1
 fi
 if [ ${COUNTFILE} -gt 1 ]; then
-    echo "More than one (${COUNTFILE}) R-Car_Gen3_Series_Evaluation_Software_Package_of_Linux_Drivers-*.zip file found!"
+    echo "More than one (${COUNTFILE}) RZG2_Group_Evaluation_Software_Package_of_Linux_Drivers_*.tar.gz file found!"
     echo "Clean your directory \"${_src_full}\""
     usage
     exit 1
 fi
 
-unzip -d ${_src_full} -oq ${_src_full}/R-Car_Gen3_Series_Evaluation_Software_Package_for_Linux-*.zip
-unzip -d ${_src_full} -oq ${_src_full}/R-Car_Gen3_Series_Evaluation_Software_Package_of_Linux_Drivers-*.zip
-
-tar -C ${_src_full} -zxf ${_src_full}/R-Car_Gen3_Series_Evaluation_Software_Package_for_Linux-*.tar.gz --strip-components 2
-tar -C ${_src_full} -zxf ${_src_full}/R-Car_Gen3_Series_Evaluation_Software_Package_of_Linux_Drivers-*.tar.gz --strip-components 2
+tar -C ${_src_full} -zxf ${_src_full}/RZG2_Group_Evaluation_Software_Package_for_Linux_*.tar.gz --strip-components 2
+tar -C ${_src_full} -zxf ${_src_full}/RZG2_Group_Evaluation_Software_Package_of_Linux_Drivers_*.tar.gz --strip-components 2
 
 # source directory check
 if [ ! -d ${_src_path}/${_src_dirname} ]; then
