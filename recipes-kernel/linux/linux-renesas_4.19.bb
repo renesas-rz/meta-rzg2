@@ -65,7 +65,14 @@ do_download_firmware () {
     install -m 755 ${WORKDIR}/regulatory* ${STAGING_KERNEL_DIR}/firmware
 }
 
+do_kernel_metadata_af_patch() {
+  # need to recall do_kernel_metadata after do_patch for some patches applied to defconfig
+  rm -f ${WORKDIR}/defconfig
+  do_kernel_metadata
+}
+
 addtask do_download_firmware after do_configure before do_compile
+addtask do_kernel_metadata_af_patch after do_patch before do_kernel_configme
 
 # Fix race condition, which can causes configs in defconfig file be ignored
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
