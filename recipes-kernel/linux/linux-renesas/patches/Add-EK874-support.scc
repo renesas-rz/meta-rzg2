@@ -173,3 +173,4 @@ patch 0172-pinctrl-sh-pfc-r8a77990-Add-Audio-SSI-pins-groups-an.patch
 patch 0173-arm64-dts-r8a774c0-Add-Sound-device-node-SSI-and-Aud.patch
 patch 0174-arm64-defconfig-Enable-Sound-support-for-R8A774C0-So.patch
 patch 0175-drm-rcar-du-Add-support-interlace-mode.patch
+patch 0176-arm64-dts-renesas-r8a774c0-cat874-Enable-sound-suppo.patch
