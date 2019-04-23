@@ -1,9 +1,9 @@
 # meta-rzg2
 
-This layer provides that evaluation board is mounted ARM SoCs of Renesas
-Electronics, called the RZG2. Currently, this supports
-board and the SoCs of the following:
-- Board: EK874 / SoC: R8A774C0 (RZG2E)
+This is a Yocto build layer that provides support for the RZ/G2 Group of 64bit Arm-based MPUs from Renesas Electronics.
+Currently the following boards and MPUs are supported:
+
+- Board: EK874 / MPU: R8A774C0 (RZ/G2E)
 
 ## Patches
 
