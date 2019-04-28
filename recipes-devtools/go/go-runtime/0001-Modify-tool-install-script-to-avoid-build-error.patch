@@ -1,0 +1,26 @@
+From 6e272403f1ed399ab04800e7bebd64caf9c889b3 Mon Sep 17 00:00:00 2001
+From: Yoshihiro Okada <yoshihiro.okada@cybertrust.co.jp>
+Date: Tue, 18 Dec 2018 13:15:57 +0900
+Subject: [PATCH] Modify tool install script to avoid build error.
+
+---
+ src/make.bash | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/make.bash b/src/make.bash
+index f199349..e2ed235 100755
+--- a/src/make.bash
++++ b/src/make.bash
+@@ -183,7 +183,8 @@ if [ "$do_host_build" = "yes" ]; then
+ 	echo
+ fi
+ 
+-if [ "$do_target_build" = "yes" ]; then
++if [ ! -f ./.avoid_build_error -a "$do_target_build" = "yes" ]; then
++    touch ./.avoid_build_error
+     GO_INSTALL="${GO_TARGET_INSTALL:-std cmd}"
+     echo "##### Building packages and commands for $GOOS/$GOARCH."
+     if [ "$GOHOSTOS" = "$GOOS" -a "$GOHOSTARCH" = "$GOARCH" -a "$do_host_build" = "yes" ]; then
+-- 
+2.7.4
+
