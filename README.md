@@ -26,6 +26,7 @@ This layer depends on:
 
     URI: git://git.openembedded.org/meta-openembedded
     layers: meta-oe
+            meta-filesystems, meta-networking, meta-python (for Docker)
     branch: rocko
     revision: 352531015014d1957d6444d114f4451e241c4d23
     
@@ -37,6 +38,11 @@ This layer depends on:
     (for core-image-qt)
     URI: https://github.com/meta-qt5/meta-qt5.git 
     revision: c1b0c9f546289b1592d7a895640de103723a0305
+
+    (for Docker)
+    URI: https://git.yoctoproject.org/git/meta-virtualization
+    branch: rocko
+    revision: b704c689b67639214b9568a3d62e82df27e9434f
 
 ## Build Instructions
 
