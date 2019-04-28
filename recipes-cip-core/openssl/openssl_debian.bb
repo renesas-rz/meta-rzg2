@@ -3,6 +3,8 @@
 # base branch: daisy
 #
 
+require include/docker-control.inc
+
 PR = "r1"
 
 inherit debian-package
@@ -22,6 +24,10 @@ file://configure-targets.patch \
 file://shared-libs.patch \
 file://oe-ldflags.patch \
 file://find.pl \
+"
+
+SRC_URI_append = "\
+  ${@base_conditional("USE_DOCKER", "1", " file://0001-Fix-dnf-error-when-installing-openssl-at-do_rootfs.patch ", "", d)} \
 "
 
 # "${S}/Configure" is written by perl script
