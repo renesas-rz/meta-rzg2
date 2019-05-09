@@ -1,0 +1,26 @@
+From 65c62f45281bdece2eac6ade400a3475a596aaa2 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 29 Apr 2019 10:44:16 +0700
+Subject: [PATCH 10/11] arch: arm64: defconfig: configs for USB TypeC
+
+This patch will configs USB TypeC and HD3SS3220 TypeC chip.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index bbeaf68..ac431af 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -756,3 +756,6 @@ CONFIG_DRM_TILCDC=y
+ CONFIG_DRM_I2C_NXP_TDA998X=y
+ CONFIG_SND_SOC_ALL_CODECS=y
+ CONFIG_COMPILE_TEST=y
++
++CONFIG_USB_TYPEC=m
++CONFIG_TYPEC_HD3SS3220=m
+-- 
+2.7.4
+

@@ -1,0 +1,41 @@
+From 7d674167d9fbf7469285c0853ec741415d00c28a Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 12 Apr 2019 11:59:01 +0700
+Subject: [PATCH 6/6] arm64: dts: renesas: r8a774c0-cat874: Enable TPU node
+
+This patch enable TPU node on CAT874 board
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 0f2c202..230c057 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -200,6 +200,11 @@
+ 			"audio_clkout_a", "audio_clkout1_a";
+ 		function = "audio_clk";
+ 	};
++
++	tpu0_pins: tpu {
++		groups = "tpu0_to0";
++		function = "tpu0";
++	};
+ };
+ 
+ &scif2 {
+@@ -412,3 +417,9 @@
+ &ssi4 {
+ 	shared-pin;
+ };
++
++&tpu{
++	pinctrl-0 = <&tpu0_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++};
+-- 
+2.7.4
+

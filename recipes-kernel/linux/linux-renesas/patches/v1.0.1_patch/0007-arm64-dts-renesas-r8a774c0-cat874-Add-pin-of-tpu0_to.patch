@@ -1,0 +1,30 @@
+From d57c865be59ddf0915f34ff5a007bbad1d1dbe56 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 8 May 2019 11:27:08 +0700
+Subject: [PATCH] arm64: dts: renesas: r8a774c0-cat874: Add pin of tpu0_to1 to
+ TPU node
+
+This patch added pin of tpu0_to1 to TPU node in order to out signal to
+CLK1 by TPU on CAT874 board
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 230c057..94365e2 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -202,7 +202,7 @@
+ 	};
+ 
+ 	tpu0_pins: tpu {
+-		groups = "tpu0_to0";
++		groups = "tpu0_to0", "tpu0_to1";
+ 		function = "tpu0";
+ 	};
+ };
+-- 
+2.7.4
+

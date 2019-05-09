@@ -1,0 +1,79 @@
+From 21d27c3b19a30dfd0094ef0e100aeb45a06127c8 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 12 Apr 2019 11:33:44 +0700
+Subject: [PATCH 3/6] pinctrl: r8a77990: add pins, groups, function for TPU
+
+This patch add pins, groups, function for TPU0{T0,T1} for
+SoC R8A77990 and SoC R8A774C0.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a77990.c | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+index 1eef93d..383dde3 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+@@ -3227,8 +3227,25 @@ static const unsigned int ssi9_ctrl_b_mux[] = {
+ 	SSI_SCK9_B_MARK, SSI_WS9_B_MARK,
+ };
+ 
++/* - TPU -------------------------------------------------------------------- */
++static const unsigned int tpu0_to0_pins[] = {
++	/* TPU0TO0 */
++	RCAR_GP_PIN(6, 13),
++};
++static const unsigned int tpu0_to0_mux[] = {
++	TPU0TO0_MARK,
++};
++
++static const unsigned int tpu0_to1_pins[] = {
++	/* TPU0TO1 */
++	RCAR_GP_PIN(6, 14),
++};
++static const unsigned int tpu0_to1_mux[] = {
++	TPU0TO1_MARK,
++};
++
+ static const struct {
+-	struct sh_pfc_pin_group common[207];
++	struct sh_pfc_pin_group common[209];
+ 	struct sh_pfc_pin_group r8a77990[0];
+ } pinmux_groups = {
+ 	.common = {
+@@ -3439,6 +3456,8 @@ static const struct {
+ 		SH_PFC_PIN_GROUP(ssi9_data),
+ 		SH_PFC_PIN_GROUP(ssi9_ctrl_a),
+ 		SH_PFC_PIN_GROUP(ssi9_ctrl_b),
++		SH_PFC_PIN_GROUP(tpu0_to0),
++		SH_PFC_PIN_GROUP(tpu0_to1),
+ 	},
+ };
+ 
+@@ -3772,8 +3791,13 @@ static const char * const ssi_groups[] = {
+ 	"ssi9_ctrl_b",
+ };
+ 
++static const char * const tpu0_groups[] = {
++	"tpu0_to0",
++	"tpu0_to1",
++};
++
+ static const struct {
+-	struct sh_pfc_function common[41];
++	struct sh_pfc_function common[42];
+ 	struct sh_pfc_function r8a77990[0];
+ } pinmux_functions = {
+ 	.common = {
+@@ -3818,6 +3842,7 @@ static const struct {
+ 		SH_PFC_FUNCTION(msiof3),
+ 		SH_PFC_FUNCTION(du),
+ 		SH_PFC_FUNCTION(ssi),
++		SH_PFC_FUNCTION(tpu0),
+ 	},
+ };
+ 
+-- 
+2.7.4
+

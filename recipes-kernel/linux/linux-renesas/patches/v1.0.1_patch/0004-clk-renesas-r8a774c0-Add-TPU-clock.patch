@@ -1,0 +1,27 @@
+From 91b0169d22329ea0bb0e0993fd871f5e5de3ac5d Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 12 Apr 2019 11:55:30 +0700
+Subject: [PATCH 4/6] clk: renesas: r8a774c0: Add TPU clock
+
+This patch adds the TPU clocks to the R8A774C0 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/clk/renesas/r8a774c0-cpg-mssr.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/renesas/r8a774c0-cpg-mssr.c b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+index b091243..0823861 100644
+--- a/drivers/clk/renesas/r8a774c0-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+@@ -150,6 +150,7 @@ static const struct mssr_mod_clk r8a774c0_mod_clks[] __initconst = {
+ 	DEF_MOD("cmt2",			 301,	R8A774C0_CLK_R),
+ 	DEF_MOD("cmt1",			 302,	R8A774C0_CLK_R),
+ 	DEF_MOD("cmt0",			 303,	R8A774C0_CLK_R),
++	DEF_MOD("tpu",			 304,	R8A774C0_CLK_S3D4C),
+ 	DEF_MOD("scif2",		 310,	R8A774C0_CLK_S3D4C),
+ 	DEF_MOD("sdif3",		 311,	R8A774C0_CLK_SD3),
+ 	DEF_MOD("sdif1",		 313,	R8A774C0_CLK_SD1),
+-- 
+2.7.4
+
