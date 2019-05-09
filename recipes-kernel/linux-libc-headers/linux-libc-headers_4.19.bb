@@ -12,7 +12,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/../linux/linux-renesas:"
 
 SRC_URI_append = " \
     file://0001-linux-add-time.h-header-file-to-net_tstamp.h.patch \
-    file://patches/Add-EK874-support.scc \
+    file://patches.scc \
 "
 
 S = "${WORKDIR}/git"

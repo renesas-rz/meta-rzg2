@@ -15,11 +15,11 @@ SRCREV = "c312fd1d432e36f9012127fe3c1d2b7023afae48"
 SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
 SRC_URI_append += "\
-  file://patches/Add-EK874-support.scc \
+  file://patches.scc \
 "
 
 SRC_URI_append_r8a774c0 += "\
-  ${@base_conditional("USE_ECC", "1", " file://0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \
+  ${@base_conditional("USE_ECC", "1", " file://patches/option_patch/0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \
 "
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 LINUX_VERSION ?= "4.19.13-cip1"
