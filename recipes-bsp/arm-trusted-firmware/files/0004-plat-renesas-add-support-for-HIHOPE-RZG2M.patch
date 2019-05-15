@@ -1,0 +1,478 @@
+From fee899836a5d50392f6e8091df2d3abfc09138be Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Wed, 15 May 2019 13:53:08 +0700
+Subject: [PATCH] plat: renesas: add support for HIHOPE-RZG2M
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ plat/renesas/rcar/bl2_rcar_setup.c                 | 23 ++++++--
+ plat/renesas/rcar/bl2_secure_setting.c             | 12 ++---
+ .../renesas/rcar/ddr/ddr_b/boot_init_dram_config.c | 63 +++++++++++++++++++++-
+ plat/renesas/rcar/drivers/board/board.c            |  7 +++
+ plat/renesas/rcar/drivers/board/board.h            |  3 +-
+ plat/renesas/rcar/pfc/M3/pfc_init_m3.c             | 39 ++++++++++++++
+ plat/renesas/rcar/platform.mk                      | 23 ++++++++
+ tools/dummy_create/makefile                        |  6 +++
+ tools/dummy_create/sa6.c                           |  6 +--
+ 9 files changed, 168 insertions(+), 14 deletions(-)
+
+diff --git a/plat/renesas/rcar/bl2_rcar_setup.c b/plat/renesas/rcar/bl2_rcar_setup.c
+index 8110c87..20c6b66 100644
+--- a/plat/renesas/rcar/bl2_rcar_setup.c
++++ b/plat/renesas/rcar/bl2_rcar_setup.c
+@@ -118,8 +118,14 @@
+ #define TARGET_PRODUCT		RCAR_PRODUCT_H3
+ #define TARGET_NAME		"R-Car H3"
+ #elif RCAR_LSI == RCAR_M3
++
++#if (RZG_HIHOPE_RZG2M) // RZG_HIHOPE_RZG2M
++#define TARGET_PRODUCT		RCAR_PRODUCT_M3
++#define TARGET_NAME		"RZ G2M"
++#else  // RZG_HIHOPE_RZG2M
+ #define TARGET_PRODUCT		RCAR_PRODUCT_M3
+ #define TARGET_NAME		"R-Car M3"
++#endif // RZG_HIHOPE_RZG2M
+ #elif RCAR_LSI == RCAR_M3N
+ #define TARGET_PRODUCT		RCAR_PRODUCT_M3N
+ #define TARGET_NAME		"R-Car M3N"
+@@ -385,7 +391,11 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+ 	const char *cpu_ca57        = "CA57";
+ 	const char *cpu_ca53        = "CA53";
+ 	const char *product_h3      = "H3";
++#if (RZG_HIHOPE_RZG2M) // RZG_HIHOPE_RZG2M
++	const char *product_m3      = "G2M";
++#else  // RZG_HIHOPE_RZG2M
+ 	const char *product_m3      = "M3";
++#endif // RZG_HIHOPE_RZG2M
+ 	const char *product_m3n     = "M3N";
+ #if(RZG_EK874) // RZG_EK874
+ 	const char *product_e3      = "G2E";
+@@ -483,19 +493,25 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+ 
+ 	if(RCAR_PRODUCT_M3_CUT11 ==
+ 		(reg & (RCAR_PRODUCT_MASK | RCAR_CUT_MASK))) {
++#if (RZG_HIHOPE_RZG2M) // RZG_HIHOPE_RZG2M
++		(void)sprintf(msg,
++			"BL2: PRR is RZG %s Ver.1.1 / Ver.1.2\n", str);
++#else  // RZG_HIHOPE_RZG2M
+ 		/* M3 Ver.1.1 or Ver.1.2 */
+ 		(void)sprintf(msg,
+ 			"BL2: PRR is R-Car %s Ver.1.1 / Ver.1.2\n", str);
++#endif // RZG_HIHOPE_RZG2M
++
+ 	} else {
+-#if (RZG_EK874) //RZG_EK874
++#if (RZG_EK874 | RZG_HIHOPE_RZG2M) //RZG_EK874 | RZG_HIHOPE_RZG2M
+ 		(void)sprintf(msg, "BL2: PRR is RZG %s Ver.%d.%d\n", str,
+ 			((prr_val & RCAR_MAJOR_MASK) >> RCAR_MAJOR_SHIFT)
+ 			 + RCAR_MAJOR_OFFSET, (prr_val & RCAR_MINOR_MASK));
+-#else //RZG_EK874
++#else //RZG_EK874 | RZG_HIHOPE_RZG2M
+ 		(void)sprintf(msg, "BL2: PRR is R-Car %s Ver.%d.%d\n", str,
+ 			((prr_val & RCAR_MAJOR_MASK) >> RCAR_MAJOR_SHIFT)
+ 			 + RCAR_MAJOR_OFFSET, (prr_val & RCAR_MINOR_MASK));
+-#endif //RZG_EK874
++#endif //RZG_EK874 | RZG_HIHOPE_RZG2M
+ 	}
+ 	NOTICE("%s", msg);
+ 
+@@ -524,6 +540,7 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+ 	case BOARD_STARTER_KIT_PRE:
+ 	case BOARD_EBISU_4D:
+ 	case BOARD_EK874:
++	case BOARD_HIHOPE_RZG2M:
+ 		/* Do nothing. */
+ 		break;
+ 	default:
+diff --git a/plat/renesas/rcar/bl2_secure_setting.c b/plat/renesas/rcar/bl2_secure_setting.c
+index 2418e2d..411dc29 100644
+--- a/plat/renesas/rcar/bl2_secure_setting.c
++++ b/plat/renesas/rcar/bl2_secure_setting.c
+@@ -91,12 +91,12 @@ static const struct {
+ 	/** Security attribute setting for slave ports 13 */
+ 	/* Bit22: RPC slave ports. */
+ 	/*        0: registers can be accessed from secure resource only. */
+-#if RZG_EK874
++#if (RZG_EK874) | (RZG_HIHOPE_RZG2M)
+ 	/* Permit RPC access from non-secure resource */
+ 	{SEC_SEL13,		0xFFFFFFFFU},
+-#else	// RZG_EK874
++#else	// RZG_EK874 | RZG_HIHOPE_RZG2M
+ 	{SEC_SEL13,		0xFFBFFFFFU},
+-#endif	// RZG_EK874
++#endif	// RZG_EK874 | RZG_HIHOPE_RZG2M
+ 
+ 	/** Security attribute setting for slave ports 14 */
+ 	/* Bit27: System Timer (SCMT) slave ports. */
+@@ -227,14 +227,14 @@ static const struct {
+ 	/** Security group 1 attribute setting for slave ports 13 */
+ 	/* Bit22: RPC slave ports. */
+ 	/*        SecurityGroup3 */
+-#if RZG_EK874
++#if (RZG_EK874) | (RZG_HIHOPE_RZG2M)
+ 	/* Permit RPC access from non-secure resource */
+ 	{SEC_GRP0COND13,	0x00000000U},
+ 	{SEC_GRP1COND13,	0x00000000U},
+-#else	// RZG_EK874
++#else	// RZG_EK874 | RZG_HIHOPE_RZG2M
+ 	{SEC_GRP0COND13,	0x00400000U},
+ 	{SEC_GRP1COND13,	0x00400000U},
+-#endif	// RZG_EK874
++#endif	// RZG_EK874 | RZG_HIHOPE_RZG2M
+ 
+ 	/** Security group 0 attribute setting for slave ports 14 */
+ 	/** Security group 1 attribute setting for slave ports 14 */
+diff --git a/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c b/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c
+index 5541a1a..2afada9 100644
+--- a/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c
++++ b/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c
+@@ -8,10 +8,15 @@
+  *	NUMBER OF BOARD CONFIGRATION
+  *	PLEASE DEFINE
+  ******************************************************************************/
+-#define BOARDNUM 18
++#define BOARDNUM 19
+ /*******************************************************************************
+  *	PLEASE SET board number or board judge function
+  ******************************************************************************/
++#if (RZG_HIHOPE_RZG2M) // RZG_HIHOPE_RZG2M
++static uint32_t boardcnf_get_brd_type(void){
++	return (18);
++}
++#else  // RZG_HIHOPE_RZG2M
+ #define BOARD_JUDGE_AUTO
+ #ifdef BOARD_JUDGE_AUTO
+ static uint32_t _board_judge(void);
+@@ -23,6 +28,7 @@ static uint32_t boardcnf_get_brd_type(void){
+ 		return (1);
+ }
+ #endif // BOARD_JUDGE_AUTO
++#endif // RZG_HIHOPE_RZG2M
+ 
+ /*******************************************************************************
+  *	Set DRAM ODT , VREFca , Derating  condtition
+@@ -1403,6 +1409,61 @@ static const struct _boardcnf boardcnfs[BOARDNUM] = {
+ 			  0, 0, 0, 0, 0, 0, 0, 0 }
+ 		}
+ 	}
++},
++/*
++ * boardcnf[18] Jiangsu HopeRun Software Co., Ltd. HiHope RZ/G2M board with RZ/G2M/SoC
++ */
++{
++	0x03,		/* phyvalid */
++	0x01,		/* dbi_en */
++	0x02c0,		/* cacs_dly */
++	0,		/* cacs_dly_adj */
++	0x0300,		/* dqdm_dly_w */
++	0x00a0,		/* dqdm_dly_r */
++	{
++/*ch[0]*/	{
++/*ddr_density[]*/	{ 0x02, 0x02 },
++/*ddr_density[]*///	{ 0x04, 0x04 },
++/*ca_swap*/		0x00345201,
++/*dqs_swap*/		0x3201,
++/*dq_swap[]*/		{ 0x01672543, 0x45361207, 0x45632107, 0x60715234 },
++/*dm_swap[]*/		{ 0x08, 0x08, 0x08, 0x08 },
++/*wdqlvl_patt[]*/	WDQLVL_PAT,
++/*cacs_adj*/		{ 0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0 },
++/*dm_adj_w*/		{ 0, 0, 0, 0 },
++/*dqdm_adj_w*/		{ 0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0 },
++/*dm_adj_r*/		{ 0, 0, 0, 0 },
++/*dqdm_adj_r*/		{ 0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0 }
++		},
++/*ch[1]*/	{
++/*ddr_density[]*/	{ 0x02, 0x02 },
++/*ddr_density[]*///	{ 0x04, 0x04 },
++/*ca_swap*/		0x00302154,
++/*dqs_swap*/		0x2310,
++/*dq_swap[]*/		{ 0x01672543, 0x45361207, 0x45632107, 0x60715234 },
++/*dm_swap[]*/		{ 0x08, 0x08, 0x08, 0x08 },
++/*wdqlvl_patt[]*/	WDQLVL_PAT,
++/*cacs_adj*/		{ 0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0 },
++/*dm_adj_w*/		{ 0, 0, 0, 0 },
++/*dqdm_adj_w*/		{ 0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0 },
++/*dm_adj_r*/		{ 0, 0, 0, 0 },
++/*dqdm_adj_r*/		{ 0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0,
++			  0, 0, 0, 0, 0, 0, 0, 0 }
++		}
++	}
+ }
+ };
+ 
+diff --git a/plat/renesas/rcar/drivers/board/board.c b/plat/renesas/rcar/drivers/board/board.c
+index 2528785..c40024d 100644
+--- a/plat/renesas/rcar/drivers/board/board.c
++++ b/plat/renesas/rcar/drivers/board/board.c
+@@ -20,7 +20,11 @@
+ #define BOARD_DEFAULT		(BOARD_EBISU << BOARD_CODE_SHIFT)
+ #endif
+ #else  /* (RCAR_LSI == RCAR_E3) */
++#if (RZG_HIHOPE_RZG2M) // RZG_HIHOPE_RZG2M
++#define BOARD_DEFAULT		(BOARD_HIHOPE_RZG2M << BOARD_CODE_SHIFT)
++#else  // RZG_HIHOPE_RZG2M
+ #define BOARD_DEFAULT		(BOARD_SALVATOR_X << BOARD_CODE_SHIFT)
++#endif // RZG_HIHOPE_RZG2M
+ #endif /* (RCAR_LSI == RCAR_E3) */
+ #endif
+ 
+@@ -46,6 +50,7 @@ const char *g_board_tbl[] = {
+ 	[BOARD_STARTER_KIT_PRE]	= "Starter Kit",
+ 	[BOARD_EBISU_4D]	= "Ebisu-4D",
+ 	[BOARD_EK874]		= "EK874 RZ/G2E",
++	[BOARD_HIHOPE_RZG2M]	= "HiHope RZ/G2M",
+ 	[BOARD_UNKNOWN]		= "unknown"
+ };
+ 
+@@ -72,6 +77,8 @@ int32_t get_board_type(uint32_t *type, uint32_t *rev)
+ 					   0xFFU, 0xFFU, 0xFFU, 0xFFU},
+ 		[BOARD_EK874]		= {0x10U, 0xFFU, 0xFFU, 0xFFU,
+ 					   0xFFU, 0xFFU, 0xFFU, 0xFFU},
++		[BOARD_HIHOPE_RZG2M]	= {0x10U, 0xFFU, 0xFFU, 0xFFU,
++					   0xFFU, 0xFFU, 0xFFU, 0xFFU},
+ 	};
+ 
+ 	if (BOARD_ID_UNKNOWN == g_board_id) {
+diff --git a/plat/renesas/rcar/drivers/board/board.h b/plat/renesas/rcar/drivers/board/board.h
+index ffc3c31..6a24617 100644
+--- a/plat/renesas/rcar/drivers/board/board.h
++++ b/plat/renesas/rcar/drivers/board/board.h
+@@ -19,8 +19,9 @@
+ #define BOARD_STARTER_KIT_PRE		(0x0BU)
+ #define BOARD_EBISU_4D			(0x0DU)
+ #define BOARD_EK874			(0x0EU)
++#define BOARD_HIHOPE_RZG2M		(0x0FU)
+ 
+-#define BOARD_UNKNOWN			(BOARD_EK874+1U)
++#define BOARD_UNKNOWN			(BOARD_HIHOPE_RZG2M+1U)
+ 
+ #define BOARD_REV_UNKNOWN		(0xFFU)
+ 
+diff --git a/plat/renesas/rcar/pfc/M3/pfc_init_m3.c b/plat/renesas/rcar/pfc/M3/pfc_init_m3.c
+index cae3962..0053fd9 100644
+--- a/plat/renesas/rcar/pfc/M3/pfc_init_m3.c
++++ b/plat/renesas/rcar/pfc/M3/pfc_init_m3.c
+@@ -896,12 +896,20 @@ static void pfc_reg_write(uint32_t addr, uint32_t data)
+ 
+ void pfc_init_m3(void)
+ {
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	uint32_t reg;
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* Work around for PFC eratta */
+ 	StartRtDma0_Descriptor();
+ 
+ 	/* initialize module select */
++#if RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_MOD_SEL0, 0x00000000);
++	pfc_reg_write(PFC_MOD_SEL1, 0x00000000);
++	pfc_reg_write(PFC_MOD_SEL2, 0x00000000);
++#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_MOD_SEL0, MOD_SEL0_MSIOF3_A
+ 				  | MOD_SEL0_MSIOF2_A
+ 				  | MOD_SEL0_MSIOF1_A
+@@ -956,8 +964,12 @@ void pfc_init_m3(void)
+ 				  | MOD_SEL2_ADG_B_A
+ 				  | MOD_SEL2_ADG_C_A
+ 				  | MOD_SEL2_VIN4_A);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize peripheral function select */
++#if RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_IPSR17, 0x00000010);	// select SCIF_CLK_A
++#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_IPSR0, IPSR_28_FUNC(0)
+ 			       | IPSR_24_FUNC(0)
+ 			       | IPSR_20_FUNC(0)
+@@ -1105,7 +1117,15 @@ void pfc_init_m3(void)
+ 	pfc_reg_write(PFC_IPSR18, IPSR_4_FUNC(0)
+ 				| IPSR_0_FUNC(0));
+ 
++#endif // RZG_HIHOPE_RZG2M
++
+ 	/* initialize GPIO/perihperal function select */
++#if RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_GPSR3, GPSR3_SD0_CD);
++	pfc_reg_write(PFC_GPSR5, 0x00000C00);	// TX2_A, RX2_A
++	pfc_reg_write(PFC_GPSR6, 0x00800000);	// SCIF_CLK_A
++	pfc_reg_write(PFC_GPSR7, 0x00000000);
++#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_GPSR0, GPSR0_D15
+ 			       | GPSR0_D14
+ 			       | GPSR0_D13
+@@ -1214,8 +1234,11 @@ void pfc_init_m3(void)
+ 			       | GPSR7_HDMI0_CEC
+ 			       | GPSR7_AVS2
+ 			       | GPSR7_AVS1);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize POC control register */
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
+ 				  | POC_SD3_DAT7_33V
+ 				  | POC_SD3_DAT6_33V
+@@ -1233,8 +1256,11 @@ void pfc_init_m3(void)
+ 				  | POC_SD0_DAT0_33V
+ 				  | POC_SD0_CMD_33V
+ 				  | POC_SD0_CLK_33V);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize DRV control register */
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	reg = mmio_read_32(PFC_DRVCTRL0);
+ 	reg = ((reg & DRVCTRL0_MASK) | DRVCTRL0_QSPI0_SPCLK(3)
+ 				     | DRVCTRL0_QSPI0_MOSI_IO0(3)
+@@ -1480,8 +1506,11 @@ void pfc_init_m3(void)
+ 				      | DRVCTRL24_USB31_PWEN(7)
+ 				      | DRVCTRL24_USB31_OVC(7));
+ 	pfc_reg_write(PFC_DRVCTRL24, reg);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize LSI pin pull-up/down control */
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_PUD0,0x00005FBFU);
+ 	pfc_reg_write(PFC_PUD1,0x00300FFEU);
+ 	pfc_reg_write(PFC_PUD2,0x330001E6U);
+@@ -1489,8 +1518,11 @@ void pfc_init_m3(void)
+ 	pfc_reg_write(PFC_PUD4,0xFFFFFF00U);
+ 	pfc_reg_write(PFC_PUD5,0x7F5FFF87U);
+ 	pfc_reg_write(PFC_PUD6,0x00000055U);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize LSI pin pull-enable register */
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_PUEN0,0x00000FFFU);
+ 	pfc_reg_write(PFC_PUEN1,0x00100234U);
+ 	pfc_reg_write(PFC_PUEN2,0x000004C4U);
+@@ -1498,6 +1530,7 @@ void pfc_init_m3(void)
+ 	pfc_reg_write(PFC_PUEN4,0x3E000000U);
+ 	pfc_reg_write(PFC_PUEN5,0x1F000805U);
+ 	pfc_reg_write(PFC_PUEN6,0x00000006U);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize positive/negative logic select */
+ 	mmio_write_32(GPIO_POSNEG0, 0x00000000U);
+@@ -1518,13 +1551,18 @@ void pfc_init_m3(void)
+ 	mmio_write_32(GPIO_IOINTSEL6, 0x00000000U);
+ 
+ 	/* initialize general output register */
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	mmio_write_32(GPIO_OUTDT1, 0x00000000U);
+ 	mmio_write_32(GPIO_OUTDT2, 0x00000400U);
+ 	mmio_write_32(GPIO_OUTDT3, 0x0000C000U);
+ 	mmio_write_32(GPIO_OUTDT5, 0x00000006U);
+ 	mmio_write_32(GPIO_OUTDT6, 0x00003880U);
++#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize general input/output switching */
++#if RZG_HIHOPE_RZG2M
++#else  // RZG_HIHOPE_RZG2M
+ 	mmio_write_32(GPIO_INOUTSEL0, 0x00000000U);
+ 	mmio_write_32(GPIO_INOUTSEL1, 0x01000A00U);
+ 	mmio_write_32(GPIO_INOUTSEL2, 0x00000400U);
+@@ -1532,4 +1570,5 @@ void pfc_init_m3(void)
+ 	mmio_write_32(GPIO_INOUTSEL4, 0x00000000U);
+ 	mmio_write_32(GPIO_INOUTSEL5, 0x0000020EU);
+ 	mmio_write_32(GPIO_INOUTSEL6, 0x00013880U);
++#endif // RZG_HIHOPE_RZG2M
+ }
+diff --git a/plat/renesas/rcar/platform.mk b/plat/renesas/rcar/platform.mk
+index c5d62fb..37ed3c8 100644
+--- a/plat/renesas/rcar/platform.mk
++++ b/plat/renesas/rcar/platform.mk
+@@ -216,6 +216,23 @@ else
+       endif
+       $(eval $(call add_define,RCAR_LSI_CUT))
+     endif
++  else ifeq (${LSI},G2M)
++    RCAR_LSI:=${RCAR_M3}
++    ifndef LSI_CUT
++      # enable compatible function.
++      RCAR_LSI_CUT_COMPAT := 1
++      $(eval $(call add_define,RCAR_LSI_CUT_COMPAT))
++    else
++      # disable compatible function.
++      ifeq (${LSI_CUT},10)
++        RCAR_LSI_CUT:=0
++      else ifeq (${LSI_CUT},11)
++        RCAR_LSI_CUT:=1
++      else
++        $(error "Error: ${LSI_CUT} is not supported.")
++      endif
++      $(eval $(call add_define,RCAR_LSI_CUT))
++    endif
+   else
+     $(error "Error: ${LSI} is not supported.")
+   endif
+@@ -368,6 +385,12 @@ RZG_EK874 := 0
+ endif
+ $(eval $(call add_define,RZG_EK874))
+ 
++#Process HIHOPE RZ/G2M flag
++ifndef RZG_HIHOPE_RZG2M
++RZG_HIHOPE_RZG2M := 0
++endif
++$(eval $(call add_define,RZG_HIHOPE_RZG2M))
++
+ # RCAR_SYSTEM_RESET_KEEPON_DDR requires power control of PMIC etc.
+ # When executing SYSTEM_SUSPEND other than Salvator-X, Salvator-XS and Ebisu,
+ # processing equivalent to that implemented in PMIC_ROHM_BD9571 is necessary.
+diff --git a/tools/dummy_create/makefile b/tools/dummy_create/makefile
+index d380162..c7f6e3c 100644
+--- a/tools/dummy_create/makefile
++++ b/tools/dummy_create/makefile
+@@ -61,6 +61,12 @@ RZG_EK874 := 0
+ endif
+ $(eval $(call add_define,RZG_EK874))
+ 
++#Process HIHOPE RZ/G2M flag
++ifndef RZG_HIHOPE_RZG2M
++RZG_HIHOPE_RZG2M := 0
++endif
++$(eval $(call add_define,RZG_HIHOPE_RZG2M))
++
+ ###################################################
+ 
+ #c compiler
+diff --git a/tools/dummy_create/sa6.c b/tools/dummy_create/sa6.c
+index e6dafc1..15f5a75 100644
+--- a/tools/dummy_create/sa6.c
++++ b/tools/dummy_create/sa6.c
+@@ -22,11 +22,11 @@
+ /* Reserved */
+ #define RCAR_BL32_PARTITION		(0x00000000U)
+ /* Source address on flash for BL33 */
+-#if (RZG_EK874)
++#if (RZG_EK874 | RZG_HIHOPE_RZG2M)
+ #define RCAR_BL33SRC_ADDRESS		(0x00300000U)
+-#else	// RZG_EK874
++#else	// RZG_EK874 | RZG_HIHOPE_RZG2M
+ #define RCAR_BL33SRC_ADDRESS		(0x00640000U)
+-#endif	// RZG_EK874
++#endif	// RZG_EK874 | RZG_HIHOPE_RZG2M
+ /* Reserved */
+ #define RCAR_BL33_PARTITION		(0x00000000U)
+ #define RCAR_BL332SRC_ADDRESS		(0x00000000U)
+-- 
+2.7.4
+

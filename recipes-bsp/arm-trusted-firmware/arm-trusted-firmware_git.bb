@@ -17,6 +17,7 @@ SRCREV = "7f126e2e718a69bec850c87bd05c4c168b32c4df"
 
 SRC_URI += "file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch \
             file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
+            file://0004-plat-renesas-add-support-for-HIHOPE-RZG2M.patch \
 "
 
 SRC_URI_append_r8a774c0 += "\
@@ -25,10 +26,12 @@ SRC_URI_append_r8a774c0 += "\
 
 PV = "v1.5+renesas+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "(ek874)"
+COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m)"
 PLATFORM = "rcar"
 ATFW_OPT_LOSSY = "${@base_conditional("USE_MULTIMEDIA", "1", "RCAR_LOSSY_ENABLE=1", "", d)}"
 ATFW_OPT_r8a774c0 = "LSI=G2E RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RZG_EK874=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none""
+ATFW_OPT_r8a774a1 = "LSI=G2M RCAR_DRAM_SPLIT=2 RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2M=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 SPD="none""
+
 ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_EK874_ECC=1 ", "",d)}"
 
 # requires CROSS_COMPILE set by hand as there is no configure script
