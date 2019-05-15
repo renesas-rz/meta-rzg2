@@ -15,7 +15,7 @@ SRC_URI += " \
 inherit pythonnative systemd
 SYSTEMD_SERVICE_${PN} = "optee.service"
 
-COMPATIBLE_MACHINE = "ek874"
+COMPATIBLE_MACHINE = "ek874|hihope-rzg2m"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
