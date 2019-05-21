@@ -15,8 +15,10 @@ BRANCH = "rcar_gen3"
 SRC_URI = "git://github.com/renesas-rcar/arm-trusted-firmware.git;branch=${BRANCH}"
 SRCREV = "7f126e2e718a69bec850c87bd05c4c168b32c4df"
 
-SRC_URI += "file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch \
-            file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
+SRC_URI += "${@'file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch' \
+           if '${BINUVERSION}' == '2.25' else ''}"
+
+SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0004-plat-renesas-add-support-for-HIHOPE-RZG2M.patch \
 "
 
