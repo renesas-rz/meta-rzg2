@@ -36,11 +36,11 @@ RDEPENDS_packagegroup-gstreamer1.0-plugins = " \
     gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad \
+    ${@base_conditional("USE_OMX_COMMON", "1", "gstreamer1.0-plugin-vspfilter gstreamer1.0-plugin-vspmfilter", "", d)} \
 "
 
 RDEPENDS_packagegroup-gstreamer1.0-plugins-base = " \
     gstreamer1.0-meta-base \
-    ${@base_conditional("USE_OMX_COMMON", "1", "gstreamer1.0-plugin-vspfilter", "", d)} \
 "
 
 RDEPENDS_packagegroup-gstreamer1.0-plugins-audio = " \
