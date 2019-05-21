@@ -57,26 +57,6 @@ do_install () {
     install -m 644 ${S}/${VSPM_DRV_DIR}/include/fdp_drv.h ${D}/${includedir}/
 }
 
-do_populate_sysroot[sstate-inputdirs] += "${S}/${VSPM_DRV_DIR}/include/"
-do_populate_sysroot[sstate-outputdirs] += "${KERNELSRC}/include/"
-do_populate_sysroot_setscene[prefuncs] = "vspm_sstate_check_func"
-SSTATE_DUPWHITELIST = "${KERNELSRC}/include"
-
-vspm_sstate_check_func() {
-    # An error is returned when unpack of kernel source has not been completed yet.
-    # By returning error, rebuild task runs by force (Invalidating sstate).
-    # This module installs shared header files in ${KERNELSRC}/include by
-    # sstate cache.
-    # Those files will be deleted by unpack task of kernel.
-    if [ ${WITHIN_EXT_SDK} -eq 1 ]; then
-        :
-    else
-        if [ ! -d "${KERNELSRC}/include" ]; then
-            exit 1
-        fi
-    fi
-}
-
 # Should also clean deploy/licenses directory
 # for module when do_clean.
 do_clean[cleandirs] += "${LICENSE_DIRECTORY}/${PN}"
