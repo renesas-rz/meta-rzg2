@@ -1,0 +1,28 @@
+From 390ae818a1322586be09377bcc4c7e6fd505aacd Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
+Date: Thu, 23 May 2019 10:33:55 +0700
+Subject: [PATCH 83/92] dt-bindings: thermal: rcar-thermal: Add r8a774a1
+ support
+
+Document RZ/G2M (R8A774A1) SoC bindings.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+---
+ Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+index cfa154b..07c1ead 100644
+--- a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
++++ b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+@@ -10,6 +10,7 @@ Required properties:
+ 			    - "renesas,r8a7795-thermal" (R-Car H3)
+ 			    - "renesas,r8a7796-thermal" (R-Car M3-W)
+ 			    - "renesas,r8a77965-thermal" (R-Car M3-N)
++			    - "renesas,r8a774a1-thermal" (RZ/G2M)
+ - reg			: Address ranges of the thermal registers. Each sensor
+ 			  needs one address range. Sorting must be done in
+ 			  increasing order according to datasheet, i.e.
+-- 
+2.7.4
+

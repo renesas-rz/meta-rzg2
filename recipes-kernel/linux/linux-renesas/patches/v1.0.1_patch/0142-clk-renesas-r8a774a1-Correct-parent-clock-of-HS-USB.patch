@@ -1,0 +1,35 @@
+From 161a6102083de5625f61657b6ef8014dcb1530a2 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 22 May 2019 10:55:39 +0700
+Subject: [PATCH 4/4] clk: renesas: r8a774a1: Correct parent clock of HS-USB
+
+According to the R-Car Gen3 Hardware Manual Rev. 1.00, the parent clock
+of the HS-USB module clocks on RZ/G2M SoCs is S3D2.
+
+Signed-off-by: Kazuya Mizuguchi <kazuya.mizuguchi.ks@renesas.com>
+[takeshi: Update R-Car H3, M3-N, and E3]
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+[geert: Update RZ/G2M and RZ/G2E]
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/clk/renesas/r8a774a1-cpg-mssr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/renesas/r8a774a1-cpg-mssr.c b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+index ce9c2bf..86be10f 100644
+--- a/drivers/clk/renesas/r8a774a1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+@@ -170,7 +170,7 @@ static const struct mssr_mod_clk r8a774a1_mod_clks[] __initconst = {
+ 	DEF_MOD("vspi0",		631,	R8A774A1_CLK_S0D1),
+ 	DEF_MOD("ehci1",		702,	R8A774A1_CLK_S3D2),
+ 	DEF_MOD("ehci0",		703,	R8A774A1_CLK_S3D2),
+-	DEF_MOD("hsusb",		704,	R8A774A1_CLK_S3D4),
++	DEF_MOD("hsusb",		704,	R8A774A1_CLK_S3D2),
+ 	DEF_MOD("csi20",		714,	R8A774A1_CLK_CSI0),
+ 	DEF_MOD("csi40",		716,	R8A774A1_CLK_CSI0),
+ 	DEF_MOD("du2",			722,	R8A774A1_CLK_S2D1),
+-- 
+2.7.4
+

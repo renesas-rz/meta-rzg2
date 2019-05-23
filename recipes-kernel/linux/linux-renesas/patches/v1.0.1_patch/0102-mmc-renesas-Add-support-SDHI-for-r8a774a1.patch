@@ -1,0 +1,27 @@
+From bec85271bf29599ca1a929686baee5ce91e69fae Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@renesas.com>
+Date: Wed, 22 May 2019 13:20:53 +0700
+Subject: [PATCH 66/92] mmc: renesas: Add support SDHI for r8a774a1
+
+This patch add soc whitelist for r8a774a1
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_internal_dmac.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_internal_dmac.c b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+index 03ea0c5..77e71ac 100644
+--- a/drivers/mmc/host/renesas_sdhi_internal_dmac.c
++++ b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+@@ -303,6 +303,7 @@ static const struct soc_device_attribute gen3_soc_whitelist[] = {
+ 	{ .soc_id = "r8a77965" },
+ 	{ .soc_id = "r8a77980" },
+ 	{ .soc_id = "r8a77995" },
++	{ .soc_id = "r8a774a1" },
+ 	{ .soc_id = "r8a774c0" },
+ 	{ /* sentinel */ }
+ };
+-- 
+2.7.4
+

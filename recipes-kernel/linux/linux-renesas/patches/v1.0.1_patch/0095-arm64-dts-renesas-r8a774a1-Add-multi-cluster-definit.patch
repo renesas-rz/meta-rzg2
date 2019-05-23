@@ -1,0 +1,54 @@
+From fd829122461dcb40ce1032b99bb57d47691e0160 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 22 May 2019 10:20:12 +0700
+Subject: [PATCH 59/92] arm64: dts: renesas: r8a774a1: Add multi-cluster
+ definition
+
+This patch adds the "cpu-map" for multi-cluster into r8a774a1
+device-tree. This definition is used to parse the cpu topology.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 78b88f8..f4d64ed 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -59,6 +59,32 @@
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+ 
++		cpu-map {
++			cluster0 {
++				core0 {
++					cpu = <&a57_0>;
++				};
++				core1 {
++					cpu = <&a57_1>;
++				};
++			};
++
++			cluster1 {
++				core0 {
++					cpu = <&a53_0>;
++				};
++				core1 {
++					cpu = <&a53_1>;
++				};
++				core2 {
++					cpu = <&a53_2>;
++				};
++				core3 {
++					cpu = <&a53_3>;
++				};
++			};
++		};
++
+ 		a57_0: cpu@0 {
+ 			compatible = "arm,cortex-a57", "arm,armv8";
+ 			reg = <0x0>;
+-- 
+2.7.4
+

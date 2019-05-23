@@ -1,0 +1,58 @@
+From 404f95b4c6c5f6a8dddbb0e91e6619ad685e5837 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 20 May 2019 10:47:45 +0700
+Subject: [PATCH 50/92] arm64: dts: renesas: hihope-common: enable hsusb for
+ otg mode
+
+This patch enable hsusb and use otg mode for USB 2.0 channel 0.
+Also SHDN pin of max3355 always high, so set this pins always high on
+boot.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index b57cf6f..bda3846 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -102,7 +102,7 @@
+ };
+ 
+ &ohci0 {
+-	dr_mode = "host";
++	dr_mode = "otg";
+ 	status = "okay";
+ };
+ 
+@@ -112,7 +112,7 @@
+ };
+ 
+ &ehci0 {
+-	dr_mode = "host";
++	dr_mode = "otg";
+ 	status = "okay";
+ };
+ 
+@@ -135,3 +135,17 @@
+ 
+ 	status = "okay";
+ };
++
++&hsusb {
++	dr_mode = "otg";
++	status = "okay";
++};
++
++&gpio6 {
++	max3355-en-shdn {
++		gpio-hog;
++		gpios = <16 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "max3355-en-shdn";
++	};
++};
+-- 
+2.7.4
+

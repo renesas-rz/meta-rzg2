@@ -1,0 +1,65 @@
+From 72a59942e8f65f870ec52b56ff5ee73069dd32e6 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@renesas.com>
+Date: Tue, 14 May 2019 09:20:21 +0700
+Subject: [PATCH 27/92] arm64: dts: renesas: hihope-rzg2-ex: Add ethernet
+ support
+
+This patch adds ethernet support to the sub board.
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi | 39 +++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+index 1bc2417..8859378 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+@@ -6,5 +6,44 @@
+  * Copyright (C) 2019 Renesas Electronics Corp.
+  */
+ 
++#include <dt-bindings/gpio/gpio.h>
+ / {
++	aliases {
++		ethernet0 = &avb;
++	};
++};
++
++&avb {
++	pinctrl-0 = <&avb_pins>;
++	pinctrl-names = "default";
++	phy-handle = <&phy0>;
++	phy-mode = "rgmii-txid";
++	status = "okay";
++
++	phy0: ethernet-phy@0 {
++		reg = <0>;
++		interrupt-parent = <&gpio2>;
++		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
++		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
++	};
++};
++
++&pfc {
++	avb_pins: avb {
++		mux {
++			groups = "avb_link", "avb_mdio", "avb_mii";
++			function = "avb";
++		};
++
++		pins_mdio {
++			groups = "avb_mdio";
++			drive-strength = <24>;
++		};
++
++		pins_mii_tx {
++			pins = "PIN_AVB_TX_CTL", "PIN_AVB_TXC", "PIN_AVB_TD0",
++			       "PIN_AVB_TD1", "PIN_AVB_TD2", "PIN_AVB_TD3";
++			drive-strength = <12>;
++		};
++	};
+ };
+-- 
+2.7.4
+

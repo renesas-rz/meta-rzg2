@@ -1,0 +1,28 @@
+From 87a2ae136f741a2aff127ee3900011c8469d9567 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Tue, 21 May 2019 13:38:04 +0700
+Subject: [PATCH 40/92] arm64: dts: renesas: hihope-common: Add RWDT support
+
+This patch enables RWDT and use 60 seconds as default timeout.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 34fae7b..f1b61bc 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -60,3 +60,8 @@
+ &tmu4 {
+ 	status = "okay";
+ };
++
++&rwdt {
++	status = "okay";
++	timeout-sec = <60>;
++};
+-- 
+2.7.4
+

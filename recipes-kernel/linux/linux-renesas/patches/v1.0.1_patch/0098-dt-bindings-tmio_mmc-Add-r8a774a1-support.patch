@@ -1,0 +1,27 @@
+From c8d929bbd5b5e35da511ff4ae3931bec16571956 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@renesas.com>
+Date: Wed, 22 May 2019 14:41:51 +0700
+Subject: [PATCH 62/92] dt-bindings: tmio_mmc: Add r8a774a1 support
+
+Document RZ/G2M (R8A774A1) SoC bindings.
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/mmc/tmio_mmc.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/mmc/tmio_mmc.txt b/Documentation/devicetree/bindings/mmc/tmio_mmc.txt
+index 3fe4cb2..e60b94f 100644
+--- a/Documentation/devicetree/bindings/mmc/tmio_mmc.txt
++++ b/Documentation/devicetree/bindings/mmc/tmio_mmc.txt
+@@ -30,6 +30,7 @@ Required properties:
+ 		"renesas,sdhi-r8a77980" - SDHI IP on R8A77980 SoC
+ 		"renesas,sdhi-r8a77990" - SDHI IP on R8A77990 SoC
+ 		"renesas,sdhi-r8a77995" - SDHI IP on R8A77995 SoC
++		"renesas,sdhi-r8a774a1" - SDHI IP on R8A774A1 SoC
+ 		"renesas,sdhi-r8a774c0" - SDHI IP on R8A774C0 SoC
+ 		"renesas,sdhi-shmobile" - a generic sh-mobile SDHI controller
+ 		"renesas,rcar-gen1-sdhi" - a generic R-Car Gen1 SDHI controller
+-- 
+2.7.4
+

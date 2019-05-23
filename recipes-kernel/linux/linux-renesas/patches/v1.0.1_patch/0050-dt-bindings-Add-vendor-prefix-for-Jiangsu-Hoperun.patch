@@ -1,0 +1,29 @@
+From ba1bd3a4054906a79e7bfc38cf0c0146e3d75dee Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 6 May 2019 13:17:33 +0700
+Subject: [PATCH 14/92] dt-bindings: Add vendor prefix for Jiangsu Hoperun
+
+Add Jiangsu Hoperun to the list of devicetree vendor prefixes.
+
+Website: https://www.hoperun.com
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+index b77f359..0022afe 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.txt
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -164,6 +164,7 @@ holt	Holt Integrated Circuits, Inc.
+ honeywell	Honeywell
+ hp	Hewlett Packard
+ holtek	Holtek Semiconductor, Inc.
++hoperun	Jiangsu Hoperun Software Co., Ltd
+ hwacom	HwaCom Systems Inc.
+ i2se	I2SE GmbH
+ ibm	International Business Machines (IBM)
+-- 
+2.7.4
+

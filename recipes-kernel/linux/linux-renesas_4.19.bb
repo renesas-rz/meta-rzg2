@@ -5,7 +5,7 @@ require include/cas-control.inc
 require include/ecc-control.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
-COMPATIBLE_MACHINE = "ek874"
+COMPATIBLE_MACHINE = "ek874|hihope-rzg2m"
 
 KERNEL_URL = " \
     git://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git"

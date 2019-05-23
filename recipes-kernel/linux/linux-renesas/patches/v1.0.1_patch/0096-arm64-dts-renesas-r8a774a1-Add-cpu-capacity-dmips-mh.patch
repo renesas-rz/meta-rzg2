@@ -1,0 +1,82 @@
+From b24cba7580553e5fb64797208ae18aa1779fd64b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 22 May 2019 10:39:37 +0700
+Subject: [PATCH 60/92] arm64: dts: renesas: r8a774a1: Add cpu
+ capacity-dmips-mhz
+
+Set the capacity-dmips-mhz for RZ/G2M, that is based on dhrystone.
+
+Expected cpu capacity:
+Cortex-A57: 1024, Cortex-A53: 434
+
+Note:
+The cpu capacity in Cortex-A53 side is scaled with max cpufreq
+in current implementation.
+
+543 * 1.2[GHz]/1.5[GHz] = 434
+
+Therefore, it needs to set "543" to capacity-dmips-mhz in dt
+if it uses cpu capacity with "434" on Cortex-A53.
+
+Signed-off-by: Gaku Inami <gaku.inami.xw@bp.renesas.com>
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index f4d64ed..c3613f87 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -93,6 +93,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks =<&cpg CPG_CORE R8A774A1_CLK_Z>;
++			capacity-dmips-mhz = <1024>;
+ 		};
+ 
+ 		a57_1: cpu@1 {
+@@ -103,6 +104,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks =<&cpg CPG_CORE R8A774A1_CLK_Z>;
++			capacity-dmips-mhz = <1024>;
+ 		};
+ 
+ 		a53_0: cpu@100 {
+@@ -112,6 +114,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU0>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			capacity-dmips-mhz = <543>;
+ 		};
+ 
+ 		a53_1: cpu@101 {
+@@ -121,6 +124,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU1>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			capacity-dmips-mhz = <543>;
+ 		};
+ 
+ 		a53_2: cpu@102 {
+@@ -130,6 +134,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU2>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			capacity-dmips-mhz = <543>;
+ 		};
+ 
+ 		a53_3: cpu@103 {
+@@ -139,6 +144,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU3>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			capacity-dmips-mhz = <543>;
+ 		};
+ 
+ 		L2_CA57: cache-controller-0 {
+-- 
+2.7.4
+

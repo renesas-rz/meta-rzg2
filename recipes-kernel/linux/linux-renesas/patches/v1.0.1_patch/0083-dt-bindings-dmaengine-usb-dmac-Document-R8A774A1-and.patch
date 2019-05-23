@@ -1,0 +1,29 @@
+From 28c6b793ae5ebe93fafb9317242eb884cec1d058 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 20 May 2019 10:36:25 +0700
+Subject: [PATCH 47/92] dt-bindings: dmaengine: usb-dmac: Document R8A774A1 and
+ R8A774C0 bindings.
+
+Add document for R8A774A1 SoC, also for R8A774A0 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/dma/renesas,usb-dmac.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/dma/renesas,usb-dmac.txt b/Documentation/devicetree/bindings/dma/renesas,usb-dmac.txt
+index 482e543..1321397 100644
+--- a/Documentation/devicetree/bindings/dma/renesas,usb-dmac.txt
++++ b/Documentation/devicetree/bindings/dma/renesas,usb-dmac.txt
+@@ -14,6 +14,8 @@ Required Properties:
+ 	  - "renesas,r8a77965-usb-dmac" (R-Car M3-N)
+ 	  - "renesas,r8a77990-usb-dmac" (R-Car E3)
+ 	  - "renesas,r8a77995-usb-dmac" (R-Car D3)
++	  - "renesas,r8a774c0-usb-dmac" (RZ/G2E)
++	  - "renesas,r8a774a1-usb-dmac" (RZ/G2M)
+ - reg: base address and length of the registers block for the DMAC
+ - interrupts: interrupt specifiers for the DMAC, one for each entry in
+   interrupt-names.
+-- 
+2.7.4
+

@@ -1,0 +1,30 @@
+From 529859d43e8571047632e45ff57b06e8fca73a1b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 16 May 2019 10:24:32 +0700
+Subject: [PATCH 33/92] dt-bindings: timer: renesas: tmu: document R8A774A1
+ bindings
+
+Document the RZ/G2M SoC in the Renesas TMU bindings.
+The TMU hardware in those is the Renesas standard 3-channel timer
+unit.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/timer/renesas,tmu.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/timer/renesas,tmu.txt b/Documentation/devicetree/bindings/timer/renesas,tmu.txt
+index 9744629..ffcd3b5 100644
+--- a/Documentation/devicetree/bindings/timer/renesas,tmu.txt
++++ b/Documentation/devicetree/bindings/timer/renesas,tmu.txt
+@@ -10,6 +10,7 @@ Required Properties:
+ 
+   - compatible: must contain one or more of the following:
+     - "renesas,tmu-r8a7740" for the r8a7740 TMU
++    - "renesas,tmu-r8a774a1" for the r8a774a1 TMU
+     - "renesas,tmu-r8a774c0" for the r8a774c0 TMU
+     - "renesas,tmu-r8a7778" for the r8a7778 TMU
+     - "renesas,tmu-r8a7779" for the r8a7779 TMU
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From 722ef97a8f57d0cf85748587ecbe28c516bf0b99 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 6 May 2019 16:16:46 +0700
+Subject: [PATCH 23/92] arm64: dts: renesas: r8a774a1: Add pinctrl device node
+
+This patch adds pinctrl device node for R8A774A1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 8056f51..2167c63 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -167,6 +167,11 @@
+ 			reg = <0 0xfff00044 0 4>;
+ 		};
+ 
++		pfc: pin-controller@e6060000 {
++			compatible = "renesas,pfc-r8a774a1";
++			reg = <0 0xe6060000 0 0x50c>;
++		};
++
+ 		scif2: serial@e6e88000 {
+ 			compatible = "renesas,scif-r8a774a1",
+ 				"renesas,rcar-gen3-scif", "renesas,scif";
+-- 
+2.7.4
+

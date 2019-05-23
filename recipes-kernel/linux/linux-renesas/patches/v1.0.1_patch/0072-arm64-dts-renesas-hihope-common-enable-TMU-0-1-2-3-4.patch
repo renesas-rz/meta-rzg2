@@ -1,0 +1,45 @@
+From 71b2c25e7e1d40b3f56ca010cd2902552d0ac637 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 16 May 2019 10:50:25 +0700
+Subject: [PATCH 36/92] arm64: dts: renesas: hihope-common: enable
+ TMU{0,1,2,3,4}
+
+This patch enables TMU{0,1,2,3,4} support for both Hihope-rzg2m and
+Hihope-rzg2n platform.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 1ff7157..34fae7b 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -40,3 +40,23 @@
+ &cmt1 {
+ 	status = "okay";
+ };
++
++&tmu0 {
++	status = "okay";
++};
++
++&tmu1 {
++	status = "okay";
++};
++
++&tmu2 {
++	status = "okay";
++};
++
++&tmu3 {
++	status = "okay";
++};
++
++&tmu4 {
++	status = "okay";
++};
+-- 
+2.7.4
+

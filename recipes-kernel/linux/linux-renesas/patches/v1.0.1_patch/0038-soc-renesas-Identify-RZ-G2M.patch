@@ -1,0 +1,41 @@
+From 3ad3de7e56ca1928107ab81c1d904673aee5010d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 6 May 2019 10:17:18 +0700
+Subject: [PATCH 02/92] soc: renesas: Identify RZ/G2M
+
+Add support for identifying the RZ/G2M (r8a774a1) SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/renesas-soc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/soc/renesas/renesas-soc.c b/drivers/soc/renesas/renesas-soc.c
+index 5be1de5..d9b8485 100644
+--- a/drivers/soc/renesas/renesas-soc.c
++++ b/drivers/soc/renesas/renesas-soc.c
+@@ -110,6 +110,11 @@ static const struct renesas_soc soc_rz_g1c __initconst __maybe_unused = {
+ 	.id	= 0x53,
+ };
+ 
++static const struct renesas_soc soc_rz_g2m __initconst __maybe_unused = {
++	.family	= &fam_rzg2,
++	.id	= 0x52,
++};
++
+ static const struct renesas_soc soc_rz_g2e __initconst __maybe_unused = {
+ 	.family	= &fam_rzg2,
+ 	.id	= 0x57,
+@@ -215,6 +220,9 @@ static const struct of_device_id renesas_socs[] __initconst = {
+ #ifdef CONFIG_ARCH_R8A77470
+ 	{ .compatible = "renesas,r8a77470",	.data = &soc_rz_g1c },
+ #endif
++#ifdef CONFIG_ARCH_R8A774A1
++	{ .compatible = "renesas,r8a774a1",	.data = &soc_rz_g2m },
++#endif
+ #ifdef CONFIG_ARCH_R8A774C0
+ 	{ .compatible = "renesas,r8a774c0",	.data = &soc_rz_g2e },
+ #endif
+-- 
+2.7.4
+

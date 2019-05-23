@@ -1,0 +1,85 @@
+From 15863220e34c558c3b85c4a8769f2398190a40c7 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@renesas.com>
+Date: Wed, 22 May 2019 13:09:28 +0700
+Subject: [PATCH 64/92] arm64: dts: renesas: hihope-common: Enable SDHI0 node
+
+This patch enable micro SD card with SDR104 transfer mode
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 48 ++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index bda3846..605c5ae 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -27,6 +27,28 @@
+ 		gpio = <&gpio6 24 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 	};
++
++	reg_3p3v: regulator1 {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	vccq_sdhi0: regulator-vccq-sdhi0 {
++		compatible = "regulator-gpio";
++
++		regulator-name = "SDHI0 VccQ";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++
++		gpios = <&gpio6 30 GPIO_ACTIVE_HIGH>;
++		gpios-states = <1>;
++		states = <3300000 1
++			  1800000 0>;
++	};
+ };
+ 
+ &extal_clk {
+@@ -62,6 +84,18 @@
+ 			pins = "GP_6_26";
+ 		};
+ 	};
++
++	sdhi0_pins: sd0 {
++		groups = "sdhi0_data4", "sdhi0_ctrl";
++		function = "sdhi0";
++		power-source = <3300>;
++	};
++
++	sdhi0_pins_uhs: sd0_uhs {
++		groups = "sdhi0_data4", "sdhi0_ctrl";
++		function = "sdhi0";
++		power-source = <1800>;
++	};
+ };
+ 
+ &scif2 {
+@@ -149,3 +183,17 @@
+ 		line-name = "max3355-en-shdn";
+ 	};
+ };
++
++&sdhi0 {
++	pinctrl-0 = <&sdhi0_pins>;
++	pinctrl-1 = <&sdhi0_pins_uhs>;
++	pinctrl-names = "default", "state_uhs";
++
++	vmmc-supply = <&reg_3p3v>;
++	vqmmc-supply = <&vccq_sdhi0>;
++	cd-gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
++	bus-width = <4>;
++	sd-uhs-sdr50;
++	sd-uhs-sdr104;
++	status = "okay";
++};
+-- 
+2.7.4
+

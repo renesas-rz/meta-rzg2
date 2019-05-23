@@ -1,0 +1,52 @@
+From 29ada89d4de4e435a7ae7a30fed46b4e008ae10f Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Thu, 23 May 2019 18:28:47 +0700
+Subject: [PATCH 91/92] arm64: dts: renesas: r8a774a1: Add CAN nodes
+
+Add the device nodes for both RZ/G2M CAN channels.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index fe9edbb9..ef7ad5f 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -342,6 +342,32 @@
+ 			status = "disabled";
+ 		};
+ 
++		can0: can@e6c30000 {
++			compatible = "renesas,can-r8a774a1",
++						 "renesas,rcar-gen3-can";
++			reg = <0 0xe6c30000 0 0x1000>;
++			interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 916>,
++					 <&can_clk>;
++			clock-names = "clkp1", "can_clk";
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 916>;
++			status = "disabled";
++		};
++
++		can1: can@e6c38000 {
++			compatible = "renesas,can-r8a774a1",
++						 "renesas,rcar-gen3-can";
++			reg = <0 0xe6c38000 0 0x1000>;
++			interrupts = <GIC_SPI 187 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 915>,
++					 <&can_clk>;
++			clock-names = "clkp1", "can_clk";
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 915>;
++			status = "disabled";
++		};
++
+ 		hscif0: serial@e6540000 {
+ 			compatible = "renesas,hscif-r8a774a1",
+ 						 "renesas,rcar-gen3-hscif",
+-- 
+2.7.4
+
