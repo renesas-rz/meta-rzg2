@@ -7,12 +7,13 @@ LICENSE = "CLOSED"
 PN = "gles-user-module"
 PR = "r0"
 
-COMPATIBLE_MACHINE = "(r8a774c0)"
+COMPATIBLE_MACHINE = "(r8a774a1|r8a774c0)"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/rogue"
 GLES = "gsx"
 
+SRC_URI_r8a774a1 = "file://r8a77960_linux_gsx_binaries_gles.tar.bz2"
 SRC_URI_r8a774c0 = "file://r8a77990_linux_gsx_binaries_gles.tar.bz2"
 
 SRC_URI_append = " \
