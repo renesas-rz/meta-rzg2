@@ -10,6 +10,7 @@ S = "${WORKDIR}/git"
 MMNGR_DRV_DIR = "mmngr_drv/mmngr/mmngr-module/files/mmngr"
 
 MMNGR_CFG_ek874 = "MMNGR_EBISU"
+MMNGR_CFG_hihope-rzg2m = "MMNGR_SALVATORX"
 
 includedir = "${RENESAS_DATADIR}/include"
 SSTATE_DUPWHITELIST += "${STAGING_INCDIR}"
