@@ -4,21 +4,11 @@ IMAGE_INSTALL_append = " \
     v4l-utils \
     i2c-tools \
     coreutils \
-    audio-init \
 "
 
 # Support secure environment
 IMAGE_INSTALL_append = " \
     optee-client \
-    linux-firmware \
-    init-ifupdown \
-    wlconf \
-    init-wl18xx \
-    iw \
-    wpa-supplicant \
-    kernel-module-wlcore-sdio \
-    bt-fw \
-    obexftp \
 "
 
 # Add overrides for selection 32 bit or 64 bit target

@@ -9,8 +9,18 @@ IMAGE_INSTALL_append = " \
     can-utils \
     iproute2 \
     alsa-utils \
+    audio-init \
     usbutils \
     pciutils \
+    linux-firmware \
+    init-ifupdown \
+    wlconf \
+    init-wl18xx \
+    iw \
+    wpa-supplicant \
+    kernel-module-wlcore-sdio \
+    bt-fw \
+    obexftp \
 "
 
 # Additional tools for support Tool develop
