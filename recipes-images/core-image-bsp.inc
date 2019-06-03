@@ -31,4 +31,7 @@ IMAGE_INSTALL_append = " \
     connman-tools \
     connman-tests \
     connman-wait-online \
+    lttng-modules \
+    lttng-tools \
+    lttng-ust \
 "
