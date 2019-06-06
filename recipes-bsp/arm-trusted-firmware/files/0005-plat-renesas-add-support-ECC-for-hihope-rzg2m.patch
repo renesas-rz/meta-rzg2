@@ -1,0 +1,146 @@
+From 126477216aefb971b57fb4abb0d6ab3a77ff5d24 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Tue, 4 Jun 2019 18:29:15 +0700
+Subject: [PATCH] plat: renesas: add support ECC for hihope-rzg2m
+
+hihope-rzg2m currently have 4GB of DRAM in two channels,
+After this commit, 1 channel used for ECC code, so only one channel 
+can be mapped for usage
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ plat/renesas/rcar/bl2_fusa.c       | 77 ++++++++++++++++++++++++++++++++++++++
+ plat/renesas/rcar/bl2_rcar_setup.c |  7 ++++
+ plat/renesas/rcar/platform.mk      |  7 ++++
+ 3 files changed, 91 insertions(+)
+ create mode 100644 plat/renesas/rcar/bl2_fusa.c
+
+diff --git a/plat/renesas/rcar/bl2_fusa.c b/plat/renesas/rcar/bl2_fusa.c
+new file mode 100644
+index 0000000..c24a7cc
+--- /dev/null
++++ b/plat/renesas/rcar/bl2_fusa.c
+@@ -0,0 +1,77 @@
++/*
++ * bl2_ecc_setup.c -
++ *
++ * Copyright (C) 2019 Renesas Electronics Corporation.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stdint.h>
++#include <debug.h>
++#include <mmio.h>
++
++
++#define	FUSA_USE_HIMEM		0
++#define	FUSA_DRAM_CLEAR		0
++
++#define	FUSACR			0xE6784020	/* FuSa Ctrl */
++
++#define	EFUSASEL(x)	((uint32_t)x & 0xff) << 24	/*Setting for Extra Split mode*/
++#define	DFUSASEL(x)	((uint32_t)x & 0xff) << 16	/*Setting for DRAM*/
++#define	SFUSASEL(x)	((uint32_t)x & 0x3f)				/*Setting for SRAM*/
++
++#ifndef ARRAY_SIZE
++#define	ARRAY_SIZE(a)		(sizeof(a) / sizeof(a[0]))
++#endif
++
++#if FUSA_USE_HIMEM
++#define	DRAM_ADDR(addr)		((uintptr_t)addr)
++#else
++#define	DRAM_ADDR(addr)		((uintptr_t)addr - (uintptr_t)0x3C0000000)
++#endif
++
++#define	HIHOPE_RZG2M_FUSAAREA		0x400000000
++#define	HIHOPE_RZG2M_FUSAAREA_TOTAL	2048
++#define	HIHOPE_RZG2M_ECCAREA		0x600000000
++#define	HIHOPE_RZG2M_ECCAREA_TOTAL	2048
++
++#if FUSA_DRAM_CLEAR
++/* Write zero-valued octa-byte words */
++static void bzero64(uintptr_t start, uint64_t size)
++{
++	/* start should be aligned on word boundary, size should be multiple of 8 */
++	volatile uint64_t *ptr = (volatile uint64_t *)start;
++	volatile uint64_t *end = ptr + (size / sizeof(uint64_t));
++
++	while (ptr < end)
++		*ptr++ = 0;
++}
++#endif
++
++/* Dump DRAM ECC area (for debug purpose) */
++extern void bl2_show_ecc(void)
++{
++}
++
++/* Setup DRAM ECC configuration registers */
++extern void bl2_enable_ecc(void)
++{
++#if FUSA_DRAM_CLEAR
++	/* Clear DRAM ECC Area (for check) */
++	NOTICE("BL2: Clearing ECC area at %lx\n", HIHOPE_RZG2M_ECCAREA);
++	bzero64(HIHOPE_RZG2M_ECCAREA, (uint64_t)(HIHOPE_RZG2M_ECCAREA_TOTAL*1024*1024));
++#endif
++
++		mmio_write_32((uintptr_t)((uint32_t *)FUSACR), EFUSASEL(0)
++																									| DFUSASEL(0xff)
++																									| SFUSASEL(0));
++
++		NOTICE("BL2: DRAM ECC DFUSASEL=0x%x\n",DFUSASEL(0xff));
++
++#if FUSA_DRAM_CLEAR
++	/* Clear DRAM data area to initialize ECC area */
++	bzero64(HIHOPE_RZG2M_FUSAAREA+128*1024*1024), (uint64_t)((HIHOPE_RZG2M_FUSAAREA_TOTAL-128)*1024*1024)));
++	*((volatile uint64_t *)DRAM_ADDR(HIHOPE_RZG2M_FUSAAREA+128*1024*1024)));	/* dummy read as memory barrier */
++#endif
++	NOTICE("BL2: DRAM ECC Configured. 0x%lx,+%ldMB\n", HIHOPE_RZG2M_FUSAAREA, (uint64_t)(HIHOPE_RZG2M_FUSAAREA_TOTAL));
++}
+diff --git a/plat/renesas/rcar/bl2_rcar_setup.c b/plat/renesas/rcar/bl2_rcar_setup.c
+index ef22d34..1620f7b 100644
+--- a/plat/renesas/rcar/bl2_rcar_setup.c
++++ b/plat/renesas/rcar/bl2_rcar_setup.c
+@@ -687,6 +687,13 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+ 		qos_init();
+ 	}
+ 
++#if (RZG_DRAM_HIHOPE_RZG2M_ECC == 1)
++	{
++		extern void bl2_enable_ecc(void);
++		bl2_enable_ecc();
++	}
++#endif
++
+ 	if ((modemr_boot_dev == MODEMR_BOOT_DEV_EMMC_25X1) ||
+ 	    (modemr_boot_dev == MODEMR_BOOT_DEV_EMMC_50X8)) {
+ 		/* Initialize eMMC */
+diff --git a/plat/renesas/rcar/platform.mk b/plat/renesas/rcar/platform.mk
+index 10c990c..a4e4748 100644
+--- a/plat/renesas/rcar/platform.mk
++++ b/plat/renesas/rcar/platform.mk
+@@ -33,6 +33,7 @@ BL2_SOURCES		+=	${RCAR_GIC_SOURCES}				\
+ 				plat/renesas/rcar/drivers/error/bl2_int_error.c	\
+ 				plat/renesas/rcar/aarch64/rcar_helpers.S	\
+ 				plat/renesas/rcar/bl2_rcar_setup.c		\
++				plat/renesas/rcar/bl2_fusa.c			\
+ 				plat/renesas/rcar/aarch64/rcar_common.c		\
+ 				plat/renesas/rcar/aarch64/rcar_drivers_common.c	\
+ 				plat/renesas/rcar/drivers/io/io_rcar.c		\
+@@ -349,6 +350,12 @@ RCAR_DRAM_DDR3L_MEMDUAL :=1
+ endif
+ $(eval $(call add_define,RCAR_DRAM_DDR3L_MEMDUAL))
+ 
++# Process RZG_DRAM_HIHOPE_RZG2M_ECC flag
++ifndef RZG_DRAM_HIHOPE_RZG2M_ECC
++RZG_DRAM_HIHOPE_RZG2M_ECC :=0
++endif
++$(eval $(call add_define,RZG_DRAM_HIHOPE_RZG2M_ECC))
++
+ # Process RCAR_BL33_ARG0 flag
+ ifdef RCAR_BL33_ARG0
+ $(eval $(call add_define,RCAR_BL33_ARG0))
+-- 
+2.7.4
+

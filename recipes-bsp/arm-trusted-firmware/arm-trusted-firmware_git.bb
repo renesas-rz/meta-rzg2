@@ -26,6 +26,10 @@ SRC_URI_append_r8a774c0 += "\
   ${@base_conditional("USE_ECC", "1", " file://0003-plat-renesas-bl2-add-ECC-support-for-DRAM.patch ", "",d)} \
 "
 
+SRC_URI_append_r8a774a1 += "\
+  ${@base_conditional("USE_ECC", "1", " file://0005-plat-renesas-add-support-ECC-for-hihope-rzg2m.patch ", "",d)} \
+"
+
 PV = "v1.5+renesas+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m)"
@@ -35,6 +39,8 @@ ATFW_OPT_r8a774c0 = "LSI=G2E RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RZG_EK874
 ATFW_OPT_r8a774a1 = "LSI=G2M RCAR_DRAM_SPLIT=2 RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2M=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 SPD="none""
 
 ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_EK874_ECC=1 ", "",d)}"
+
+ATFW_OPT_append_r8a774a1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_HIHOPE_RZG2M_ECC=1 RCAR_DRAM_SPLIT=0", "",d)}"
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
