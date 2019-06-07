@@ -1,0 +1,29 @@
+From ed761c78922bb8a6c743bc653d7766cb3f428e27 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 4 Jun 2019 16:12:24 +0700
+Subject: [PATCH 177/215] arm64: defconfig: correct config for usb type c
+ support
+
+Our kernel use CONFIG_TYPEC for usb typec support, not CONFIG_USB_TYPEC
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/configs/defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 2a10fc4..f2f78f7 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -757,7 +757,7 @@ CONFIG_DRM_I2C_NXP_TDA998X=y
+ CONFIG_SND_SOC_ALL_CODECS=y
+ CONFIG_COMPILE_TEST=y
+ 
+-CONFIG_USB_TYPEC=y
++CONFIG_TYPEC=y
+ CONFIG_TYPEC_HD3SS3220=y
+ CONFIG_DRM_PANEL_LVDS=y
+ CONFIG_COMMON_CLK_VC5=y
+-- 
+2.7.4
+

@@ -1,0 +1,123 @@
+From f2cc11041c8951b19844f00651dd98de87a21d0a Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 28 May 2019 18:09:47 +0700
+Subject: [PATCH 161/215] arm64: dts: renesas: r8a774a1: add thermal cooling
+ management
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Based on upstream commit support for r8a7796 SoC:
+<479e5d70a9cee635d0feda260eed3719fb565ca8>
+
+Add nodes and properties for thermal cooling management support.
+
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Acked-by: Eduardo Valentin <edubezval@gmail.com>
+Signed-off-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 41 +++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 00a9083..be2a671 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -96,6 +96,7 @@
+ 			clocks =<&cpg CPG_CORE R8A774A1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			capacity-dmips-mhz = <1024>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		a57_1: cpu@1 {
+@@ -109,6 +110,7 @@
+ 			clocks =<&cpg CPG_CORE R8A774A1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			capacity-dmips-mhz = <1024>;
++			#cooling-cells = <2>;
+ 		};
+ 
+ 		a53_0: cpu@100 {
+@@ -1596,12 +1598,25 @@
+ 			thermal-sensors = <&tsc 0>;
+ 
+ 			trips {
++				sensor1_passive: sensor1-passive {
++					temperature = <95000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
+ 				sensor1_crit: sensor1-crit {
+ 					temperature = <120000>;
+ 					hysteresis = <2000>;
+ 					type = "critical";
+ 				};
+ 			};
++
++			cooling-maps {
++				map0 {
++					trip = <&sensor1_passive>;
++					cooling-device = <&a57_0 5 5>;
++				};
++			};
+ 		};
+ 
+ 		sensor_thermal2: sensor-thermal2 {
+@@ -1610,12 +1625,25 @@
+ 			thermal-sensors = <&tsc 1>;
+ 
+ 			trips {
++				sensor2_passive: sensor2-passive {
++					temperature = <95000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
+ 				sensor2_crit: sensor2-crit {
+ 					temperature = <120000>;
+ 					hysteresis = <2000>;
+ 					type = "critical";
+ 				};
+ 			};
++
++			cooling-maps {
++				map0 {
++					trip = <&sensor2_passive>;
++					cooling-device = <&a57_0 5 5>;
++				};
++			};
+ 		};
+ 
+ 		sensor_thermal3: sensor-thermal3 {
+@@ -1624,12 +1652,25 @@
+ 			thermal-sensors = <&tsc 2>;
+ 
+ 			trips {
++				sensor3_passive: sensor3-passive {
++					temperature = <95000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
+ 				sensor3_crit: sensor3-crit {
+ 					temperature = <120000>;
+ 					hysteresis = <2000>;
+ 					type = "critical";
+ 				};
+ 			};
++
++			cooling-maps {
++				map0 {
++					trip = <&sensor3_passive>;
++					cooling-device = <&a57_0 5 5>;
++				};
++			};
+ 		};
+ 	};
+ 
+-- 
+2.7.4
+

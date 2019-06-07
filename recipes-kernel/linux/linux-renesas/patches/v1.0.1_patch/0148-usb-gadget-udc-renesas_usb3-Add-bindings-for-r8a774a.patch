@@ -1,0 +1,28 @@
+From b8e5e85f96fb05aa4d94563fee5861e7136fff81 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh,wz@renesas.com>
+Date: Tue, 28 May 2019 11:23:16 +0700
+Subject: [PATCH 148/215] usb: gadget: udc: renesas_usb3: Add bindings for
+ r8a774a1
+
+Document RZ/G2M (R8A774A1) SoC bindings.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh,wz@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas_usb3.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas_usb3.txt b/Documentation/devicetree/bindings/usb/renesas_usb3.txt
+index be069b5a..eb26342 100644
+--- a/Documentation/devicetree/bindings/usb/renesas_usb3.txt
++++ b/Documentation/devicetree/bindings/usb/renesas_usb3.txt
+@@ -6,6 +6,7 @@ Required properties:
+ 	- "renesas,r8a7796-usb3-peri"
+ 	- "renesas,r8a77965-usb3-peri"
+ 	- "renesas,r8a774c0-usb3-peri"
++	- "renesas,r8a774a1-usb3-peri"
+ 	- "renesas,rcar-gen3-usb3-peri" for a generic R-Car Gen3 or RZ/G2
+ 	compatible device
+ 
+-- 
+2.7.4
+

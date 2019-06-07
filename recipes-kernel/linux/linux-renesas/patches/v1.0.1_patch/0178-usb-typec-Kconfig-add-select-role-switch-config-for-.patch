@@ -1,0 +1,30 @@
+From 29c59c426665abb2071b45ae66046fef487f24d3 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 5 Jun 2019 10:15:06 +0700
+Subject: [PATCH 178/215] usb: typec: Kconfig: add select role switch config
+ for HD3SS3220
+
+HD3SS3220 use some function in common role switch.
+With built-in option for HD3SS3320 we will miss reference to role switch source,
+so we select config for role switch base on config of HD3SS3220.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/usb/typec/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/usb/typec/Kconfig b/drivers/usb/typec/Kconfig
+index fde51c5..45276aa 100644
+--- a/drivers/usb/typec/Kconfig
++++ b/drivers/usb/typec/Kconfig
+@@ -95,6 +95,7 @@ source "drivers/usb/typec/ucsi/Kconfig"
+ config TYPEC_HD3SS3220
+ 	tristate "TI HD3SS3220 Type-C DRP Port controller driver"
+ 	depends on I2C
++	select USB_ROLE_SWITCH
+ 	help
+ 	  Say Y or M here if your system has TI HD3SS3220 Type-C DRP Port
+ 	  controller driver.
+-- 
+2.7.4
+

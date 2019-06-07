@@ -1,0 +1,33 @@
+From 1b671087a1bb5505efda5a7a419dbafd6be6723f Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh,wz@renesas.com>
+Date: Wed, 29 May 2019 09:56:54 +0700
+Subject: [PATCH 150/215] dt-bindings: rcar-gen3-phy-usb3: Add bindings for
+ r8a774a1
+
+This patch adds bindings for r8a774a1 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh,wz@renesas.com>
+---
+ Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt b/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt
+index 47dd296..175efc0 100644
+--- a/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt
++++ b/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt
+@@ -13,8 +13,10 @@ Required properties:
+ 	      SoC.
+ 	      "renesas,r8a77965-usb3-phy" if the device is a part of an
+ 	      R8A77965 SoC.
+-	      "renesas,rcar-gen3-usb3-phy" for a generic R-Car Gen3 compatible
+-	      device.
++	      "renesas,r8a774a1-usb3-phy" if the device is a part of an
++	      R8A774A1 SoC.
++	      "renesas,rcar-gen3-usb3-phy" for a generic R-Car Gen3 or RZ/G2 Series
++	      compatible device.
+ 
+ 	      When compatible with the generic version, nodes must list the
+ 	      SoC-specific version corresponding to the platform first
+-- 
+2.7.4
+

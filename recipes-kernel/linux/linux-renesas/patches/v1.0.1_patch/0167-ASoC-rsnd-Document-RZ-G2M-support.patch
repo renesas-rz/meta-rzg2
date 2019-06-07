@@ -1,0 +1,27 @@
+From 53783d27eb7d6a509f70c6a854965b69fbaea76d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 28 May 2019 19:12:17 +0700
+Subject: [PATCH 167/215] ASoC: rsnd: Document RZ/G2M support
+
+Document support for the sound modules in the RZ/G2M (r8a774a1) SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/sound/renesas,rsnd.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/sound/renesas,rsnd.txt b/Documentation/devicetree/bindings/sound/renesas,rsnd.txt
+index 170945e..5989842 100644
+--- a/Documentation/devicetree/bindings/sound/renesas,rsnd.txt
++++ b/Documentation/devicetree/bindings/sound/renesas,rsnd.txt
+@@ -344,6 +344,7 @@ Required properties:
+ 				  Examples with soctypes are:
+ 				    - "renesas,rcar_sound-r8a7743" (RZ/G1M)
+ 				    - "renesas,rcar_sound-r8a7745" (RZ/G1E)
++				    - "renesas,rcar_sound-r8a774a1" (RZ/G2M)
+ 				    - "renesas,rcar_sound-r8a774c0" (RZ/G2E)
+ 				    - "renesas,rcar_sound-r8a7778" (R-Car M1A)
+ 				    - "renesas,rcar_sound-r8a7779" (R-Car H1)
+-- 
+2.7.4
+

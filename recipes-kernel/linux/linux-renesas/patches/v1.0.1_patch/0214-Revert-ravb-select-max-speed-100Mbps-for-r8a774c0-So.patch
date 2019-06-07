@@ -1,0 +1,56 @@
+From a298f84171879214d04e6182f70dd5e2536d9359 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@renesas.com>
+Date: Fri, 7 Jun 2019 13:06:50 +0700
+Subject: [PATCH 214/215] Revert "ravb: select max speed 100Mbps for r8a774c0
+ SoC"
+
+This issue occurs on old board version due to a hardware issue.
+On new board version, this issue no longer happens so we re-set 1000Mbps
+speed for ravb phy
+
+This reverts commit df9531a4b7b57ff7b9f7619d7314a9ad41c519aa.
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@renesas.com>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index bee095e..d6f7539 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1026,11 +1026,6 @@ static const struct soc_device_attribute r8a7795es10[] = {
+ 	{ /* sentinel */ }
+ };
+ 
+-static const struct soc_device_attribute ravb_quirks_match[] = {
+-	{ .soc_id = "r8a774c0", .revision = "ES1.*" },
+-	{ /* sentinel */ }
+-};
+-
+ /* PHY init function */
+ static int ravb_phy_init(struct net_device *ndev)
+ {
+@@ -1069,8 +1064,7 @@ static int ravb_phy_init(struct net_device *ndev)
+ 	/* This driver only support 10/100Mbit speeds on R-Car H3 ES1.0
+ 	 * at this time.
+ 	 */
+-	if (soc_device_match(r8a7795es10) ||
+-	    soc_device_match(ravb_quirks_match)) {
++	if (soc_device_match(r8a7795es10)) {
+ 		err = phy_set_max_speed(phydev, SPEED_100);
+ 		if (err) {
+ 			netdev_err(ndev, "failed to limit PHY to 100Mbit/s\n");
+@@ -1962,9 +1956,6 @@ static void ravb_set_delay_mode(struct net_device *ndev)
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	int set = 0;
+ 
+-	if (soc_device_match(ravb_quirks_match))
+-		return;
+-
+ 	if (priv->phy_interface == PHY_INTERFACE_MODE_RGMII_ID ||
+ 	    priv->phy_interface == PHY_INTERFACE_MODE_RGMII_RXID)
+ 		set |= APSR_DM_RDM;
+-- 
+2.7.4
+

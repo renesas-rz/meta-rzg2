@@ -1,0 +1,115 @@
+From 7f09e1839f8f44867d5d5bd62c53b35ba0fb2650 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 30 May 2019 13:49:13 +0700
+Subject: [PATCH 174/215] arm64: dts: renesas: hihope-common: Enable sound
+ support
+
+This patch enables sound support with PCM5102 codec
+(External I2S Board in Low speed Connector).
+Also add the simple-audio-card device node to interconnect
+the SoC sound device and codec.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 74 ++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index e10f6608..6b0e534 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -74,6 +74,29 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <25000000>;
+ 	};
++
++	sound {
++		compatible = "simple-audio-card";
++		simple-audio-card,format = "i2s";
++
++		sndcpu: simple-audio-card,cpu {
++			sound-dai = <&rcar_sound>;
++			bitclock-master;
++			frame-master;
++		};
++		sndcodec: simple-audio-card,codec {
++			sound-dai = <&pcm5102a>;
++		};
++	};
++
++	pcm5102a: pcm5102a {
++		compatible = "ti,pcm5102a";
++		#sound-dai-cells = <0>;
++	};
++};
++
++&audio_clk_a {
++	clock-frequency = <22579200>;
+ };
+ 
+ &extal_clk {
+@@ -180,6 +203,16 @@
+ 		groups = "usb30";
+ 		function = "usb30";
+ 	};
++
++	sound_pins: sound {
++		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
++		function = "ssi";
++	};
++
++	sound_clk_pins: sound_clk {
++		groups = "audio_clk_a_a";
++		function = "audio_clk";
++	};
+ };
+ 
+ &scif2 {
+@@ -380,3 +413,44 @@
+ 
+ 	status = "okay";
+ };
++
++&rcar_sound {
++	pinctrl-0 = <&sound_pins &sound_clk_pins>;
++	pinctrl-names = "default";
++
++	/* Single DAI */
++	#sound-dai-cells = <0>;
++
++	/* audio_clkout0/1/2/3 */
++	#clock-cells = <1>;
++	clock-frequency = <11289600>;
++
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 1005>,
++		 <&cpg CPG_MOD 1006>, <&cpg CPG_MOD 1007>,
++		 <&cpg CPG_MOD 1008>, <&cpg CPG_MOD 1009>,
++		 <&cpg CPG_MOD 1010>, <&cpg CPG_MOD 1011>,
++		 <&cpg CPG_MOD 1012>, <&cpg CPG_MOD 1013>,
++		 <&cpg CPG_MOD 1014>, <&cpg CPG_MOD 1015>,
++		 <&cpg CPG_MOD 1022>, <&cpg CPG_MOD 1023>,
++		 <&cpg CPG_MOD 1024>, <&cpg CPG_MOD 1025>,
++		 <&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
++		 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
++		 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
++		 <&audio_clk_a>, <&audio_clk_b>, <&audio_clk_c>,
++		 <&cpg CPG_CORE R8A774A1_CLK_S0D4>;
++
++	rcar_sound,dai {
++		dai0 {
++			playback = <&ssi1 &src1 &dvc0>;
++		};
++	};
++};
++
++&ssi1 {
++	shared-pin;
++};
+-- 
+2.7.4
+

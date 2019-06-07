@@ -1,0 +1,44 @@
+From 09d7d4887c3c65db6a3e1106c77358e715f790f0 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh,wz@renesas.com>
+Date: Tue, 28 May 2019 11:10:42 +0700
+Subject: [PATCH 152/215] arm64: dts: renesas: hihope-common: Enable USB30 Host
+ device on RZG2M
+
+This patch enable USB30 Host Device on RZ/G2M
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh,wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 8b0cbc9..28a55b4 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -171,6 +171,11 @@
+ 		groups = "du_rgb888", "du_sync", "du_oddf", "du_clk_out_0";
+ 		function = "du";
+ 	};
++
++	usb30_pins: usb30 {
++		groups = "usb30";
++		function = "usb30";
++	};
+ };
+ 
+ &scif2 {
+@@ -352,3 +357,11 @@
+ &pcie_bus_clk {
+ 	clock-frequency = <100000000>;
+ };
++
++&xhci0
++{
++	pinctrl-0 = <&usb30_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

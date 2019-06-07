@@ -1,0 +1,36 @@
+From d31454905be65415c3f806f5d14eb19cac816c95 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Wed, 5 Jun 2019 13:20:20 +0700
+Subject: [PATCH 204/215] arm64: dts: renesas: r8a774a1: Add TPU nodes
+
+This patch adds TPU node for SoC R8A774A1.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index ad10ef6..943f676 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -742,6 +742,16 @@
+ 			status = "disabled";
+ 		};
+ 
++		tpu: pwm@e6e80000 {
++			compatible = "renesas,tpu";
++			reg = <0 0xe6e80000 0 0x148>;
++			clocks = <&cpg CPG_MOD 304>;
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 304>;
++			#pwm-cells = <3>;
++			status = "disabled";
++		};
++
+ 		gpio0: gpio@e6050000 {
+ 			compatible = "renesas,gpio-r8a774a1",
+ 				"renesas,rcar-gen3-gpio";
+-- 
+2.7.4
+
