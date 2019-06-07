@@ -20,6 +20,8 @@ SRC_URI += "${@'file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.p
 
 SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0004-plat-renesas-add-support-for-HIHOPE-RZG2M.patch \
+            file://0006-plat-renesas-rcar-qos-E3-mstat390.h-Modify-default-s.patch \
+            file://0007-plat-renesas-rcar-qos-M3-mstat195.h-Modify-default-s.patch \
 "
 
 SRC_URI_append_r8a774c0 += "\
