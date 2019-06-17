@@ -4,6 +4,7 @@ This is a Yocto build layer that provides support for the RZ/G2 Group of 64bit A
 Currently the following boards and MPUs are supported:
 
 - Board: EK874 / MPU: R8A774C0 (RZ/G2E)
+- Board: HIHOPE-RZG2M / MPU: R8A774A1 (RZG2M)
 
 ## Patches
 
@@ -77,7 +78,7 @@ Prepare default configuration files. :
 ```bash
     $ cp $WORK/meta-rzg2/docs/sample/conf/<board>/<toolchain>/*.conf ./conf/
 ```
-\<board\> : ek874
+\<board\> : ek874, hihope-rzg2m
 
 \<toolchain\> : poky-gcc, linaro-gcc
 
@@ -101,7 +102,7 @@ Images generated:
 Use bitbake -c populate_sdk for generating the toolchain SDK:
 For 64-bit target SDK (aarch64):
 ```bash
-    $ bitbake core-image-weston(|qt) -c populate_sdk
+    $ bitbake core-image-weston(|qt)-sdk -c populate_sdk
 ```
 The SDK can be found in the output directory _'tmp/deploy/sdk'_
 
