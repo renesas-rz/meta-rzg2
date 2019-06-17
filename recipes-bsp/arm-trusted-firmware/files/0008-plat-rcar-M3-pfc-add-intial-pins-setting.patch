@@ -1,0 +1,853 @@
+From f86d0133fa2507e587c179df9cecf747b3bb96d3 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Mon, 17 Jun 2019 17:08:49 +0700
+Subject: [PATCH] plat: rcar: M3: pfc: add intial pins setting
+
+Add initail pin setting for RZG2M base on M3's setting
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ plat/renesas/rcar/pfc/M3/pfc_init_m3.c | 719 +++++++++++++++++++++++++++++----
+ 1 file changed, 651 insertions(+), 68 deletions(-)
+
+diff --git a/plat/renesas/rcar/pfc/M3/pfc_init_m3.c b/plat/renesas/rcar/pfc/M3/pfc_init_m3.c
+index 0053fd9..84232bc 100644
+--- a/plat/renesas/rcar/pfc/M3/pfc_init_m3.c
++++ b/plat/renesas/rcar/pfc/M3/pfc_init_m3.c
+@@ -896,19 +896,67 @@ static void pfc_reg_write(uint32_t addr, uint32_t data)
+ 
+ void pfc_init_m3(void)
+ {
+-#if RZG_HIHOPE_RZG2M
+-#else  // RZG_HIHOPE_RZG2M
+ 	uint32_t reg;
+-#endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* Work around for PFC eratta */
+ 	StartRtDma0_Descriptor();
+ 
+ 	/* initialize module select */
+ #if RZG_HIHOPE_RZG2M
+-	pfc_reg_write(PFC_MOD_SEL0, 0x00000000);
+-	pfc_reg_write(PFC_MOD_SEL1, 0x00000000);
+-	pfc_reg_write(PFC_MOD_SEL2, 0x00000000);
++	pfc_reg_write(PFC_MOD_SEL0, MOD_SEL0_MSIOF3_A
++				  | MOD_SEL0_MSIOF2_A
++				  | MOD_SEL0_MSIOF1_A
++				  | MOD_SEL0_LBSC_A
++				  | MOD_SEL0_IEBUS_A
++				  | MOD_SEL0_I2C2_A
++				  | MOD_SEL0_I2C1_A
++				  | MOD_SEL0_HSCIF4_A
++				  | MOD_SEL0_HSCIF3_A
++				  | MOD_SEL0_HSCIF1_A
++				  | MOD_SEL0_FSO_A
++				  | MOD_SEL0_HSCIF2_A
++				  | MOD_SEL0_ETHERAVB_A
++				  | MOD_SEL0_DRIF3_A
++				  | MOD_SEL0_DRIF2_A
++				  | MOD_SEL0_DRIF1_A
++				  | MOD_SEL0_DRIF0_A
++				  | MOD_SEL0_CANFD0_A
++				  | MOD_SEL0_ADG_A_A);
++	pfc_reg_write(PFC_MOD_SEL1, MOD_SEL1_TSIF1_A
++				  | MOD_SEL1_TSIF0_A
++				  | MOD_SEL1_TIMER_TMU_A
++				  | MOD_SEL1_SSP1_1_A
++				  | MOD_SEL1_SSP1_0_A
++				  | MOD_SEL1_SSI_A
++				  | MOD_SEL1_SPEED_PULSE_IF_A
++				  | MOD_SEL1_SIMCARD_A
++				  | MOD_SEL1_SDHI2_A
++				  | MOD_SEL1_SCIF4_A
++				  | MOD_SEL1_SCIF3_A
++				  | MOD_SEL1_SCIF2_A
++				  | MOD_SEL1_SCIF1_A
++				  | MOD_SEL1_SCIF_A
++				  | MOD_SEL1_REMOCON_A
++				  | MOD_SEL1_RCAN0_A
++				  | MOD_SEL1_PWM6_A
++				  | MOD_SEL1_PWM5_A
++				  | MOD_SEL1_PWM4_A
++				  | MOD_SEL1_PWM3_A
++				  | MOD_SEL1_PWM2_A
++				  | MOD_SEL1_PWM1_A);
++	pfc_reg_write(PFC_MOD_SEL2, MOD_SEL2_I2C_5_B
++				  | MOD_SEL2_I2C_3_B
++				  | MOD_SEL2_I2C_0_B
++				  | MOD_SEL2_FM_A
++				  | MOD_SEL2_SCIF5_A
++				  | MOD_SEL2_I2C6_A
++				  | MOD_SEL2_NDF_A
++				  | MOD_SEL2_SSI2_A
++				  | MOD_SEL2_SSI9_A
++				  | MOD_SEL2_TIMER_TMU2_A
++				  | MOD_SEL2_ADG_B_A
++				  | MOD_SEL2_ADG_C_A
++				  | MOD_SEL2_VIN4_A);
+ #else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_MOD_SEL0, MOD_SEL0_MSIOF3_A
+ 				  | MOD_SEL0_MSIOF2_A
+@@ -968,7 +1016,152 @@ void pfc_init_m3(void)
+ 
+ 	/* initialize peripheral function select */
+ #if RZG_HIHOPE_RZG2M
+-	pfc_reg_write(PFC_IPSR17, 0x00000010);	// select SCIF_CLK_A
++	pfc_reg_write(PFC_IPSR0, IPSR_28_FUNC(0)
++			       | IPSR_24_FUNC(0)
++			       | IPSR_20_FUNC(0)
++			       | IPSR_16_FUNC(0)
++			       | IPSR_12_FUNC(0)
++			       | IPSR_8_FUNC(0)
++			       | IPSR_4_FUNC(0)
++			       | IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR1, IPSR_28_FUNC(6)
++			       | IPSR_24_FUNC(0)
++			       | IPSR_20_FUNC(0)
++			       | IPSR_16_FUNC(0)
++			       | IPSR_12_FUNC(3)
++			       | IPSR_8_FUNC(3)
++			       | IPSR_4_FUNC(3)
++			       | IPSR_0_FUNC(3));
++	pfc_reg_write(PFC_IPSR2, IPSR_28_FUNC(0)
++			       | IPSR_24_FUNC(6)
++			       | IPSR_20_FUNC(6)
++			       | IPSR_16_FUNC(6)
++			       | IPSR_12_FUNC(6)
++			       | IPSR_8_FUNC(6)
++			       | IPSR_4_FUNC(6)
++			       | IPSR_0_FUNC(6));
++	pfc_reg_write(PFC_IPSR3, IPSR_28_FUNC(6)
++			       | IPSR_24_FUNC(6)
++			       | IPSR_20_FUNC(6)
++			       | IPSR_16_FUNC(6)
++			       | IPSR_12_FUNC(6)
++			       | IPSR_8_FUNC(0)
++			       | IPSR_4_FUNC(0)
++			       | IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR4, IPSR_28_FUNC(0)
++			       | IPSR_24_FUNC(0)
++			       | IPSR_20_FUNC(0)
++			       | IPSR_16_FUNC(0)
++			       | IPSR_12_FUNC(0)
++			       | IPSR_8_FUNC(6)
++			       | IPSR_4_FUNC(6)
++			       | IPSR_0_FUNC(6));
++	pfc_reg_write(PFC_IPSR5, IPSR_28_FUNC(0)
++			       | IPSR_24_FUNC(0)
++			       | IPSR_20_FUNC(0)
++			       | IPSR_16_FUNC(0)
++			       | IPSR_12_FUNC(0)
++			       | IPSR_8_FUNC(6)
++			       | IPSR_4_FUNC(0)
++			       | IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR6, IPSR_28_FUNC(6)
++			       | IPSR_24_FUNC(6)
++			       | IPSR_20_FUNC(6)
++			       | IPSR_16_FUNC(6)
++			       | IPSR_12_FUNC(6)
++			       | IPSR_8_FUNC(0)
++			       | IPSR_4_FUNC(0)
++			       | IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR7, IPSR_28_FUNC(0)
++			       | IPSR_24_FUNC(0)
++			       | IPSR_20_FUNC(0)
++			       | IPSR_16_FUNC(0)
++			       | IPSR_12_FUNC(0)
++			       | IPSR_8_FUNC(6)
++			       | IPSR_4_FUNC(6)
++			       | IPSR_0_FUNC(6));
++	pfc_reg_write(PFC_IPSR8, IPSR_28_FUNC(1)
++			       | IPSR_24_FUNC(1)
++			       | IPSR_20_FUNC(1)
++			       | IPSR_16_FUNC(1)
++			       | IPSR_12_FUNC(0)
++			       | IPSR_8_FUNC(0)
++			       | IPSR_4_FUNC(0)
++			       | IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR9, IPSR_28_FUNC(0)
++			       | IPSR_24_FUNC(0)
++			       | IPSR_20_FUNC(0)
++			       | IPSR_16_FUNC(0)
++			       | IPSR_12_FUNC(0)
++			       | IPSR_8_FUNC(0)
++			       | IPSR_4_FUNC(0)
++			       | IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR10, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(0)
++				| IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR11, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(4)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(0)
++				| IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR12, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(4)
++				| IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR13, IPSR_28_FUNC(8)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(3)
++				| IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR14, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(0)
++				| IPSR_4_FUNC(3)
++				| IPSR_0_FUNC(8));
++	pfc_reg_write(PFC_IPSR15, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(0)
++				| IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR16, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(0)
++				| IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR17, IPSR_28_FUNC(0)
++				| IPSR_24_FUNC(0)
++				| IPSR_20_FUNC(0)
++				| IPSR_16_FUNC(0)
++				| IPSR_12_FUNC(0)
++				| IPSR_8_FUNC(0)
++				| IPSR_4_FUNC(1)
++				| IPSR_0_FUNC(0));
++	pfc_reg_write(PFC_IPSR18, IPSR_4_FUNC(0)
++				| IPSR_0_FUNC(0));
+ #else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_IPSR0, IPSR_28_FUNC(0)
+ 			       | IPSR_24_FUNC(0)
+@@ -1116,16 +1309,10 @@ void pfc_init_m3(void)
+ 				| IPSR_0_FUNC(0));
+ 	pfc_reg_write(PFC_IPSR18, IPSR_4_FUNC(0)
+ 				| IPSR_0_FUNC(0));
+-
+ #endif // RZG_HIHOPE_RZG2M
+ 
+ 	/* initialize GPIO/perihperal function select */
+ #if RZG_HIHOPE_RZG2M
+-	pfc_reg_write(PFC_GPSR3, GPSR3_SD0_CD);
+-	pfc_reg_write(PFC_GPSR5, 0x00000C00);	// TX2_A, RX2_A
+-	pfc_reg_write(PFC_GPSR6, 0x00800000);	// SCIF_CLK_A
+-	pfc_reg_write(PFC_GPSR7, 0x00000000);
+-#else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_GPSR0, GPSR0_D15
+ 			       | GPSR0_D14
+ 			       | GPSR0_D13
+@@ -1133,9 +1320,20 @@ void pfc_init_m3(void)
+ 			       | GPSR0_D11
+ 			       | GPSR0_D10
+ 			       | GPSR0_D9
+-			       | GPSR0_D8);
++			       | GPSR0_D8
++			       | GPSR0_D7
++			       | GPSR0_D6
++			       | GPSR0_D5
++			       | GPSR0_D4
++			       | GPSR0_D3
++			       | GPSR0_D2
++			       | GPSR0_D0);
+ 	pfc_reg_write(PFC_GPSR1, GPSR1_CLKOUT
+ 			       | GPSR1_EX_WAIT0_A
++			       | GPSR1_WE1
++			       | GPSR1_RD
++			       | GPSR1_RD_WR
++			       | GPSR1_CS0
+ 			       | GPSR1_A19
+ 			       | GPSR1_A18
+ 			       | GPSR1_A17
+@@ -1159,7 +1357,6 @@ void pfc_init_m3(void)
+ 			       | GPSR2_AVB_MDC
+ 			       | GPSR2_PWM2_A
+ 			       | GPSR2_PWM1_A
+-			       | GPSR2_IRQ5
+ 			       | GPSR2_IRQ4
+ 			       | GPSR2_IRQ3
+ 			       | GPSR2_IRQ2
+@@ -1177,50 +1374,37 @@ void pfc_init_m3(void)
+ 			       | GPSR3_SD0_DAT0
+ 			       | GPSR3_SD0_CMD
+ 			       | GPSR3_SD0_CLK);
+-	pfc_reg_write(PFC_GPSR4, GPSR4_SD3_DAT7
++	pfc_reg_write(PFC_GPSR4, GPSR4_SD3_DS
++			       | GPSR4_SD3_DAT7
+ 			       | GPSR4_SD3_DAT6
++			       | GPSR4_SD3_DAT5
++			       | GPSR4_SD3_DAT4
+ 			       | GPSR4_SD3_DAT3
+ 			       | GPSR4_SD3_DAT2
+ 			       | GPSR4_SD3_DAT1
+ 			       | GPSR4_SD3_DAT0
+ 			       | GPSR4_SD3_CMD
+ 			       | GPSR4_SD3_CLK
+-			       | GPSR4_SD2_DS
+ 			       | GPSR4_SD2_DAT3
+ 			       | GPSR4_SD2_DAT2
+ 			       | GPSR4_SD2_DAT1
+ 			       | GPSR4_SD2_DAT0
+ 			       | GPSR4_SD2_CMD
+ 			       | GPSR4_SD2_CLK);
+-	pfc_reg_write(PFC_GPSR5, GPSR5_MSIOF0_SS2
+-			       | GPSR5_MSIOF0_SS1
++	pfc_reg_write(PFC_GPSR5, GPSR5_MSIOF0_RXD
++			       | GPSR5_MSIOF0_TXD
+ 			       | GPSR5_MSIOF0_SYNC
+-			       | GPSR5_HRTS0
+-			       | GPSR5_HCTS0
+-			       | GPSR5_HTX0
+-			       | GPSR5_HRX0
+-			       | GPSR5_HSCK0
++			       | GPSR5_MSIOF0_SCK
+ 			       | GPSR5_RX2_A
+ 			       | GPSR5_TX2_A
+-			       | GPSR5_SCK2
+ 			       | GPSR5_RTS1_TANS
+ 			       | GPSR5_CTS1
+ 			       | GPSR5_TX1_A
+ 			       | GPSR5_RX1_A
+ 			       | GPSR5_RTS0_TANS
+ 			       | GPSR5_SCK0);
+-	pfc_reg_write(PFC_GPSR6, GPSR6_USB30_OVC
+-			       | GPSR6_USB30_PWEN
+-			       | GPSR6_USB1_OVC
+-			       | GPSR6_USB1_PWEN
+-			       | GPSR6_USB0_OVC
+-			       | GPSR6_USB0_PWEN
+-			       | GPSR6_AUDIO_CLKB_B
++	pfc_reg_write(PFC_GPSR6, GPSR6_AUDIO_CLKB_B
+ 			       | GPSR6_AUDIO_CLKA_A
+-			       | GPSR6_SSI_SDATA8
+-			       | GPSR6_SSI_SDATA7
+-			       | GPSR6_SSI_WS78
+-			       | GPSR6_SSI_SCK78
+ 			       | GPSR6_SSI_WS6
+ 			       | GPSR6_SSI_SCK6
+ 			       | GPSR6_SSI_SDATA4
+@@ -1230,40 +1414,409 @@ void pfc_init_m3(void)
+ 			       | GPSR6_SSI_SDATA0
+ 			       | GPSR6_SSI_WS0129
+ 			       | GPSR6_SSI_SCK0129);
+-	pfc_reg_write(PFC_GPSR7, GPSR7_HDMI1_CEC
+-			       | GPSR7_HDMI0_CEC
+-			       | GPSR7_AVS2
++	pfc_reg_write(PFC_GPSR7, GPSR7_AVS2
+ 			       | GPSR7_AVS1);
+-#endif // RZG_HIHOPE_RZG2M
+-
+-	/* initialize POC control register */
+-#if RZG_HIHOPE_RZG2M
+-#else  // RZG_HIHOPE_RZG2M
+-	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
+-				  | POC_SD3_DAT7_33V
+-				  | POC_SD3_DAT6_33V
+-				  | POC_SD3_DAT5_33V
+-				  | POC_SD3_DAT4_33V
+-				  | POC_SD3_DAT3_33V
+-				  | POC_SD3_DAT2_33V
+-				  | POC_SD3_DAT1_33V
+-				  | POC_SD3_DAT0_33V
+-				  | POC_SD3_CMD_33V
+-				  | POC_SD3_CLK_33V
+-				  | POC_SD0_DAT3_33V
+-				  | POC_SD0_DAT2_33V
+-				  | POC_SD0_DAT1_33V
+-				  | POC_SD0_DAT0_33V
+-				  | POC_SD0_CMD_33V
+-				  | POC_SD0_CLK_33V);
+-#endif // RZG_HIHOPE_RZG2M
+-
+-	/* initialize DRV control register */
+-#if RZG_HIHOPE_RZG2M
+ #else  // RZG_HIHOPE_RZG2M
+-	reg = mmio_read_32(PFC_DRVCTRL0);
+-	reg = ((reg & DRVCTRL0_MASK) | DRVCTRL0_QSPI0_SPCLK(3)
+-				     | DRVCTRL0_QSPI0_MOSI_IO0(3)
++	pfc_reg_write(PFC_GPSR0, GPSR0_D15
++			       | GPSR0_D14
++			       | GPSR0_D13
++			       | GPSR0_D12
++			       | GPSR0_D11
++			       | GPSR0_D10
++			       | GPSR0_D9
++			       | GPSR0_D8);
++	pfc_reg_write(PFC_GPSR1, GPSR1_CLKOUT
++			       | GPSR1_EX_WAIT0_A
++			       | GPSR1_A19
++			       | GPSR1_A18
++			       | GPSR1_A17
++			       | GPSR1_A16
++			       | GPSR1_A15
++			       | GPSR1_A14
++			       | GPSR1_A13
++			       | GPSR1_A12
++			       | GPSR1_A7
++			       | GPSR1_A6
++			       | GPSR1_A5
++			       | GPSR1_A4
++			       | GPSR1_A3
++			       | GPSR1_A2
++			       | GPSR1_A1
++			       | GPSR1_A0);
++	pfc_reg_write(PFC_GPSR2, GPSR2_AVB_AVTP_CAPTURE_A
++			       | GPSR2_AVB_AVTP_MATCH_A
++			       | GPSR2_AVB_LINK
++			       | GPSR2_AVB_PHY_INT
++			       | GPSR2_AVB_MDC
++			       | GPSR2_PWM2_A
++			       | GPSR2_PWM1_A
++			       | GPSR2_IRQ5
++			       | GPSR2_IRQ4
++			       | GPSR2_IRQ3
++			       | GPSR2_IRQ2
++			       | GPSR2_IRQ1
++			       | GPSR2_IRQ0);
++	pfc_reg_write(PFC_GPSR3, GPSR3_SD0_WP
++			       | GPSR3_SD0_CD
++			       | GPSR3_SD1_DAT3
++			       | GPSR3_SD1_DAT2
++			       | GPSR3_SD1_DAT1
++			       | GPSR3_SD1_DAT0
++			       | GPSR3_SD0_DAT3
++			       | GPSR3_SD0_DAT2
++			       | GPSR3_SD0_DAT1
++			       | GPSR3_SD0_DAT0
++			       | GPSR3_SD0_CMD
++			       | GPSR3_SD0_CLK);
++	pfc_reg_write(PFC_GPSR4, GPSR4_SD3_DAT7
++			       | GPSR4_SD3_DAT6
++			       | GPSR4_SD3_DAT3
++			       | GPSR4_SD3_DAT2
++			       | GPSR4_SD3_DAT1
++			       | GPSR4_SD3_DAT0
++			       | GPSR4_SD3_CMD
++			       | GPSR4_SD3_CLK
++			       | GPSR4_SD2_DS
++			       | GPSR4_SD2_DAT3
++			       | GPSR4_SD2_DAT2
++			       | GPSR4_SD2_DAT1
++			       | GPSR4_SD2_DAT0
++			       | GPSR4_SD2_CMD
++			       | GPSR4_SD2_CLK);
++	pfc_reg_write(PFC_GPSR5, GPSR5_MSIOF0_SS2
++			       | GPSR5_MSIOF0_SS1
++			       | GPSR5_MSIOF0_SYNC
++			       | GPSR5_HRTS0
++			       | GPSR5_HCTS0
++			       | GPSR5_HTX0
++			       | GPSR5_HRX0
++			       | GPSR5_HSCK0
++			       | GPSR5_RX2_A
++			       | GPSR5_TX2_A
++			       | GPSR5_SCK2
++			       | GPSR5_RTS1_TANS
++			       | GPSR5_CTS1
++			       | GPSR5_TX1_A
++			       | GPSR5_RX1_A
++			       | GPSR5_RTS0_TANS
++			       | GPSR5_SCK0);
++	pfc_reg_write(PFC_GPSR6, GPSR6_USB30_OVC
++			       | GPSR6_USB30_PWEN
++			       | GPSR6_USB1_OVC
++			       | GPSR6_USB1_PWEN
++			       | GPSR6_USB0_OVC
++			       | GPSR6_USB0_PWEN
++			       | GPSR6_AUDIO_CLKB_B
++			       | GPSR6_AUDIO_CLKA_A
++			       | GPSR6_SSI_SDATA8
++			       | GPSR6_SSI_SDATA7
++			       | GPSR6_SSI_WS78
++			       | GPSR6_SSI_SCK78
++			       | GPSR6_SSI_WS6
++			       | GPSR6_SSI_SCK6
++			       | GPSR6_SSI_SDATA4
++			       | GPSR6_SSI_WS4
++			       | GPSR6_SSI_SCK4
++			       | GPSR6_SSI_SDATA1_A
++			       | GPSR6_SSI_SDATA0
++			       | GPSR6_SSI_WS0129
++			       | GPSR6_SSI_SCK0129);
++	pfc_reg_write(PFC_GPSR7, GPSR7_HDMI1_CEC
++			       | GPSR7_HDMI0_CEC
++			       | GPSR7_AVS2
++			       | GPSR7_AVS1);
++#endif // RZG_HIHOPE_RZG2M
++
++	/* initialize POC control register */
++#if RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
++				  | POC_SD3_DAT7_33V
++				  | POC_SD3_DAT6_33V
++				  | POC_SD3_DAT5_33V
++				  | POC_SD3_DAT4_33V
++				  | POC_SD3_DAT3_33V
++				  | POC_SD3_DAT2_33V
++				  | POC_SD3_DAT1_33V
++				  | POC_SD3_DAT0_33V
++				  | POC_SD3_CMD_33V
++				  | POC_SD3_CLK_33V
++				  | POC_SD0_DAT3_33V
++				  | POC_SD0_DAT2_33V
++				  | POC_SD0_DAT1_33V
++				  | POC_SD0_DAT0_33V
++				  | POC_SD0_CMD_33V
++				  | POC_SD0_CLK_33V);
++#else  // RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
++				  | POC_SD3_DAT7_33V
++				  | POC_SD3_DAT6_33V
++				  | POC_SD3_DAT5_33V
++				  | POC_SD3_DAT4_33V
++				  | POC_SD3_DAT3_33V
++				  | POC_SD3_DAT2_33V
++				  | POC_SD3_DAT1_33V
++				  | POC_SD3_DAT0_33V
++				  | POC_SD3_CMD_33V
++				  | POC_SD3_CLK_33V
++				  | POC_SD0_DAT3_33V
++				  | POC_SD0_DAT2_33V
++				  | POC_SD0_DAT1_33V
++				  | POC_SD0_DAT0_33V
++				  | POC_SD0_CMD_33V
++				  | POC_SD0_CLK_33V);
++#endif // RZG_HIHOPE_RZG2M
++
++	/* initialize DRV control register */
++#if RZG_HIHOPE_RZG2M
++	reg = mmio_read_32(PFC_DRVCTRL0);
++	reg = ((reg & DRVCTRL0_MASK) | DRVCTRL0_QSPI0_SPCLK(3)
++				     | DRVCTRL0_QSPI0_MOSI_IO0(3)
++				     | DRVCTRL0_QSPI0_MISO_IO1(3)
++				     | DRVCTRL0_QSPI0_IO2(3)
++				     | DRVCTRL0_QSPI0_IO3(3)
++				     | DRVCTRL0_QSPI0_SSL(3)
++				     | DRVCTRL0_QSPI1_SPCLK(3)
++				     | DRVCTRL0_QSPI1_MOSI_IO0(3));
++	pfc_reg_write(PFC_DRVCTRL0, reg);
++	reg = mmio_read_32(PFC_DRVCTRL1);
++	reg = ((reg & DRVCTRL1_MASK) | DRVCTRL1_QSPI1_MISO_IO1(3)
++				     | DRVCTRL1_QSPI1_IO2(3)
++				     | DRVCTRL1_QSPI1_IO3(3)
++				     | DRVCTRL1_QSPI1_SS(3)
++				     | DRVCTRL1_RPC_INT(3)
++				     | DRVCTRL1_RPC_WP(3)
++				     | DRVCTRL1_RPC_RESET(3)
++				     | DRVCTRL1_AVB_RX_CTL(7));
++	pfc_reg_write(PFC_DRVCTRL1, reg);
++	reg = mmio_read_32(PFC_DRVCTRL2);
++	reg = ((reg & DRVCTRL2_MASK) | DRVCTRL2_AVB_RXC(7)
++				     | DRVCTRL2_AVB_RD0(7)
++				     | DRVCTRL2_AVB_RD1(7)
++				     | DRVCTRL2_AVB_RD2(7)
++				     | DRVCTRL2_AVB_RD3(7)
++				     | DRVCTRL2_AVB_TX_CTL(3)
++				     | DRVCTRL2_AVB_TXC(3)
++				     | DRVCTRL2_AVB_TD0(3));
++	pfc_reg_write(PFC_DRVCTRL2, reg);
++	reg = mmio_read_32(PFC_DRVCTRL3);
++	reg = ((reg & DRVCTRL3_MASK) | DRVCTRL3_AVB_TD1(3)
++				     | DRVCTRL3_AVB_TD2(3)
++				     | DRVCTRL3_AVB_TD3(3)
++				     | DRVCTRL3_AVB_TXCREFCLK(7)
++				     | DRVCTRL3_AVB_MDIO(7)
++				     | DRVCTRL3_AVB_MDC(7)
++				     | DRVCTRL3_AVB_MAGIC(7)
++				     | DRVCTRL3_AVB_PHY_INT(7));
++	pfc_reg_write(PFC_DRVCTRL3, reg);
++	reg = mmio_read_32(PFC_DRVCTRL4);
++	reg = ((reg & DRVCTRL4_MASK) | DRVCTRL4_AVB_LINK(7)
++				     | DRVCTRL4_AVB_AVTP_MATCH(7)
++				     | DRVCTRL4_AVB_AVTP_CAPTURE(7)
++				     | DRVCTRL4_IRQ0(7)
++				     | DRVCTRL4_IRQ1(7)
++				     | DRVCTRL4_IRQ2(7)
++				     | DRVCTRL4_IRQ3(7)
++				     | DRVCTRL4_IRQ4(7));
++	pfc_reg_write(PFC_DRVCTRL4, reg);
++	reg = mmio_read_32(PFC_DRVCTRL5);
++	reg = ((reg & DRVCTRL5_MASK) | DRVCTRL5_IRQ5(7)
++				     | DRVCTRL5_PWM0(7)
++				     | DRVCTRL5_PWM1(7)
++				     | DRVCTRL5_PWM2(7)
++				     | DRVCTRL5_A0(3)
++				     | DRVCTRL5_A1(3)
++				     | DRVCTRL5_A2(3)
++				     | DRVCTRL5_A3(3));
++	pfc_reg_write(PFC_DRVCTRL5, reg);
++	reg = mmio_read_32(PFC_DRVCTRL6);
++	reg = ((reg & DRVCTRL6_MASK) | DRVCTRL6_A4(3)
++				     | DRVCTRL6_A5(3)
++				     | DRVCTRL6_A6(3)
++				     | DRVCTRL6_A7(3)
++				     | DRVCTRL6_A8(7)
++				     | DRVCTRL6_A9(7)
++				     | DRVCTRL6_A10(7)
++				     | DRVCTRL6_A11(7));
++	pfc_reg_write(PFC_DRVCTRL6, reg);
++	reg = mmio_read_32(PFC_DRVCTRL7);
++	reg = ((reg & DRVCTRL7_MASK) | DRVCTRL7_A12(3)
++				     | DRVCTRL7_A13(3)
++				     | DRVCTRL7_A14(3)
++				     | DRVCTRL7_A15(3)
++				     | DRVCTRL7_A16(3)
++				     | DRVCTRL7_A17(3)
++				     | DRVCTRL7_A18(3)
++				     | DRVCTRL7_A19(3));
++	pfc_reg_write(PFC_DRVCTRL7, reg);
++	reg = mmio_read_32(PFC_DRVCTRL8);
++	reg = ((reg & DRVCTRL8_MASK) | DRVCTRL8_CLKOUT(7)
++				     | DRVCTRL8_CS0(7)
++				     | DRVCTRL8_CS1_A2(7)
++				     | DRVCTRL8_BS(7)
++				     | DRVCTRL8_RD(7)
++				     | DRVCTRL8_RD_W(7)
++				     | DRVCTRL8_WE0(7)
++				     | DRVCTRL8_WE1(7));
++	pfc_reg_write(PFC_DRVCTRL8, reg);
++	reg = mmio_read_32(PFC_DRVCTRL9);
++	reg = ((reg & DRVCTRL9_MASK) | DRVCTRL9_EX_WAIT0(7)
++				     | DRVCTRL9_PRESETOU(7)
++				     | DRVCTRL9_D0(7)
++				     | DRVCTRL9_D1(7)
++				     | DRVCTRL9_D2(7)
++				     | DRVCTRL9_D3(7)
++				     | DRVCTRL9_D4(7)
++				     | DRVCTRL9_D5(7));
++	pfc_reg_write(PFC_DRVCTRL9, reg);
++	reg = mmio_read_32(PFC_DRVCTRL10);
++	reg = ((reg & DRVCTRL10_MASK) | DRVCTRL10_D6(7)
++				      | DRVCTRL10_D7(7)
++				      | DRVCTRL10_D8(3)
++				      | DRVCTRL10_D9(3)
++				      | DRVCTRL10_D10(3)
++				      | DRVCTRL10_D11(3)
++				      | DRVCTRL10_D12(3)
++				      | DRVCTRL10_D13(3));
++	pfc_reg_write(PFC_DRVCTRL10, reg);
++	reg = mmio_read_32(PFC_DRVCTRL11);
++	reg = ((reg & DRVCTRL11_MASK) | DRVCTRL11_D14(3)
++				      | DRVCTRL11_D15(3)
++				      | DRVCTRL11_AVS1(7)
++				      | DRVCTRL11_AVS2(7)
++				      | DRVCTRL11_HDMI0_CEC(7)
++				      | DRVCTRL11_HDMI1_CEC(7)
++				      | DRVCTRL11_DU_DOTCLKIN0(3)
++				      | DRVCTRL11_DU_DOTCLKIN1(3));
++	pfc_reg_write(PFC_DRVCTRL11, reg);
++	reg = mmio_read_32(PFC_DRVCTRL12);
++	reg = ((reg & DRVCTRL12_MASK) | DRVCTRL12_DU_DOTCLKIN2(3)
++				      | DRVCTRL12_DU_DOTCLKIN3(3)
++				      | DRVCTRL12_DU_FSCLKST(3)
++				      | DRVCTRL12_DU_TMS(3));
++	pfc_reg_write(PFC_DRVCTRL12, reg);
++	reg = mmio_read_32(PFC_DRVCTRL13);
++	reg = ((reg & DRVCTRL13_MASK) | DRVCTRL13_TDO(3)
++				      | DRVCTRL13_ASEBRK(3)
++				      | DRVCTRL13_SD0_CLK(7)
++				      | DRVCTRL13_SD0_CMD(7)
++				      | DRVCTRL13_SD0_DAT0(7)
++				      | DRVCTRL13_SD0_DAT1(7)
++				      | DRVCTRL13_SD0_DAT2(7)
++				      | DRVCTRL13_SD0_DAT3(7));
++	pfc_reg_write(PFC_DRVCTRL13, reg);
++	reg = mmio_read_32(PFC_DRVCTRL14);
++	reg = ((reg & DRVCTRL14_MASK) | DRVCTRL14_SD1_CLK(7)
++				      | DRVCTRL14_SD1_CMD(7)
++				      | DRVCTRL14_SD1_DAT0(5)
++				      | DRVCTRL14_SD1_DAT1(5)
++				      | DRVCTRL14_SD1_DAT2(5)
++				      | DRVCTRL14_SD1_DAT3(5)
++				      | DRVCTRL14_SD2_CLK(5)
++				      | DRVCTRL14_SD2_CMD(5));
++	pfc_reg_write(PFC_DRVCTRL14, reg);
++	reg = mmio_read_32(PFC_DRVCTRL15);
++	reg = ((reg & DRVCTRL15_MASK) | DRVCTRL15_SD2_DAT0(5)
++				      | DRVCTRL15_SD2_DAT1(5)
++				      | DRVCTRL15_SD2_DAT2(5)
++				      | DRVCTRL15_SD2_DAT3(5)
++				      | DRVCTRL15_SD2_DS(5)
++				      | DRVCTRL15_SD3_CLK(7)
++				      | DRVCTRL15_SD3_CMD(7)
++				      | DRVCTRL15_SD3_DAT0(7));
++	pfc_reg_write(PFC_DRVCTRL15, reg);
++	reg = mmio_read_32(PFC_DRVCTRL16);
++	reg = ((reg & DRVCTRL16_MASK) | DRVCTRL16_SD3_DAT1(7)
++				      | DRVCTRL16_SD3_DAT2(7)
++				      | DRVCTRL16_SD3_DAT3(7)
++				      | DRVCTRL16_SD3_DAT4(7)
++				      | DRVCTRL16_SD3_DAT5(7)
++				      | DRVCTRL16_SD3_DAT6(7)
++				      | DRVCTRL16_SD3_DAT7(7)
++				      | DRVCTRL16_SD3_DS(7));
++	pfc_reg_write(PFC_DRVCTRL16, reg);
++	reg = mmio_read_32(PFC_DRVCTRL17);
++	reg = ((reg & DRVCTRL17_MASK) | DRVCTRL17_SD0_CD(7)
++				      | DRVCTRL17_SD0_WP(7)
++				      | DRVCTRL17_SD1_CD(7)
++				      | DRVCTRL17_SD1_WP(7)
++				      | DRVCTRL17_SCK0(7)
++				      | DRVCTRL17_RX0(7)
++				      | DRVCTRL17_TX0(7)
++				      | DRVCTRL17_CTS0(7));
++	pfc_reg_write(PFC_DRVCTRL17, reg);
++	reg = mmio_read_32(PFC_DRVCTRL18);
++	reg = ((reg & DRVCTRL18_MASK) | DRVCTRL18_RTS0_TANS(7)
++				      | DRVCTRL18_RX1(7)
++				      | DRVCTRL18_TX1(7)
++				      | DRVCTRL18_CTS1(7)
++				      | DRVCTRL18_RTS1_TANS(7)
++				      | DRVCTRL18_SCK2(7)
++				      | DRVCTRL18_TX2(7)
++				      | DRVCTRL18_RX2(7));
++	pfc_reg_write(PFC_DRVCTRL18, reg);
++	reg = mmio_read_32(PFC_DRVCTRL19);
++	reg = ((reg & DRVCTRL19_MASK) | DRVCTRL19_HSCK0(7)
++				      | DRVCTRL19_HRX0(7)
++				      | DRVCTRL19_HTX0(7)
++				      | DRVCTRL19_HCTS0(7)
++				      | DRVCTRL19_HRTS0(7)
++				      | DRVCTRL19_MSIOF0_SCK(7)
++				      | DRVCTRL19_MSIOF0_SYNC(7)
++				      | DRVCTRL19_MSIOF0_SS1(7));
++	pfc_reg_write(PFC_DRVCTRL19, reg);
++	reg = mmio_read_32(PFC_DRVCTRL20);
++	reg = ((reg & DRVCTRL20_MASK) | DRVCTRL20_MSIOF0_TXD(7)
++				      | DRVCTRL20_MSIOF0_SS2(7)
++				      | DRVCTRL20_MSIOF0_RXD(7)
++				      | DRVCTRL20_MLB_CLK(7)
++				      | DRVCTRL20_MLB_SIG(7)
++				      | DRVCTRL20_MLB_DAT(7)
++				      | DRVCTRL20_MLB_REF(7)
++				      | DRVCTRL20_SSI_SCK0129(7));
++	pfc_reg_write(PFC_DRVCTRL20, reg);
++	reg = mmio_read_32(PFC_DRVCTRL21);
++	reg = ((reg & DRVCTRL21_MASK) | DRVCTRL21_SSI_WS0129(7)
++				      | DRVCTRL21_SSI_SDATA0(7)
++				      | DRVCTRL21_SSI_SDATA1(7)
++				      | DRVCTRL21_SSI_SDATA2(7)
++				      | DRVCTRL21_SSI_SCK34(7)
++				      | DRVCTRL21_SSI_WS34(7)
++				      | DRVCTRL21_SSI_SDATA3(7)
++				      | DRVCTRL21_SSI_SCK4(7));
++	pfc_reg_write(PFC_DRVCTRL21, reg);
++	reg = mmio_read_32(PFC_DRVCTRL22);
++	reg = ((reg & DRVCTRL22_MASK) | DRVCTRL22_SSI_WS4(7)
++				      | DRVCTRL22_SSI_SDATA4(7)
++				      | DRVCTRL22_SSI_SCK5(7)
++				      | DRVCTRL22_SSI_WS5(7)
++				      | DRVCTRL22_SSI_SDATA5(7)
++				      | DRVCTRL22_SSI_SCK6(7)
++				      | DRVCTRL22_SSI_WS6(7)
++				      | DRVCTRL22_SSI_SDATA6(7));
++	pfc_reg_write(PFC_DRVCTRL22, reg);
++	reg = mmio_read_32(PFC_DRVCTRL23);
++	reg = ((reg & DRVCTRL23_MASK) | DRVCTRL23_SSI_SCK78(7)
++				      | DRVCTRL23_SSI_WS78(7)
++				      | DRVCTRL23_SSI_SDATA7(7)
++				      | DRVCTRL23_SSI_SDATA8(7)
++				      | DRVCTRL23_SSI_SDATA9(7)
++				      | DRVCTRL23_AUDIO_CLKA(7)
++				      | DRVCTRL23_AUDIO_CLKB(7)
++				      | DRVCTRL23_USB0_PWEN(7));
++	pfc_reg_write(PFC_DRVCTRL23, reg);
++	reg = mmio_read_32(PFC_DRVCTRL24);
++	reg = ((reg & DRVCTRL24_MASK) | DRVCTRL24_USB0_OVC(7)
++				      | DRVCTRL24_USB1_PWEN(7)
++				      | DRVCTRL24_USB1_OVC(7)
++				      | DRVCTRL24_USB30_PWEN(7)
++				      | DRVCTRL24_USB30_OVC(7)
++				      | DRVCTRL24_USB31_PWEN(7)
++				      | DRVCTRL24_USB31_OVC(7));
++	pfc_reg_write(PFC_DRVCTRL24, reg);
++#else  // RZG_HIHOPE_RZG2M
++	reg = mmio_read_32(PFC_DRVCTRL0);
++	reg = ((reg & DRVCTRL0_MASK) | DRVCTRL0_QSPI0_SPCLK(3)
++				     | DRVCTRL0_QSPI0_MOSI_IO0(3)
+ 				     | DRVCTRL0_QSPI0_MISO_IO1(3)
+ 				     | DRVCTRL0_QSPI0_IO2(3)
+ 				     | DRVCTRL0_QSPI0_IO3(3)
+@@ -1510,6 +2063,13 @@ void pfc_init_m3(void)
+ 
+ 	/* initialize LSI pin pull-up/down control */
+ #if RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_PUD0,0x00005FBFU);
++	pfc_reg_write(PFC_PUD1,0x00300EFEU);
++	pfc_reg_write(PFC_PUD2,0x330001E6U);
++	pfc_reg_write(PFC_PUD3,0x000002E0U);
++	pfc_reg_write(PFC_PUD4,0xFFFFFF00U);
++	pfc_reg_write(PFC_PUD5,0x7F5FFF87U);
++	pfc_reg_write(PFC_PUD6,0x00000055U);
+ #else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_PUD0,0x00005FBFU);
+ 	pfc_reg_write(PFC_PUD1,0x00300FFEU);
+@@ -1522,6 +2082,13 @@ void pfc_init_m3(void)
+ 
+ 	/* initialize LSI pin pull-enable register */
+ #if RZG_HIHOPE_RZG2M
++	pfc_reg_write(PFC_PUEN0,0x00000FFFU);
++	pfc_reg_write(PFC_PUEN1,0x00100234U);
++	pfc_reg_write(PFC_PUEN2,0x000004C4U);
++	pfc_reg_write(PFC_PUEN3,0x00000200U);
++	pfc_reg_write(PFC_PUEN4,0x3E000000U);
++	pfc_reg_write(PFC_PUEN5,0x1F000805U);
++	pfc_reg_write(PFC_PUEN6,0x00000006U);
+ #else  // RZG_HIHOPE_RZG2M
+ 	pfc_reg_write(PFC_PUEN0,0x00000FFFU);
+ 	pfc_reg_write(PFC_PUEN1,0x00100234U);
+@@ -1552,6 +2119,14 @@ void pfc_init_m3(void)
+ 
+ 	/* initialize general output register */
+ #if RZG_HIHOPE_RZG2M
++	mmio_write_32(GPIO_OUTDT0, 0x00000001U);
++	mmio_write_32(GPIO_OUTDT1, 0x00000000U);
++	mmio_write_32(GPIO_OUTDT2, 0x00000400U);
++	mmio_write_32(GPIO_OUTDT3, 0x00000000U);
++	mmio_write_32(GPIO_OUTDT4, 0x00000000U);
++	mmio_write_32(GPIO_OUTDT5, 0x00000000U);
++	mmio_write_32(GPIO_OUTDT6, 0x00003800U);
++	mmio_write_32(GPIO_OUTDT7, 0x00000003U);
+ #else  // RZG_HIHOPE_RZG2M
+ 	mmio_write_32(GPIO_OUTDT1, 0x00000000U);
+ 	mmio_write_32(GPIO_OUTDT2, 0x00000400U);
+@@ -1562,6 +2137,14 @@ void pfc_init_m3(void)
+ 
+ 	/* initialize general input/output switching */
+ #if RZG_HIHOPE_RZG2M
++	mmio_write_32(GPIO_INOUTSEL0, 0x00000001U);
++	mmio_write_32(GPIO_INOUTSEL1, 0x00100B00U);
++	mmio_write_32(GPIO_INOUTSEL2, 0x00000418U);
++	mmio_write_32(GPIO_INOUTSEL3, 0x00002000U);
++	mmio_write_32(GPIO_INOUTSEL4, 0x00000040U);
++	mmio_write_32(GPIO_INOUTSEL5, 0x00000208U);
++	mmio_write_32(GPIO_INOUTSEL6, 0x00013F00U);
++	mmio_write_32(GPIO_INOUTSEL7, 0x00000003U);
+ #else  // RZG_HIHOPE_RZG2M
+ 	mmio_write_32(GPIO_INOUTSEL0, 0x00000000U);
+ 	mmio_write_32(GPIO_INOUTSEL1, 0x01000A00U);
+-- 
+2.7.4
+
