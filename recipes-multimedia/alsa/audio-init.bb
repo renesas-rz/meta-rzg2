@@ -1,9 +1,12 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-LICENSE = "CLOSED"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 SRC_URI_append = " \
     file://audio.sh \
+    file://COPYING.MIT \
 "
+S = "${WORKDIR}"
 
 do_install() {
     install -d ${D}/${sysconfdir}/profile.d

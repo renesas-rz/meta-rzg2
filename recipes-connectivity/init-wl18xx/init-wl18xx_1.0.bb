@@ -1,7 +1,10 @@
 SUMMARY = "Startup script for WL18xx modules"
-LICENSE = "CLOSED"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-SRC_URI = "file://wl18xx-init"
+SRC_URI = "file://wl18xx-init \
+  file://COPYING.MIT \
+"
 
 S = "${WORKDIR}"
 
