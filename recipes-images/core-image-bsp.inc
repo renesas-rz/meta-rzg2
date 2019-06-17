@@ -21,6 +21,7 @@ IMAGE_INSTALL_append = " \
     kernel-module-wlcore-sdio \
     bt-fw \
     obexftp \
+    bluez-alsa \
 "
 
 # Additional tools for support Tool develop
