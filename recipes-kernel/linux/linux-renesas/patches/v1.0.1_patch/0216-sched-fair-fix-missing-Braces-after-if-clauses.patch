@@ -1,0 +1,36 @@
+From 541ecebba3a789be56542ed1b381cc0ccf047e19 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 17 Jun 2019 14:17:31 +0700
+Subject: [PATCH 2/2] sched/fair: fix missing Braces after 'if' clauses
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch fixes missng Braces {} after if clauses.
+This misisng cause wrong and warning when compile:
+"warning: this ‘if’ clause does not guard"
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ kernel/sched/fair.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 43fe6c6..3452ce1 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -9285,9 +9285,10 @@ static void nohz_balancer_kick(struct rq *rq)
+ 		goto out;
+ 	}
+ 
+-	if (rq->misfit_task_load)
++	if (rq->misfit_task_load) {
+ 		flags = NOHZ_KICK_MASK;
+ 		goto out;
++	}
+ 
+ 	rcu_read_lock();
+ 	sds = rcu_dereference(per_cpu(sd_llc_shared, cpu));
+-- 
+2.7.4
+
