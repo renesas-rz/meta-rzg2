@@ -9,6 +9,12 @@ LIC_FILES_CHKSUM = " \
     file://LICENSE.FDL;md5=6d9f2a9af4c8b8c3c769f6cc1b6aaf7e \
 "
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:" 
+ 
+SRC_URI_append = " \
+    file://0001-Fix-division-by-zero-in-radial-gradiants-with-NEON.patch \
+"
+
 # switch to GLES 2 support
 PACKAGECONFIG_GL = "${@base_contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)}"
 
