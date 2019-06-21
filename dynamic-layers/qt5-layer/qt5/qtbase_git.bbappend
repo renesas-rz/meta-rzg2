@@ -13,6 +13,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
  
 SRC_URI_append = " \
     file://0001-Fix-division-by-zero-in-radial-gradiants-with-NEON.patch \
+    file://0002-Make-tst_QOpenGLWindow-pass-on-platforms-where-the-d.patch \
+    file://0003-Blacklist-and-skip-failing-tests-for-Boot2Qt-64-bit-.patch \
+    file://0004-Skip-failing-tests-in-tst_QWindow-on-Wayland.patch \
 "
 
 # switch to GLES 2 support
