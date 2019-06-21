@@ -15,6 +15,7 @@ VSPFILTER_CONF_r8a774a1 = "gstvspfilter-${MACHINE}_r8a774a1.conf"
 SRC_URI = " \
     git://github.com/renesas-rcar/gst-plugin-vspfilter.git;branch=RCAR-GEN3/1.0.0 \
     file://${VSPFILTER_CONF} \
+    file://0001-vspfilter-Increase-number-of-buffers.patch \
 "
 
 SRCREV = "c506c57b6c169e0cd9578a294a829640a531c2d4"
