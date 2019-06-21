@@ -1,0 +1,53 @@
+From f98cf9f2c834f57ad0484bca15b440b7060bea8c Mon Sep 17 00:00:00 2001
+From: Kha Tran <kha.tran.px@renesas.com>
+Date: Thu, 21 Feb 2019 17:54:12 +0700
+Subject: [PATCH 220/227] media: rcar-vin: Add support for R8A774C0
+
+This patch adds supported for RZ/G2E
+
+Signed-off-by: Kha Tran <kha.tran.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-core.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-core.c b/drivers/media/platform/rcar-vin/rcar-core.c
+index ce09799..fa7e93f 100644
+--- a/drivers/media/platform/rcar-vin/rcar-core.c
++++ b/drivers/media/platform/rcar-vin/rcar-core.c
+@@ -1097,6 +1097,22 @@ static const struct rvin_info rcar_info_r8a77995 = {
+ 	.routes = rcar_info_r8a77995_routes,
+ };
+ 
++static const struct rvin_group_route rcar_info_r8a774c0_routes[] = {
++	{ .csi = RVIN_CSI40, .channel = 0, .vin = 4, .mask = BIT(0) | BIT(3) },
++	{ .csi = RVIN_CSI40, .channel = 0, .vin = 5, .mask = BIT(2) },
++	{ .csi = RVIN_CSI40, .channel = 1, .vin = 4, .mask = BIT(2) },
++	{ .csi = RVIN_CSI40, .channel = 1, .vin = 5, .mask = BIT(1) | BIT(3) },
++	{ /* Sentinel */ }
++};
++
++static const struct rvin_info rcar_info_r8a774c0 = {
++	.model = RCAR_GEN3,
++	.use_mc = true,
++	.max_width = 4096,
++	.max_height = 4096,
++	.routes = rcar_info_r8a774c0_routes,
++};
++
+ static const struct of_device_id rvin_of_id_table[] = {
+ 	{
+ 		.compatible = "renesas,vin-r8a7778",
+@@ -1146,6 +1162,10 @@ static const struct of_device_id rvin_of_id_table[] = {
+ 		.compatible = "renesas,vin-r8a77995",
+ 		.data = &rcar_info_r8a77995,
+ 	},
++	{
++		.compatible = "renesas,vin-r8a774c0",
++		.data = &rcar_info_r8a774c0,
++	},
+ 	{ /* Sentinel */ },
+ };
+ MODULE_DEVICE_TABLE(of, rvin_of_id_table);
+-- 
+2.7.4
+

@@ -1,0 +1,34 @@
+From dca92058495fb636b2bb80ab0bd1d2cf319250d8 Mon Sep 17 00:00:00 2001
+From: Kha Tran <kha.tran.px@renesas.com>
+Date: Thu, 21 Feb 2019 18:00:51 +0700
+Subject: [PATCH 219/227] media: dt-bindings: rcar-csi2: Add R8A774C0 support
+
+This patch adds documentation for CSI2 of RZ/G2E
+
+Signed-off-by: Kha Tran <kha.tran.px@renesas.com>
+---
+ Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt b/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt
+index 2d385b6..4e9a4f7 100644
+--- a/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt
++++ b/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt
+@@ -2,12 +2,13 @@ Renesas R-Car MIPI CSI-2
+ ------------------------
+ 
+ The R-Car CSI-2 receiver device provides MIPI CSI-2 capabilities for the
+-Renesas R-Car family of devices. It is used in conjunction with the
++Renesas R-Car and RZ/G2 family of devices. It is used in conjunction with the
+ R-Car VIN module, which provides the video capture capabilities.
+ 
+ Mandatory properties
+ --------------------
+  - compatible: Must be one or more of the following
++   - "renesas,r8a774c0-csi2" for the R8A774C0 device.
+    - "renesas,r8a7795-csi2" for the R8A7795 device.
+    - "renesas,r8a7796-csi2" for the R8A7796 device.
+    - "renesas,r8a77965-csi2" for the R8A77965 device.
+-- 
+2.7.4
+

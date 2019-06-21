@@ -383,3 +383,14 @@ patch patches/v1.0.1_patch/0213-input-usbtouchscreen-add-option-for-inverting-X-
 patch patches/v1.0.1_patch/0214-Revert-ravb-select-max-speed-100Mbps-for-r8a774c0-So.patch
 patch patches/v1.0.1_patch/0215-arm64-dts-renesas-r8a774a1-Add-QoS-device-node.patch
 patch patches/v1.0.1_patch/0216-sched-fair-fix-missing-Braces-after-if-clauses.patch
+patch patches/v1.0.1_patch/0217-pinctrl-sh-pfc-r8a77990-Fix-remained-MOD_SEL-bit-num.patch
+patch patches/v1.0.1_patch/0218-media-dt-bindings-rcar-vin-Add-R8A774C0-support.patch
+patch patches/v1.0.1_patch/0219-media-dt-bindings-rcar-csi2-Add-R8A774C0-support.patch
+patch patches/v1.0.1_patch/0220-media-rcar-vin-Add-support-for-R8A774C0.patch
+patch patches/v1.0.1_patch/0221-media-rcar-csi2-Add-support-for-R8A774C0.patch
+patch patches/v1.0.1_patch/0222-pinctrl-sh-pfc-r8a77990-Add-VIN-pins-groups-and-func.patch
+patch patches/v1.0.1_patch/0223-media-platform-rcar-csi2-Fix-issue-camera-cannot-reg.patch
+patch patches/v1.0.1_patch/0224-media-i2c-OV5645-ensure-clock-lane-in-LP-11-state-be.patch
+patch patches/v1.0.1_patch/0225-arm64-defconfig-Enable-config-for-OV5645-camera.patch
+patch patches/v1.0.1_patch/0226-arm64-dts-renesas-r8a774c0-Add-VIN-and-CSI2-node.patch
+patch patches/v1.0.1_patch/0227-arm64-dts-renesas-r8a774c0-cat874-Enabel-VIN-CSI2-an.patch

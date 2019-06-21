@@ -1,0 +1,60 @@
+From 2bc7794350f8e36278c7706b1c99beb1ab395fa1 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 20 Jun 2019 16:41:46 +0700
+Subject: [PATCH 217/227] pinctrl: sh-pfc: r8a77990: Fix remained MOD_SEL bit
+ numbering
+
+Based on upstream commit id:
+<3e3eebeacad79bda8a9664c86c04f5201e86fece>
+
+This patch fixed remaining bits in MOD_SEL which not defined
+in previous commit:
+<83c95079dd4cff02eb5550a6ee17571f41352843>
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a77990.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+index c12775b..8f8d644 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+@@ -396,9 +396,9 @@ FM(IP12_31_28)	IP12_31_28	FM(IP13_31_28)	IP13_31_28	FM(IP14_31_28)	IP14_31_28	FM
+ #define REV8(f0, f1, f2, f3, f4, f5, f6, f7)	f0 f4 f2 f6 f1 f5 f3 f7
+ 
+ /* MOD_SEL0 */			/* 0 */				/* 1 */				/* 2 */				/* 3 */			/* 4 */			/* 5 */		/* 6 */		/* 7 */
+-#define MOD_SEL0_30_29		FM(SEL_ADGB_0)			FM(SEL_ADGB_1)			FM(SEL_ADGB_2)			F_(0, 0)
++#define MOD_SEL0_30_29		REV4(FM(SEL_ADGB_0),		FM(SEL_ADGB_1),			FM(SEL_ADGB_2),			F_(0, 0))
+ #define MOD_SEL0_28		FM(SEL_DRIF0_0)			FM(SEL_DRIF0_1)
+-#define MOD_SEL0_27_26		FM(SEL_FM_0)			FM(SEL_FM_1)			FM(SEL_FM_2)			F_(0, 0)
++#define MOD_SEL0_27_26		REV4(FM(SEL_FM_0),		FM(SEL_FM_1),			FM(SEL_FM_2),			F_(0, 0))
+ #define MOD_SEL0_25		FM(SEL_FSO_0)			FM(SEL_FSO_1)
+ #define MOD_SEL0_24		FM(SEL_HSCIF0_0)		FM(SEL_HSCIF0_1)
+ #define MOD_SEL0_23		FM(SEL_HSCIF1_0)		FM(SEL_HSCIF1_1)
+@@ -413,11 +413,11 @@ FM(IP12_31_28)	IP12_31_28	FM(IP13_31_28)	IP13_31_28	FM(IP14_31_28)	IP14_31_28	FM
+ #define MOD_SEL0_9		FM(SEL_PWM4_0)			FM(SEL_PWM4_1)
+ #define MOD_SEL0_8		FM(SEL_PWM5_0)			FM(SEL_PWM5_1)
+ #define MOD_SEL0_7		FM(SEL_PWM6_0)			FM(SEL_PWM6_1)
+-#define MOD_SEL0_6_5		FM(SEL_REMOCON_0)		FM(SEL_REMOCON_1)		FM(SEL_REMOCON_2)		F_(0, 0)
++#define MOD_SEL0_6_5		REV4(FM(SEL_REMOCON_0),		FM(SEL_REMOCON_1),		FM(SEL_REMOCON_2),		F_(0, 0))
+ #define MOD_SEL0_4		FM(SEL_SCIF_0)			FM(SEL_SCIF_1)
+ #define MOD_SEL0_3		FM(SEL_SCIF0_0)			FM(SEL_SCIF0_1)
+ #define MOD_SEL0_2		FM(SEL_SCIF2_0)			FM(SEL_SCIF2_1)
+-#define MOD_SEL0_1_0		FM(SEL_SPEED_PULSE_IF_0)	FM(SEL_SPEED_PULSE_IF_1)	FM(SEL_SPEED_PULSE_IF_2)	F_(0, 0)
++#define MOD_SEL0_1_0		REV4(FM(SEL_SPEED_PULSE_IF_0),	FM(SEL_SPEED_PULSE_IF_1),	FM(SEL_SPEED_PULSE_IF_2),	F_(0, 0))
+ 
+ /* MOD_SEL1 */			/* 0 */				/* 1 */				/* 2 */				/* 3 */			/* 4 */			/* 5 */		/* 6 */		/* 7 */
+ #define MOD_SEL1_31		FM(SEL_SIMCARD_0)		FM(SEL_SIMCARD_1)
+@@ -437,7 +437,7 @@ FM(IP12_31_28)	IP12_31_28	FM(IP13_31_28)	IP13_31_28	FM(IP14_31_28)	IP14_31_28	FM
+ #define MOD_SEL1_10_9		REV4(FM(SEL_SCIF5_0),		FM(SEL_SCIF5_1),		FM(SEL_SCIF5_2),		F_(0, 0))
+ #define MOD_SEL1_8		FM(SEL_VIN4_0)			FM(SEL_VIN4_1)
+ #define MOD_SEL1_7		FM(SEL_VIN5_0)			FM(SEL_VIN5_1)
+-#define MOD_SEL1_6_5		FM(SEL_ADGC_0)			FM(SEL_ADGC_1)			FM(SEL_ADGC_2)			F_(0, 0)
++#define MOD_SEL1_6_5		REV4(FM(SEL_ADGC_0),		FM(SEL_ADGC_1),			FM(SEL_ADGC_2),			F_(0, 0))
+ #define MOD_SEL1_4		FM(SEL_SSI9_0)			FM(SEL_SSI9_1)
+ 
+ #define PINMUX_MOD_SELS	\
+-- 
+2.7.4
+

@@ -1,0 +1,42 @@
+From 46404e112d603b40c30474a802e63660dca52e90 Mon Sep 17 00:00:00 2001
+From: Kha Tran <kha.tran.px@renesas.com>
+Date: Thu, 21 Feb 2019 17:57:05 +0700
+Subject: [PATCH 221/227] media: rcar-csi2: Add support for R8A774C0
+
+This patch adds supported for RZ/G2E
+
+Signed-off-by: Kha Tran <kha.tran.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-csi2.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-csi2.c b/drivers/media/platform/rcar-vin/rcar-csi2.c
+index dc5ae80..87201fc 100644
+--- a/drivers/media/platform/rcar-vin/rcar-csi2.c
++++ b/drivers/media/platform/rcar-vin/rcar-csi2.c
+@@ -959,6 +959,11 @@ static const struct rcar_csi2_info rcar_csi2_info_r8a77970 = {
+ 	.confirm_start = rcsi2_confirm_start_v3m_e3,
+ };
+ 
++static const struct rcar_csi2_info rcar_csi2_info_r8a774c0 = {
++	.init_phtw = rcsi2_init_phtw_v3m_e3,
++	.confirm_start = rcsi2_confirm_start_v3m_e3,
++};
++
+ static const struct of_device_id rcar_csi2_of_table[] = {
+ 	{
+ 		.compatible = "renesas,r8a7795-csi2",
+@@ -976,6 +981,10 @@ static const struct of_device_id rcar_csi2_of_table[] = {
+ 		.compatible = "renesas,r8a77970-csi2",
+ 		.data = &rcar_csi2_info_r8a77970,
+ 	},
++	{
++		.compatible = "renesas,r8a774c0-csi2",
++		.data = &rcar_csi2_info_r8a774c0,
++	},
+ 	{ /* sentinel */ },
+ };
+ MODULE_DEVICE_TABLE(of, rcar_csi2_of_table);
+-- 
+2.7.4
+
