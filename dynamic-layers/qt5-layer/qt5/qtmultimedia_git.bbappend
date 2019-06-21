@@ -30,6 +30,7 @@ SRC_URI_append = " \
     file://0013-qtmultimedia-qmlvideofx-update-GUI-compatible-iWave.patch \
     file://0014-qtmultimedia-qmlvideofx-correct-Fullscreen-setting-f.patch \
     file://0015-camerarecordermode-fit-screen-display-camera-with-Qt.patch \
+    file://0016-plugins-alsa-Add-default-key-for-alsa-plugin.patch \
 "
 
 RDEPENDS_${PN}-plugins += " \
