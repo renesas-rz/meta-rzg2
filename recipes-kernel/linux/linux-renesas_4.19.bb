@@ -3,6 +3,7 @@ DESCRIPTION = "Linux kernel for the RZG2 based board"
 require recipes-kernel/linux/linux-yocto.inc
 require include/cas-control.inc
 require include/ecc-control.inc
+require include/docker-control.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 COMPATIBLE_MACHINE = "ek874|hihope-rzg2m"
@@ -65,6 +66,9 @@ SRC_URI_append = " \
     file://bluetooth.cfg \
 "
 
+SRC_URI_append = "\
+  ${@base_conditional("USE_DOCKER", "1", " file://docker.cfg ", "", d)} \
+"
 
 do_download_firmware () {
     install -m 755 ${WORKDIR}/r8a779x_usb3_v*.dlmem ${STAGING_KERNEL_DIR}/firmware
