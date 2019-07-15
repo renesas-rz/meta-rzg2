@@ -9,6 +9,10 @@ PR = "r0"
 S = "${WORKDIR}/git"
 MMNGR_DRV_DIR = "mmngr_drv/mmngr/mmngr-module/files/mmngr"
 
+SRC_URI_append = " \
+    file://0001-Add-physical-address-translating-feature.patch \
+"
+
 MMNGR_CFG_ek874 = "MMNGR_EBISU"
 MMNGR_CFG_hihope-rzg2m = "MMNGR_SALVATORX"
 
