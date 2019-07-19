@@ -1,0 +1,33 @@
+From e05e267e47610490a6daecea40a17686b35521b0 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 24 Apr 2019 19:41:03 +0700
+Subject: [PATCH 070/248] drm: rcar-du: Fix vblank initialization
+
+The drm_vblank_init() takes the total number of CRTCs as an
+argument, but the rcar-du driver passes a bitmask of the CRTC indices.
+Fix it.
+
+Fixes: 4bf8e1962f91 ("drm: Renesas R-Car Display Unit DRM driver")
+Reported-by: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Signed-off-by: Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_kms.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_kms.c b/drivers/gpu/drm/rcar-du/rcar_du_kms.c
+index 3ea6337..5b015cf 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_kms.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_kms.c
+@@ -581,7 +581,7 @@ int rcar_du_modeset_init(struct rcar_du_device *rcdu)
+ 	 * Initialize vertical blanking interrupts handling. Start with vblank
+ 	 * disabled for all CRTCs.
+ 	 */
+-	ret = drm_vblank_init(dev, (1 << rcdu->num_crtcs) - 1);
++	ret = drm_vblank_init(dev, rcdu->num_crtcs);
+ 	if (ret < 0)
+ 		return ret;
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,80 @@
+From 5ea1c1f00880dc145774009af1d00f18839d8d3b Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Mon, 1 Jul 2019 17:45:00 +0700
+Subject: [PATCH 044/248] arm64: dts: renesas: r8a774c0-cat874: Add Wifi
+
+This patch enables Wifi for RZ/G2E (R8A774C0 SoC).
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 40 +++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 5c11a8d..6c0d060 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -66,6 +66,18 @@
+ 			  1800000 0>;
+ 	};
+ 
++	wlan_en_reg: fixedregulator {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <70000>;
++
++		/* WLAN_EN GPIO for this board - Bank2, pin25 */
++		gpio = <&gpio2 25 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
+ 	sound {
+ 		compatible = "simple-audio-card";
+ 		simple-audio-card,format = "i2s";
+@@ -93,6 +105,12 @@
+ 
+ &extal_clk {
+ 	clock-frequency = <48000000>;
++
++	sdhi3_pins_uhs: sd3_uhs {
++		groups = "sdhi3_data4", "sdhi3_ctrl";
++		function = "sdhi3";
++		power-source = <1800>;
++	};
+ };
+ 
+ &pcie_bus_clk {
+@@ -141,6 +159,28 @@
+ 	status = "okay";
+ };
+ 
++&sdhi3 {
++	/* used for on-board WIFI */
++	status = "okay";
++	pinctrl-0 = <&sdhi3_pins_uhs>;
++	pinctrl-names = "default";
++
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	non-removable;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@2 {
++	    compatible = "ti,wl1837";
++	    reg = <2>;
++	    interrupt-parent = <&gpio1>;
++	    interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
++	};
++};
++
+ &sdhi0 {
+ 	pinctrl-0 = <&sdhi0_pins>;
+ 	pinctrl-1 = <&sdhi0_pins_uhs>;
+-- 
+2.7.4
+

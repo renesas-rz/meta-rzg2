@@ -1,0 +1,108 @@
+From 5e2b3c3b15b7486709d25c0a15a9f6a4a11e84a8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:55:06 +0700
+Subject: [PATCH 221/248] arm64: dts: renesas: r8a774c0-cat874: Enable VIN/CSI2
+ and OV5645 camera
+
+This patch enables VIN/CSI2 and OV5645 camera for RZ/G2E.
+
+Signed-off-by: Tri Luong <tri.luong.te@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 76 +++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index e25e299..6b0d8f3 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -126,6 +126,30 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <74250000>;
+ 	};
++
++	camera_vdddo_1v8: 1p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vdddo";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-always-on;
++	};
++
++	camera_vdda_2v8: 2p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vdda";
++		regulator-min-microvolt = <2800000>;
++		regulator-max-microvolt = <2800000>;
++		regulator-always-on;
++	};
++
++	camera_vddd_1v5: 1p5v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vddd";
++		regulator-min-microvolt = <1500000>;
++		regulator-max-microvolt = <1500000>;
++		regulator-always-on;
++	};
+ };
+ 
+ &audio_clk_a {
+@@ -407,3 +431,55 @@
+ 		 <&x13_clk>;
+ 	clock-names = "du.0", "du.1", "dclkin.0";
+ };
++
++&vin4 {
++	status = "okay";
++};
++
++&vin5 {
++	status = "okay";
++};
++
++&csi40 {
++	status = "okay";
++
++	ports {
++		port@0 {
++			reg = <0>;
++
++			csi40_in: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&ov5645_csi40>;
++			};
++		};
++	};
++};
++
++&i2c3 {
++	status = "okay";
++
++	ov5645: ov5645@3c {
++		compatible = "ovti,ov5645";
++		reg = <0x3c>;
++
++		enable-gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
++
++		clocks = <&cpg CPG_MOD 716>;
++		clock-names = "xclk";
++		clock-frequency = <24000000>;
++
++		vdddo-supply = <&camera_vdddo_1v8>;
++		vdda-supply = <&camera_vdda_2v8>;
++		vddd-supply = <&camera_vddd_1v5>;
++
++		port {
++			ov5645_csi40: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&csi40_in>;
++			};
++		};
++	};
++};
+-- 
+2.7.4
+

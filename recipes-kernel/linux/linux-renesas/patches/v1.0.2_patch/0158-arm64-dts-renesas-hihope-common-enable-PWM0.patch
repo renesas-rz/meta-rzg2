@@ -1,0 +1,46 @@
+From 149be1772931cedb3d9373c2fc961afce5ecea9b Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Thu, 30 May 2019 09:41:38 +0700
+Subject: [PATCH 158/248] arm64: dts: renesas: hihope-common: enable PWM0
+
+This patch enable PWM0 support for both Hihope-rzg2m and
+Hihope-rzg2n platform.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index ada5502..8b0cbc9 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -117,6 +117,11 @@
+ 		function = "scif_clk";
+ 	};
+ 
++	pwm0_pins: pwm0 {
++		groups = "pwm0";
++		function = "pwm0";
++	};
++
+ 	usb0_pins: usb0 {
+ 		groups = "usb0";
+ 		function = "usb0";
+@@ -199,6 +204,13 @@
+ 	clock-frequency = <14745600>;
+ };
+ 
++&pwm0 {
++	pinctrl-0 = <&pwm0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
+ &cmt0 {
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

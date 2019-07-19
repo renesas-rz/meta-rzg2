@@ -1,0 +1,99 @@
+From eb66091c1417b04dbf212a10b15c598cfe1a8c64 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Thu, 23 May 2019 18:08:55 +0700
+Subject: [PATCH 149/248] arm64: dts: renesas: hihope-common: enable HSCIF{0,1}
+ and SCIF0
+
+This patch enables HSCIF{0,1} and SCIF0 support
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 58 ++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index b9ee4db..ada5502 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -11,6 +11,9 @@
+ / {
+ 	aliases {
+ 		serial0 = &scif2;
++		serial1 = &hscif0;
++		serial2 = &hscif1;
++		serial3 = &scif0;
+ 	};
+ 
+ 	chosen {
+@@ -86,6 +89,34 @@
+ };
+ 
+ &pfc {
++	pinctrl-0 = <&scif_clk_pins>;
++	pinctrl-names = "default";
++
++	scif2_pins: scif2 {
++		groups = "scif2_data_a";
++		function = "scif2";
++	};
++
++	hscif0_pins: hscif0 {
++		groups = "hscif0_data", "hscif0_ctrl";
++		function = "hscif0";
++	};
++
++	hscif1_pins: hscif1 {
++		groups = "hscif1_data_a", "hscif1_ctrl_a";
++		function = "hscif1";
++	};
++
++	scif0_pins: scif0 {
++		groups = "scif0_data";
++		function = "scif0";
++	};
++
++	scif_clk_pins: scif_clk {
++		groups = "scif_clk_a";
++		function = "scif_clk";
++	};
++
+ 	usb0_pins: usb0 {
+ 		groups = "usb0";
+ 		function = "usb0";
+@@ -141,6 +172,33 @@
+ 	status = "okay";
+ };
+ 
++&hscif0 {
++	pinctrl-0 = <&hscif0_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
++&hscif1 {
++	pinctrl-0 = <&hscif1_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
++&scif0 {
++	pinctrl-0 = <&scif0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
++&scif_clk {
++	clock-frequency = <14745600>;
++};
++
+ &cmt0 {
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

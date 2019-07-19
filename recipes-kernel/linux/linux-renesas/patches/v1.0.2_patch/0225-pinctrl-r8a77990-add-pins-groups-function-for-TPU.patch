@@ -1,0 +1,91 @@
+From 523f4b3d9ffe2e641de7c99165a9c050db973f0a Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@rvc.renesas.com>
+Date: Wed, 3 Jul 2019 10:24:40 +0700
+Subject: [PATCH 225/248] pinctrl: r8a77990: add pins, groups, function for TPU
+
+This patch add pins, groups, function for TPU0{T0,T1} for
+SoC R8A77990 and SoC R8A774C0.
+
+Signed-off-by: Son Lam <son.lam.ym@rvc.renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a77990.c | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+index 151640c..4825757 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77990.c
+@@ -3449,6 +3449,23 @@ static const unsigned int ssi9_ctrl_b_mux[] = {
+ 	SSI_SCK9_B_MARK, SSI_WS9_B_MARK,
+ };
+ 
++/* - TPU -------------------------------------------------------------------- */
++static const unsigned int tpu0_to0_pins[] = {
++	/* TPU0TO0 */
++	RCAR_GP_PIN(6, 13),
++};
++static const unsigned int tpu0_to0_mux[] = {
++	TPU0TO0_MARK,
++};
++
++static const unsigned int tpu0_to1_pins[] = {
++	/* TPU0TO1 */
++	RCAR_GP_PIN(6, 14),
++};
++static const unsigned int tpu0_to1_mux[] = {
++	TPU0TO1_MARK,
++};
++
+ /* - TMU -------------------------------------------------------------------- */
+ static const unsigned int tmu_tclk1_a_pins[] = {
+ 	/* TCLK */
+@@ -3766,7 +3783,7 @@ static const unsigned int vin5_clk_b_mux[] = {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_pin_group common[245];
++	struct sh_pfc_pin_group common[247];
+ 	struct sh_pfc_pin_group automotive[23];
+ } pinmux_groups = {
+ 	.common = {
+@@ -3987,6 +4004,8 @@ static const struct {
+ 		SH_PFC_PIN_GROUP(usb0_id),
+ 		SH_PFC_PIN_GROUP(usb30),
+ 		SH_PFC_PIN_GROUP(usb30_id),
++		SH_PFC_PIN_GROUP(tpu0_to0),
++		SH_PFC_PIN_GROUP(tpu0_to1),
+ 		VIN_DATA_PIN_GROUP(vin4_data, 8, _a),
+ 		VIN_DATA_PIN_GROUP(vin4_data, 10, _a),
+ 		VIN_DATA_PIN_GROUP(vin4_data, 12, _a),
+@@ -4412,6 +4431,11 @@ static const char * const ssi_groups[] = {
+ 	"ssi9_ctrl_b",
+ };
+ 
++static const char * const tpu0_groups[] = {
++	"tpu0_to0",
++	"tpu0_to1",
++};
++
+ static const char * const tmu_groups[] = {
+ 	"tmu_tclk1_a",
+ 	"tmu_tclk1_b",
+@@ -4465,7 +4489,7 @@ static const char * const vin5_groups[] = {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_function common[45];
++	struct sh_pfc_function common[46];
+ 	struct sh_pfc_function automotive[6];
+ } pinmux_functions = {
+ 	.common = {
+@@ -4514,6 +4538,7 @@ static const struct {
+ 		SH_PFC_FUNCTION(usb30),
+ 		SH_PFC_FUNCTION(vin4),
+ 		SH_PFC_FUNCTION(vin5),
++		SH_PFC_FUNCTION(tpu0),
+ 	},
+ 	.automotive = {
+ 		SH_PFC_FUNCTION(canfd0),
+-- 
+2.7.4
+

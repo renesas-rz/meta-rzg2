@@ -1,0 +1,107 @@
+From 82e8212685ea8dbe1d8de20862785ebc6858b7bc Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 26 Feb 2019 13:14:29 +0700
+Subject: [PATCH 003/248] clk: renesas: rcar-gen3: Add ZG clock divider support
+
+This patch adds ZG clock divider support for R-Car Gen3 SoC.
+
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/rcar-gen3-cpg.c | 39 ++++++++++++++++++++++++++++++++++++-
+ drivers/clk/renesas/rcar-gen3-cpg.h |  1 +
+ 2 files changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/clk/renesas/rcar-gen3-cpg.c b/drivers/clk/renesas/rcar-gen3-cpg.c
+index 6af921d..4395ddf 100644
+--- a/drivers/clk/renesas/rcar-gen3-cpg.c
++++ b/drivers/clk/renesas/rcar-gen3-cpg.c
+@@ -65,7 +65,7 @@ static void cpg_simple_notifier_register(struct raw_notifier_head *notifiers,
+ }
+ 
+ /*
+- * Z Clock & Z2 Clock
++ * Z Clock & Z2 Clock & ZG Clock
+  *
+  * Traits of this clock:
+  * prepare - clk_prepare only ensures that parents are prepared
+@@ -75,6 +75,7 @@ static void cpg_simple_notifier_register(struct raw_notifier_head *notifiers,
+  */
+ #define CPG_FRQCRB			0x00000004
+ #define CPG_FRQCRB_KICK			BIT(31)
++#define CPG_FRQCRB_ZGFC_MASK		GENMASK(28, 24)
+ #define CPG_FRQCRC			0x000000e0
+ #define CPG_FRQCRC_ZFC_MASK		GENMASK(12, 8)
+ #define CPG_FRQCRC_Z2FC_MASK		GENMASK(4, 0)
+@@ -83,6 +84,7 @@ struct cpg_z_clk {
+ 	struct clk_hw hw;
+ 	void __iomem *reg;
+ 	void __iomem *kick_reg;
++	unsigned int fixed_div;
+ 	unsigned long mask;
+ };
+ 
+@@ -198,6 +200,37 @@ static struct clk * __init cpg_z_clk_register(const char *name,
+ 	return clk;
+ }
+ 
++static struct clk * __init cpg_zg_clk_register(const char *name,
++						const char *parent_name,
++						void __iomem *reg)
++{
++	struct clk_init_data init;
++	struct cpg_z_clk *zclk;
++	struct clk *clk;
++
++	zclk = kzalloc(sizeof(*zclk), GFP_KERNEL);
++	if (!zclk)
++		return ERR_PTR(-ENOMEM);
++
++	init.name = name;
++	init.ops = &cpg_z_clk_ops;
++	init.flags = 0;
++	init.parent_names = &parent_name;
++	init.num_parents = 1;
++
++	zclk->reg = reg + CPG_FRQCRB;
++	zclk->kick_reg = reg + CPG_FRQCRB;
++	zclk->hw.init = &init;
++	zclk->mask = CPG_FRQCRB_ZGFC_MASK;
++	zclk->fixed_div = 4; /* PLLVCO x 1/2 x 3DGE divider x 1/2 */
++
++	clk = clk_register(NULL, &zclk->hw);
++	if (IS_ERR(clk))
++		kfree(zclk);
++
++	return clk;
++}
++
+ /*
+  * SDn Clock
+  */
+@@ -585,6 +618,10 @@ struct clk * __init rcar_gen3_cpg_clk_register(struct device *dev,
+ 		}
+ 		break;
+ 
++	case CLK_TYPE_GEN3_ZG:
++		return cpg_zg_clk_register(core->name, __clk_get_name(parent),
++						base);
++
+ 	default:
+ 		return ERR_PTR(-EINVAL);
+ 	}
+diff --git a/drivers/clk/renesas/rcar-gen3-cpg.h b/drivers/clk/renesas/rcar-gen3-cpg.h
+index 04dc45d..57768a3 100644
+--- a/drivers/clk/renesas/rcar-gen3-cpg.h
++++ b/drivers/clk/renesas/rcar-gen3-cpg.h
+@@ -23,6 +23,7 @@ enum rcar_gen3_clk_types {
+ 	CLK_TYPE_GEN3_MDSEL,	/* Select parent/divider using mode pin */
+ 	CLK_TYPE_GEN3_Z,
+ 	CLK_TYPE_GEN3_Z2,
++	CLK_TYPE_GEN3_ZG,
+ 	CLK_TYPE_GEN3_OSC,	/* OSC EXTAL predivider and fixed divider */
+ 	CLK_TYPE_GEN3_RCKSEL,	/* Select parent/divider using RCKCR.CKSEL */
+ };
+-- 
+2.7.4
+

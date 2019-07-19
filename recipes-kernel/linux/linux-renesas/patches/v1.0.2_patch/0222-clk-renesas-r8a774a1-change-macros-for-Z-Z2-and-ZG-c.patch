@@ -1,0 +1,34 @@
+From 0bcde2732088139f985af9808efce83d7e142a64 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 17:08:21 +0700
+Subject: [PATCH 222/248] clk: renesas: r8a774a1: change macros for Z, Z2 and
+ ZG clock
+
+This patch changes defined macros for Z, Z2 and ZG clock
+for r8a774a1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774a1-cpg-mssr.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/clk/renesas/r8a774a1-cpg-mssr.c b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+index 8449637..a7b1084 100644
+--- a/drivers/clk/renesas/r8a774a1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+@@ -71,9 +71,9 @@ static const struct cpg_core_clk r8a774a1_core_clks[] __initconst = {
+ 	DEF_GEN3_OSC(".r",      CLK_RINT,          CLK_EXTAL,      32),
+ 
+ 	/* Core Clock Outputs */
+-	DEF_BASE("z",           R8A774A1_CLK_Z,     CLK_TYPE_GEN3_Z, CLK_PLL0),
+-	DEF_BASE("z2",          R8A774A1_CLK_Z2,    CLK_TYPE_GEN3_Z2, CLK_PLL2),
+-	DEF_BASE("zg",          R8A774A1_CLK_ZG, CLK_TYPE_GEN3_ZG, CLK_PLL4, 4),
++	DEF_GEN3_Z("z",		R8A774A1_CLK_Z,  CLK_TYPE_GEN3_Z,  CLK_PLL0, 2),
++	DEF_GEN3_Z("z2",	R8A774A1_CLK_Z2, CLK_TYPE_GEN3_Z2, CLK_PLL2, 2),
++	DEF_GEN3_Z("zg",	R8A774A1_CLK_ZG, CLK_TYPE_GEN3_ZG, CLK_PLL4, 4),
+ 	DEF_FIXED("ztr",        R8A774A1_CLK_ZTR,   CLK_PLL1_DIV2,  6, 1),
+ 	DEF_FIXED("ztrd2",      R8A774A1_CLK_ZTRD2, CLK_PLL1_DIV2, 12, 1),
+ 	DEF_FIXED("zt",         R8A774A1_CLK_ZT,    CLK_PLL1_DIV2,  4, 1),
+-- 
+2.7.4
+

@@ -1,0 +1,30 @@
+From 54fa9fd04ba2c36b34c19638b5cfe576afe77eb9 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 27 Feb 2019 03:48:32 +0700
+Subject: [PATCH 052/248] dt-bindings: usb: renesas_usbhs: Add r8a774c0 support
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas_usbhs.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas_usbhs.txt b/Documentation/devicetree/bindings/usb/renesas_usbhs.txt
+index 616c6c4..e243c84 100644
+--- a/Documentation/devicetree/bindings/usb/renesas_usbhs.txt
++++ b/Documentation/devicetree/bindings/usb/renesas_usbhs.txt
+@@ -16,8 +16,9 @@ Required properties:
+ 	- "renesas,usbhs-r8a77965" for r8a77965 (R-Car M3-N) compatible device
+ 	- "renesas,usbhs-r8a77995" for r8a77995 (R-Car D3) compatible device
+ 	- "renesas,usbhs-r7s72100" for r7s72100 (RZ/A1) compatible device
++	- "renesas,usbhs-r8a774c0" for r8a774c0 (RZ/G2E) compatible device
+ 	- "renesas,rcar-gen2-usbhs" for R-Car Gen2 or RZ/G1 compatible devices
+-	- "renesas,rcar-gen3-usbhs" for R-Car Gen3 compatible device
++	- "renesas,rcar-gen3-usbhs" for R-Car Gen3 or RZ/G2 compatible device
+ 	- "renesas,rza1-usbhs" for RZ/A1 compatible device
+ 
+ 	When compatible with the generic version, nodes must list the
+-- 
+2.7.4
+

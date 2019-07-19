@@ -1,0 +1,28 @@
+From ba6e39a1ec076814b3bb0fa6e6dd9bb2442c11c0 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Jul 2019 15:22:55 +0700
+Subject: [PATCH 036/248] arm64: defconfig: Enable Sound support for R8A774C0
+ SoC
+
+This patch enables config needed for Sound support in R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index fbae4f7..d7221d5 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -756,3 +756,7 @@ CONFIG_PTP_1588_CLOCK=y
+ 
+ CONFIG_DRM_TILCDC=y
+ CONFIG_DRM_I2C_NXP_TDA998X=y
++
++# Enable Audio support
++CONFIG_SND_SOC_ALL_CODECS=y
++CONFIG_COMPILE_TEST=y
+-- 
+2.7.4
+

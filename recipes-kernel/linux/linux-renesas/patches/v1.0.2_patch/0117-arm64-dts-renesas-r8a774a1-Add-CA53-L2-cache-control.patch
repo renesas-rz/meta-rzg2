@@ -1,0 +1,37 @@
+From 4aee15d2310af23847b52d5be16cc03df68690cd Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 15 May 2019 18:20:52 +0700
+Subject: [PATCH 117/248] arm64: dts: renesas: r8a774a1: Add CA53 L2
+ cache-controller node
+
+Add a device node for the Cortex-A53 L2 cache-controller.
+
+The L2 cache for the Cortex-A53 CPU cores is 512 KiB large
+(organized as 32 KiB x 16 ways).
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index e440339..c5c0119 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -85,6 +85,13 @@
+ 			cache-unified;
+ 			cache-level = <2>;
+ 		};
++
++		L2_CA53: cache-controller-1 {
++			compatible = "cache";
++			power-domains = <&sysc R8A774A1_PD_CA53_SCU>;
++			cache-unified;
++			cache-level = <2>;
++		};
+ 	};
+ 
+ 	extal_clk: extal {
+-- 
+2.7.4
+

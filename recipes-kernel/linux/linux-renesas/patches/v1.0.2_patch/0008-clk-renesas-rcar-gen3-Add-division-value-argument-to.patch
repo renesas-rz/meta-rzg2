@@ -1,0 +1,56 @@
+From 0b24fc0c97d072c32cb5ee1560338bb3fb8e9525 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Jul 2019 13:58:34 +0700
+Subject: [PATCH 008/248] clk: renesas: rcar-gen3: Add division value argument
+ to cpg_z_clk_register
+
+This patch adds an argument to cpg_z_clk_register() that sets the
+division value of the z and z2 clock divider in struct cpg_core_clk[].
+
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/rcar-gen3-cpg.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/clk/renesas/rcar-gen3-cpg.c b/drivers/clk/renesas/rcar-gen3-cpg.c
+index ed927dc..2da04c0 100644
+--- a/drivers/clk/renesas/rcar-gen3-cpg.c
++++ b/drivers/clk/renesas/rcar-gen3-cpg.c
+@@ -319,7 +319,8 @@ static const struct clk_ops cpg_z_clk_ops = {
+ static struct clk * __init cpg_z_clk_register(const char *name,
+ 					      const char *parent_name,
+ 					      void __iomem *reg,
+-					      unsigned long mask)
++					      unsigned long mask,
++					      unsigned long div)
+ {
+ 	struct clk_init_data init;
+ 	struct cpg_z_clk *zclk;
+@@ -339,7 +340,7 @@ static struct clk * __init cpg_z_clk_register(const char *name,
+ 	zclk->kick_reg = reg + CPG_FRQCRB;
+ 	zclk->hw.init = &init;
+ 	zclk->mask = mask;
+-	zclk->fixed_div = 2;    /* PLLVCO x 1/2 x SYS-CPU divider */
++	zclk->fixed_div = div;    /* PLLVCO x 1/div x SYS-CPU divider */
+ 	zclk->max_freq = 1;
+ 
+ 	clk = clk_register(NULL, &zclk->hw);
+@@ -726,11 +727,12 @@ struct clk * __init rcar_gen3_cpg_clk_register(struct device *dev,
+ 
+ 	case CLK_TYPE_GEN3_Z:
+ 		return cpg_z_clk_register(core->name, __clk_get_name(parent),
+-					  base, CPG_FRQCRC_ZFC_MASK);
++					  base, CPG_FRQCRC_ZFC_MASK, core->div);
+ 
+ 	case CLK_TYPE_GEN3_Z2:
+ 		return cpg_z_clk_register(core->name, __clk_get_name(parent),
+-					  base, CPG_FRQCRC_Z2FC_MASK);
++					  base, CPG_FRQCRC_Z2FC_MASK,
++					  core->div);
+ 
+ 	case CLK_TYPE_GEN3_OSC:
+ 		/*
+-- 
+2.7.4
+

@@ -1,0 +1,144 @@
+From 951a6d3025333212253b0e253e2c4fab5255161f Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Tue, 28 May 2019 15:44:43 +0700
+Subject: [PATCH 185/248] thermal: rcar_gen3_thermal: PIO-INT can be selected
+ for each TSC separately
+
+In current implementation, rcar_gen3_thermal driver can
+support both polling mode (temperature checking by software
+polling check) and interrupt mode (temperature is checked
+and signaled by hardware interrupt.)
+
+When switching between two modes, in case the thermal module
+supports more than one thermal channel (as H3/M3/M3N),
+it is only possible to switch all channel running
+in same mode at a time.
+
+This patch improves so that switching of channels are separately.
+It means, at a time, channel 1 is executing in interrupt mode
+while channel 2 is executing in polling mode.
+
+Signed-off-by: Hien Dang <hien.dang.eb@renesas.com>
+Signed-off-by: Dien Pham <dien.pham.ry@renesas.com>
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 49 ++++++++++++++++++++++---------------
+ 1 file changed, 29 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index 2ecf24b..8258a85 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -74,6 +74,7 @@ struct rcar_gen3_thermal_tsc {
+ 	void __iomem *base;
+ 	struct thermal_zone_device *zone;
+ 	struct equation_coefs coef;
++	bool irq_cap;
+ };
+ 
+ struct rcar_gen3_thermal_priv {
+@@ -81,7 +82,6 @@ struct rcar_gen3_thermal_priv {
+ 	unsigned int num_tscs;
+ 	spinlock_t lock; /* Protect interrupts on and off */
+ 	void (*thermal_init)(struct rcar_gen3_thermal_tsc *tsc);
+-	bool irq_cap;
+ };
+ 
+ static inline u32 rcar_gen3_thermal_read(struct rcar_gen3_thermal_tsc *tsc,
+@@ -205,6 +205,9 @@ static int rcar_gen3_thermal_set_irq_temp(struct rcar_gen3_thermal_tsc *tsc)
+ {
+ 	int mcelsius, low, high;
+ 
++	if (!tsc->irq_cap)
++		return 0;
++
+ 	mcelsius = rcar_gen3_thermal_convert_temp(tsc);
+ 
+ 	low = mcelsius - MCELSIUS(1);
+@@ -226,10 +229,13 @@ static const struct thermal_zone_of_device_ops rcar_gen3_tz_of_ops = {
+ static void rcar_thermal_irq_set(struct rcar_gen3_thermal_priv *priv, bool on)
+ {
+ 	unsigned int i;
+-	u32 val = on ? IRQ_TEMPD1 | IRQ_TEMP2 : 0;
++	u32 val;
+ 
+-	for (i = 0; i < priv->num_tscs; i++)
++	for (i = 0; i < priv->num_tscs; i++) {
++		val = (on && priv->tscs[i]->irq_cap) ?
++			IRQ_TEMPD1 | IRQ_TEMP2 : 0;
+ 		rcar_gen3_thermal_write(priv->tscs[i], REG_GEN3_IRQMSK, val);
++	}
+ }
+ 
+ static irqreturn_t rcar_gen3_thermal_irq(int irq, void *data)
+@@ -355,7 +361,6 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 	int ret, irq, i;
+ 	char *irqname;
+ 	struct device_node *tz_nd;
+-	int idle;
+ 
+ 	/* default values if FUSEs are missing */
+ 	/* TODO: Read values from hardware on supported platforms */
+@@ -398,16 +403,6 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 						IRQF_SHARED, irqname, priv);
+ 		if (ret)
+ 			return ret;
+-
+-		priv->irq_cap = 1;
+-	}
+-
+-	for_each_node_with_property(tz_nd, "polling-delay") {
+-		of_property_read_u32(tz_nd, "polling-delay", &idle);
+-		if (idle > 0) {
+-			priv->irq_cap = 0;
+-			break;
+-		}
+ 	}
+ 
+ 	pm_runtime_enable(dev);
+@@ -437,8 +432,24 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 		priv->thermal_init(tsc);
+ 		rcar_gen3_thermal_calc_coefs(&tsc->coef, ptat, thcode[i]);
+ 
+-		if (priv->irq_cap)
+-			rcar_gen3_thermal_set_irq_temp(tsc);
++
++		for_each_node_with_property(tz_nd, "polling-delay") {
++			u32 zone_id, idle;
++
++			if (of_parse_phandle(tz_nd, "thermal-sensors", 0)) {
++				of_property_read_u32_index(tz_nd,
++							   "thermal-sensors",
++							   1, &zone_id);
++				if (zone_id == i) {
++					of_property_read_u32(tz_nd,
++							     "polling-delay",
++							     &idle);
++					tsc->irq_cap = idle ? 0 : 1;
++				}
++			}
++		}
++
++		rcar_gen3_thermal_set_irq_temp(tsc);
+ 
+ 		zone = devm_thermal_zone_of_sensor_register(dev, i, tsc,
+ 							    &rcar_gen3_tz_of_ops);
+@@ -491,13 +502,11 @@ static int __maybe_unused rcar_gen3_thermal_resume(struct device *dev)
+ 		struct rcar_gen3_thermal_tsc *tsc = priv->tscs[i];
+ 
+ 		priv->thermal_init(tsc);
+-		if (priv->irq_cap)
+-			rcar_gen3_thermal_set_irq_temp(tsc);
++		rcar_gen3_thermal_set_irq_temp(tsc);
+ 	}
+ 
+ 
+-	if (priv->irq_cap)
+-		rcar_thermal_irq_set(priv, true);
++	rcar_thermal_irq_set(priv, true);
+ 
+ 	return 0;
+ }
+-- 
+2.7.4
+

@@ -1,0 +1,61 @@
+From 065dfeb76237cb026ef1a9124fc8088f1f91957b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Jul 2019 14:02:36 +0700
+Subject: [PATCH 010/248] clk: renesas: rcar-gen3: Add support Z2 clock divider
+ for R8A774C0
+
+This patch supports the Z2 clock divider for the R8A774C0 SoC. In this
+SoC, the Z2 clock divider bits of the FRQCRC register is bit[12:8].
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/rcar-gen3-cpg.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/clk/renesas/rcar-gen3-cpg.c b/drivers/clk/renesas/rcar-gen3-cpg.c
+index 6baf7ac..3797be9 100644
+--- a/drivers/clk/renesas/rcar-gen3-cpg.c
++++ b/drivers/clk/renesas/rcar-gen3-cpg.c
+@@ -42,6 +42,7 @@ static u32 cpg_quirks;
+ 
+ #define PLL_ERRATA		BIT(0)  /* Missing PLL0/2/4 post-divider */
+ #define RCKCR_CKSEL		BIT(1)  /* Reserved RCLK clock source select */
++#define Z2FC_BIT_MASK_SFT_8	BIT(2)	/* Use Z2FC bit mask range to [12:8] */
+ 
+ struct cpg_simple_notifier {
+ 	struct notifier_block nb;
+@@ -204,6 +205,7 @@ static struct clk * __init cpg_pll_clk_register(const char *name,
+ #define CPG_FRQCRB_ZGFC_MASK		GENMASK(28, 24)
+ #define CPG_FRQCRC			0x000000e0
+ #define CPG_FRQCRC_ZFC_MASK		GENMASK(12, 8)
++#define CPG_FRQCRC_Z2FC_SFT_8_MASK	GENMASK(12, 8)
+ #define CPG_FRQCRC_Z2FC_MASK		GENMASK(4, 0)
+ 
+ #define Z_CLK_ROUND(f)	(100000000 * DIV_ROUND_CLOSEST_ULL((f), 100000000))
+@@ -617,6 +619,10 @@ static const struct soc_device_attribute cpg_quirks_match[] __initconst = {
+ 		.soc_id = "r8a7796", .revision = "ES1.0",
+ 		.data = (void *)RCKCR_CKSEL,
+ 	},
++	{
++		.soc_id = "r8a774c0",
++		.data = (void *)Z2FC_BIT_MASK_SFT_8,
++	},
+ 	{ /* sentinel */ }
+ };
+ 
+@@ -731,6 +737,12 @@ struct clk * __init rcar_gen3_cpg_clk_register(struct device *dev,
+ 					  base, CPG_FRQCRC_ZFC_MASK, core->div);
+ 
+ 	case CLK_TYPE_GEN3_Z2:
++		if (cpg_quirks & Z2FC_BIT_MASK_SFT_8)
++			return cpg_z_clk_register(core->name,
++						__clk_get_name(parent), base,
++						CPG_FRQCRC_Z2FC_SFT_8_MASK,
++						core->div);
++
+ 		return cpg_z_clk_register(core->name, __clk_get_name(parent),
+ 					  base, CPG_FRQCRC_Z2FC_MASK,
+ 					  core->div);
+-- 
+2.7.4
+

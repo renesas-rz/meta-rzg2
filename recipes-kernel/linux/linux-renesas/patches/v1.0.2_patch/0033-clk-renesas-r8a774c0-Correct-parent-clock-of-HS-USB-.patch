@@ -1,0 +1,32 @@
+From e1087b34d3dc26ed58bf67ee9909db8957713765 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Jul 2019 15:09:23 +0700
+Subject: [PATCH 033/248] clk: renesas: r8a774c0: Correct parent clock of
+ HS-USB and EHCI/OHCI
+
+According to Hardware Manual, correct the parent clock of US-USB and
+EHCI/OHCI into S3D2 clock on R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774c0-cpg-mssr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/clk/renesas/r8a774c0-cpg-mssr.c b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+index 22a551b..17872da 100644
+--- a/drivers/clk/renesas/r8a774c0-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+@@ -179,8 +179,8 @@ static const struct mssr_mod_clk r8a774c0_mod_clks[] __initconst = {
+ 	DEF_MOD("vspb",			 626,	R8A774C0_CLK_S0D1),
+ 	DEF_MOD("vspi0",		 631,	R8A774C0_CLK_S0D1),
+ 
+-	DEF_MOD("ehci0",		 703,	R8A774C0_CLK_S3D4),
+-	DEF_MOD("hsusb",		 704,	R8A774C0_CLK_S3D4),
++	DEF_MOD("ehci0",		 703,	R8A774C0_CLK_S3D2),
++	DEF_MOD("hsusb",		 704,	R8A774C0_CLK_S3D2),
+ 	DEF_MOD("csi40",		 716,	R8A774C0_CLK_CSI0),
+ 	DEF_MOD("du1",			 723,	R8A774C0_CLK_S1D1),
+ 	DEF_MOD("du0",			 724,	R8A774C0_CLK_S1D1),
+-- 
+2.7.4
+

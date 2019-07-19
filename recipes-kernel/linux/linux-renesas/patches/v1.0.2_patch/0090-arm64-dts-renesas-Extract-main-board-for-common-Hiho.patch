@@ -1,0 +1,106 @@
+From 980ec1c3cc57c21ce4386faed8d34d3bb083e394 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 6 May 2019 14:47:25 +0700
+Subject: [PATCH 090/248] arm64: dts: renesas: Extract main board for common
+ Hihope RZ/G2M and RZ/G2N support
+
+The HiHope RZ/G2M and HiHope RZ/G2N boards are very similar.
+To avoid duplication, prepare for the advent of the latter by
+extracting the common parts of main boards into its own .dtsi file.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi     | 34 ++++++++++++++++++++++
+ .../boot/dts/renesas/r8a774a1-hihope-rzg2m.dts     | 26 +----------------
+ 2 files changed, 35 insertions(+), 25 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/hihope-common.dtsi
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+new file mode 100644
+index 0000000..6af6754
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -0,0 +1,34 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for common parts of Main boards for HiHope RZ/G2M platform
++ * and HiHope RZ/G2N platform
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++/ {
++	aliases {
++		serial0 = &scif2;
++	};
++
++	chosen {
++		bootargs = "ignore_loglevel rw root=/dev/nfs ip=dhcp";
++		stdout-path = "serial0:115200n8";
++	};
++};
++
++&extal_clk {
++	clock-frequency = <16666666>;
++};
++
++&extalr_clk {
++	clock-frequency = <32768>;
++};
++
++&usb_extal_clk {
++	clock-frequency = <50000000>;
++};
++
++&scif2 {
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index 4149d65..d823761 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -8,20 +8,12 @@
+ 
+ /dts-v1/;
+ #include "r8a774a1.dtsi"
++#include "hihope-common.dtsi"
+ 
+ / {
+ 	model = "Hoperun Technology HiHope RZ/G2M platform (hihope-rzg2m)";
+ 	compatible = "hoperun,hihope-rzg2m", "renesas,r8a774a1";
+ 
+-	aliases {
+-		serial0 = &scif2;
+-	};
+-
+-	chosen {
+-		bootargs = "ignore_loglevel rw root=/dev/nfs ip=dhcp";
+-		stdout-path = "serial0:115200n8";
+-	};
+-
+ 	memory@48000000 {
+ 		device_type = "memory";
+ 		/* first 128MB is reserved for secure area. */
+@@ -33,19 +25,3 @@
+ 		reg = <0x6 0x00000000 0x0 0x80000000>;
+ 	};
+ };
+-
+-&extal_clk {
+-	clock-frequency = <16666666>;
+-};
+-
+-&extalr_clk {
+-	clock-frequency = <32768>;
+-};
+-
+-&usb_extal_clk {
+-	clock-frequency = <50000000>;
+-};
+-
+-&scif2 {
+-	status = "okay";
+-};
+-- 
+2.7.4
+

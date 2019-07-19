@@ -1,0 +1,88 @@
+From 6330dffef19d0b26761f9303ed3bde97019c8281 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 15 May 2019 18:29:43 +0700
+Subject: [PATCH 118/248] arm64: dts: renesas: r8a774a1: Add Cortex-A53 CPU
+ cores
+
+This patch adds Cortex-A53 CPU cores of R8A774A1 SoC, and sets a
+total of 6 cores (2 x Cortex-A57 + 4 x Cortex-A53).
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 46 +++++++++++++++++++++++++++----
+ 1 file changed, 41 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index c5c0119..449be7e 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -79,6 +79,42 @@
+ 			clocks =<&cpg CPG_CORE R8A774A1_CLK_Z>;
+ 		};
+ 
++		a53_0: cpu@100 {
++			compatible = "arm,cortex-a53", "arm,armv8";
++			reg = <0x100>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774A1_PD_CA53_CPU0>;
++			next-level-cache = <&L2_CA53>;
++			enable-method = "psci";
++		};
++
++		a53_1: cpu@101 {
++			compatible = "arm,cortex-a53","arm,armv8";
++			reg = <0x101>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774A1_PD_CA53_CPU1>;
++			next-level-cache = <&L2_CA53>;
++			enable-method = "psci";
++		};
++
++		a53_2: cpu@102 {
++			compatible = "arm,cortex-a53","arm,armv8";
++			reg = <0x102>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774A1_PD_CA53_CPU2>;
++			next-level-cache = <&L2_CA53>;
++			enable-method = "psci";
++		};
++
++		a53_3: cpu@103 {
++			compatible = "arm,cortex-a53","arm,armv8";
++			reg = <0x103>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774A1_PD_CA53_CPU3>;
++			next-level-cache = <&L2_CA53>;
++			enable-method = "psci";
++		};
++
+ 		L2_CA57: cache-controller-0 {
+ 			compatible = "cache";
+ 			power-domains = <&sysc R8A774A1_PD_CA57_SCU>;
+@@ -172,7 +208,7 @@
+ 				<0x0 0xf1040000 0 0x20000>,
+ 				<0x0 0xf1060000 0 0x20000>;
+ 			interrupts = <GIC_PPI 9
+-				(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_HIGH)>;
++				(GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_HIGH)>;
+ 			clocks = <&cpg CPG_MOD 408>;
+ 			clock-names = "clk";
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+@@ -813,10 +849,10 @@
+ 	timer {
+ 		compatible = "arm,armv8-timer";
+ 		interrupts-extended =
+-		<&gic GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
+-		<&gic GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
+-		<&gic GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
+-		<&gic GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>;
++		<&gic GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
++		<&gic GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
++		<&gic GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
++		<&gic GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>;
+ 	};
+ 
+ 	/* External USB clocks - can be overridden by the board */
+-- 
+2.7.4
+

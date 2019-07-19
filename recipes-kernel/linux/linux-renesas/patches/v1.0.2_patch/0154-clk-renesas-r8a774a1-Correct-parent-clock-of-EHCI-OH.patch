@@ -1,0 +1,39 @@
+From 17155e98baf0e878aa57f16a57f9e596ef73dcbe Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:18:24 +0700
+Subject: [PATCH 154/248] clk: renesas: r8a774a1: Correct parent clock of
+ EHCI/OHCI
+
+According to the R-Car Gen3 Hardware Manual Rev. 1.00, the parent clock
+of the EHCI/OHCI module clocks on RZ/G2M SoCs is S3D2.
+
+Signed-off-by: Kazuya Mizuguchi <kazuya.mizuguchi.ks@renesas.com>
+[takeshi: Update R-Car H3, M3-N, and E3]
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+[geert: Update RZ/G2M and RZ/G2E]
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774a1-cpg-mssr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/clk/renesas/r8a774a1-cpg-mssr.c b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+index 50aa2ea..b49f0ab 100644
+--- a/drivers/clk/renesas/r8a774a1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+@@ -168,8 +168,8 @@ static const struct mssr_mod_clk r8a774a1_mod_clks[] __initconst = {
+ 	DEF_MOD("vspd0",		 623,	R8A774A1_CLK_S0D2),
+ 	DEF_MOD("vspb",			 626,	R8A774A1_CLK_S0D1),
+ 	DEF_MOD("vspi0",		 631,	R8A774A1_CLK_S0D1),
+-	DEF_MOD("ehci1",		 702,	R8A774A1_CLK_S3D4),
+-	DEF_MOD("ehci0",		 703,	R8A774A1_CLK_S3D4),
++	DEF_MOD("ehci1",		 702,	R8A774A1_CLK_S3D2),
++	DEF_MOD("ehci0",		 703,	R8A774A1_CLK_S3D2),
+ 	DEF_MOD("hsusb",		 704,	R8A774A1_CLK_S3D4),
+ 	DEF_MOD("csi20",		 714,	R8A774A1_CLK_CSI0),
+ 	DEF_MOD("csi40",		 716,	R8A774A1_CLK_CSI0),
+-- 
+2.7.4
+

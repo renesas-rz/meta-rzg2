@@ -1,0 +1,29 @@
+From 50685ce9c714593b313de9ba6c02ff4218a791aa Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 24 May 2019 19:23:19 +0700
+Subject: [PATCH 174/248] arm64: dts: renesas: hihope-common: fix name node of
+ x302 clock
+
+This patch fixes the right name node of x302 clock.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 36791c24..e10f6608 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -63,7 +63,7 @@
+ 	};
+ 
+ 	/* External DU dot clocks */
+-	x302_clk: x304-clock {
++	x302_clk: x302-clock {
+ 		compatible = "fixed-clock";
+ 		#clock-cells = <0>;
+ 		clock-frequency = <33000000>;
+-- 
+2.7.4
+

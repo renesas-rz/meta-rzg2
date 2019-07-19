@@ -1,0 +1,31 @@
+From 9e155d10cd3faaa116ca53d5f825cf9eb86fc9dc Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 1 Jul 2019 17:59:48 +0700
+Subject: [PATCH 054/248] arm64: dts: renesas: r8a774c0-cat874: enable USB3.0
+ function
+
+This patch enables USB3.0 function device for the RZ/G2E board on the
+R8A774C0 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 0a5b97f..e794e9a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -349,3 +349,9 @@
+ 
+ 	status = "okay";
+ };
++
++&usb3_peri0 {
++	companion = <&xhci0>;
++
++	status = "okay";
++};
+-- 
+2.7.4
+

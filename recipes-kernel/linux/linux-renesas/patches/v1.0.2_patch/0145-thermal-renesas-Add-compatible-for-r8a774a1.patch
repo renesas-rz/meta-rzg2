@@ -1,0 +1,27 @@
+From 83fcef34a8847a8db3639e7a76c2b1393e63f39b Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
+Date: Thu, 23 May 2019 10:34:50 +0700
+Subject: [PATCH 145/248] thermal: renesas: Add compatible for r8a774a1
+
+This patch add compatible string for r8a774a1.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index 704c8ad..aa03074 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -321,6 +321,7 @@ static const struct of_device_id rcar_gen3_thermal_dt_ids[] = {
+ 	{ .compatible = "renesas,r8a7795-thermal", },
+ 	{ .compatible = "renesas,r8a7796-thermal", },
+ 	{ .compatible = "renesas,r8a77965-thermal", },
++	{ .compatible = "renesas,r8a774a1-thermal", },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, rcar_gen3_thermal_dt_ids);
+-- 
+2.7.4
+

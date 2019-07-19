@@ -1,0 +1,55 @@
+From 074bad0a0040da1faeb1eac444869bc585e8d157 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 30 May 2019 10:56:08 +0700
+Subject: [PATCH 210/248] arm64: dts: renesas: hihope-common: enable msiof0
+ node
+
+This patch enable MSIOF0 on SoC R8A774A1 for HiHope Board.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 4032540..a56d32e 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -14,6 +14,10 @@
+ 		serial1 = &hscif0;
+ 		serial2 = &hscif1;
+ 		serial3 = &scif0;
++		spi0 = &msiof0;
++		spi1 = &msiof1;
++		spi2 = &msiof2;
++		spi3 = &msiof3;
+ 	};
+ 
+ 	chosen {
+@@ -217,6 +221,12 @@
+ 		groups = "audio_clk_a_a";
+ 		function = "audio_clk";
+ 	};
++
++	msiof0_pins: spi0 {
++		groups = "msiof0_clk", "msiof0_sync",
++			 "msiof0_rxd", "msiof0_txd";
++		function = "msiof0";
++	};
+ };
+ 
+ &scif2 {
+@@ -464,3 +474,10 @@
+ &ssi1 {
+ 	shared-pin;
+ };
++
++&msiof0 {
++	pinctrl-0 = <&msiof0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

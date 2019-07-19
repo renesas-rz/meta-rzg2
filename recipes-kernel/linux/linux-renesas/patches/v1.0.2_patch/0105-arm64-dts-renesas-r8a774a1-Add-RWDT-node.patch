@@ -1,0 +1,36 @@
+From ba871155952ec2e4f7ec98e64a6ab932f83ee749 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Tue, 21 May 2019 13:30:53 +0700
+Subject: [PATCH 105/248] arm64: dts: renesas: r8a774a1: Add RWDT node
+
+This patch adds RWDT node for R8A774A1 SoC
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 2522452..0677fb9 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -673,6 +673,16 @@
+ 			i2c-scl-internal-delay-ns = <6>;
+ 			status = "disabled";
+ 		};
++
++		rwdt: watchdog@e6020000 {
++			compatible = "renesas,r8a774a1-wdt",
++				"renesas,rcar-gen3-wdt";
++			reg = <0 0xe6020000 0 0x0c>;
++			clocks = <&cpg CPG_MOD 402>;
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 402>;
++			status = "disabled";
++		};
+ 	};
+ 
+ 	timer {
+-- 
+2.7.4
+

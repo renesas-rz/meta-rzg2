@@ -1,0 +1,63 @@
+From e3e60267a49a61c0f756aed1fe480766e192a6d6 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:06:39 +0700
+Subject: [PATCH 130/248] drm: rcar-du: Add R8A774A1 support
+
+Add support for the R8A774A1 DU (which is very similar to the R8A7796
+DU); it has one RGB output, one LVDS output and one HDMI output.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_drv.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.c b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+index 6efc041..a277a55 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+@@ -294,6 +294,34 @@ static const struct rcar_du_device_info rcar_du_r8a77970_info = {
+ 	.num_lvds = 1,
+ };
+ 
++static const struct rcar_du_device_info rcar_du_r8a774a1_info = {
++	.gen = 3,
++	.features = RCAR_DU_FEATURE_CRTC_IRQ_CLOCK
++		| RCAR_DU_FEATURE_EXT_CTRL_REGS
++		| RCAR_DU_FEATURE_VSP1_SOURCE,
++	.channels_mask = BIT(2) | BIT(1) | BIT(0),
++	.routes = {
++		/*
++		 * R8A774A1 has one RGB output, one LVDS output and one HDMI
++		 * output.
++		 */
++		[RCAR_DU_OUTPUT_DPAD0] = {
++			.possible_crtcs = BIT(2),
++			.port = 0,
++		},
++		[RCAR_DU_OUTPUT_HDMI0] = {
++			.possible_crtcs = BIT(1),
++			.port = 1,
++		},
++		[RCAR_DU_OUTPUT_LVDS0] = {
++			.possible_crtcs = BIT(0),
++			.port = 2,
++		},
++	},
++	.num_lvds = 1,
++	.dpll_ch =  BIT(1),
++};
++
+ static const struct rcar_du_device_info rcar_du_r8a774c0_info = {
+ 	.gen = 3,
+ 	.features = RCAR_DU_FEATURE_CRTC_IRQ_CLOCK
+@@ -335,6 +363,7 @@ static const struct of_device_id rcar_du_of_table[] = {
+ 	{ .compatible = "renesas,du-r8a7796", .data = &rcar_du_r8a7796_info },
+ 	{ .compatible = "renesas,du-r8a77965", .data = &rcar_du_r8a77965_info },
+ 	{ .compatible = "renesas,du-r8a77970", .data = &rcar_du_r8a77970_info },
++	{ .compatible = "renesas,du-r8a774a1", .data = &rcar_du_r8a774a1_info },
+ 	{ .compatible = "renesas,du-r8a774c0", .data = &rcar_du_r8a774c0_info },
+ 	{ }
+ };
+-- 
+2.7.4
+

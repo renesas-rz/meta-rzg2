@@ -1,0 +1,29 @@
+From 9326ad13766ecde3c9986cc2ba8db2e607f02429 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 May 2019 19:23:09 +0700
+Subject: [PATCH 241/248] drm: rcar-du: Add lvds_clk_mask to support for
+ r8a774c0
+
+This patch add lvds_clk_mask support for R8A774C0 SoC to use
+LVDS PLL output as dot clock for more precise.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.c b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+index a277a55..e6a5a1d 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+@@ -348,6 +348,7 @@ static const struct rcar_du_device_info rcar_du_r8a774c0_info = {
+ 		},
+ 	},
+ 	.num_lvds = 2,
++	.lvds_clk_mask = BIT(0) | BIT(1),
+ };
+ 
+ static const struct of_device_id rcar_du_of_table[] = {
+-- 
+2.7.4
+

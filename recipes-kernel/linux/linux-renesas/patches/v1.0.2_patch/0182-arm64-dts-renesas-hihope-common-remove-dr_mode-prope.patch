@@ -1,0 +1,40 @@
+From af9e764b069b7a5d367236eca85317fcb6e38e4c Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 30 May 2019 19:39:40 +0700
+Subject: [PATCH 182/248] arm64: dts: renesas: hihope-common: remove dr_mode
+ property on ohci1/ehci1
+
+dr_mode property make driver recognize PHY1 as support OTG, and will
+reset OHCI/EHCI continuos when connect USB3.0 device to it.
+
+Power supply at the probed PHY driver so USB3.0 will be seen as the
+host device and try to enumerate board as peripheral.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 6b0e534..ee7ee2a 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -292,7 +292,6 @@
+ };
+ 
+ &ohci1 {
+-	dr_mode = "host";
+ 	status = "okay";
+ };
+ 
+@@ -302,7 +301,6 @@
+ };
+ 
+ &ehci1 {
+-	dr_mode = "host";
+ 	status = "okay";
+ };
+ 
+-- 
+2.7.4
+

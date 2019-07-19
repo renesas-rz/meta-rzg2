@@ -1,0 +1,47 @@
+From 56f755eb19d62731e7cb3907316ba16857f59d7d Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Mon, 15 Jul 2019 13:49:26 +0700
+Subject: [PATCH 246/248] arm64: dts: renesas: r8a774c0-cat874: Fix wrong SDHI
+ pin configure used for Wifi on RZ/G2E.
+
+This patch fixes the wrong SDHI pin configure used for
+Wifi device on RZ/G2E.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 88a0e6c..7d4a95c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -159,12 +159,6 @@
+ 
+ &extal_clk {
+ 	clock-frequency = <48000000>;
+-
+-	sdhi3_pins_uhs: sd3_uhs {
+-		groups = "sdhi3_data4", "sdhi3_ctrl";
+-		function = "sdhi3";
+-		power-source = <1800>;
+-	};
+ };
+ 
+ &pcie_bus_clk {
+@@ -245,6 +239,12 @@
+ 		function = "usb30";
+ 	};
+ 
++	sdhi3_pins_uhs: sd3_uhs {
++		groups = "sdhi3_data4", "sdhi3_ctrl";
++		function = "sdhi3";
++		power-source = <1800>;
++	};
++
+ 	du_pins: du {
+ 		groups = "du_rgb888", "du_sync", "du_clk_out_0",
+ 			"du_disp", "du_clk_in_0";
+-- 
+2.7.4
+

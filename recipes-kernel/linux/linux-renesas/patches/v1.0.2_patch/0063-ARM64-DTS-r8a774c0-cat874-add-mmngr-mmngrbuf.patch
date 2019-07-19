@@ -1,0 +1,45 @@
+From 06269698eb2a0bb07e98b9b31e38f82423adb236 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Fri, 29 Mar 2019 10:56:54 +0700
+Subject: [PATCH 063/248] ARM64: DTS: r8a774c0-cat874: add mmngr, mmngrbuf
+
+Add device node for mmngr, mmngrbuf. Reserve 128M for MMP CMA.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index e794e9a..963e2e5 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -42,9 +42,25 @@
+ 			reg = <0x00000000 0x58000000 0x0 0x10000000>;
+ 			linux,cma-default;
+ 		};
++
++		/* device specific region for contiguous allocations */
++		mmp_reserved: linux,multimedia {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x68000000 0x0 0x08000000>;
++		};
+ 	};
+ 
+ 
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>;
++	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
++	};
++
+ 	vcc_sdhi0: regulator-vcc-sdhi0 {
+ 		compatible = "regulator-fixed";
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,37 @@
+From 836f50ce3f3aa4b1b9d97ed9e82ab06362c539a8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 15 May 2019 18:39:23 +0700
+Subject: [PATCH 119/248] arm64: dts: renesas: r8a774a1: Add Cortex-A53 PMU
+ node
+
+Enable the performance monitor unit for the Cortex-A53 cores on the
+R8A774A1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 449be7e..e4c31aa 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -158,6 +158,15 @@
+ 		interrupt-affinity = <&a57_0>, <&a57_1>;
+ 	};
+ 
++	pmu_a53 {
++		compatible = "arm,cortex-a53-pmu";
++		interrupts-extended =	<&gic GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>,
++					<&gic GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>,
++					<&gic GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>,
++					<&gic GIC_SPI 87 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-affinity = <&a53_0>, <&a53_1>, <&a53_2>, <&a53_3>;
++	};
++
+ 	psci {
+ 		compatible = "arm,psci-1.0", "arm,psci-0.2";
+ 		method = "smc";
+-- 
+2.7.4
+

@@ -1,0 +1,44 @@
+From e9889bb4e51ea8a534274408182978ed805bd9a4 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 12 Mar 2019 15:06:17 +0700
+Subject: [PATCH 055/248] phy: renesas: rcar-gen3-usb2: change a condition
+ "dr_mode"
+
+This patch changes a condition about dr_mode. If a device node has
+any dr_mode ("host", "peripheral" or "otg"), this driver allows to
+set "is_otg_channel" to true. Also, this patch keeps the dr_mode
+value for future use.
+
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+Signed-off-by: Kishon Vijay Abraham I <kishon@ti.com>
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/phy/renesas/phy-rcar-gen3-usb2.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/phy/renesas/phy-rcar-gen3-usb2.c b/drivers/phy/renesas/phy-rcar-gen3-usb2.c
+index d76bf06..9888ecf 100644
+--- a/drivers/phy/renesas/phy-rcar-gen3-usb2.c
++++ b/drivers/phy/renesas/phy-rcar-gen3-usb2.c
+@@ -89,6 +89,7 @@ struct rcar_gen3_chan {
+ 	struct phy *phy;
+ 	struct regulator *vbus;
+ 	struct work_struct work;
++	enum usb_dr_mode dr_mode;
+ 	bool extcon_host;
+ 	bool has_otg_pins;
+ };
+@@ -448,7 +449,8 @@ static int rcar_gen3_phy_usb2_probe(struct platform_device *pdev)
+ 			dev_err(dev, "No irq handler (%d)\n", irq);
+ 	}
+ 
+-	if (of_usb_get_dr_mode_by_phy(dev->of_node, 0) == USB_DR_MODE_OTG) {
++	channel->dr_mode = of_usb_get_dr_mode_by_phy(dev->of_node, 0);
++	if (channel->dr_mode != USB_DR_MODE_UNKNOWN) {
+ 		int ret;
+ 
+ 		channel->has_otg_pins = (uintptr_t)of_device_get_match_data(dev);
+-- 
+2.7.4
+

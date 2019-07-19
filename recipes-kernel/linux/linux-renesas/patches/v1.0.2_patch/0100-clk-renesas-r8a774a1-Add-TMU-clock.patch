@@ -1,0 +1,31 @@
+From 577bba3f8636430d713a056f8cbb2d3591c2e62b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 15:41:51 +0700
+Subject: [PATCH 100/248] clk: renesas: r8a774a1: Add TMU clock
+
+This patch adds the TMU clocks to the R8A774A1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774a1-cpg-mssr.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/clk/renesas/r8a774a1-cpg-mssr.c b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+index b0da342..50aa2ea 100644
+--- a/drivers/clk/renesas/r8a774a1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+@@ -112,6 +112,11 @@ static const struct cpg_core_clk r8a774a1_core_clks[] __initconst = {
+ 
+ static const struct mssr_mod_clk r8a774a1_mod_clks[] __initconst = {
+ 	DEF_MOD("fdp1-0",		 119,	R8A774A1_CLK_S0D1),
++	DEF_MOD("tmu4",			 121,	R8A774A1_CLK_S0D6),
++	DEF_MOD("tmu3",			 122,	R8A774A1_CLK_S3D2),
++	DEF_MOD("tmu2",			 123,	R8A774A1_CLK_S3D2),
++	DEF_MOD("tmu1",			 124,	R8A774A1_CLK_S3D2),
++	DEF_MOD("tmu0",			 125,	R8A774A1_CLK_CP),
+ 	DEF_MOD("scif5",		 202,	R8A774A1_CLK_S3D4),
+ 	DEF_MOD("scif4",		 203,	R8A774A1_CLK_S3D4),
+ 	DEF_MOD("scif3",		 204,	R8A774A1_CLK_S3D4),
+-- 
+2.7.4
+

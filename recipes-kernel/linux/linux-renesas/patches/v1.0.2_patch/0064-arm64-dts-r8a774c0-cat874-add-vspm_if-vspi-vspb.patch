@@ -1,0 +1,42 @@
+From 75b094a6f4e3683033f3a949772b706e0282240b Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Mon, 1 Jul 2019 18:59:33 +0700
+Subject: [PATCH 064/248] arm64: dts: r8a774c0-cat874: add vspm_if, vspi, vspb
+
+this commit enable vspb, vspi, vspmif for cat874
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 963e2e5..331a748 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -61,6 +61,10 @@
+ 		compatible = "renesas,mmngrbuf";
+ 	};
+ 
++	vspm_if {
++		compatible = "renesas,vspm_if";
++	};
++
+ 	vcc_sdhi0: regulator-vcc-sdhi0 {
+ 		compatible = "regulator-fixed";
+ 
+@@ -371,3 +375,11 @@
+ 
+ 	status = "okay";
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+-- 
+2.7.4
+

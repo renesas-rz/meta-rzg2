@@ -1,0 +1,152 @@
+From 2df5432623047b004484352f41c959ce2b9e6462 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 27 May 2019 13:38:38 +0700
+Subject: [PATCH 170/248] arm64: dts: renesas: r8a774a1: Create thermal zone to
+ support IPA
+
+Based on commit "arm64: dts: r8a7796: Create thermal zone to support
+IPA" from "https://patchwork.kernel.org/patch/10739609":
+- Setup a thermal zone driven by SoC temperature sensor.
+  Create passive trip points and bind them to CPUFreq cooling
+  device that supports power extension.
+- In R-Car Gen3, IPA is supportted for only one channel
+  (on H3/M3/M3N board, it is channel THS3). Reason:
+  Currently, IPA controls base on only CPU temperature.
+  And only one thermal channel is assembled closest
+  CPU cores is selected as target of IPA.
+  If other channels are used, IPA controlling is not properly.
+
+Apply this similar feature for RZ/G2M.
+
+Signed-off-by: Hien Dang <hien.dang.eb@rvc.renesas.com>
+Signed-off-by: An Huynh <an.huynh.uj@rvc.renesas.com>
+[takeshi.kihara.df: fix W=1 dtc unit_address_vs_reg warnings]
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Yoshihiro Kaneko <ykaneko0929@gmail.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 57 +++++++++++++++----------------
+ 1 file changed, 27 insertions(+), 30 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index be2a671..199f625 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -111,6 +111,9 @@
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			capacity-dmips-mhz = <1024>;
+ 			#cooling-cells = <2>;
++			dynamic-power-coefficient = <854>;
++			cooling-min-level = <0>;
++			cooling-max-level = <2>;
+ 		};
+ 
+ 		a53_0: cpu@100 {
+@@ -124,6 +127,10 @@
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			capacity-dmips-mhz = <543>;
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <277>;
++			cooling-min-level = <0>;
++			cooling-max-level = <2>;
+ 		};
+ 
+ 		a53_1: cpu@101 {
+@@ -1596,64 +1603,47 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&tsc 0>;
++			sustainable-power = <3874>;
+ 
+ 			trips {
+-				sensor1_passive: sensor1-passive {
+-					temperature = <95000>;
+-					hysteresis = <2000>;
+-					type = "passive";
+-				};
+-
+ 				sensor1_crit: sensor1-crit {
+ 					temperature = <120000>;
+ 					hysteresis = <2000>;
+ 					type = "critical";
+ 				};
+ 			};
+-
+-			cooling-maps {
+-				map0 {
+-					trip = <&sensor1_passive>;
+-					cooling-device = <&a57_0 5 5>;
+-				};
+-			};
+ 		};
+ 
+ 		sensor_thermal2: sensor-thermal2 {
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&tsc 1>;
++			sustainable-power = <3874>;
+ 
+ 			trips {
+-				sensor2_passive: sensor2-passive {
+-					temperature = <95000>;
+-					hysteresis = <2000>;
+-					type = "passive";
+-				};
+-
+ 				sensor2_crit: sensor2-crit {
+ 					temperature = <120000>;
+ 					hysteresis = <2000>;
+ 					type = "critical";
+ 				};
+ 			};
+-
+-			cooling-maps {
+-				map0 {
+-					trip = <&sensor2_passive>;
+-					cooling-device = <&a57_0 5 5>;
+-				};
+-			};
+ 		};
+ 
+ 		sensor_thermal3: sensor-thermal3 {
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&tsc 2>;
++			sustainable-power = <3874>;
+ 
+ 			trips {
+-				sensor3_passive: sensor3-passive {
+-					temperature = <95000>;
++				threshold: trip-point0 {
++					temperature = <90000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
++				target: trip-point1 {
++					temperature = <100000>;
+ 					hysteresis = <2000>;
+ 					type = "passive";
+ 				};
+@@ -1667,8 +1657,15 @@
+ 
+ 			cooling-maps {
+ 				map0 {
+-					trip = <&sensor3_passive>;
+-					cooling-device = <&a57_0 5 5>;
++					trip = <&target>;
++					cooling-device = <&a57_0 0 2>;
++					contribution = <1024>;
++				};
++
++				map1 {
++					trip = <&target>;
++					cooling-device = <&a53_0 0 2>;
++					contribution = <1024>;
+ 				};
+ 			};
+ 		};
+-- 
+2.7.4
+

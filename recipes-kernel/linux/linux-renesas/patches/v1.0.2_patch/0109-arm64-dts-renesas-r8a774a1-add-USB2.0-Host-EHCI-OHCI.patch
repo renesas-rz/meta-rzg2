@@ -1,0 +1,77 @@
+From 0dc050aa24df344891bb454530feadd205377606 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 20 May 2019 09:32:47 +0700
+Subject: [PATCH 109/248] arm64: dts: renesas: r8a774a1: add USB2.0 Host
+ (EHCI/OHCI) device nodes
+
+Add USB2.0 host (EHCI/OHCI) device tree nodes to R8A774A1 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 50 +++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 6f37fee..0dbc6c3 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -684,6 +684,56 @@
+ 			status = "disabled";
+ 		};
+ 
++		ohci0: usb@ee080000 {
++			compatible = "generic-ohci";
++			reg = <0 0xee080000 0 0x100>;
++			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 703>;
++			phys = <&usb2_phy0>;
++			phy-names = "usb";
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 703>;
++			status = "disabled";
++		};
++
++		ohci1: usb@ee0a0000 {
++			compatible = "generic-ohci";
++			reg = <0 0xee0a0000 0 0x100>;
++			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 702>;
++			phys = <&usb2_phy1>;
++			phy-names = "usb";
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 702>;
++			status = "disabled";
++		};
++
++		ehci0: usb@ee080100 {
++			compatible = "generic-ehci";
++			reg = <0 0xee080100 0 0x100>;
++			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 703>;
++			phys = <&usb2_phy0>;
++			phy-names = "usb";
++			companion= <&ohci0>;
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 703>;
++			status = "disabled";
++		};
++
++		ehci1: usb@ee0a0100 {
++			compatible = "generic-ehci";
++			reg = <0 0xee0a0100 0 0x100>;
++			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 702>;
++			phys = <&usb2_phy1>;
++			phy-names = "usb";
++			companion= <&ohci1>;
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 702>;
++			status = "disabled";
++		};
++
+ 		usb2_phy0: usb-phy@ee080200 {
+ 			compatible = "renesas,usb2-phy-r8a774a1",
+ 				     "renesas,rcar-gen3-usb2-phy";
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+From f5349359007d975cf9a5c4b9c095d6fc1a9eb776 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Jul 2019 15:08:32 +0700
+Subject: [PATCH 032/248] clk: renesas: r8a774c0: Add ADG clocks
+
+This patch adds ADG clock to the R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774c0-cpg-mssr.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/renesas/r8a774c0-cpg-mssr.c b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+index 732f802..22a551b 100644
+--- a/drivers/clk/renesas/r8a774c0-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+@@ -202,6 +202,7 @@ static const struct mssr_mod_clk r8a774c0_mod_clks[] __initconst = {
+ 	DEF_MOD("can-if0",		 916,	R8A774C0_CLK_S3D4),
+ 	DEF_MOD("i2c6",			 918,	R8A774C0_CLK_S3D2),
+ 	DEF_MOD("i2c5",			 919,	R8A774C0_CLK_S3D2),
++	DEF_MOD("adg",			 922,	R8A774C0_CLK_ZA8),
+ 	DEF_MOD("i2c-dvfs",		 926,	R8A774C0_CLK_CP),
+ 	DEF_MOD("i2c4",			 927,	R8A774C0_CLK_S3D2),
+ 	DEF_MOD("i2c3",			 928,	R8A774C0_CLK_S3D2),
+-- 
+2.7.4
+

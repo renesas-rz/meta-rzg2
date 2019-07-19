@@ -1,0 +1,37 @@
+From 5c2b222473c4a16850b6a50cf13f2a690e425dbb Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Tue, 16 Jul 2019 15:25:59 +0700
+Subject: [PATCH 245/248] arm64: dts: renesas: r8a774c0-cat874: Define and
+ enable Bluetooth pin.
+
+This patch defines and enables pin for bluetooth device
+used for RZ/GE board (R8A774C0 SoC).
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 0701937..88a0e6c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -443,6 +443,15 @@
+ 	status = "okay";
+ };
+ 
++&gpio4 {
++	bluetooth-en-gpio {
++		gpio-hog;
++		gpios = <6 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "bluetooth-en-gpio";
++	};
++};
++
+ &du {
+ 	pinctrl-0 = <&du_pins>;
+ 	pinctrl-names = "default";
+-- 
+2.7.4
+

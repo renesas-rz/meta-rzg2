@@ -1,0 +1,32 @@
+From 3db3dc6b434716cb31ebcb797f80e215738b229d Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 1 Mar 2019 22:22:52 +0700
+Subject: [PATCH 050/248] dt-bindings: usb-xhci: Add r8a774c0 support
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/usb-xhci.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/usb/usb-xhci.txt b/Documentation/devicetree/bindings/usb/usb-xhci.txt
+index ac4cd0d..1d371e3 100644
+--- a/Documentation/devicetree/bindings/usb/usb-xhci.txt
++++ b/Documentation/devicetree/bindings/usb/usb-xhci.txt
+@@ -15,9 +15,11 @@ Required properties:
+     - "renesas,xhci-r8a7796" for r8a7796 SoC
+     - "renesas,xhci-r8a77965" for r8a77965 SoC
+     - "renesas,xhci-r8a77990" for r8a77990 SoC
++    - "renesas,xhci-r8a774c0" for r8a774c0 SoC
+     - "renesas,rcar-gen2-xhci" for a generic R-Car Gen2 or RZ/G1 compatible
+       device
+-    - "renesas,rcar-gen3-xhci" for a generic R-Car Gen3 compatible device
++    - "renesas,rcar-gen3-xhci" for a generic R-Car Gen3 or RZ/G2 compatible
++      device
+     - "xhci-platform" (deprecated)
+ 
+     When compatible with the generic version, nodes must list the
+-- 
+2.7.4
+
