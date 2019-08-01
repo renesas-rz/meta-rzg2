@@ -19,6 +19,7 @@ SRC_URI_append = " \
     file://1001-Share-toytoolkit-lib.patch \
     file://1008-larger-weston-bar-suitable-for-touch-screen.patch \
     file://0001-desktop-shell-Position-maximized-surfaces-on-the-cor.patch \
+    file://0001-weston-add-weston_desktop_api_set_xwayland_position.patch \
 "
 
 S = "${WORKDIR}/git"

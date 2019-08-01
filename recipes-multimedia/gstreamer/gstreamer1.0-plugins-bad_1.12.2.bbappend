@@ -1,3 +1,4 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 SRC_URI_remove = "http://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${PV}.tar.xz"
 SRC_URI_append = " git://github.com/renesas-rcar/gst-plugins-bad.git;branch=RCAR-GEN3/1.12.2"
 
@@ -25,6 +26,12 @@ do_configure_prepend() {
     ./autogen.sh --noconfigure
     cd ${B}
 }
+
+SRC_URI_append += " \
+    file://0001-waylandsink-Add-set-window-position.patch \
+    file://0002-waylandsink-Add-set-window-scale-feature.patch \
+    file://0003-waylandsink-Add-fullscreen-display-feature.patch \
+"
 
 RDEPENDS_gstreamer1.0-plugins-bad += "libwayland-egl"
 
