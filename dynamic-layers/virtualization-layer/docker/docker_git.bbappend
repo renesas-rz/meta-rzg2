@@ -5,6 +5,7 @@ SRC_URI += "\
     file://update_date_time.sh \
     file://set_dns_nameserver.service \
     file://update_date_time.service \
+    file://normalize-aarch64-architectures-to-arm64.patch;patchdir=${S}/src/import/vendor/github.com/docker/swarmkit \
 "
 
 RDEPENDS_${PN} += "bash"

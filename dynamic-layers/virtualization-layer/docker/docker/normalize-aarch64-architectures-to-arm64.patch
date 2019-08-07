@@ -1,0 +1,32 @@
+From 9d702763118b132cbe9005a80625ba2160089c3d Mon Sep 17 00:00:00 2001
+From: Aaron Welch <welch@packet.net>
+Date: Fri, 13 Oct 2017 14:34:08 -0400
+Subject: [PATCH 6/6] normalize "aarch64" architectures to "arm64"
+
+Signed-off-by: Aaron Welch <welch@packet.net>
+---
+ manager/scheduler/filter.go | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/manager/scheduler/filter.go b/manager/scheduler/filter.go
+index 3b1c73f..9697e4a 100644
+--- a/manager/scheduler/filter.go
++++ b/manager/scheduler/filter.go
+@@ -294,6 +294,14 @@ func (f *PlatformFilter) platformEqual(imgPlatform, nodePlatform api.Platform) b
+ 		nodePlatform.Architecture = "amd64"
+ 	}
+ 
++	// normalize "aarch64" architectures to "arm64"
++	if imgPlatform.Architecture == "aarch64" {
++		imgPlatform.Architecture = "arm64"
++	}
++	if nodePlatform.Architecture == "aarch64" {
++		nodePlatform.Architecture = "arm64"
++	}
++
+ 	if (imgPlatform.Architecture == "" || imgPlatform.Architecture == nodePlatform.Architecture) && (imgPlatform.OS == "" || imgPlatform.OS == nodePlatform.OS) {
+ 		return true
+ 	}
+-- 
+2.7.4
+
