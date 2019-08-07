@@ -1,0 +1,11 @@
+[Unit]
+Description=Synchronize date and time from NTP server pool.ntp.org
+After=network.target
+Requires=network.target
+
+[Service]
+ExecStart=/usr/bin/update_date_time.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
