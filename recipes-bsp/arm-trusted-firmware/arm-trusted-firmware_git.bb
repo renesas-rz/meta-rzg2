@@ -24,6 +24,7 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0007-plat-renesas-rcar-qos-M3-mstat195.h-Modify-default-s.patch \
             file://0008-plat-rcar-M3-pfc-add-intial-pins-setting.patch \
             file://0009-plat-renesas-add-support-for-HIHOPE-RZG2N.patch \
+            file://0010-plat-renesas-rcar-qos-M3N-mstat195.h-Modify-default-.patch \
 "
 
 SRC_URI_append_r8a774c0 += "\
