@@ -20,6 +20,8 @@ SRC_URI_append = " \
     file://1008-larger-weston-bar-suitable-for-touch-screen.patch \
     file://0001-desktop-shell-Position-maximized-surfaces-on-the-cor.patch \
     file://0001-weston-add-weston_desktop_api_set_xwayland_position.patch \
+    file://0001-compositor-main-Change-default-name-of-weston-device.patch \
+    file://add-symlink-vsp.rules \
 "
 
 S = "${WORKDIR}/git"
@@ -59,9 +61,13 @@ do_install_append() {
     # Set XDG_RUNTIME_DIR to /run/user/$UID (e.g. run/user/0)
     install -d ${D}/${sysconfdir}/profile.d
     install -m 0755 ${WORKDIR}/weston.sh ${D}/${sysconfdir}/profile.d/weston.sh
+
+    install -d ${D}/${sysconfdir}/udev/rules.d/
+    install ${WORKDIR}/add-symlink-vsp.rules ${D}/${sysconfdir}/udev/rules.d/
 }
 
 FILES_${PN}_append = " \
     ${sysconfdir}/xdg/weston/weston.ini \
     ${sysconfdir}/profile.d/weston.sh \
+    ${sysconfdir}/udev/rules.d/add-symlink-vsp.rules \
 "

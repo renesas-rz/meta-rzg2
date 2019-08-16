@@ -1,0 +1,31 @@
+From 7e656a50a2444b8a1b2b940588c09f37b656a3a4 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
+Date: Sat, 17 Aug 2019 03:12:42 +0700
+Subject: [PATCH] compositor: main: Change default name of weston device node
+ in vsp mode
+
+Because the name of device node of vsp driver which is defined
+as /dev/media-vsp2.0 and /dev/media-vsp2.1. So the name of device
+node will is changed to /dev/media-vsp2.0 of wesoton in vsp mode only.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+---
+ compositor/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compositor/main.c b/compositor/main.c
+index 4c0f8c9..1adedf0 100644
+--- a/compositor/main.c
++++ b/compositor/main.c
+@@ -1241,7 +1241,7 @@ load_drm_backend(struct weston_compositor *c,
+ 	/* for v4l2 renderer */
+ 	section = weston_config_get_section(wc, "v4l2-renderer", NULL, NULL);
+ 	weston_config_section_get_string(section, "device",
+-					 &config.v4l2ops.device, "/dev/media0");
++					 &config.v4l2ops.device, "/dev/media-vsp2.0");
+ 	weston_config_section_get_string(section, "device-module",
+ 					 &config.v4l2ops.device_module, NULL);
+ 	weston_config_section_get_bool(section, "gl-fallback", &is_enable,
+-- 
+1.9.1
+
