@@ -35,4 +35,5 @@ IMAGE_INSTALL_append = " \
     lttng-modules \
     lttng-tools \
     lttng-ust \
+    tcf-agent \
 "
