@@ -9,8 +9,9 @@ PN = "gstreamer1.0-plugin-vspfilter"
 
 EXTRA_AUTORECONF_append = " -I ${STAGING_DATADIR}/aclocal"
 
-VSPFILTER_CONF_r8a774c0 = "gstvspfilter-${MACHINE}_r8a774c0.conf"
 VSPFILTER_CONF_r8a774a1 = "gstvspfilter-${MACHINE}_r8a774a1.conf"
+VSPFILTER_CONF_r8a774b1 = "gstvspfilter-${MACHINE}_r8a774b1.conf"
+VSPFILTER_CONF_r8a774c0 = "gstvspfilter-${MACHINE}_r8a774c0.conf"
 
 SRC_URI = " \
     git://github.com/renesas-rcar/gst-plugin-vspfilter.git;branch=RCAR-GEN3/1.0.0 \
