@@ -1,0 +1,27 @@
+diff --git a/arch/arm/mach-rmobile/cpu_info.c b/arch/arm/mach-rmobile/cpu_info.c
+index 2327033..6534a64 100644
+--- a/arch/arm/mach-rmobile/cpu_info.c
++++ b/arch/arm/mach-rmobile/cpu_info.c
+@@ -60,7 +60,7 @@ static const struct {
+ 	{ RMOBILE_CPU_TYPE_R8A7794, "R8A7794" },
+ 	{ RMOBILE_CPU_TYPE_R8A7795, "R8A7795" },
+ 	{ RMOBILE_CPU_TYPE_R8A774A1, "R8A774A1" },
+-	{ RMOBILE_CPU_TYPE_R8A77965, "R8A77965" },
++	{ RMOBILE_CPU_TYPE_R8A774B1, "R8A774B1" },
+ 	{ RMOBILE_CPU_TYPE_R8A77970, "R8A77970" },
+ 	{ RMOBILE_CPU_TYPE_R8A774C0, "R8A774C0" },
+ 	{ RMOBILE_CPU_TYPE_R8A77995, "R8A77995" },
+
+diff --git a/arch/arm/mach-rmobile/include/mach/rmobile.h b/arch/arm/mach-rmobile/include/mach/rmobile.h
+index da2392d..2749459 100644
+--- a/arch/arm/mach-rmobile/include/mach/rmobile.h
++++ b/arch/arm/mach-rmobile/include/mach/rmobile.h
+@@ -33,7 +33,7 @@
+ #define RMOBILE_CPU_TYPE_R8A7794	0x4C
+ #define RMOBILE_CPU_TYPE_R8A7795	0x4F
+ #define RMOBILE_CPU_TYPE_R8A774A1	0x52
+-#define RMOBILE_CPU_TYPE_R8A77965	0x55
++#define RMOBILE_CPU_TYPE_R8A774B1	0x55
+ #define RMOBILE_CPU_TYPE_R8A77970	0x54
+ #define RMOBILE_CPU_TYPE_R8A774C0	0x57
+ #define RMOBILE_CPU_TYPE_R8A77995	0x58

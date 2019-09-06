@@ -6,7 +6,16 @@ DEPENDS += "bc-native dtc-native"
 UBOOT_URL = "git://github.com/renesas-rz/renesas-u-boot-cip.git"
 BRANCH = "v2018.09/rzg2"
 
-SRC_URI = "${UBOOT_URL};branch=${BRANCH}"
+SRC_URI = "${UBOOT_URL};branch=${BRANCH} \
+	file://0010-cpg-mass-r8a774b1-support.patch \
+	file://0011-dtsi-r8a774b1-support.patch \
+	file://0012-pfc-r8a774b1-support.patch \
+	file://0013-renesas_rpc_spi-r8a774b1-support.patch \
+	file://0014-renesas-sdhi-r8a774b1-support.patch \
+	file://0015-xhci-rcar.c-r8a774b1-support.patch \
+	file://0016-hihope-rzg2n-support.patch \
+	file://0017-correct-cpuinfo.patch \
+"
 SRCREV = "156df5b7d21e033e9f234faa827a04e705a35700"
 PV = "v2018.09+git${SRCPV}"
 

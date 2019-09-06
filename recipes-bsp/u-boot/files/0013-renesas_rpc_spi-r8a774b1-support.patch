@@ -1,0 +1,12 @@
+diff --git a/drivers/spi/renesas_rpc_spi.c b/drivers/spi/renesas_rpc_spi.c
+index a51314d..58eba2c 100644
+--- a/drivers/spi/renesas_rpc_spi.c
++++ b/drivers/spi/renesas_rpc_spi.c
+@@ -449,6 +449,7 @@ static const struct udevice_id rpc_spi_ids[] = {
+ 	{ .compatible = "renesas,rpc-r8a77970" },
+ 	{ .compatible = "renesas,rpc-r8a77995" },
+ 	{ .compatible = "renesas,rpc-r8a774a1" },
++	{ .compatible = "renesas,rpc-r8a774b1" },
+ 	{ .compatible = "renesas,rpc-r8a774c0" },
+ 	{ }
+ };

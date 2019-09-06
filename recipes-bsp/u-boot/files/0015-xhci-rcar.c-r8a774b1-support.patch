@@ -1,0 +1,12 @@
+diff --git a/drivers/usb/host/xhci-rcar.c b/drivers/usb/host/xhci-rcar.c
+index 3376da6..4632af5 100644
+--- a/drivers/usb/host/xhci-rcar.c
++++ b/drivers/usb/host/xhci-rcar.c
+@@ -146,6 +146,7 @@ static const struct udevice_id xhci_rcar_ids[] = {
+ 	{ .compatible = "renesas,xhci-r8a7796" },
+ 	{ .compatible = "renesas,xhci-r8a77965" },
+ 	{ .compatible = "renesas,xhci-r8a774a1" },
++	{ .compatible = "renesas,xhci-r8a774b1" },
+ 	{ }
+ };
+ 
