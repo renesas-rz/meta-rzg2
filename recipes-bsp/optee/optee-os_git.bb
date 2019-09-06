@@ -22,7 +22,7 @@ SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=master;name=officialgit;destsuffix=git_official \
 "
 
-COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m)"
+COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n)"
 PLATFORM = "rcar"
 
 DEPENDS = "python-pycrypto-native"
