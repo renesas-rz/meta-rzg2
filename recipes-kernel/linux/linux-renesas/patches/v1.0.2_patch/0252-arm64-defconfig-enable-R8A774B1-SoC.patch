@@ -1,0 +1,28 @@
+From 126f09d48d036c147aa08484ef4b0556199b0d39 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 24 Jul 2019 13:22:27 +0700
+Subject: [PATCH 252/345] arm64: defconfig: enable R8A774B1 SoC
+
+This patch enables the Renesas RZ/G2N (R8A774B1) SoC in the ARM64
+defconfig.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 16ac4ed..71003ad 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -51,6 +51,7 @@ CONFIG_ARCH_SEATTLE=y
+ CONFIG_ARCH_SYNQUACER=y
+ CONFIG_ARCH_RENESAS=y
+ CONFIG_ARCH_R8A774A1=y
++CONFIG_ARCH_R8A774B1=y
+ CONFIG_ARCH_R8A774C0=y
+ CONFIG_ARCH_R8A7795=y
+ CONFIG_ARCH_R8A7796=y
+-- 
+2.7.4
+

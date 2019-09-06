@@ -1,0 +1,33 @@
+From 6f006e79750287aebcf75ef569c5f823bb575522 Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Mon, 26 Aug 2019 16:30:10 +0700
+Subject: [PATCH 326/345] drivers: thermal: rcar_gen3_thermal: Thermal support
+ for RZ/G2N
+
+This patch adds thermal compatible string for R8A774B1 SoC.
+Based on RCAR patch:
+    - Repository: renesas-bsp
+    - Branch: v4.14.75-ltsi/rcar-3.9.6
+    - Commit <e039d00e9e96> ("thermal: rcar_gen3_thermal: add r8a77965
+    support")
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index 8258a85..c06991b 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -335,6 +335,7 @@ static const struct of_device_id rcar_gen3_thermal_dt_ids[] = {
+ 	{ .compatible = "renesas,r8a7796-thermal", },
+ 	{ .compatible = "renesas,r8a77965-thermal", },
+ 	{ .compatible = "renesas,r8a774a1-thermal", },
++	{ .compatible = "renesas,r8a774b1-thermal", },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, rcar_gen3_thermal_dt_ids);
+-- 
+2.7.4
+

@@ -1,0 +1,173 @@
+From f33316eebc02a33c986b678b5865e8c5b6086797 Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Mon, 12 Aug 2019 12:57:49 +0700
+Subject: [PATCH 327/345] drivers: thermal: rcar_gen3_thermal: Update thermal
+ calculation formula
+
+1. Based on RCAR patch:
+    - Repository: renesas-bsp
+    - Branch: v4.14.75-ltsi/rcar-3.9.6
+    - Commit <d4e41702e53b> ("thermal: rcar_gen3_thermal: [H3/M3N]
+    Update calculation formula due to HW evaluation")
+
+2. Temperature calculation formula of G2M and G2N/H are different as
+below:
+    - For G2M: TJ_1 = 116
+    - For G2N/H: TJ_1 = 126
+
+3. Update the formula to calculate CTEMP:
+    Currently, the CTEMP is average of val1 (calculated by formula 1)
+    and val2 (calculated by formula 2). But as descripting in HWM:
+    - If (STEMP < Tj_T) CTEMP should be val1
+    - If (STEMP > Tj_T) CTEMP should be val2
+
+4. Update the formula to calculate temperature:
+    Currently, current TEMP is calculated as average of val1 (calculated
+    by formula 1) and val2 (calculated by formula 2) But as the
+    desciption in HWM:
+    - If (TEMP_CODE < THCODE[11:0]) CTEMP should be val1
+    - If (TEMP_CODE > THCODE[11:0]) CTEMP should be val2
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 57 ++++++++++++++++++++++++-------------
+ 1 file changed, 37 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index c06991b..c2499ca 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -75,6 +75,7 @@ struct rcar_gen3_thermal_tsc {
+ 	struct thermal_zone_device *zone;
+ 	struct equation_coefs coef;
+ 	bool irq_cap;
++	int id; /* Thermal channel id */
+ };
+ 
+ struct rcar_gen3_thermal_priv {
+@@ -112,6 +113,15 @@ static inline void rcar_gen3_thermal_write(struct rcar_gen3_thermal_tsc *tsc,
+  * Integer also needs to be signed so that leaves 7 bits for binary
+  * fixed point scaling.
+  */
++static int ths_tj;
++static int tj_2;
++
++/* Default THCODE values if FUSEs are missing */
++static int thcode[TSC_MAX_NUM][3] = {
++	{ 3397, 2800, 2221 },
++	{ 3393, 2795, 2216 },
++	{ 3389, 2805, 2237 },
++};
+ 
+ #define FIXPT_SHIFT 7
+ #define FIXPT_INT(_x) ((_x) << FIXPT_SHIFT)
+@@ -121,22 +131,23 @@ static inline void rcar_gen3_thermal_write(struct rcar_gen3_thermal_tsc *tsc,
+ 
+ #define RCAR3_THERMAL_GRAN 500 /* mili Celsius */
+ 
+-/* no idea where these constants come from */
+-#define TJ_1 116
++#define THS_TJ1     126 /* Use for G2N, G2H */
++#define THS_TJ1_G2M 116 /* Use for G2M */
++
++#define TJ_1 (ths_tj)
++#define TJ_2 (INT_FIXPT(tj_2))
+ #define TJ_3 -41
+ 
+ static void rcar_gen3_thermal_calc_coefs(struct equation_coefs *coef,
+ 					 int *ptat, int *thcode)
+ {
+-	int tj_2;
+-
+ 	/* TODO: Find documentation and document constant calculation formula */
+ 
+ 	/*
+ 	 * Division is not scaled in BSP and if scaled it might overflow
+ 	 * the dividend (4095 * 4095 << 14 > INT_MAX) so keep it unscaled
+ 	 */
+-	tj_2 = (FIXPT_INT((ptat[1] - ptat[2]) * 157)
++	tj_2 = (FIXPT_INT((ptat[1] - ptat[2]) * (TJ_1 - TJ_3))
+ 		/ (ptat[0] - ptat[2])) - FIXPT_INT(41);
+ 
+ 	coef->a1 = FIXPT_DIV(FIXPT_INT(thcode[1] - thcode[2]),
+@@ -160,16 +171,18 @@ static int rcar_gen3_thermal_round(int temp)
+ 
+ static int rcar_gen3_thermal_convert_temp(struct rcar_gen3_thermal_tsc *tsc)
+ {
+-	int mcelsius, val1, val2;
++	int mcelsius, val;
+ 	u32 reg;
+ 
+ 	/* Read register and convert to mili Celsius */
+ 	reg = rcar_gen3_thermal_read(tsc, REG_GEN3_TEMP) & CTEMP_MASK;
+ 
+-	val1 = FIXPT_DIV(FIXPT_INT(reg) - tsc->coef.b1, tsc->coef.a1);
+-	val2 = FIXPT_DIV(FIXPT_INT(reg) - tsc->coef.b2, tsc->coef.a2);
+-	mcelsius = rcar_gen3_thermal_round(FIXPT_TO_MCELSIUS(
+-						(val1 + val2) / 2));
++	if (reg < thcode[tsc->id][1])
++		val = FIXPT_DIV(FIXPT_INT(reg) - tsc->coef.b1, tsc->coef.a1);
++	else
++		val = FIXPT_DIV(FIXPT_INT(reg) - tsc->coef.b2, tsc->coef.a2);
++
++	mcelsius = rcar_gen3_thermal_round(FIXPT_TO_MCELSIUS(val));
+ 	return mcelsius;
+ }
+ 
+@@ -192,13 +205,15 @@ static int rcar_gen3_thermal_get_temp(void *devdata, int *temp)
+ static int rcar_gen3_thermal_mcelsius_to_temp(struct rcar_gen3_thermal_tsc *tsc,
+ 					      int mcelsius)
+ {
+-	int celsius, val1, val2;
+-
++	int celsius, val;
+ 	celsius = DIV_ROUND_CLOSEST(mcelsius, 1000);
+-	val1 = celsius * tsc->coef.a1 + tsc->coef.b1;
+-	val2 = celsius * tsc->coef.a2 + tsc->coef.b2;
+ 
+-	return INT_FIXPT((val1 + val2) / 2);
++	if (celsius < TJ_2)
++		val = celsius * tsc->coef.a1 + tsc->coef.b1;
++	else
++		val = celsius * tsc->coef.a2 + tsc->coef.b2;
++
++	return INT_FIXPT(val);
+ }
+ 
+ static int rcar_gen3_thermal_set_irq_temp(struct rcar_gen3_thermal_tsc *tsc)
+@@ -366,11 +381,6 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 	/* default values if FUSEs are missing */
+ 	/* TODO: Read values from hardware on supported platforms */
+ 	int ptat[3] = { 2631, 1509, 435 };
+-	int thcode[TSC_MAX_NUM][3] = {
+-		{ 3397, 2800, 2221 },
+-		{ 3393, 2795, 2216 },
+-		{ 3389, 2805, 2237 },
+-	};
+ 
+ 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+@@ -380,6 +390,12 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 	if (soc_device_match(r8a7795es1))
+ 		priv->thermal_init = rcar_gen3_thermal_init_r8a7795es1;
+ 
++	if (!of_device_is_compatible(pdev->dev.of_node,
++			"renesas,r8a774a1-thermal"))
++		ths_tj = THS_TJ1;
++	else
++		ths_tj = THS_TJ1_G2M;
++
+ 	spin_lock_init(&priv->lock);
+ 
+ 	platform_set_drvdata(pdev, priv);
+@@ -428,6 +444,7 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 			goto error_unregister;
+ 		}
+ 
++		tsc->id = i;
+ 		priv->tscs[i] = tsc;
+ 
+ 		priv->thermal_init(tsc);
+-- 
+2.7.4
+

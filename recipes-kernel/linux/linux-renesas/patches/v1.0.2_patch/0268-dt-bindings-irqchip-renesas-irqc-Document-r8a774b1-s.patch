@@ -1,0 +1,28 @@
+From 7c55f991cb5e33ecbef794c87fe9495ba2f6788d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 25 Jul 2019 13:05:03 +0700
+Subject: [PATCH 268/345] dt-bindings: irqchip: renesas-irqc: Document r8a774b1
+ support
+
+Document RZ/G2N (R8A774B1) SoC bindings.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/interrupt-controller/renesas,irqc.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/interrupt-controller/renesas,irqc.txt b/Documentation/devicetree/bindings/interrupt-controller/renesas,irqc.txt
+index c974b83..67baef1 100644
+--- a/Documentation/devicetree/bindings/interrupt-controller/renesas,irqc.txt
++++ b/Documentation/devicetree/bindings/interrupt-controller/renesas,irqc.txt
+@@ -14,6 +14,7 @@ Required properties:
+     - "renesas,irqc-r8a7793" (R-Car M2-N)
+     - "renesas,irqc-r8a7794" (R-Car E2)
+     - "renesas,intc-ex-r8a774a1" (RZ/G2M)
++    - "renesas,intc-ex-r8a774b1" (RZ/G2N)
+     - "renesas,intc-ex-r8a774c0" (RZ/G2E)
+     - "renesas,intc-ex-r8a7795" (R-Car H3)
+     - "renesas,intc-ex-r8a7796" (R-Car M3-W)
+-- 
+2.7.4
+

@@ -1,0 +1,33 @@
+From f28f9c9389a475bd2457209eb9d3083181d92a03 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 24 Jul 2019 15:37:14 +0700
+Subject: [PATCH 263/345] dt-bindings: arm: shmobile: Add hoperun hihope-rzg2n
+ and hihope-rzg2n-ex boards
+
+This patch adds board hihope-rzg2n (powered by the RZ/G2N) and board
+hihope-rzg2n-ex (included hihope-rzg2n and sub board that sits on top of
+hihope-rzg2n). Both boards are made by Jiangsu Hoperun.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/arm/shmobile.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/arm/shmobile.txt b/Documentation/devicetree/bindings/arm/shmobile.txt
+index 757a316..2b16492 100644
+--- a/Documentation/devicetree/bindings/arm/shmobile.txt
++++ b/Documentation/devicetree/bindings/arm/shmobile.txt
+@@ -137,6 +137,10 @@ Boards:
+     compatible = "hoperun,hihope-rzg2m", "renesas,r8a774a1"
+   - Hoperun Technology HiHope RZ/G2M extension board (hihope-rzg2m-ex)
+     compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m", "renesas,r8a774a1"
++  - Hoperun Technology HiHope RZ/G2N platform (hihope-rzg2n)
++    compatible = "hoperun,hihope-rzg2n", "renesas,r8a774b1"
++  - Hoperun Technology HiHope RZ/G2N extension board (hihope-rzg2n-ex)
++    compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2n", "renesas,r8a774b1"
+   - Silicon Linux RZ/G2E 96board platform (CAT874)
+     compatible = "si-linux,cat874", "renesas,r8a774c0"
+   - Silicon Linux sub board for CAT874 (CAT875)
+-- 
+2.7.4
+
