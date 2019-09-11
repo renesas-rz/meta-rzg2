@@ -1,0 +1,28 @@
+From 83f74a445344b7b2ca25cf83115fc792fa623669 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 9 Sep 2019 10:13:42 +0700
+Subject: [PATCH 1/2] gstplaybin change vspmfilter as default converter
+
+Since vspmfilter is implemented, we use it as default converter.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index c9f38eb..71d23a9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -610,7 +610,7 @@ AG_GST_CHECK_FEATURE(XSHM, [X Shared Memory extension], [ ], [
+ ])
+ 
+ dnl set default video converter
+-DEFAULT_CNV="vspfilter"
++DEFAULT_CNV="vspmfilter"
+ AC_SUBST(DEFAULT_CNV)
+ 
+ dnl *** ext plug-ins ***
+-- 
+2.7.4
+

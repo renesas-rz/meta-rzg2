@@ -1,0 +1,75 @@
+From 1091d51ac5d495e3d98062e88f889f287fdaeda9 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 11 Sep 2019 13:42:44 +0700
+Subject: [PATCH] playback: add set property dmabuf-use for video filter
+
+When playbin need to create video-filter for usage.
+In case user use vspmfilter for default, we will set the property
+"dmabuf-use" to TRUE for downstream usage, such as waylandsink
+or sink of Qt.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ gst/playback/gstplaysink.c             |  3 +++
+ gst/playback/gstplaysinkvideoconvert.c | 15 +++++++++++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/gst/playback/gstplaysink.c b/gst/playback/gstplaysink.c
+index e393279..e49bdad 100644
+--- a/gst/playback/gstplaysink.c
++++ b/gst/playback/gstplaysink.c
+@@ -1509,6 +1509,9 @@ gen_video_deinterlace_chain (GstPlaySink * playsink)
+     gst_bin_add (bin, chain->conv);
+     head = chain->conv;
+     prev = chain->conv;
++    if (g_object_class_find_property (G_OBJECT_GET_CLASS (G_OBJECT (head)),
++        "dmabuf-use"))
++      g_object_set (G_OBJECT(head), "dmabuf-use", TRUE, NULL);
+   }
+ 
+   GST_DEBUG_OBJECT (playsink, "creating deinterlace");
+diff --git a/gst/playback/gstplaysinkvideoconvert.c b/gst/playback/gstplaysinkvideoconvert.c
+index 5bac5d0..c300a72 100644
+--- a/gst/playback/gstplaysinkvideoconvert.c
++++ b/gst/playback/gstplaysinkvideoconvert.c
+@@ -57,8 +57,12 @@ gst_play_sink_video_convert_add_conversion_elements (GstPlaySinkVideoConvert *
+   if (self->use_converters) {
+     el = gst_play_sink_convert_bin_add_conversion_element_factory (cbin,
+         COLORSPACE, "conv");
+-    if (el)
++    if (el) {
+       prev = el;
++      if (g_object_class_find_property (G_OBJECT_GET_CLASS (G_OBJECT (el)),
++          "dmabuf-use"))
++        g_object_set (G_OBJECT(el), "dmabuf-use", TRUE, NULL);
++    }
+ 
+     el = gst_play_sink_convert_bin_add_conversion_element_factory (cbin,
+         "videoscale", "scale");
+@@ -71,6 +75,9 @@ gst_play_sink_video_convert_add_conversion_elements (GstPlaySinkVideoConvert *
+           goto link_failed;
+       }
+       prev = el;
++      if (g_object_class_find_property (G_OBJECT_GET_CLASS (G_OBJECT (el)),
++          "dmabuf-use"))
++        g_object_set (G_OBJECT(el), "dmabuf-use", TRUE, NULL);
+     }
+   }
+ 
+@@ -91,8 +98,12 @@ gst_play_sink_video_convert_add_conversion_elements (GstPlaySinkVideoConvert *
+               GST_PAD_LINK_CHECK_TEMPLATE_CAPS))
+         goto link_failed;
+     }
+-    if (el)
++    if (el) {
+       prev = el;
++      if (g_object_class_find_property (G_OBJECT_GET_CLASS (G_OBJECT (el)),
++          "dmabuf-use"))
++        g_object_set (G_OBJECT(el), "dmabuf-use", TRUE, NULL);
++    }
+   }
+ 
+   return TRUE;
+-- 
+2.7.4
+
