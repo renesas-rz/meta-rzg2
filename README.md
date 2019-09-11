@@ -88,6 +88,11 @@ Prepare default configuration files. :
 
 \<toolchain\> : poky-gcc, linaro-gcc
 
+**(Optional)** If you would like to enable Docker feature, please uncomment the below line inside file _"./conf/local.conf"_:
+```
+    #MACHINE_FEATURES_append = " docker"
+```
+
 Build the target file system image using bitbake:
 ```bash
     $ bitbake core-image-<target>
