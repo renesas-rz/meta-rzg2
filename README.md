@@ -5,6 +5,7 @@ Currently the following boards and MPUs are supported:
 
 - Board: EK874 / MPU: R8A774C0 (RZ/G2E)
 - Board: HIHOPE-RZG2M / MPU: R8A774A1 (RZG2M)
+- Board: HIHOPE-RZG2N / MPU: R8A774B1 (RZG2N)
 
 ## Patches
 
@@ -84,7 +85,7 @@ Prepare default configuration files. :
 ```bash
     $ cp $WORK/meta-rzg2/docs/sample/conf/<board>/<toolchain>/*.conf ./conf/
 ```
-\<board\> : ek874, hihope-rzg2m
+\<board\> : ek874, hihope-rzg2m, hihope-rzg2n
 
 \<toolchain\> : poky-gcc, linaro-gcc
 
