@@ -1,0 +1,26 @@
+From e652ce54731b68013c165c8ba5ff87202f360e92 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Sep 2019 10:52:36 +0700
+Subject: [PATCH 307/405] arm64: defconfig: enable Debug filesystem for RZ/G2
+ SoC
+
+This patch enables Debug filesystem config to support for debugging
+purposes in RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index b326a7c..4fdd782 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -355,3 +355,4 @@ CONFIG_DEBUG_KERNEL=y
+ # CONFIG_PROVE_LOCKING is not set
+ # CONFIG_FTRACE is not set
+ CONFIG_MEMTEST=y
++CONFIG_DEBUG_FS=y
+-- 
+2.7.4
+

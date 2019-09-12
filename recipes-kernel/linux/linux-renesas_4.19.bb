@@ -6,7 +6,7 @@ require include/ecc-control.inc
 require include/docker-control.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
-COMPATIBLE_MACHINE = "ek874|hihope-rzg2m"
+COMPATIBLE_MACHINE = "ek874|hihope-rzg2m|hihope-rzg2n"
 
 KERNEL_URL = " \
     git://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git"

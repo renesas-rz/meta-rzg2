@@ -1,0 +1,36 @@
+From e88995f8856618bd71b5329950bd00d44fa548b5 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 6 Aug 2019 15:52:39 +0700
+Subject: [PATCH 275/405] soc: renesas: rcar-topology: Add missing dependency
+ and description about topology in RZ/G2
+
+This patch missing dependency and drescription about topology in RZ/G2
+series because RZ/G2M can support big.LITTLE like R-CarM3W.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 80c5f43..74cbb55 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -27,11 +27,12 @@ config SOC_RENESAS
+ 	select SYSC_R8A77995 if ARCH_R8A77995
+ 
+ config RCAR_CPU_TOPOLOGY
+-	depends on (ARCH_R8A7795 || ARCH_R8A7796)
++	depends on (ARCH_R8A7795 || ARCH_R8A7796 || ARCH_R8A774A1)
+ 	bool "R-Car CPU Topology"
+ 	default y
+ 	help
+-	  This enables the capacity awareness feature for R-Car series.
++	  This enables the capacity awareness feature for R-Car
++	  and RZ/G2 series.
+ 
+ 
+ if SOC_RENESAS
+-- 
+2.7.4
+

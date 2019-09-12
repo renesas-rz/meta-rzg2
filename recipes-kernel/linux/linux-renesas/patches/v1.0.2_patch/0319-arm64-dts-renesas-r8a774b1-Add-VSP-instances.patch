@@ -1,0 +1,148 @@
+From ce853afacd3db7e07d5f47d5c26b635babfa5fc1 Mon Sep 17 00:00:00 2001
+From: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+Date: Thu, 5 Sep 2019 15:51:09 +0700
+Subject: [PATCH 319/405] arm64: dts: renesas: r8a774b1: Add VSP instances
+
+The r8a774b1 has 6 VSP instances.
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 82 ++++++++++++++++++++++++++-----
+ 1 file changed, 71 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index e64be6e..365b997 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -1064,13 +1064,37 @@
+ 		};
+ 
+ 		vsp@fe960000 {
++			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe960000 0 0x8000>;
+-			/* placeholder */
++			renesas,has-bru;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-hgo;
++			renesas,#rpf = <5>;
++			renesas,#uds = <0>;
++			renesas,#wpf = <1>;
+ 		};
+ 
+ 		vspb: vspm@fe960000 {
++			compatible = "renesas,vspm";
+ 			reg = <0 0xfe960000 0 0x8000>, <0 0xfe96f000 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 626>, <&cpg CPG_MOD 607>;
++			clock-names = "vsp", "fcp";
++			renesas,#ch = <3>;
++			renesas,#rpf = <31>;
++			renesas,#rpf_clut = <6>;
++			renesas,#wpf_rot = <0>;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-bru;
++			renesas,has-hgo;
++			renesas,#read_outstanding = <0>;
++			renesas,#start_reservation = <1>;
++			power-domains = <&sysc R8A774B1_PD_A3VP>;
++			resets = <&cpg 626>, <&cpg 607>;
++			reset-names = "vsp", "fcp";
++			status = "disabled";
+ 		};
+ 
+ 		fcpvb0: fcp@fe96f000 {
+@@ -1082,13 +1106,42 @@
+ 		};
+ 
+ 		vsp@fe9a0000 {
++			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe9a0000 0 0x8000>;
+-			/* placeholder */
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-hgo;
++			renesas,has-hgt;
++			renesas,#rpf = <1>;
++			renesas,#uds = <1>;
++			renesas,#wpf = <1>;
+ 		};
+ 
+ 		vspi0: vspm@fe9a0000 {
++			compatible = "renesas,vspm";
+ 			reg = <0 0xfe9a0000 0 0x8000>, <0 0xfe9af000 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 444 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 631>, <&cpg CPG_MOD 611>;
++			clock-names = "vsp", "fcp";
++			renesas,#ch = <0>;
++			renesas,#rpf = <1>;
++			renesas,#rpf_clut = <1>;
++			renesas,#wpf_rot = <1>;
++			renesas,has-sru;
++			renesas,has-uds;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-hst;
++			renesas,has-hsi;
++			renesas,has-hgo;
++			renesas,has-hgt;
++			renesas,has-shp;
++			renesas,#read_outstanding = <2>;
++			renesas,#start_reservation = <1>;
++			power-domains = <&sysc R8A774B1_PD_A3VP>;
++			resets = <&cpg 631>, <&cpg 611>;
++			reset-names = "vsp", "fcp";
++			status = "disabled";
+ 		};
+ 
+ 		fcpvi0: fcp@fe9af000 {
+@@ -1100,8 +1153,14 @@
+ 		};
+ 
+ 		vspd0: vsp@fea20000 {
++			compatible = "renesas,vsp2";
+ 			reg = <0 0xfea20000 0 0x4000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 466 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 623>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 623>;
++
++			renesas,fcp = <&fcpvd0>;
+ 		};
+ 
+ 		fcpvd0: fcp@fea27000 {
+@@ -1113,8 +1172,14 @@
+ 		};
+ 
+ 		vspd1: vsp@fea28000 {
++			compatible = "renesas,vsp2";
+ 			reg = <0 0xfea28000 0 0x4000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 467 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 622>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 622>;
++
++			renesas,fcp = <&fcpvd1>;
+ 		};
+ 
+ 		fcpvd1: fcp@fea2f000 {
+@@ -1125,11 +1190,6 @@
+ 			resets = <&cpg 602>;
+ 		};
+ 
+-		vspd2: vsp@fea30000 {
+-			reg = <0 0xfea30000 0 0x4000>;
+-			/* placeholder */
+-		};
+-
+ 		du: display@feb00000 {
+ 			reg = <0 0xfeb00000 0 0x70000>;
+ 
+-- 
+2.7.4
+

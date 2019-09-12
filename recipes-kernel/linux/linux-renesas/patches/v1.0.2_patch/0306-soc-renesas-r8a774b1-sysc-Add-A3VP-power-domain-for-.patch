@@ -1,0 +1,42 @@
+From 7462f4bdd768fde5b7244a7885c9294fcf8fe49b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 22 Aug 2019 16:28:35 +0700
+Subject: [PATCH 306/405] soc: renesas: r8a774b1-sysc: Add A3VP power domain
+ for R8A774B1
+
+This patch adds A3VP power domain for R8A774B1 to support Video
+Processing domain.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/r8a774b1-sysc.c       | 1 +
+ include/dt-bindings/power/r8a774b1-sysc.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/soc/renesas/r8a774b1-sysc.c b/drivers/soc/renesas/r8a774b1-sysc.c
+index 799faf0..e25fe60 100644
+--- a/drivers/soc/renesas/r8a774b1-sysc.c
++++ b/drivers/soc/renesas/r8a774b1-sysc.c
+@@ -22,6 +22,7 @@ static const struct rcar_sysc_area r8a774b1_areas[] __initconst = {
+ 	  PD_CPU_NOCR },
+ 	{ "ca57-cpu1",	 0x80, 1, R8A774B1_PD_CA57_CPU1, R8A774B1_PD_CA57_SCU,
+ 	  PD_CPU_NOCR },
++	{ "a3vp",	0x340, 0, R8A774B1_PD_A3VP,	R8A774B1_PD_ALWAYS_ON },
+ 	{ "a3vc",	0x380, 0, R8A774B1_PD_A3VC,	R8A774B1_PD_ALWAYS_ON },
+ 	{ "a2vc0",	0x3c0, 0, R8A774B1_PD_A2VC0,	R8A774B1_PD_A3VC },
+ 	{ "a2vc1",	0x3c0, 1, R8A774B1_PD_A2VC1,	R8A774B1_PD_A3VC },
+diff --git a/include/dt-bindings/power/r8a774b1-sysc.h b/include/dt-bindings/power/r8a774b1-sysc.h
+index 10cf4e2..b5d64d5 100644
+--- a/include/dt-bindings/power/r8a774b1-sysc.h
++++ b/include/dt-bindings/power/r8a774b1-sysc.h
+@@ -14,6 +14,7 @@
+ 
+ #define R8A774B1_PD_CA57_CPU0		 0
+ #define R8A774B1_PD_CA57_CPU1		 1
++#define R8A774B1_PD_A3VP		 9
+ #define R8A774B1_PD_CA57_SCU		12
+ #define R8A774B1_PD_A3VC		14
+ #define R8A774B1_PD_3DG_A		17
+-- 
+2.7.4
+

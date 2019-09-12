@@ -1,0 +1,872 @@
+From cade373bbc14c037bd6511061606ce7873d5ca05 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 25 Jul 2019 14:07:49 +0700
+Subject: [PATCH 265/405] arm64: dts: renesas: Add Renesas R8A774B1 SoC support
+
+This patch adds basic support for the RZ/G2N (R8A774B1) SoC:
+	- PSCI
+	- CPUs: CA57{0;1}
+	- Cache controller
+	- Main clocks and controller
+	- Interrupt controller
+	- Timer
+	- PMU
+	- Reset controller
+	- Pin function controller
+	- Product register
+	- System controller
+	- UART for console
+
+Also add placeholders to avoid compilation error with
+the common platform code.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 835 ++++++++++++++++++++++++++++++
+ 1 file changed, 835 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+new file mode 100644
+index 0000000..3741fa5
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -0,0 +1,835 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the r8a774b1 SoC
++ *
++ * Based on r8a774b1.dtsi
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/interrupt-controller/arm-gic.h>
++#include <dt-bindings/clock/r8a774b1-cpg-mssr.h>
++#include <dt-bindings/power/r8a774b1-sysc.h>
++
++/ {
++	compatible = "renesas,r8a774b1";
++	#address-cells = <2>;
++	#size-cells = <2>;
++
++	aliases {
++		i2c0 = &i2c0;
++		i2c1 = &i2c1;
++		i2c2 = &i2c2;
++		i2c3 = &i2c3;
++		i2c4 = &i2c4;
++		i2c5 = &i2c5;
++		i2c6 = &i2c6;
++		i2c7 = &i2c_dvfs;
++	};
++
++	/*
++	 * The external audio clocks are configured as 0 Hz fixed frequency
++	 * clocks by default.
++	 * Boards that provide audio clocks should override them.
++	 */
++	audio_clk_a: audio_clk_a {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	audio_clk_b: audio_clk_b {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	audio_clk_c: audio_clk_c {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	/* External CAN clock - to be overridden by boards that provide it */
++	can_clk: can {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	extal_clk: extal {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		/* This value must be overridden by the board */
++		clock-frequency = <0>;
++	};
++
++	extalr_clk: extalr {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		/* This value must be overridden by the board */
++		clock-frequency = <0>;
++	};
++
++	/* External PCIe clock - can be overridden by the board */
++	pcie_bus_clk: pcie_bus {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	/* External SCIF clock - to be overridden by boards that provide it */
++	scif_clk: scif {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	/* External USB clocks - can be overridden by the board */
++	usb3s0_clk: usb3s0 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	usb_extal_clk: usb_extal {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	/* MSIOF reference clock - to be overridden by boards that provide it */
++	msiof_ref_clk: msiof-ref-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
++	psci {
++		compatible = "arm,psci-1.0", "arm,psci-0.2";
++		method = "smc";
++	};
++
++	cpus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		a57_0: cpu@0 {
++			compatible = "arm,cortex-a57", "arm,armv8";
++			reg = <0x0>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774B1_PD_CA57_CPU0>;
++			next-level-cache = <&L2_CA57>;
++			enable-method = "psci";
++			clocks = <&cpg CPG_CORE R8A774B1_CLK_Z>;
++		};
++
++		a57_1: cpu@1 {
++			compatible = "arm,cortex-a57", "arm,armv8";
++			reg = <0x1>;
++			device_type = "cpu";
++			power-domains = <&sysc R8A774B1_PD_CA57_CPU1>;
++			next-level-cache = <&L2_CA57>;
++			enable-method = "psci";
++			clocks = <&cpg CPG_CORE R8A774B1_CLK_Z>;
++		};
++
++		L2_CA57: cache-controller-0 {
++			compatible = "cache";
++			power-domains = <&sysc R8A774B1_PD_CA57_SCU>;
++			cache-unified;
++			cache-level = <2>;
++		};
++	};
++
++	pmu_a57 {
++		compatible = "arm,cortex-a57-pmu";
++		interrupts-extended =	<&gic GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
++					<&gic GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-affinity = <&a57_0>, <&a57_1>;
++	};
++
++	soc {
++		compatible = "simple-bus";
++		interrupt-parent = <&gic>;
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		cpg: clock-controller@e6150000 {
++			compatible = "renesas,r8a774b1-cpg-mssr";
++			reg = <0 0xe6150000 0 0x0bb0>;
++			clocks = <&extal_clk>, <&extalr_clk>;
++			clock-names = "extal", "extalr";
++			#clock-cells = <2>;
++			#power-domain-cells = <0>;
++			#reset-cells = <1>;
++		};
++
++		rst: reset-controller@e6160000 {
++			compatible = "renesas,r8a774b1-rst";
++			reg = <0 0xe6160000 0 0x018c>;
++		};
++
++		sysc: system-controller@e6180000 {
++			compatible = "renesas,r8a774b1-sysc";
++			reg = <0 0xe6180000 0 0x0400>;
++			#power-domain-cells = <1>;
++		};
++
++		gic: interrupt-controller@f1010000 {
++			compatible = "arm,gic-400";
++			#interrupt-cells = <3>;
++			#address-cells = <0>;
++			interrupt-controller;
++			reg =	<0x0 0xf1010000 0 0x1000>,
++				<0x0 0xf1020000 0 0x20000>,
++				<0x0 0xf1040000 0 0x20000>,
++				<0x0 0xf1060000 0 0x20000>;
++			interrupts = <GIC_PPI 9
++			(GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_HIGH)>;
++			clocks = <&cpg CPG_MOD 408>;
++			clock-names = "clk";
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 408>;
++		};
++
++		prr: chipid@fff00044 {
++			compatible = "renesas,prr";
++			reg = <0 0xfff00044 0 4>;
++		};
++
++		pfc: pin-controller@e6060000 {
++			compatible = "renesas,pfc-r8a774b1";
++			reg = <0 0xe6060000 0 0x50c>;
++		};
++
++		tsc: thermal@e6198000 {
++			reg =	<0 0xe6198000 0 0x100>,
++				<0 0xe61a0000 0 0x100>,
++				<0 0xe61a8000 0 0x100>;
++			/* placeholder */
++		};
++
++		avb: ethernet@e6800000 {
++			reg = <0 0xe6800000 0 0x800>, <0 0xe6a00000 0 0x10000>;
++			/* placeholder */
++		};
++
++		can0: can@e6c30000 {
++			reg = <0 0xe6c30000 0 0x1000>;
++			/* placeholder */
++		};
++
++		can1: can@e6c38000 {
++			reg = <0 0xe6c38000 0 0x1000>;
++			/* placeholder */
++		};
++
++		hscif0: serial@e6540000 {
++			reg = <0 0xe6540000 0 0x60>;
++			/* placeholder */
++		};
++
++		hscif1: serial@e6550000 {
++			reg = <0 0xe6550000 0 0x60>;
++			/* placeholder */
++		};
++
++		hscif2: serial@e6560000 {
++			reg = <0 0xe6560000 0 0x60>;
++			/* placeholder */
++		};
++
++		hscif3: serial@e66a0000 {
++			reg = <0 0xe66a0000 0 0x60>;
++			/* placeholder */
++		};
++
++		hscif4: serial@e66b0000 {
++			reg = <0 0xe66b0000 0 0x60>;
++			/* placeholder */
++		};
++
++		scif0: serial@e6e60000 {
++			reg = <0 0xe6e60000 0 64>;
++			/* placeholder */
++		};
++
++		scif1: serial@e6e68000 {
++			reg = <0 0xe6e68000 0 64>;
++			/* placeholder */
++		};
++
++		scif2: serial@e6e88000 {
++			compatible = "renesas,scif-r8a774b1",
++				"renesas,rcar-gen3-scif", "renesas,scif";
++			reg = <0 0xe6e88000 0 0x40>;
++			interrupts = <GIC_SPI 164 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 310>, <&scif_clk>;
++			clock-names = "fck", "scif_clk";
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 310>;
++			status = "disabled";
++		};
++
++		scif3: serial@e6c50000 {
++			reg = <0 0xe6c50000 0 64>;
++			/* placeholder */
++		};
++
++		scif4: serial@e6c40000 {
++			reg = <0 0xe6c40000 0 64>;
++			/* placeholder */
++		};
++
++		scif5: serial@e6f30000 {
++			reg = <0 0xe6f30000 0 64>;
++			/* placeholder */
++		};
++
++		pwm0: pwm@e6e30000 {
++			reg = <0 0xe6e30000 0 8>;
++			/* placeholder */
++		};
++
++		pwm1: pwm@e6e31000 {
++			reg = <0 0xe6e31000 0 8>;
++			/* placeholder */
++		};
++
++		pwm2: pwm@e6e32000 {
++			reg = <0 0xe6e32000 0 8>;
++			/* placeholder */
++		};
++
++		pwm3: pwm@e6e33000 {
++			reg = <0 0xe6e33000 0 8>;
++			/* placeholder */
++		};
++
++		pwm4: pwm@e6e34000 {
++			reg = <0 0xe6e34000 0 8>;
++			/* placeholder */
++		};
++
++		pwm5: pwm@e6e35000 {
++			reg = <0 0xe6e35000 0 8>;
++			/* placeholder */
++		};
++
++		pwm6: pwm@e6e36000 {
++			reg = <0 0xe6e36000 0 8>;
++			/* placeholder */
++		};
++
++		tpu: pwm@e6e80000 {
++			reg = <0 0xe6e80000 0 0x148>;
++			/* placeholder */
++		};
++
++		gpio0: gpio@e6050000 {
++			reg = <0 0xe6050000 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio1: gpio@e6051000 {
++			reg = <0 0xe6051000 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio2: gpio@e6052000 {
++			reg = <0 0xe6052000 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio3: gpio@e6053000 {
++			reg = <0 0xe6053000 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio4: gpio@e6054000 {
++			reg = <0 0xe6054000 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio5: gpio@e6055000 {
++			reg = <0 0xe6055000 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio6: gpio@e6055400 {
++			reg = <0 0xe6055400 0 0x50>;
++			/* placeholder */
++		};
++
++		gpio7: gpio@e6055800 {
++			reg = <0 0xe6055800 0 0x50>;
++			/* placeholder */
++		};
++
++		dmac0: dma-controller@e6700000 {
++			reg = <0 0xe6700000 0 0x10000>;
++			/* placeholder */
++		};
++
++		dmac1: dma-controller@e7300000 {
++			reg = <0 0xe7300000 0 0x10000>;
++			/* placeholder */
++		};
++
++		dmac2: dma-controller@e7310000 {
++			reg = <0 0xe7310000 0 0x10000>;
++			/* placeholder */
++		};
++
++		cmt0: timer@e60f0000 {
++			reg = <0 0xe60f0000 0 0x1004>;
++			/* placeholder */
++		};
++
++		cmt1: timer@e6130000 {
++			reg = <0 0xe6130000 0 0x1004>;
++			/* placeholder */
++		};
++
++		tmu0: timer@e61e0000 {
++			reg = <0 0xe61e0000 0 0x30>;
++			/* placeholder */
++		};
++
++		tmu1: timer@e6fc0000 {
++			reg = <0 0xe6fc0000 0 0x30>;
++			/* placeholder */
++		};
++
++		tmu2: timer@e6fd0000 {
++			reg = <0 0xe6fd0000 0 0x30>;
++			/* placeholder */
++		};
++
++		tmu3: timer@e6fe0000 {
++			reg = <0 0xe6fe0000 0 0x30>;
++			/* placeholder */
++		};
++
++		tmu4: timer@ffc00000 {
++			reg = <0 0xffc00000 0 0x30>;
++			/* placeholder */
++		};
++
++		i2c0: i2c@e6500000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe6500000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c1: i2c@e6508000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe6508000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c2: i2c@e6510000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe6510000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c3: i2c@e66d0000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe66d0000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c4: i2c@e66d8000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe66d8000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c5: i2c@e66e0000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe66e0000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c6: i2c@e66e8000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe66e8000 0 0x40>;
++			/* placeholder */
++		};
++
++		i2c_dvfs: i2c@e60b0000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0 0xe60b0000 0 0x15>;
++			/* placeholder */
++		};
++
++		rwdt: watchdog@e6020000 {
++			reg = <0 0xe6020000 0 0x0c>;
++			/* placeholder */
++		};
++
++		hsusb: usb@e6590000 {
++			reg = <0 0xe6590000 0 0x100>;
++			/* placeholder */
++		};
++
++		usb_dmac0: dma-controller@e65a0000 {
++			reg = <0 0xe65a0000 0 0x100>;
++			/* placeholder */
++		};
++
++		usb_dmac1: dma-controller@e65b0000 {
++			reg = <0 0xe65b0000 0 0x100>;
++			/* placeholder */
++		};
++
++		ohci0: usb@ee080000 {
++			reg = <0 0xee080000 0 0x100>;
++			/* placeholder */
++		};
++
++		ohci1: usb@ee0a0000 {
++			reg = <0 0xee0a0000 0 0x100>;
++			/* placeholder */
++		};
++
++		ehci0: usb@ee080100 {
++			reg = <0 0xee080100 0 0x100>;
++			/* placeholder */
++		};
++
++		ehci1: usb@ee0a0100 {
++			reg = <0 0xee0a0100 0 0x100>;
++			/* placeholder */
++		};
++
++		usb2_phy0: usb-phy@ee080200 {
++			reg = <0 0xee080200 0 0x700>;
++			/* placeholder */
++		};
++
++		usb2_phy1: usb-phy@ee0a0200 {
++			reg = <0 0xee0a0200 0 0x700>;
++			/* placeholder */
++		};
++
++		sdhi0: sd@ee100000 {
++			reg = <0 0xee100000 0 0x2000>;
++			/* placeholder */
++		};
++
++		sdhi1: sd@ee120000 {
++			reg = <0 0xee120000 0 0x2000>;
++			/* placeholder */
++		};
++
++		sdhi2: sd@ee140000 {
++			reg = <0 0xee140000 0 0x2000>;
++			/* placeholder */
++		};
++
++		sdhi3: sd@ee160000 {
++			reg = <0 0xee160000 0 0x2000>;
++			/* placeholder */
++		};
++
++		fcpci0: vcp4@fe8df000 {
++			reg = <0 0xfe8df000 0 0x200>;
++			/* placeholder */
++		};
++
++		fcpcs: vcp4@fe90f000 {
++			reg = <0 0xfe90f000 0 0x200>;
++			/* placeholder */
++		};
++
++		ivdp1c: vcp4@fe8d0000 {
++			reg = <0 0xfe8d0000 0 0x200>, <0 0xfe8d0200 0 0x200>;
++			/* placeholder */
++		};
++
++		vcplf: vcp4@fe910000 {
++			reg = <0 0xfe910000 0 0x200>, <0 0xfe910200 0 0x200>;
++			/* placeholder */
++		};
++
++		vdpb: vcp4@fe900000 {
++			reg = <0 0xfe900000 0 0x200>, <0 0xfe900200 0 0x200>;
++			/* placeholder */
++		};
++
++		fdp0: fdpm@fe940000 {
++			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
++			/* placeholder */
++		};
++
++		fcpf0: fcp@fe950000 {
++			reg = <0 0xfe950000 0 0x200>;
++			/* placeholder */
++		};
++
++		vsp@fe960000 {
++			reg = <0 0xfe960000 0 0x8000>;
++			/* placeholder */
++		};
++
++		vspb: vspm@fe960000 {
++			reg = <0 0xfe960000 0 0x8000>, <0 0xfe96f000 0 0x200>;
++			/* placeholder */
++		};
++
++		fcpvb0: fcp@fe96f000 {
++			reg = <0 0xfe96f000 0 0x200>;
++			/* placeholder */
++		};
++
++		vsp@fe9a0000 {
++			reg = <0 0xfe9a0000 0 0x8000>;
++			/* placeholder */
++		};
++
++		vspi0: vspm@fe9a0000 {
++			reg = <0 0xfe9a0000 0 0x8000>, <0 0xfe9af000 0 0x200>;
++			/* placeholder */
++		};
++
++		fcpvi0: fcp@fe9af000 {
++			reg = <0 0xfe9af000 0 0x200>;
++			/* placeholder */
++		};
++
++		vspd0: vsp@fea20000 {
++			reg = <0 0xfea20000 0 0x4000>;
++			/* placeholder */
++		};
++
++		fcpvd0: fcp@fea27000 {
++			reg = <0 0xfea27000 0 0x200>;
++			/* placeholder */
++		};
++
++		vspd1: vsp@fea28000 {
++			reg = <0 0xfea28000 0 0x4000>;
++			/* placeholder */
++		};
++
++		fcpvd1: fcp@fea2f000 {
++			reg = <0 0xfea2f000 0 0x200>;
++			/* placeholder */
++		};
++
++		vspd2: vsp@fea30000 {
++			reg = <0 0xfea30000 0 0x4000>;
++			/* placeholder */
++		};
++
++		fcpvd2: fcp@fea37000 {
++			reg = <0 0xfea37000 0 0x200>;
++			/* placeholder */
++		};
++
++		du: display@feb00000 {
++			reg = <0 0xfeb00000 0 0x70000>;
++
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					reg = <0>;
++					du_out_rgb: endpoint {
++					};
++				};
++
++				port@1 {
++					reg = <1>;
++					du_out_hdmi0: endpoint {
++					};
++				};
++
++				port@2 {
++					reg = <2>;
++					du_out_lvds0: endpoint {
++					};
++				};
++			};
++
++			/* placeholder */
++		};
++
++		lvds0: lvds@feb90000 {
++			reg = <0 0xfeb90000 0 0x14>;
++
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					reg = <0>;
++					lvds0_in: endpoint {
++					};
++				};
++
++				port@1 {
++					reg = <1>;
++					lvds0_out: endpoint {
++					};
++				};
++			};
++			/* placeholder */
++		};
++
++		pciec0: pcie@fe000000 {
++			reg = <0 0xfe000000 0 0x80000>;
++			/* placeholder */
++		};
++
++		pciec1: pcie@ee800000 {
++			reg = <0 0xee800000 0 0x80000>;
++			/* placeholder */
++		};
++
++		usb3_phy0: usb-phy@e65ee000 {
++			reg = <0 0xe65ee000 0 0x90>;
++			/* placeholder */
++		};
++
++		xhci0: usb@ee000000 {
++			reg = <0 0xee000000 0 0xc00>;
++			/* placeholder */
++		};
++
++		usb3_peri0: usb@ee020000 {
++			reg = <0 0xee020000 0 0x400>;
++			/* placeholder */
++		};
++
++		audma0: dma-controller@ec700000 {
++			reg = <0 0xec700000 0 0x10000>;
++			/* placeholder */
++		};
++
++		audma1: dma-controller@ec720000 {
++			reg = <0 0xec720000 0 0x10000>;
++			/* placeholder */
++		};
++
++		rcar_sound: sound@ec500000 {
++			reg =	<0 0xec500000 0 0x1000>, /* SCU */
++				<0 0xec5a0000 0 0x100>,  /* ADG */
++				<0 0xec540000 0 0x1000>, /* SSIU */
++				<0 0xec541000 0 0x280>,  /* SSI */
++				<0 0xec740000 0 0x200>; /*Audio DMAC peri peri*/
++			reg-names = "scu", "adg", "ssiu", "ssi", "audmapp";
++			rcar_sound,ssi {
++				ssi0: ssi-0 {
++				};
++				ssi1: ssi-1 {
++				};
++				ssi2: ssi-2 {
++				};
++				ssi3: ssi-3 {
++				};
++				ssi4: ssi-4 {
++				};
++				ssi5: ssi-5 {
++				};
++				ssi6: ssi-6 {
++				};
++				ssi7: ssi-7 {
++				};
++				ssi8: ssi-8 {
++				};
++				ssi9: ssi-9 {
++				};
++			};
++			rcar_sound,src {
++				src0: src-0 {
++				};
++				src1: src-1 {
++				};
++				src2: src-2 {
++				};
++				src3: src-3 {
++				};
++				src4: src-4 {
++				};
++				src5: src-5 {
++				};
++				src6: src-6 {
++				};
++				src7: src-7 {
++				};
++				src8: src-8 {
++				};
++				src9: src-9 {
++				};
++			};
++
++			rcar_sound,mix {
++				mix0: mix-0 { };
++				mix1: mix-1 { };
++			};
++
++			rcar_sound,ctu {
++				ctu00: ctu-0 { };
++				ctu01: ctu-1 { };
++				ctu02: ctu-2 { };
++				ctu03: ctu-3 { };
++				ctu10: ctu-4 { };
++				ctu11: ctu-5 { };
++				ctu12: ctu-6 { };
++				ctu13: ctu-7 { };
++			};
++
++			rcar_sound,dvc {
++				dvc0: dvc-0 {
++				};
++				dvc1: dvc-1 {
++				};
++			};
++			/* placeholder */
++		};
++
++		msiof0: spi@e6e90000 {
++			reg = <0 0xe6e90000 0 0x0064>;
++			/* placeholder */
++		};
++
++		msiof1: spi@e6ea0000 {
++			reg = <0 0xe6ea0000 0 0x0064>;
++			/* placeholder */
++		};
++
++		msiof2: spi@e6c00000 {
++			reg = <0 0xe6c00000 0 0x0064>;
++			/* placeholder */
++		};
++
++		msiof3: spi@e6c10000 {
++			reg = <0 0xe6c10000 0 0x0064>;
++			/* placeholder */
++		};
++
++	};
++
++	timer {
++		compatible = "arm,armv8-timer";
++		interrupts-extended =
++		<&gic GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
++		<&gic GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
++		<&gic GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>,
++		<&gic GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_LOW)>;
++	};
++};
+-- 
+2.7.4
+

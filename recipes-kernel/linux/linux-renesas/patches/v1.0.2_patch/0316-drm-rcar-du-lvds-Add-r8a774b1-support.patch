@@ -1,0 +1,28 @@
+From 424b54b5df5d5a070fad7689e990ce1ed62f360b Mon Sep 17 00:00:00 2001
+From: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+Date: Thu, 5 Sep 2019 15:46:34 +0700
+Subject: [PATCH 316/405] drm: rcar-du: lvds: Add r8a774b1 support
+
+The LVDS encoders on RZ/G2N SoC is similar to R-Car M3-N.
+Add support for RZ/G2N (R8A774B1) SoC to the LVDS encoder driver.
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_lvds.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_lvds.c b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+index c9717dd..7a60ad5 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_lvds.c
++++ b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+@@ -1055,6 +1055,7 @@ static const struct of_device_id rcar_lvds_of_table[] = {
+ 	{ .compatible = "renesas,r8a774c0-lvds",
+ 	.data = &rcar_lvds_r8a774c0_info },
+ 	{ .compatible = "renesas,r8a774a1-lvds", .data = &rcar_lvds_gen3_info },
++	{ .compatible = "renesas,r8a774b1-lvds", .data = &rcar_lvds_gen3_info },
+ 	{ }
+ };
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+From 5594675251943fe255b7b6b8734071e9c94cc386 Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Wed, 28 Aug 2019 17:18:04 +0700
+Subject: [PATCH 353/405] mmc: renesas_sdhi: Add r8a774b1 support
+
+This patch add RZ/G2N (R8A774B1) SoC into SDHI  whitelist.
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_internal_dmac.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_internal_dmac.c b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+index 0129837..764f82f 100644
+--- a/drivers/mmc/host/renesas_sdhi_internal_dmac.c
++++ b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+@@ -299,6 +299,7 @@ static const struct soc_device_attribute gen3_soc_whitelist[] = {
+ 	  .data = (void *)BIT(SDHI_INTERNAL_DMAC_ONE_RX_ONLY) },
+ 	/* generic ones */
+ 	{ .soc_id = "r8a774a1" },
++	{ .soc_id = "r8a774b1" },
+ 	{ .soc_id = "r8a774c0" },
+ 	{ .soc_id = "r8a7795" },
+ 	{ .soc_id = "r8a7796" },
+-- 
+2.7.4
+

@@ -1,0 +1,64 @@
+From 85683d04f029bb27bd6ab83cce85e44985c68984 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Thu, 15 Aug 2019 11:06:28 +0700
+Subject: [PATCH 278/405] arm64: dts: renesas: hihope-common: Declare the leds.
+
+This patch declares the leds for common platform.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 38 ++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index baaf99b..9a66b43 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -97,6 +97,44 @@
+ 		};
+ 	};
+ 
++	leds {
++		compatible = "gpio-leds";
++
++		bt_active_led {
++			label = "blue:bt";
++			gpios = <&gpio7  0 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "hci0-power";
++			default-state = "off";
++		};
++
++		led0 {
++			gpios = <&gpio6 11 GPIO_ACTIVE_HIGH>;
++			label = "led0";
++		};
++
++		led1 {
++			gpios = <&gpio6 12 GPIO_ACTIVE_HIGH>;
++			label = "led1";
++		};
++
++		led2 {
++			gpios = <&gpio6 13 GPIO_ACTIVE_HIGH>;
++			label = "led2";
++		};
++
++		led3 {
++			gpios = <&gpio0  0 GPIO_ACTIVE_HIGH>;
++			label = "led3";
++		};
++
++		wlan_active_led {
++			label = "yellow:wlan";
++			gpios = <&gpio7  1 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "phy0tx";
++			default-state = "off";
++		};
++	};
++
+ 	pcm5102a: pcm5102a {
+ 		compatible = "ti,pcm5102a";
+ 		#sound-dai-cells = <0>;
+-- 
+2.7.4
+

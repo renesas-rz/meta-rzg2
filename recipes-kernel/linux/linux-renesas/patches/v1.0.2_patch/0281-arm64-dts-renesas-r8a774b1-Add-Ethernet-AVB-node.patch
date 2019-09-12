@@ -1,0 +1,70 @@
+From adc586bbab5ce2216807578b6cd9f544883e3a54 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Wed, 14 Aug 2019 19:31:53 +0700
+Subject: [PATCH 281/405] arm64: dts: renesas: r8a774b1: Add Ethernet AVB node
+
+This patch adds Ethernet AVB node for R8A774B1 SoC
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 44 +++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index a9ea72b..f4333d7 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -228,8 +228,48 @@
+ 		};
+ 
+ 		avb: ethernet@e6800000 {
+-			reg = <0 0xe6800000 0 0x800>, <0 0xe6a00000 0 0x10000>;
+-			/* placeholder */
++			compatible = "renesas,etheravb-r8a774b1",
++						"renesas,etheravb-rcar-gen3";
++			reg = <0 0xe6800000 0 0x800>;
++			interrupts = <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 40 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 41 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 43 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 51 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 52 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "ch0", "ch1", "ch2", "ch3",
++					"ch4", "ch5", "ch6", "ch7",
++					"ch8", "ch9", "ch10", "ch11",
++					"ch12", "ch13", "ch14", "ch15",
++					"ch16", "ch17", "ch18", "ch19",
++					"ch20", "ch21", "ch22", "ch23",
++					"ch24";
++			clocks = <&cpg CPG_MOD 812>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 812>;
++			phy-mode = "rgmii";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
+ 		};
+ 
+ 		can0: can@e6c30000 {
+-- 
+2.7.4
+

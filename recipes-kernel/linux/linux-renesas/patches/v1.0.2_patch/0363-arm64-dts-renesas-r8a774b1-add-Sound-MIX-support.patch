@@ -1,0 +1,35 @@
+From 7e8c2ee9e575308f3bb88e89c992927942a19e4c Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Wed, 28 Aug 2019 15:51:36 +0700
+Subject: [PATCH 363/405] arm64: dts: renesas: r8a774b1: add Sound MIX support
+
+This patch adds MIX[0.1] support for R8A774B1 SoC.
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 9c557f1..87a0138 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -1600,6 +1600,7 @@
+ 				 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
+ 				 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
+ 				 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++				 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
+ 				 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
+ 				 <&audio_clk_a>, <&audio_clk_b>,
+ 				 <&audio_clk_c>,
+@@ -1612,6 +1613,7 @@
+ 					"src.5", "src.4", "src.3", "src.2",
+ 					"src.1", "src.0",
+ 					"ctu.1", "ctu.0",
++					"mix.1", "mix.0",
+ 					"dvc.0", "dvc.1",
+ 					"clk_a", "clk_b", "clk_c", "clk_i";
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+-- 
+2.7.4
+

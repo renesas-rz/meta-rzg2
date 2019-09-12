@@ -1,0 +1,31 @@
+From 21193c62efebe715999ac6bd2d153fbd3184d648 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Fri, 6 Sep 2019 15:33:01 +0700
+Subject: [PATCH 337/405] arm64: configs: defconfig: Change default config to
+ Realtek PHY
+
+This patch changes default config from Generic PHY to Realtek PHY
+due to solve the issue "Defect ethernet cannot link up when using
+ifconfig command"
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/configs/defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 058b6f9..a158e11 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -126,7 +126,7 @@ CONFIG_VIRTIO_NET=y
+ CONFIG_RAVB=y
+ CONFIG_MDIO_BUS_MUX_MMIOREG=y
+ CONFIG_MICREL_PHY=y
+-CONFIG_REALTEK_PHY=m
++CONFIG_REALTEK_PHY=y
+ # CONFIG_WLAN is not set
+ CONFIG_INPUT_MATRIXKMAP=y
+ CONFIG_INPUT_EVDEV=y
+-- 
+2.7.4
+

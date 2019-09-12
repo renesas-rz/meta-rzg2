@@ -1,0 +1,60 @@
+From 5c276ddf73ab89ef4ef186ea05ed8ad37bda045e Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 13 Sep 2019 15:38:30 +0700
+Subject: [PATCH] arm64: renesas: r8a774a1: add ref clock to msiof node
+
+Add more reference clock for msiof node. Board device-tree will
+override reference clock.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 360bf72..9532a28 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -2164,7 +2164,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6e90000 0 0x0064>;
+ 			interrupts = <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 211>;
++			clocks = <&cpg CPG_MOD 211>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac1 0x41>, <&dmac1 0x40>,
+ 			       <&dmac2 0x41>, <&dmac2 0x40>;
+ 			dma-names = "tx", "rx", "tx", "rx";
+@@ -2180,7 +2181,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6ea0000 0 0x0064>;
+ 			interrupts = <GIC_SPI 157 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 210>;
++			clocks = <&cpg CPG_MOD 210>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac1 0x43>, <&dmac1 0x42>,
+ 			       <&dmac2 0x43>, <&dmac2 0x42>;
+ 			dma-names = "tx", "rx", "tx", "rx";
+@@ -2196,7 +2198,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6c00000 0 0x0064>;
+ 			interrupts = <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 209>;
++			clocks = <&cpg CPG_MOD 209>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac0 0x45>, <&dmac0 0x44>;
+ 			dma-names = "tx", "rx";
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+@@ -2211,7 +2214,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6c10000 0 0x0064>;
+ 			interrupts = <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 208>;
++			clocks = <&cpg CPG_MOD 208>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac0 0x47>, <&dmac0 0x46>;
+ 			dma-names = "tx", "rx";
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+-- 
+1.9.1
+

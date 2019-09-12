@@ -1,0 +1,32 @@
+From 20579d00b6d21640161e0cc0a95215d4483cafb8 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 13 Sep 2019 14:59:23 +0700
+Subject: [PATCH] arm64: renesas: r8a774a1: Add MSIOF ref clock
+
+Add missing default MSIOF ref clock. Board device-tree will
+need it
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 220abbd..360bf72 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -2695,4 +2695,11 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <0>;
+ 	};
++
++        /* MSIOF reference clock - to be overridden by boards that provide it */
++        msiof_ref_clk: msiof-ref-clock {
++                compatible = "fixed-clock";
++                #clock-cells = <0>;
++                clock-frequency = <0>;
++        };
+ };
+-- 
+1.9.1
+

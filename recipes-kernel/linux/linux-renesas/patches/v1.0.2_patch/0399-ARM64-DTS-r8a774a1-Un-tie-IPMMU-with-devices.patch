@@ -1,0 +1,206 @@
+From 7053903f61446679c305df07738072052eef8931 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Mon, 9 Sep 2019 17:38:06 +0700
+Subject: [PATCH 399/405] ARM64: DTS: r8a774a1: Un-tie IPMMU with devices
+
+This commit un-tie devices with IPMMU, also disable some of IPMMUs
+to support similar to r8a7796 in v4.14.75-ltsi/rcar-3.9.6
+
+Without this commit, an error encountered when run dmatest with or
+without CONFIG_IPMMU_VMSA
+...
+[   58.199431] dmatest: dma3chan12-copy: dstbuf[0x1508] not copied!
+Expected d7, got 37
+[   58.207523] dmatest: dma3chan12-copy: dstbuf[0x1509] not copied!
+Expected d6, got 36
+[   58.215615] dmatest: dma3chan12-copy: dstbuf[0x150a] not copied!
+Expected d5, got 35
+[   58.223705] dmatest: dma3chan12-copy: dstbuf[0x150b] not copied!
+Expected d4, got 34
+[   58.231796] dmatest: dma3chan12-copy: dstbuf[0x150c] not copied!
+Expected d3, got 33
+...
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 52 +++++--------------------------
+ 1 file changed, 7 insertions(+), 45 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index b00de46..220abbd 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -468,7 +468,6 @@
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 812>;
+ 			phy-mode = "rgmii";
+-			iommus = <&ipmmu_ds0 16>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			status = "disabled";
+@@ -917,14 +916,6 @@
+ 			resets = <&cpg 219>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds0 0>, <&ipmmu_ds0 1>,
+-			       <&ipmmu_ds0 2>, <&ipmmu_ds0 3>,
+-			       <&ipmmu_ds0 4>, <&ipmmu_ds0 5>,
+-			       <&ipmmu_ds0 6>, <&ipmmu_ds0 7>,
+-			       <&ipmmu_ds0 8>, <&ipmmu_ds0 9>,
+-			       <&ipmmu_ds0 10>, <&ipmmu_ds0 11>,
+-			       <&ipmmu_ds0 12>, <&ipmmu_ds0 13>,
+-			       <&ipmmu_ds0 14>, <&ipmmu_ds0 15>;
+ 		};
+ 
+ 		dmac1: dma-controller@e7300000 {
+@@ -959,14 +950,6 @@
+ 			resets = <&cpg 218>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds1 0>, <&ipmmu_ds1 1>,
+-			       <&ipmmu_ds1 2>, <&ipmmu_ds1 3>,
+-			       <&ipmmu_ds1 4>, <&ipmmu_ds1 5>,
+-			       <&ipmmu_ds1 6>, <&ipmmu_ds1 7>,
+-			       <&ipmmu_ds1 8>, <&ipmmu_ds1 9>,
+-			       <&ipmmu_ds1 10>, <&ipmmu_ds1 11>,
+-			       <&ipmmu_ds1 12>, <&ipmmu_ds1 13>,
+-			       <&ipmmu_ds1 14>, <&ipmmu_ds1 15>;
+ 		};
+ 
+ 		dmac2: dma-controller@e7310000 {
+@@ -1001,14 +984,6 @@
+ 			resets = <&cpg 217>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds1 16>, <&ipmmu_ds1 17>,
+-			       <&ipmmu_ds1 18>, <&ipmmu_ds1 19>,
+-			       <&ipmmu_ds1 20>, <&ipmmu_ds1 21>,
+-			       <&ipmmu_ds1 22>, <&ipmmu_ds1 23>,
+-			       <&ipmmu_ds1 24>, <&ipmmu_ds1 25>,
+-			       <&ipmmu_ds1 26>, <&ipmmu_ds1 27>,
+-			       <&ipmmu_ds1 28>, <&ipmmu_ds1 29>,
+-			       <&ipmmu_ds1 30>, <&ipmmu_ds1 31>;
+ 		};
+ 
+ 		ipmmu_ds0: mmu@e6740000 {
+@@ -1017,6 +992,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 0>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_ds1: mmu@e7740000 {
+@@ -1033,6 +1009,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 2>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_mm: mmu@e67b0000 {
+@@ -1050,6 +1027,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 4>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_pv0: mmu@fd800000 {
+@@ -1058,6 +1036,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 5>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_pv1: mmu@fd950000 {
+@@ -1066,6 +1045,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 6>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vc0: mmu@fe6b0000 {
+@@ -1074,6 +1054,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 8>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vi0: mmu@febd0000 {
+@@ -1082,6 +1063,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 9>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		cmt0: timer@e60f0000 {
+@@ -1660,7 +1642,6 @@
+ 			clocks = <&cpg CPG_MOD 611>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+ 			resets = <&cpg 611>;
+-			iommus = <&ipmmu_vc0 19>;
+ 		};
+ 
+ 		vspd0: vsp@fea20000 {
+@@ -1680,7 +1661,6 @@
+ 			clocks = <&cpg CPG_MOD 603>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 603>;
+-			iommus = <&ipmmu_vi0 8>;
+ 		};
+ 
+ 		vspd1: vsp@fea28000 {
+@@ -1700,7 +1680,6 @@
+ 			clocks = <&cpg CPG_MOD 602>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 602>;
+-			iommus = <&ipmmu_vi0 9>;
+ 		};
+ 
+ 		vspd2: vsp@fea30000 {
+@@ -1720,7 +1699,6 @@
+ 			clocks = <&cpg CPG_MOD 601>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 601>;
+-			iommus = <&ipmmu_vi0 10>;
+ 		};
+ 
+ 		du: display@feb00000 {
+@@ -1918,14 +1896,6 @@
+ 			resets = <&cpg 502>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_mp 0>, <&ipmmu_mp 1>,
+-			       <&ipmmu_mp 2>, <&ipmmu_mp 3>,
+-			       <&ipmmu_mp 4>, <&ipmmu_mp 5>,
+-			       <&ipmmu_mp 6>, <&ipmmu_mp 7>,
+-			       <&ipmmu_mp 8>, <&ipmmu_mp 9>,
+-			       <&ipmmu_mp 10>, <&ipmmu_mp 11>,
+-			       <&ipmmu_mp 12>, <&ipmmu_mp 13>,
+-			       <&ipmmu_mp 14>, <&ipmmu_mp 15>;
+ 		};
+ 
+ 		audma1: dma-controller@ec720000 {
+@@ -1960,14 +1930,6 @@
+ 			resets = <&cpg 501>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_mp 16>, <&ipmmu_mp 17>,
+-			       <&ipmmu_mp 18>, <&ipmmu_mp 19>,
+-			       <&ipmmu_mp 20>, <&ipmmu_mp 21>,
+-			       <&ipmmu_mp 22>, <&ipmmu_mp 23>,
+-			       <&ipmmu_mp 24>, <&ipmmu_mp 25>,
+-			       <&ipmmu_mp 26>, <&ipmmu_mp 27>,
+-			       <&ipmmu_mp 28>, <&ipmmu_mp 29>,
+-			       <&ipmmu_mp 30>, <&ipmmu_mp 31>;
+ 		};
+ 
+ 		rcar_sound: sound@ec500000 {
+-- 
+2.7.4
+

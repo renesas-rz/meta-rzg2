@@ -1,0 +1,28 @@
+From 327d07361f4b2788d1d0b4d81ec6d3403f873142 Mon Sep 17 00:00:00 2001
+From: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+Date: Thu, 5 Sep 2019 15:44:16 +0700
+Subject: [PATCH 314/405] dt-bindings: display: renesas: lvds: Document
+ r8a774b1 bindings
+
+Document the RZ/G2N (R8A774B1) LVDS bindings.
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+---
+ Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt b/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt
+index c3672b1..524a339 100644
+--- a/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt
++++ b/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt
+@@ -9,6 +9,7 @@ Required properties:
+ - compatible : Shall contain one of
+   - "renesas,r8a7743-lvds" for R8A7743 (RZ/G1M) compatible LVDS encoders
+   - "renesas,r8a774a1-lvds" for R8A774A1 (RZ/G2M) compatible LVDS encoders
++  - "renesas,r8a774b1-lvds" for R8A774B1 (RZ/G2N) compatible LVDS encoders
+   - "renesas,r8a7790-lvds" for R8A7790 (R-Car H2) compatible LVDS encoders
+   - "renesas,r8a7791-lvds" for R8A7791 (R-Car M2-W) compatible LVDS encoders
+   - "renesas,r8a7793-lvds" for R8A7793 (R-Car M2-N) compatible LVDS encoders
+-- 
+2.7.4
+
