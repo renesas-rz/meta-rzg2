@@ -12,7 +12,8 @@ IMAGE_INSTALL_append = " \
     audio-init \
     usbutils \
     pciutils \
-    linux-firmware \
+    linux-firmware-ti-connectivity-license \
+    linux-firmware-wl18xx \
     init-ifupdown \
     wlconf \
     init-wl18xx \
