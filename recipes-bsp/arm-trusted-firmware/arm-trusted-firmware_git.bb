@@ -19,20 +19,13 @@ SRC_URI += "${@'file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.p
            if '${BINUVERSION}' == '2.25' else ''}"
 
 SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
+            file://0003-plat-renesas-bl2-add-ECC-support-for-DRAM.patch \
             file://0004-plat-renesas-add-support-for-HIHOPE-RZG2M.patch \
             file://0006-plat-renesas-rcar-qos-E3-mstat390.h-Modify-default-s.patch \
             file://0007-plat-renesas-rcar-qos-M3-mstat195.h-Modify-default-s.patch \
             file://0008-plat-rcar-M3-pfc-add-intial-pins-setting.patch \
             file://0009-plat-renesas-add-support-for-HIHOPE-RZG2N.patch \
             file://0010-plat-renesas-rcar-qos-M3N-mstat195.h-Modify-default-.patch \
-"
-
-SRC_URI_append_r8a774c0 += "\
-  ${@base_conditional("USE_ECC", "1", " file://0003-plat-renesas-bl2-add-ECC-support-for-DRAM.patch ", "",d)} \
-"
-
-SRC_URI_append_r8a774a1 += "\
-  ${@base_conditional("USE_ECC", "1", " file://0005-plat-renesas-add-support-ECC-for-hihope-rzg2m.patch ", "",d)} \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"

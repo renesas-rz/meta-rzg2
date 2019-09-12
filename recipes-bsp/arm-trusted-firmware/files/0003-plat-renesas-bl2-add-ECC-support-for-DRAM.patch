@@ -1,26 +1,32 @@
-From aab7d47d5de30506eb75236a57026155c1a1476c Mon Sep 17 00:00:00 2001
+From d6f4f3b76f4069a7e0902a137cf4e4dd697b654d Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Mon, 25 Mar 2019 18:12:45 +0700
 Subject: [PATCH] plat: renesas: bl2: add ECC support for DRAM
 
-This commit add support option for DRAM ECC.
-First added for EK874:
-- set RZG_DRAM_EK874_ECC = 0/1 : to disble/enable DRAM ECC
+This commit reset all setting of ECC as default.
+Also, all ECC registed must be initialized in IPL, if not,
+U-boot or Kernel can not access to these registers.
+
+User can use U-boot command to make ECC setting.
+
+There is option build for different platforms, since they use
+different register set:
+- RZG_DRAM_EK874_ECC is for EK874 board
 
 Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
 ---
- plat/renesas/rcar/bl2_fusa.c       | 105 +++++++++++++++++++++++++++++++++++++
- plat/renesas/rcar/bl2_rcar_setup.c |   7 +++
- plat/renesas/rcar/platform.mk      |   7 +++
- 3 files changed, 119 insertions(+)
+ plat/renesas/rcar/bl2_fusa.c       | 64 ++++++++++++++++++++++++++++++++++++++
+ plat/renesas/rcar/bl2_rcar_setup.c |  7 +++++
+ plat/renesas/rcar/platform.mk      |  7 +++++
+ 3 files changed, 78 insertions(+)
  create mode 100644 plat/renesas/rcar/bl2_fusa.c
 
 diff --git a/plat/renesas/rcar/bl2_fusa.c b/plat/renesas/rcar/bl2_fusa.c
 new file mode 100644
-index 0000000..d5933f9
+index 0000000..290565a
 --- /dev/null
 +++ b/plat/renesas/rcar/bl2_fusa.c
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,64 @@
 +/*
 + * bl2_ecc_setup.c -
 + *
@@ -33,17 +39,9 @@ index 0000000..d5933f9
 +#include <debug.h>
 +#include <mmio.h>
 +
-+
-+#define	FUSA_USE_HIMEM		0
-+#define	FUSA_DRAM_CLEAR		0
-+
-+#define	FUSACR			0xE6784020	/* FuSa Ctrl */
 +#define	DFUSAAREACR		0xE6785000	/* DRAM FuSa Area Conf */
 +#define	DECCAREACR		0xE6785040	/* DRAM ECC Area Conf */
 +#define	NUM_DAREA		16
-+#define	SFUSAAREACR		0xE6785100	/* System RAM FuSa Area Conf */
-+#define	SECCAREACR		0xE6785140	/* System RAM ECC Area Conf */
-+#define	NUM_SAREA		8
 +
 +/* As the saddr, specify high-memory address (> 4 GB) */
 +#define	FUSAAREACR(en, size, saddr)	\
@@ -55,58 +53,34 @@ index 0000000..d5933f9
 +#define	ARRAY_SIZE(a)		(sizeof(a) / sizeof(a[0]))
 +#endif
 +
-+#if FUSA_USE_HIMEM
-+#define	DRAM_ADDR(addr)		((uintptr_t)addr)
-+#else
-+#define	DRAM_ADDR(addr)		((uintptr_t)addr - (uintptr_t)0x3C0000000)
-+#endif
-+
-+#define	EK874_FUSAAREA		0x408000000
-+#define	EK874_FUSAAREA_TOTAL	((128+256+256+256+64)*1024*1024)
-+#define	EK874_ECCAREA		0x444000000
-+#define	EK874_ECCAREA_TOTAL	((128+256+256+256+64)*1024*1024)
-+
 +static const struct rzg2_ecc_conf {
 +	uint32_t fusaareacr;
 +	uint32_t eccareacr;
 +} rzg2_ek874_conf[] = {
-+	{ FUSAAREACR(1, 7, 0x408000000),    ECCAREACR(0, 0x448000000)   }, /* 128+128 MB */
-+	{ FUSAAREACR(1, 8, 0x410000000),    ECCAREACR(0, 0x450000000)   }, /* 256+256 MB */
-+	{ FUSAAREACR(1, 8, 0x420000000),    ECCAREACR(0, 0x460000000)   }, /* 256+256 MB */
-+	{ FUSAAREACR(1, 8, 0x430000000),    ECCAREACR(0, 0x470000000)   }, /* 256+256 MB */
-+	{ FUSAAREACR(1, 6, 0x440000000),    ECCAREACR(0, 0x444000000)   }, /* 64+64 MB */
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
++	{ FUSAAREACR(0, 0, 0),    ECCAREACR(0, 0)   },
 +};
 +
-+
-+#if FUSA_DRAM_CLEAR
-+/* Write zero-valued octa-byte words */
-+static void bzero64(uintptr_t start, uint64_t size)
-+{
-+	/* start should be aligned on word boundary, size should be multiple of 8 */
-+	volatile uint64_t *ptr = (volatile uint64_t *)start;
-+	volatile uint64_t *end = ptr + (size / sizeof(uint64_t));
-+
-+	while (ptr < end)
-+		*ptr++ = 0;
-+}
-+#endif
-+
-+/* Dump DRAM ECC area (for debug purpose) */
-+extern void bl2_show_ecc(void)
-+{
-+}
-+
 +/* Setup DRAM ECC configuration registers */
-+extern void bl2_enable_ecc(void)
++void bl2_enable_ecc_ek874(void)
 +{
 +	const struct rzg2_ecc_conf *conf;
 +	int n;
 +	int nb_of_conf;
-+#if FUSA_DRAM_CLEAR
-+	/* Clear DRAM ECC Area (for check) */
-+	NOTICE("BL2: Clearing ECC area at %lx\n", DRAM_ADDR(EK874_ECCAREA));
-+	bzero64(DRAM_ADDR(EK874_ECCAREA), (uint64_t)EK874_ECCAREA_TOTAL);
-+#endif
 +
 +	conf = rzg2_ek874_conf;
 +	nb_of_conf = ARRAY_SIZE(rzg2_ek874_conf);
@@ -114,30 +88,21 @@ index 0000000..d5933f9
 +	for (n = 0; n < nb_of_conf; n++, conf++) {
 +		mmio_write_32((uintptr_t)((uint32_t *)DFUSAAREACR + n), conf->fusaareacr);
 +		mmio_write_32((uintptr_t)((uint32_t *)DECCAREACR + n), conf->eccareacr);
-+		NOTICE("BL2: DRAM ECC area=%d, FuSa=0x%x ECC=0x%x, size=%d MB\n",
-+			n, conf->fusaareacr, conf->eccareacr,
-+			1 << ((conf->fusaareacr >> 24) & 0xf));
 +	}
 +
-+#if FUSA_DRAM_CLEAR
-+	/* Clear DRAM data area to initialize ECC area */
-+	bzero64(EK874_FUSAAREA, (uint64_t)EK874_FUSAAREA_TOTAL);
-+	*((volatile uint64_t *)DRAM_ADDR(EK874_FUSAAREA));	/* dummy read as memory barrier */
-+#endif
-+	NOTICE("BL2: DRAM ECC Configured. 0x%lx,+0x%lx\n", EK874_FUSAAREA, (uint64_t)EK874_FUSAAREA_TOTAL);
 +}
 diff --git a/plat/renesas/rcar/bl2_rcar_setup.c b/plat/renesas/rcar/bl2_rcar_setup.c
-index 5f2647d..8110c87 100644
+index ed6f9da..a18b105 100644
 --- a/plat/renesas/rcar/bl2_rcar_setup.c
 +++ b/plat/renesas/rcar/bl2_rcar_setup.c
-@@ -670,6 +670,13 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+@@ -697,6 +697,13 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
  		qos_init();
  	}
  
 +#if (RZG_DRAM_EK874_ECC == 1)
 +	{
-+		extern void bl2_enable_ecc(void);
-+		bl2_enable_ecc();
++		extern void bl2_enable_ecc_ek874(void);
++		bl2_enable_ecc_ek874();
 +	}
 +#endif
 +
@@ -145,7 +110,7 @@ index 5f2647d..8110c87 100644
  	    (modemr_boot_dev == MODEMR_BOOT_DEV_EMMC_50X8)) {
  		/* Initialize eMMC */
 diff --git a/plat/renesas/rcar/platform.mk b/plat/renesas/rcar/platform.mk
-index 0b5a160..c5d62fb 100644
+index 275b08a..25d7e7e 100644
 --- a/plat/renesas/rcar/platform.mk
 +++ b/plat/renesas/rcar/platform.mk
 @@ -33,6 +33,7 @@ BL2_SOURCES		+=	${RCAR_GIC_SOURCES}				\
@@ -156,7 +121,7 @@ index 0b5a160..c5d62fb 100644
  				plat/renesas/rcar/aarch64/rcar_common.c		\
  				plat/renesas/rcar/aarch64/rcar_drivers_common.c	\
  				plat/renesas/rcar/drivers/io/io_rcar.c		\
-@@ -332,6 +333,12 @@ RCAR_DRAM_DDR3L_MEMDUAL :=1
+@@ -366,6 +367,12 @@ RCAR_DRAM_DDR3L_MEMDUAL :=1
  endif
  $(eval $(call add_define,RCAR_DRAM_DDR3L_MEMDUAL))
  
