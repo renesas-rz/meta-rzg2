@@ -26,6 +26,7 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0008-plat-rcar-M3-pfc-add-intial-pins-setting.patch \
             file://0009-plat-renesas-add-support-for-HIHOPE-RZG2N.patch \
             file://0010-plat-renesas-rcar-qos-M3N-mstat195.h-Modify-default-.patch \
+            file://0011-plat-renesas-rcar-bl2_fusa-Add-option-to-enable-ECC-.patch \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"
@@ -42,6 +43,8 @@ ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PRO
 ATFW_OPT_append_r8a774a1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_HIHOPE_RZG2M_ECC=1 RCAR_DRAM_SPLIT=0", " ${ATFW_OPT_LOSSY} ",d)}"
 
 ATFW_OPT_append_r8a774b1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_HIHOPE_RZG2N_ECC=1", " ${ATFW_OPT_LOSSY} ",d)}"
+
+ATFW_OPT_append = "${@base_conditional("ECC_FULL", "1", " RZG_DRAM_ECC_FULL=1 ", "",d)}"
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
