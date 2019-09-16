@@ -27,6 +27,10 @@ SRC_URI_append_r8a774a1 += "\
   ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch ", "",d)} \
 "
 
+SRC_URI_append_r8a774b1 += "\
+  ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch ", "",d)} \
+"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 LINUX_VERSION ?= "4.19.56-cip5"
 

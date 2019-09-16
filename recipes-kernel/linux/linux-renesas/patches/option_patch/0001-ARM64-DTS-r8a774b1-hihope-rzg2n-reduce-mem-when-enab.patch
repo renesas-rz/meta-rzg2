@@ -1,0 +1,35 @@
+From d10cc6e3cf6dd4664861ab950fc7ad2ccc30f332 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Mon, 16 Sep 2019 13:56:20 +0700
+Subject: [PATCH] ARM64: DTS: r8a774b1-hihope-rzg2n: reduce mem when enable
+ Full DRAM-ECC
+
+When enable DRAM-ECC FUll, a part of DRAM used to store ECC.
+This commit limit mem to prevent Linux to access to ECC area.
+
+Currently, with 8bit data/5bit ECC, only 1984M can be used.
+- 128 MB : reserved for security area
+- 1984 MB : usable for kernel, user space
+- 1984 MB : used for ECC
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index 22b190e..9d4b4b7 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -23,7 +23,7 @@
+ 
+ 	memory@480000000 {
+ 		device_type = "memory";
+-		reg = <0x4 0x80000000 0x0 0x80000000>;
++		reg = <0x4 0x80000000 0x0 0x04000000>;
+ 	};
+ 
+ 	reserved-memory {
+-- 
+2.7.4
+
