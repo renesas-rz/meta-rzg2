@@ -27,6 +27,7 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0009-plat-renesas-add-support-for-HIHOPE-RZG2N.patch \
             file://0010-plat-renesas-rcar-qos-M3N-mstat195.h-Modify-default-.patch \
             file://0011-plat-renesas-rcar-bl2_fusa-Add-option-to-enable-ECC-.patch \
+            file://0012-plat-renesas-bl2_fusa-add-HIHOPE-RZG2M-ECC-support.patch \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"
