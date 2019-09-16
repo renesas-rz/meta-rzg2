@@ -20,11 +20,11 @@ SRC_URI_append += "\
 "
 
 SRC_URI_append_r8a774c0 += "\
-  ${@base_conditional("USE_ECC", "1", " file://patches/option_patch/0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \
+  ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \
 "
 
 SRC_URI_append_r8a774a1 += "\
-  ${@base_conditional("USE_ECC", "1", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch ", "",d)} \
+  ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch ", "",d)} \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
