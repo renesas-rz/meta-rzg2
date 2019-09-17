@@ -37,10 +37,10 @@ index 15f5a75..d6f53c9 100644
  #define RCAR_BL332SRC_ADDRESS		(0x00000000U)
 
 diff --git a/plat/renesas/rcar/platform.mk b/plat/renesas/rcar/platform.mk
-index 10c990c..275b08a 100644
+index 63416ce..4ae97c2 100644
 --- a/plat/renesas/rcar/platform.mk
 +++ b/plat/renesas/rcar/platform.mk
-@@ -232,6 +232,23 @@ else
+@@ -249,6 +249,23 @@ else
        endif
        $(eval $(call add_define,RCAR_LSI_CUT))
      endif
@@ -64,7 +64,7 @@ index 10c990c..275b08a 100644
    else
      $(error "Error: ${LSI} is not supported.")
    endif
-@@ -384,6 +401,12 @@ RZG_HIHOPE_RZG2M := 0
+@@ -401,6 +418,12 @@ RZG_HIHOPE_RZG2M := 0
  endif
  $(eval $(call add_define,RZG_HIHOPE_RZG2M))
  
@@ -79,10 +79,10 @@ index 10c990c..275b08a 100644
  # processing equivalent to that implemented in PMIC_ROHM_BD9571 is necessary.
 
 diff --git a/plat/renesas/rcar/bl2_rcar_setup.c b/plat/renesas/rcar/bl2_rcar_setup.c
-index ef22d34..ed6f9da 100644
+index d940cad..c442573 100644
 --- a/plat/renesas/rcar/bl2_rcar_setup.c
 +++ b/plat/renesas/rcar/bl2_rcar_setup.c
-@@ -127,8 +127,13 @@
+@@ -130,8 +130,13 @@
  #define TARGET_NAME		"R-Car M3"
  #endif // RZG_HIHOPE_RZG2M
  #elif RCAR_LSI == RCAR_M3N
@@ -96,7 +96,7 @@ index ef22d34..ed6f9da 100644
  #elif RCAR_LSI == RCAR_E3
  #if(RZG_EK874) // RZG_EK874
  #define TARGET_PRODUCT		RCAR_PRODUCT_E3
-@@ -396,7 +401,11 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+@@ -399,7 +404,11 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
  #else  // RZG_HIHOPE_RZG2M
  	const char *product_m3      = "M3";
  #endif // RZG_HIHOPE_RZG2M
@@ -108,9 +108,9 @@ index ef22d34..ed6f9da 100644
  #if(RZG_EK874) // RZG_EK874
  	const char *product_e3      = "G2E";
  #else // RZG_EK874
-@@ -503,15 +512,15 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+@@ -519,15 +528,15 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
  #endif // RZG_HIHOPE_RZG2M
- 
+ 		}
  	} else {
 -#if (RZG_EK874 | RZG_HIHOPE_RZG2M) //RZG_EK874 | RZG_HIHOPE_RZG2M
 +#if (RZG_EK874 | RZG_HIHOPE_RZG2N | RZG_HIHOPE_RZG2M) //RZG_EK874 | RZG_HIHOPE_RZG2N | RZG_HIHOPE_RZG2M
@@ -127,7 +127,7 @@ index ef22d34..ed6f9da 100644
  	}
  	NOTICE("%s", msg);
  
-@@ -540,6 +549,7 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+@@ -556,6 +565,7 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
  	case BOARD_STARTER_KIT_PRE:
  	case BOARD_EBISU_4D:
  	case BOARD_EK874:
@@ -191,7 +191,7 @@ index 6a24617..1d6f8ab 100644
  #define BOARD_REV_UNKNOWN		(0xFFU)
  
 diff --git a/plat/renesas/rcar/drivers/board/board.c b/plat/renesas/rcar/drivers/board/board.c
-index c40024d..9dce110 100644
+index ee25ebe..225ff93 100644
 --- a/plat/renesas/rcar/drivers/board/board.c
 +++ b/plat/renesas/rcar/drivers/board/board.c
 @@ -22,9 +22,11 @@
@@ -227,48 +227,38 @@ index c40024d..9dce110 100644
  	if (BOARD_ID_UNKNOWN == g_board_id) {
 
 diff --git a/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c b/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c
-index 2afada9..611b2ae 100644
+index 8880c1d..5d13e0d 100644
 --- a/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c
 +++ b/plat/renesas/rcar/ddr/ddr_b/boot_init_dram_config.c
-@@ -8,7 +8,7 @@
+@@ -11,7 +11,7 @@
   *	NUMBER OF BOARD CONFIGRATION
   *	PLEASE DEFINE
   ******************************************************************************/
--#define BOARDNUM 19
-+#define BOARDNUM 20
+-#define BOARDNUM 24
++#define BOARDNUM 25
  /*******************************************************************************
   *	PLEASE SET board number or board judge function
   ******************************************************************************/
-@@ -16,7 +16,11 @@
- static uint32_t boardcnf_get_brd_type(void){
- 	return (18);
+@@ -30,7 +30,11 @@ static uint32_t boardcnf_get_brd_type(void){
+ 		return (22);
+ 	}
  }
 -#else  // RZG_HIHOPE_RZG2M
 +#elif (RZG_HIHOPE_RZG2N) // RZG_HIHOPE_RZG2N
 +static uint32_t boardcnf_get_brd_type(void){
-+	return (19);
++	return (24);
 +}
 +#else
  #define BOARD_JUDGE_AUTO
  #ifdef BOARD_JUDGE_AUTO
  static uint32_t _board_judge(void);
-@@ -28,7 +32,7 @@ static uint32_t boardcnf_get_brd_type(void){
- 		return (1);
- }
- #endif // BOARD_JUDGE_AUTO
--#endif // RZG_HIHOPE_RZG2M
-+#endif
- 
- /*******************************************************************************
-  *	Set DRAM ODT , VREFca , Derating  condtition
-@@ -1464,7 +1468,44 @@ static const struct _boardcnf boardcnfs[BOARDNUM] = {
+@@ -1740,6 +1744,39 @@ static const struct _boardcnf boardcnfs[BOARDNUM] = {
  			  0, 0, 0, 0, 0, 0, 0, 0 }
  		}
  	}
--}
 +},
 +/*
-+ * boardcnf[19] Jiangsu HopeRun Software Co., Ltd. HiHope RZ/G2N board with RZ/G2N/SoC
++ * boardcnf[24] Jiangsu HopeRun Software Co., Ltd. HiHope RZ/G2N board 16Gbit/2rank/1ch board with G2N/SOC
 + */
 +{
 +	0x01,		/* phyvalid */
@@ -279,11 +269,7 @@ index 2afada9..611b2ae 100644
 +	0x00a0,		/* dqdm_dly_r */
 +	{
 +/*ch[0]*/	{
-+#if (RCAR_DRAM_LPDDR4_MEMCONF == 2)
 +/*ddr_density[]*/	{ 0x04, 0x04 },
-+#else
-+/*ddr_density[]*/	{ 0x02, 0x02 },
-+#endif
 +/*ca_swap*/		0x00345201,
 +/*dqs_swap*/		0x3201,
 +/*dq_swap[]*/		{ 0x01672543, 0x45361207, 0x45632107, 0x60715234 },
@@ -303,16 +289,14 @@ index 2afada9..611b2ae 100644
 +			  0, 0, 0, 0, 0, 0, 0, 0 }
 +		}
 +	}
-+},
+ }
  };
  
- /*******************************************************************************
-
 diff --git a/plat/renesas/rcar/pfc/M3N/pfc_init_m3n.c b/plat/renesas/rcar/pfc/M3N/pfc_init_m3n.c
-index 5f8b65e..2ff8776 100644
+index 768aba6..3495d95 100644
 --- a/plat/renesas/rcar/pfc/M3N/pfc_init_m3n.c
 +++ b/plat/renesas/rcar/pfc/M3N/pfc_init_m3n.c
-@@ -808,6 +808,62 @@ void pfc_init_m3n(void)
+@@ -801,6 +801,62 @@ void pfc_init_m3n(void)
  	uint32_t reg;
  
  	/* initialize module select */
@@ -375,7 +359,7 @@ index 5f8b65e..2ff8776 100644
  	pfc_reg_write(PFC_MOD_SEL0, MOD_SEL0_MSIOF3_A
  				  | MOD_SEL0_MSIOF2_A
  				  | MOD_SEL0_MSIOF1_A
-@@ -862,8 +918,157 @@ void pfc_init_m3n(void)
+@@ -855,8 +911,157 @@ void pfc_init_m3n(void)
  				  | MOD_SEL2_ADG_B_A
  				  | MOD_SEL2_ADG_C_A
  				  | MOD_SEL2_VIN4_A);
@@ -533,7 +517,7 @@ index 5f8b65e..2ff8776 100644
  	pfc_reg_write(PFC_IPSR0, IPSR_28_FUNC(0)
  			       | IPSR_24_FUNC(0)
  			       | IPSR_20_FUNC(0)
-@@ -1010,8 +1215,114 @@ void pfc_init_m3n(void)
+@@ -1002,8 +1207,114 @@ void pfc_init_m3n(void)
  				| IPSR_0_FUNC(0));
  	pfc_reg_write(PFC_IPSR18, IPSR_4_FUNC(0)
  				| IPSR_0_FUNC(0));
@@ -625,11 +609,11 @@ index 5f8b65e..2ff8776 100644
 +			       | GPSR5_MSIOF0_SCK
 +			       | GPSR5_RX2_A
 +			       | GPSR5_TX2_A
-+			       | GPSR5_RTS1_TANS
++			       | GPSR5_RTS1
 +			       | GPSR5_CTS1
 +			       | GPSR5_TX1_A
 +			       | GPSR5_RX1_A
-+			       | GPSR5_RTS0_TANS
++			       | GPSR5_RTS0
 +			       | GPSR5_SCK0);
 +	pfc_reg_write(PFC_GPSR6, GPSR6_AUDIO_CLKB_B
 +			       | GPSR6_AUDIO_CLKA_A
@@ -648,39 +632,28 @@ index 5f8b65e..2ff8776 100644
  	pfc_reg_write(PFC_GPSR0, GPSR0_D15
  			       | GPSR0_D14
  			       | GPSR0_D13
-@@ -1120,8 +1431,10 @@ void pfc_init_m3n(void)
- 			       | GPSR7_HDMI0_CEC
- 			       | GPSR7_AVS2
+@@ -1110,8 +1421,17 @@ void pfc_init_m3n(void)
+ 			       | GPSR6_SSI_SCK0129);
+ 	pfc_reg_write(PFC_GPSR7, GPSR7_AVS2
  			       | GPSR7_AVS1);
 +#endif // RZG_HIHOPE_RZG2N
  
  	/* initialize POC control register */
 +#if RZG_HIHOPE_RZG2N
- 	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
- 				  | POC_SD3_DAT7_33V
- 				  | POC_SD3_DAT6_33V
-@@ -1139,8 +1452,274 @@ void pfc_init_m3n(void)
- 				  | POC_SD0_DAT0_33V
- 				  | POC_SD0_CMD_33V
- 				  | POC_SD0_CLK_33V);
-+#else  // RZG_HIHOPE_RZG2N
-+	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
-+				  | POC_SD3_DAT7_33V
-+				  | POC_SD3_DAT6_33V
-+				  | POC_SD3_DAT5_33V
-+				  | POC_SD3_DAT4_33V
-+				  | POC_SD3_DAT3_33V
-+				  | POC_SD3_DAT2_33V
-+				  | POC_SD3_DAT1_33V
-+				  | POC_SD3_DAT0_33V
-+				  | POC_SD3_CMD_33V
-+				  | POC_SD3_CLK_33V
-+				  | POC_SD0_DAT3_33V
++	pfc_reg_write(PFC_POCCTRL0, POC_SD0_DAT3_33V
 +				  | POC_SD0_DAT2_33V
 +				  | POC_SD0_DAT1_33V
 +				  | POC_SD0_DAT0_33V
 +				  | POC_SD0_CMD_33V
 +				  | POC_SD0_CLK_33V);
++#else  // RZG_HIHOPE_RZG2N
+ 	pfc_reg_write(PFC_POCCTRL0, POC_SD3_DS_33V
+ 				  | POC_SD3_DAT7_33V
+ 				  | POC_SD3_DAT6_33V
+@@ -1129,8 +1449,256 @@ void pfc_init_m3n(void)
+ 				  | POC_SD0_DAT0_33V
+ 				  | POC_SD0_CMD_33V
+ 				  | POC_SD0_CLK_33V);
 +#endif // RZG_HIHOPE_RZG2N
  
  	/* initialize DRV control register */
@@ -800,8 +773,8 @@ index 5f8b65e..2ff8776 100644
 +				      | DRVCTRL11_D15(3)
 +				      | DRVCTRL11_AVS1(7)
 +				      | DRVCTRL11_AVS2(7)
-+				      | DRVCTRL11_HDMI0_CEC(7)
-+				      | DRVCTRL11_HDMI1_CEC(7)
++				      | DRVCTRL11_GP7_02(7)
++				      | DRVCTRL11_GP7_03(7)
 +				      | DRVCTRL11_DU_DOTCLKIN0(3)
 +				      | DRVCTRL11_DU_DOTCLKIN1(3));
 +	pfc_reg_write(PFC_DRVCTRL11, reg);
@@ -934,7 +907,7 @@ index 5f8b65e..2ff8776 100644
  	reg = mmio_read_32(PFC_DRVCTRL0);
  	reg = ((reg & DRVCTRL0_MASK) | DRVCTRL0_QSPI0_SPCLK(3)
  				     | DRVCTRL0_QSPI0_MOSI_IO0(3)
-@@ -1386,8 +1965,18 @@ void pfc_init_m3n(void)
+@@ -1376,8 +1944,18 @@ void pfc_init_m3n(void)
  				      | DRVCTRL24_USB31_PWEN(7)
  				      | DRVCTRL24_USB31_OVC(7));
  	pfc_reg_write(PFC_DRVCTRL24, reg);
@@ -950,13 +923,13 @@ index 5f8b65e..2ff8776 100644
 +	pfc_reg_write(PFC_PUD5,0x7F5FFF87U);
 +	pfc_reg_write(PFC_PUD6,0x00000055U);
 +#else  // RZG_HIHOPE_RZG2N
- 	pfc_reg_write(PFC_PUD0,0x00005FBFU);
- 	pfc_reg_write(PFC_PUD1,0x00300FFEU);
- 	pfc_reg_write(PFC_PUD2,0x330001E6U);
-@@ -1395,8 +1984,18 @@ void pfc_init_m3n(void)
- 	pfc_reg_write(PFC_PUD4,0xFFFFFF00U);
- 	pfc_reg_write(PFC_PUD5,0x7F5FFF87U);
- 	pfc_reg_write(PFC_PUD6,0x00000055U);
+ 	pfc_reg_write(PFC_PUD0, 0x00005FBFU);
+ 	pfc_reg_write(PFC_PUD1, 0x00300FFEU);
+ 	pfc_reg_write(PFC_PUD2, 0x330001E6U);
+@@ -1385,8 +1963,18 @@ void pfc_init_m3n(void)
+ 	pfc_reg_write(PFC_PUD4, 0xFFFFFF00U);
+ 	pfc_reg_write(PFC_PUD5, 0x7F5FFF87U);
+ 	pfc_reg_write(PFC_PUD6, 0x00000055U);
 +#endif // RZG_HIHOPE_RZG2N
  
  	/* initialize LSI pin pull-enable register */
@@ -969,19 +942,19 @@ index 5f8b65e..2ff8776 100644
 +	pfc_reg_write(PFC_PUEN5,0x1F000805U);
 +	pfc_reg_write(PFC_PUEN6,0x00000006U);
 +#else  // RZG_HIHOPE_RZG2N
- 	pfc_reg_write(PFC_PUEN0,0x00000FFFU);
- 	pfc_reg_write(PFC_PUEN1,0x00100234U);
- 	pfc_reg_write(PFC_PUEN2,0x000004C4U);
-@@ -1404,6 +2003,7 @@ void pfc_init_m3n(void)
- 	pfc_reg_write(PFC_PUEN4,0x3E000000U);
- 	pfc_reg_write(PFC_PUEN5,0x1F000805U);
- 	pfc_reg_write(PFC_PUEN6,0x00000006U);
+ 	pfc_reg_write(PFC_PUEN0, 0x00000FFFU);
+ 	pfc_reg_write(PFC_PUEN1, 0x00100234U);
+ 	pfc_reg_write(PFC_PUEN2, 0x000004C4U);
+@@ -1394,6 +1982,7 @@ void pfc_init_m3n(void)
+ 	pfc_reg_write(PFC_PUEN4, 0x3E000000U);
+ 	pfc_reg_write(PFC_PUEN5, 0x1F000805U);
+ 	pfc_reg_write(PFC_PUEN6, 0x00000006U);
 +#endif // RZG_HIHOPE_RZG2N
  
  	/* initialize positive/negative logic select */
  	mmio_write_32(GPIO_POSNEG0, 0x00000000U);
-@@ -1424,13 +2024,34 @@ void pfc_init_m3n(void)
- 	mmio_write_32(GPIO_IOINTSEL6, 0x00000000U);
+@@ -1416,13 +2005,34 @@ void pfc_init_m3n(void)
+ 	mmio_write_32(GPIO_IOINTSEL7, 0x00000000U);
  
  	/* initialize general output register */
 +#if RZG_HIHOPE_RZG2N
@@ -1015,9 +988,9 @@ index 5f8b65e..2ff8776 100644
  	mmio_write_32(GPIO_INOUTSEL0, 0x00000000U);
  	mmio_write_32(GPIO_INOUTSEL1, 0x01000A00U);
  	mmio_write_32(GPIO_INOUTSEL2, 0x00000400U);
-@@ -1438,4 +2059,5 @@ void pfc_init_m3n(void)
- 	mmio_write_32(GPIO_INOUTSEL4, 0x00000000U);
+@@ -1431,4 +2041,5 @@ void pfc_init_m3n(void)
  	mmio_write_32(GPIO_INOUTSEL5, 0x0000020EU);
  	mmio_write_32(GPIO_INOUTSEL6, 0x00013880U);
+ 	mmio_write_32(GPIO_INOUTSEL7, 0x00000000U);
 +#endif // RZG_HIHOPE_RZG2N
  }

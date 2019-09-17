@@ -1,30 +1,8 @@
-From e76fdb90e1089cd7fcbb56432270119d0ca75f30 Mon Sep 17 00:00:00 2001
-From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
-Date: Fri, 7 Jun 2019 14:14:09 +0700
-Subject: [PATCH 2/2] plat: renesas: rcar: qos: M3: mstat195.h: Modify default
- setting for RZ/G2M
-
-This patch file disables 8 unused modules:
- + IMP
- + IMR
- + RealTime Core
- + RT-DMAC
- + Secure Engine
- + ADSP
- + DCU
- + SSP
-for default setting to be suitable for RZ/G2-M
-
-Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
----
- .../renesas/rcar/qos/M3/qos_init_m3_v11_mstat195.h | 36 +++++++++++-----------
- 1 file changed, 18 insertions(+), 18 deletions(-)
-
 diff --git a/plat/renesas/rcar/qos/M3/qos_init_m3_v11_mstat195.h b/plat/renesas/rcar/qos/M3/qos_init_m3_v11_mstat195.h
-index 00c09ac..5761e30 100644
+index 393a797..2fad6ee 100644
 --- a/plat/renesas/rcar/qos/M3/qos_init_m3_v11_mstat195.h
 +++ b/plat/renesas/rcar/qos/M3/qos_init_m3_v11_mstat195.h
-@@ -29,11 +29,11 @@ static uint64_t mstat_fix[]={
+@@ -35,11 +35,11 @@ static uint64_t mstat_fix[] = {
  	/* 0x00d8, */ 0x000C08050000FFFFUL,
  	/* 0x00e0, */ 0x000C14120000FFFFUL,
  	/* 0x00e8, */ 0x0000000000000000UL,
@@ -38,7 +16,7 @@ index 00c09ac..5761e30 100644
  	/* 0x0118, */ 0x0000000000000000UL,
  	/* 0x0120, */ 0x0000000000000000UL,
  	/* 0x0128, */ 0x0000000000000000UL,
-@@ -60,12 +60,12 @@ static uint64_t mstat_fix[]={
+@@ -66,12 +66,12 @@ static uint64_t mstat_fix[] = {
  	/* 0x01d0, */ 0x000C04010000FFFFUL,
  	/* 0x01d8, */ 0x000C04010000FFFFUL,
  	/* 0x01e0, */ 0x0000000000000000UL,
@@ -55,7 +33,7 @@ index 00c09ac..5761e30 100644
  	/* 0x0218, */ 0x0000000000000000UL,
  	/* 0x0220, */ 0x0000000000000000UL,
  	/* 0x0228, */ 0x0000000000000000UL,
-@@ -75,24 +75,24 @@ static uint64_t mstat_fix[]={
+@@ -81,24 +81,24 @@ static uint64_t mstat_fix[] = {
  	/* 0x0248, */ 0x0000000000000000UL,
  	/* 0x0250, */ 0x0000000000000000UL,
  	/* 0x0258, */ 0x0000000000000000UL,
@@ -86,10 +64,10 @@ index 00c09ac..5761e30 100644
  	/* 0x02f0, */ 0x0000000000000000UL,
  	/* 0x02f8, */ 0x0000000000000000UL,
  	/* 0x0300, */ 0x0000000000000000UL,
-@@ -108,10 +108,10 @@ static uint64_t mstat_fix[]={
- 	/* 0x0350, */ 0x0000000000000000UL,
+@@ -115,10 +115,10 @@ static uint64_t mstat_fix[] = {
  };
- static uint64_t mstat_be[]={
+ 
+ static uint64_t mstat_be[] = {
 -	/* 0x0000, */ 0x001200200BDFFC01UL,
 -	/* 0x0008, */ 0x001200200BDFFC01UL,
 -	/* 0x0010, */ 0x001200200BDFFC01UL,
@@ -101,7 +79,7 @@ index 00c09ac..5761e30 100644
  	/* 0x0020, */ 0x0000000000000000UL,
  	/* 0x0028, */ 0x001200100BD03401UL,
  	/* 0x0030, */ 0x0000000000000000UL,
-@@ -170,11 +170,11 @@ static uint64_t mstat_be[]={
+@@ -177,11 +177,11 @@ static uint64_t mstat_be[] = {
  	/* 0x01d8, */ 0x002100600BDFFC01UL,
  	/* 0x01e0, */ 0x0000000000000000UL,
  	/* 0x01e8, */ 0x0000000000000000UL,
@@ -115,6 +93,3 @@ index 00c09ac..5761e30 100644
  	/* 0x0218, */ 0x001100200BDFFC01UL,
  	/* 0x0220, */ 0x001100200BDFFC01UL,
  	/* 0x0228, */ 0x0000000000000000UL,
--- 
-1.9.1
-

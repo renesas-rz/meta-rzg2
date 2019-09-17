@@ -13,7 +13,7 @@ S = "${WORKDIR}/git"
 
 BRANCH = "rcar_gen3"
 SRC_URI = "git://github.com/renesas-rcar/arm-trusted-firmware.git;branch=${BRANCH}"
-SRCREV = "7f126e2e718a69bec850c87bd05c4c168b32c4df"
+SRCREV = "236f8fbb57af7f899980bbd5a03feb12d6462970"
 
 SRC_URI += "${@'file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch' \
            if '${BINUVERSION}' == '2.25' else ''}"
@@ -23,12 +23,13 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0004-plat-renesas-add-support-for-HIHOPE-RZG2M.patch \
             file://0006-plat-renesas-rcar-qos-E3-mstat390.h-Modify-default-s.patch \
             file://0007-plat-renesas-rcar-qos-M3-mstat195.h-Modify-default-s.patch \
-            file://0008-plat-rcar-M3-pfc-add-intial-pins-setting.patch \
             file://0009-plat-renesas-add-support-for-HIHOPE-RZG2N.patch \
             file://0010-plat-renesas-rcar-qos-M3N-mstat195.h-Modify-default-.patch \
             file://0011-plat-renesas-rcar-bl2_fusa-Add-option-to-enable-ECC-.patch \
             file://0012-plat-renesas-bl2_fusa-add-HIHOPE-RZG2M-ECC-support.patch \
             file://0013-plat-renesas-bl2_fusa-Add-ECC-support-for-HIHOPE-RZG.patch \
+            file://0014-plat-renesas-add-support-emmc-boot.patch \
+            file://0015-plat-renesas-bugfix-RCAR_SECURE_BOOT_Disable.patch \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"

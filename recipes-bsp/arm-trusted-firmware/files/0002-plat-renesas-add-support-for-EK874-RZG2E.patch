@@ -1,25 +1,8 @@
-From e1e5504239d32c7107648a76fd3eaafae2b5a031 Mon Sep 17 00:00:00 2001
-From: Binh Nguyen <binh.nguyen.uw@renesas.com>
-Date: Tue, 26 Mar 2019 11:13:44 +0700
-Subject: [PATCH] plat: renesas: add support for EK874 (RZG2E)
-
-Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
----
- plat/renesas/rcar/bl2_rcar_setup.c      |  23 +++
- plat/renesas/rcar/bl2_secure_setting.c  |  11 ++
- plat/renesas/rcar/drivers/board/board.c |   7 +
- plat/renesas/rcar/drivers/board/board.h |   4 +-
- plat/renesas/rcar/pfc/E3/pfc_init_e3.c  | 334 ++++++++++++++++++++++++++++++++
- plat/renesas/rcar/platform.mk           |  28 +++
- tools/dummy_create/makefile             |   6 +
- tools/dummy_create/sa6.c                |   4 +
- 8 files changed, 416 insertions(+), 1 deletion(-)
-
 diff --git a/plat/renesas/rcar/bl2_rcar_setup.c b/plat/renesas/rcar/bl2_rcar_setup.c
-index 0338335..8110c87 100644
+index 516ab09..262023d 100644
 --- a/plat/renesas/rcar/bl2_rcar_setup.c
 +++ b/plat/renesas/rcar/bl2_rcar_setup.c
-@@ -124,8 +124,13 @@
+@@ -127,8 +127,13 @@
  #define TARGET_PRODUCT		RCAR_PRODUCT_M3N
  #define TARGET_NAME		"R-Car M3N"
  #elif RCAR_LSI == RCAR_E3
@@ -33,7 +16,7 @@ index 0338335..8110c87 100644
  #elif RCAR_LSI == RCAR_AUTO
  #define TARGET_NAME		"R-Car H3/M3/M3N"
  #endif
-@@ -382,7 +387,11 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+@@ -385,7 +390,11 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
  	const char *product_h3      = "H3";
  	const char *product_m3      = "M3";
  	const char *product_m3n     = "M3N";
@@ -45,9 +28,9 @@ index 0338335..8110c87 100644
  	const char *lcs_cm          = "CM";
  	const char *lcs_dm          = "DM";
  	const char *lcs_sd          = "SD";
-@@ -478,9 +487,15 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
- 		(void)sprintf(msg,
- 			"BL2: PRR is R-Car %s Ver.1.1 / Ver.1.2\n", str);
+@@ -488,9 +497,15 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+ 			(prr_val & RCAR_MINOR_MASK) + RCAR_M3_MINOR_OFFSET);
+ 		}
  	} else {
 +#if (RZG_EK874) //RZG_EK874
 +		(void)sprintf(msg, "BL2: PRR is RZG %s Ver.%d.%d\n", str,
@@ -61,7 +44,7 @@ index 0338335..8110c87 100644
  	}
  	NOTICE("%s", msg);
  
-@@ -508,6 +523,7 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
+@@ -518,6 +533,7 @@ static void rcar_bl2_early_platform_setup(const meminfo_t *mem_layout)
  	case BOARD_EBISU:
  	case BOARD_STARTER_KIT_PRE:
  	case BOARD_EBISU_4D:
@@ -70,7 +53,7 @@ index 0338335..8110c87 100644
  		break;
  	default:
 diff --git a/plat/renesas/rcar/bl2_secure_setting.c b/plat/renesas/rcar/bl2_secure_setting.c
-index 2469780..875e523 100644
+index 2469780..2418e2d 100644
 --- a/plat/renesas/rcar/bl2_secure_setting.c
 +++ b/plat/renesas/rcar/bl2_secure_setting.c
 @@ -91,7 +91,12 @@ static const struct {
@@ -102,7 +85,7 @@ index 2469780..875e523 100644
  	/** Security group 0 attribute setting for slave ports 14 */
  	/** Security group 1 attribute setting for slave ports 14 */
 diff --git a/plat/renesas/rcar/drivers/board/board.c b/plat/renesas/rcar/drivers/board/board.c
-index ca9b17d..2528785 100644
+index 4e3a21a..416826c 100644
 --- a/plat/renesas/rcar/drivers/board/board.c
 +++ b/plat/renesas/rcar/drivers/board/board.c
 @@ -14,7 +14,11 @@
@@ -150,10 +133,10 @@ index d6ac6da..ffc3c31 100644
  #define BOARD_REV_UNKNOWN		(0xFFU)
  
 diff --git a/plat/renesas/rcar/pfc/E3/pfc_init_e3.c b/plat/renesas/rcar/pfc/E3/pfc_init_e3.c
-index bced03a..45a6dc9 100644
+index 77b799b..f6d1d8d 100644
 --- a/plat/renesas/rcar/pfc/E3/pfc_init_e3.c
 +++ b/plat/renesas/rcar/pfc/E3/pfc_init_e3.c
-@@ -495,6 +495,27 @@ void pfc_init_e3(void)
+@@ -491,6 +491,27 @@ void pfc_init_e3(void)
  				  | MOD_SEL0_SCIF0_A
  				  | MOD_SEL0_SCIF2_A
  				  | MOD_SEL0_SPEED_PULSE_IF_A);
@@ -181,7 +164,7 @@ index bced03a..45a6dc9 100644
  	pfc_reg_write(PFC_MOD_SEL1, MOD_SEL1_SIMCARD_A
  				  | MOD_SEL1_SSI2_A
  				  | MOD_SEL1_TIMER_TMU_A
-@@ -514,8 +535,138 @@ void pfc_init_e3(void)
+@@ -510,8 +531,138 @@ void pfc_init_e3(void)
  				  | MOD_SEL1_VIN5_A
  				  | MOD_SEL1_ADGC_A
  				  | MOD_SEL1_SSI9_A);
@@ -320,14 +303,14 @@ index bced03a..45a6dc9 100644
  	pfc_reg_write(PFC_IPSR0, IPSR_28_FUNC(0)	/* QSPI1_MISO/IO1 */
  			       | IPSR_24_FUNC(0)	/* QSPI1_MOSI/IO0 */
  			       | IPSR_20_FUNC(0)	/* QSPI1_SPCLK */
-@@ -644,7 +795,116 @@ void pfc_init_e3(void)
+@@ -640,8 +791,116 @@ void pfc_init_e3(void)
  				| IPSR_8_FUNC(0)
  				| IPSR_4_FUNC(0)
  				| IPSR_0_FUNC(3));	/* USB0_OVC_B */
 +#endif	// RZG_EK874
  
+ 	/* initialize GPIO/perihperal function select */
 +#if RZG_EK874
-+	/* initialize GPIO/perihperal function select */
 +	pfc_reg_write(PFC_GPSR0, GPSR0_SCL4
 +			       | GPSR0_D15
 +			       | GPSR0_D14
@@ -416,7 +399,7 @@ index bced03a..45a6dc9 100644
 +			       | GPSR5_MSIOF0_SCK
 +			       | GPSR5_RX2_A
 +			       | GPSR5_TX2_A
-+			       | GPSR5_RTS0_TANS_A
++			       | GPSR5_RTS0_A
 +			       | GPSR5_SCK0_A);
 +	pfc_reg_write(PFC_GPSR6, GPSR6_USB30_PWEN
 +			       | GPSR6_SSI_SDATA6
@@ -434,19 +417,27 @@ index bced03a..45a6dc9 100644
 +			       | GPSR6_SSI_WS01239
 +			       | GPSR6_SSI_SCK01239);
 +#else	// RZG_EK874
- 	/* initialize GPIO/perihperal function select */
  	pfc_reg_write(PFC_GPSR0, GPSR0_SCL4
  			       | GPSR0_D15
-@@ -753,7 +1013,28 @@ void pfc_init_e3(void)
+ 			       | GPSR0_D11
+@@ -749,8 +1008,10 @@ void pfc_init_e3(void)
  			       | GPSR6_SSI_SDATA0
  			       | GPSR6_SSI_WS01239
  			       | GPSR6_SSI_SCK01239);
 +#endif	// RZG_EK874
  
+ 	/* initialize POC control */
 +#if RZG_EK874
-+	/* initialize POC control */
-+	reg = mmio_read_32(PFC_IOCTRL30);
-+	reg = ((reg & IOCTRL30_MASK) | POC_SD1_DAT3_33V
+ 	reg = mmio_read_32(PFC_POCCTRL0);
+ 	reg = ((reg & POCCTRL0_MASK) | POC_SD1_DAT3_33V
+ 				     | POC_SD1_DAT2_33V
+@@ -768,22 +1029,59 @@ void pfc_init_e3(void)
+ 	reg = mmio_read_32(PFC_POCCTRL2);
+ 	reg = (reg & POCCTRL2_MASK);
+ 	pfc_reg_write(PFC_POCCTRL2, reg);
++#else	// RZG_EK874
++	reg = mmio_read_32(PFC_POCCTRL0);
++	reg = ((reg & POCCTRL0_MASK) | POC_SD1_DAT3_33V
 +				     | POC_SD1_DAT2_33V
 +				     | POC_SD1_DAT1_33V
 +				     | POC_SD1_DAT0_33V
@@ -458,22 +449,14 @@ index bced03a..45a6dc9 100644
 +				     | POC_SD0_DAT0_33V
 +				     | POC_SD0_CMD_33V
 +				     | POC_SD0_CLK_33V);
-+	pfc_reg_write(PFC_IOCTRL30, reg);
-+	reg = mmio_read_32(PFC_IOCTRL32);
-+	reg = ((reg & IOCTRL32_MASK) & ~ POC2_VREF_33V);
-+	pfc_reg_write(PFC_IOCTRL32, reg);
-+#else	// RZG_EK874
- 	/* initialize POC control */
- 	reg = mmio_read_32(PFC_IOCTRL30);
- 	reg = ((reg & IOCTRL30_MASK) | POC_SD1_DAT3_33V
-@@ -772,7 +1053,17 @@ void pfc_init_e3(void)
- 	reg = mmio_read_32(PFC_IOCTRL32);
- 	reg = (reg & IOCTRL32_MASK);
- 	pfc_reg_write(PFC_IOCTRL32, reg);
++	pfc_reg_write(PFC_POCCTRL0, reg);
++	reg = mmio_read_32(PFC_POCCTRL2);
++	reg = (reg & POCCTRL2_MASK);
++	pfc_reg_write(PFC_POCCTRL2, reg);
 +#endif	// RZG_EK874
  
+ 	/* initialize LSI pin pull-up/down control */
 +#if RZG_EK874
-+	/* initialize LSI pin pull-up/down control */
 +	pfc_reg_write(PFC_PUD0, 0x00080000U);
 +	pfc_reg_write(PFC_PUD1, 0xCE398464U);
 +	pfc_reg_write(PFC_PUD2, 0xA4C380F4U);
@@ -481,17 +464,16 @@ index bced03a..45a6dc9 100644
 +	pfc_reg_write(PFC_PUD4, 0xFFF0FFFFU);
 +	pfc_reg_write(PFC_PUD5, 0x40000000U);
 +#else	// RZG_EK874
- 	/* initialize LSI pin pull-up/down control */
  	pfc_reg_write(PFC_PUD0, 0xFDF80000U);
  	pfc_reg_write(PFC_PUD1, 0xCE298464U);
-@@ -780,7 +1071,17 @@ void pfc_init_e3(void)
+ 	pfc_reg_write(PFC_PUD2, 0xA4C380F4U);
  	pfc_reg_write(PFC_PUD3, 0x0000079FU);
  	pfc_reg_write(PFC_PUD4, 0xFFF0FFFFU);
  	pfc_reg_write(PFC_PUD5, 0x40000000U);
 +#endif	// RZG_EK874
  
+ 	/* initialize LSI pin pull-enable register */
 +#if RZG_EK874
-+	/* initialize LSI pin pull-enable register */
 +	pfc_reg_write(PFC_PUEN0, 0x00000000U);
 +	pfc_reg_write(PFC_PUEN1, 0x00300000U);
 +	pfc_reg_write(PFC_PUEN2, 0x00400074U);
@@ -499,10 +481,9 @@ index bced03a..45a6dc9 100644
 +	pfc_reg_write(PFC_PUEN4, 0x07900600U);
 +	pfc_reg_write(PFC_PUEN5, 0x00000000U);
 +#else	// RZG_EK874
- 	/* initialize LSI pin pull-enable register */
  	pfc_reg_write(PFC_PUEN0, 0xFFF00000U);
  	pfc_reg_write(PFC_PUEN1, 0x00000000U);
-@@ -788,6 +1089,7 @@ void pfc_init_e3(void)
+ 	pfc_reg_write(PFC_PUEN2, 0x00000004U);
  	pfc_reg_write(PFC_PUEN3, 0x00000000U);
  	pfc_reg_write(PFC_PUEN4, 0x07800010U);
  	pfc_reg_write(PFC_PUEN5, 0x00000000U);
@@ -510,12 +491,11 @@ index bced03a..45a6dc9 100644
  
  	/* initialize positive/negative logic select */
  	mmio_write_32(GPIO_POSNEG0, 0x00000000U);
-@@ -798,6 +1100,16 @@ void pfc_init_e3(void)
- 	mmio_write_32(GPIO_POSNEG5, 0x00000000U);
+@@ -795,6 +1093,15 @@ void pfc_init_e3(void)
  	mmio_write_32(GPIO_POSNEG6, 0x00000000U);
  
+ 	/* initialize general IO/interrupt switching */
 +#if RZG_EK874
-+	/* initialize general IO/interrupt switching */
 +	mmio_write_32(GPIO_IOINTSEL0, 0x00000000U);
 +	mmio_write_32(GPIO_IOINTSEL1, 0x00000000U);
 +	mmio_write_32(GPIO_IOINTSEL2, 0x00000000U);
@@ -524,17 +504,17 @@ index bced03a..45a6dc9 100644
 +	mmio_write_32(GPIO_IOINTSEL5, 0x00000000U);
 +	mmio_write_32(GPIO_IOINTSEL6, 0x00000000U);
 +#else	// RZG_EK874
- 	/* initialize general IO/interrupt switching */
  	mmio_write_32(GPIO_IOINTSEL0, 0x00020000U);
  	mmio_write_32(GPIO_IOINTSEL1, 0x00000000U);
-@@ -806,7 +1118,17 @@ void pfc_init_e3(void)
+ 	mmio_write_32(GPIO_IOINTSEL2, 0x00000000U);
+@@ -802,16 +1109,36 @@ void pfc_init_e3(void)
  	mmio_write_32(GPIO_IOINTSEL4, 0x00000000U);
  	mmio_write_32(GPIO_IOINTSEL5, 0x00000000U);
  	mmio_write_32(GPIO_IOINTSEL6, 0x00000000U);
 +#endif	// RZG_EK874
  
+ 	/* initialize general output register */
 +#if RZG_EK874
-+	/* initialize general output register */
 +	mmio_write_32(GPIO_OUTDT0, 0x00000000U);
 +	mmio_write_32(GPIO_OUTDT1, 0x00000000U);
 +	mmio_write_32(GPIO_OUTDT2, 0x00000000U);
@@ -542,15 +522,15 @@ index bced03a..45a6dc9 100644
 +	mmio_write_32(GPIO_OUTDT5, 0x00000000U);
 +	mmio_write_32(GPIO_OUTDT6, 0x00000000U);
 +#else	// RZG_EK874
- 	/* initialize general output register */
  	mmio_write_32(GPIO_OUTDT0, 0x00000010U);
  	mmio_write_32(GPIO_OUTDT1, 0x00100000U);
-@@ -814,7 +1136,18 @@ void pfc_init_e3(void)
+ 	mmio_write_32(GPIO_OUTDT2, 0x00000000U);
  	mmio_write_32(GPIO_OUTDT3, 0x00008000U);
  	mmio_write_32(GPIO_OUTDT5, 0x00060000U);
  	mmio_write_32(GPIO_OUTDT6, 0x00000000U);
 +#endif	// RZG_EK874
  
+ 	/* initialize general input/output switching */
 +#if RZG_EK874
 +	/* initialize general input/output switching */
 +	mmio_write_32(GPIO_INOUTSEL0, 0x00020000U);
@@ -561,20 +541,20 @@ index bced03a..45a6dc9 100644
 +	mmio_write_32(GPIO_INOUTSEL5, 0x00080000U);
 +	mmio_write_32(GPIO_INOUTSEL6, 0x00000010U);
 +#else	// RZG_EK874
- 	/* initialize general input/output switching */
  	mmio_write_32(GPIO_INOUTSEL0, 0x00000010U);
  	mmio_write_32(GPIO_INOUTSEL1, 0x00100020U);
-@@ -823,4 +1156,5 @@ void pfc_init_e3(void)
+ 	mmio_write_32(GPIO_INOUTSEL2, 0x03000000U);
+@@ -819,4 +1146,5 @@ void pfc_init_e3(void)
  	mmio_write_32(GPIO_INOUTSEL4, 0x00000000U);
  	mmio_write_32(GPIO_INOUTSEL5, 0x00060000U);
  	mmio_write_32(GPIO_INOUTSEL6, 0x00004000U);
 +#endif	// RZG_EK874
  }
 diff --git a/plat/renesas/rcar/platform.mk b/plat/renesas/rcar/platform.mk
-index f33701b..c5d62fb 100644
+index a8b4672..cbdca87 100644
 --- a/plat/renesas/rcar/platform.mk
 +++ b/plat/renesas/rcar/platform.mk
-@@ -200,6 +201,21 @@ else
+@@ -211,6 +211,23 @@ else
        endif
        $(eval $(call add_define,RCAR_LSI_CUT))
      endif
@@ -588,6 +568,8 @@ index f33701b..c5d62fb 100644
 +      # disable compatible function.
 +      ifeq (${LSI_CUT},10)
 +        RCAR_LSI_CUT:=0
++      else ifeq (${LSI_CUT},11)
++        RCAR_LSI_CUT:=1
 +      else
 +        $(error "Error: ${LSI_CUT} is not supported.")
 +      endif
@@ -596,7 +578,7 @@ index f33701b..c5d62fb 100644
    else
      $(error "Error: ${LSI} is not supported.")
    endif
-@@ -340,6 +362,12 @@ RCAR_SYSTEM_RESET_KEEPON_DDR := 0
+@@ -351,6 +368,12 @@ RCAR_SYSTEM_RESET_KEEPON_DDR := 0
  endif
  $(eval $(call add_define,RCAR_SYSTEM_RESET_KEEPON_DDR))
  
@@ -642,6 +624,3 @@ index 3a74aa5..e6dafc1 100644
  /* Reserved */
  #define RCAR_BL33_PARTITION		(0x00000000U)
  #define RCAR_BL332SRC_ADDRESS		(0x00000000U)
--- 
-2.7.4
-
