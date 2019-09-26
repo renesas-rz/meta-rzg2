@@ -1,19 +1,23 @@
-SUMMARY = "Startup script for WL18xx modules"
+SUMMARY = "Startup script for WL18xx modules to disable Extreme Low Power mode"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-SRC_URI = "file://wl18xx-init \
-  file://COPYING.MIT \
+SRC_URI_append = " \
+	file://wl18xx-init.sh \
+	file://COPYING.MIT \
 "
 
 S = "${WORKDIR}"
 
 do_install() {
-	install -d ${D}/${sysconfdir}/init.d
-	install -m755 ${WORKDIR}/wl18xx-init ${D}/${sysconfdir}/init.d/rc.wl18xx
+        install -d ${D}/${sysconfdir}/profile.d
+        install -m 0644 ${WORKDIR}/wl18xx-init.sh ${D}/${sysconfdir}/profile.d/wl18xx-init.sh
 }
 
-inherit allarch update-rc.d
+do_configure[noexec] = "1"
+do_patch[noexec] = "1"
+do_compile[noexec] = "1"
 
-INITSCRIPT_NAME = "rc.wl18xx"
-INITSCRIPT_PARAMS = "start 8 5 2 . stop 21 0 1 6 ."
+FILES_${PN} = " \
+        ${sysconfdir}/profile.d/wl18xx-init.sh \
+"
