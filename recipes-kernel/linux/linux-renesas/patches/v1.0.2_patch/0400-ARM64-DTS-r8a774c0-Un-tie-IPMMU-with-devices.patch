@@ -8,6 +8,19 @@ to support similar to r8a77990 in v4.14.75-ltsi/rcar-3.9.6
 
 Without this commit, an error encountered with msiof on EK874 with
 or without CONFIG_IPMMU_VMSA
+-----------------------------------------------------------------
+root@ek874:/# dmesg | grep msiof
+[    1.321523] spi_sh_msiof e6e90000.spi: dma_request_slave_channel_compat
+failed
+[    1.328913] spi_sh_msiof e6e90000.spi: DMA not available, using PIO
+-----------------------------------------------------------------
+where it should be as below after this commit:
+-----------------------------------------------------------------
+root@ek874:~# dmesg | grep msiof
+[    1.337605] spi_sh_msiof e6e90000.spi: DMA available
+-----------------------------------------------------------------
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
 ---
  arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 40 ++++++-------------------------
  1 file changed, 7 insertions(+), 33 deletions(-)

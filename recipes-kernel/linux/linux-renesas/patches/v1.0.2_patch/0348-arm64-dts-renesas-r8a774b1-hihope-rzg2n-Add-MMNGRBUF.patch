@@ -23,7 +23,7 @@ index c499b2a..ca7be60 100644
 +
 +	mmngrbuf {
 +		compatible = "renesas,mmngrbuf";
-+ 	};
++	};
  };
  
  &du {
