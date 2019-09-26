@@ -24,6 +24,7 @@ PACKAGES = " \
     ${@base_conditional("USE_OMX_COMMON", "1", "packagegroup-gstreamer1.0-omx", "", d)} \
     packagegroup-gstreamer1.0-plugins-debug \
     packagegroup-gstreamer1.0-plugins-bad \
+    packagegroup-vspfilter-init \
 "
 
 RDEPENDS_packagegroup-gstreamer1.0-plugins = " \
@@ -37,6 +38,7 @@ RDEPENDS_packagegroup-gstreamer1.0-plugins = " \
     gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad \
     ${@base_conditional("USE_OMX_COMMON", "1", "gstreamer1.0-plugin-vspfilter gstreamer1.0-plugin-vspmfilter", "", d)} \
+    ${@base_conditional("USE_OMX_COMMON", "1", "vspfilter-init", "", d)} \
 "
 
 RDEPENDS_packagegroup-gstreamer1.0-plugins-base = " \

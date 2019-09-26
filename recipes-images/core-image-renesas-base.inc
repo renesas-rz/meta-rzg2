@@ -4,7 +4,6 @@ IMAGE_INSTALL_append = " \
     v4l-utils \
     i2c-tools \
     coreutils \
-    vspfilter-init \
 "
 
 # Support secure environment
