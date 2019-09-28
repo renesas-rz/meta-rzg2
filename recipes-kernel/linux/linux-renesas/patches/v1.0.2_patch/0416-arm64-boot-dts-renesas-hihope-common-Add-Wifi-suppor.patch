@@ -1,0 +1,95 @@
+From 523ff1e57c48d14e1779c471afc27b34db462318 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Mon, 23 Sep 2019 15:06:54 +0700
+Subject: [PATCH] arm64: boot: dts: renesas: hihope-common: Add Wifi support
+ for G2M and G2N
+
+This patch adds Wifi support for G2M and G2N boards.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 47 ++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 09aff8a..3ffdd31 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -70,6 +70,17 @@
+ 			  1800000 0>;
+ 	};
+ 
++	wlan_en_reg: regulator-wlan_en {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <70000>;
++
++		gpio = <&pca9654 1 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
+ 	/* External DU dot clocks */
+ 	x302_clk: x302-clock {
+ 		compatible = "fixed-clock";
+@@ -258,6 +269,12 @@
+ 		power-source = <1800>;
+ 	};
+ 
++	sdhi2_pins: sd2 {
++		groups = "sdhi2_data4", "sdhi2_ctrl";
++		function = "sdhi2";
++		power-source = <1800>;
++	};
++
+ 	sdhi3_pins: sd3 {
+ 		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
+ 		function = "sdhi3";
+@@ -325,6 +342,15 @@
+ 	status = "okay";
+ };
+ 
++&gpio2 {
++	interrupt-fixup {
++		gpio-hog;
++		gpios = <5 GPIO_ACTIVE_HIGH>;
++		line-name = "int";
++		input;
++	};
++};
++
+ &scif0 {
+ 	pinctrl-0 = <&scif0_pins>;
+ 	pinctrl-names = "default";
+@@ -448,6 +474,27 @@
+ 	status = "okay";
+ };
+ 
++&sdhi2 {
++	status = "okay";
++	pinctrl-0 = <&sdhi2_pins>;
++	pinctrl-names = "default";
++
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	non-removable;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@2 {
++		compatible = "ti,wl1837";
++		reg = <2>;
++		interrupt-parent = <&gpio2>;
++		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
++	};
++};
++
+ &sdhi3 {
+ 	pinctrl-0 = <&sdhi3_pins>;
+ 	pinctrl-1 = <&sdhi3_pins_uhs>;
+-- 
+2.7.4
+
