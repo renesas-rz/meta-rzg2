@@ -414,3 +414,4 @@ patch patches/v1.0.2_patch/0413-media-rcar-vin-Add-format-NV12-support-for-VIN-s
 patch patches/v1.0.2_patch/0414-media-rcar-vin-Fix-FourCC-of-ARGB1555-format.patch
 patch patches/v1.0.2_patch/0415-media-rcar-vin-Add-ARGB8888-format-support-for-VIN-s.patch
 patch patches/v1.0.2_patch/0416-arm64-boot-dts-renesas-hihope-common-Add-Wifi-suppor.patch
+patch patches/v1.0.2_patch/0417-mm-rzg2_mfis_ecc-disable-interrupt-as-default.patch
