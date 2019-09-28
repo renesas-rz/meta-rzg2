@@ -406,3 +406,10 @@ patch patches/v1.0.2_patch/0405-arm64-defconfig-Enable-RENESAS_MFIS_ECC.patch
 patch patches/v1.0.2_patch/0406-arm64-defconfig-enable-E1000E-config.patch
 patch patches/v1.0.2_patch/0407-arm64-renesas-r8a774a1-Add-MSIOF-ref-clock.patch
 patch patches/v1.0.2_patch/0408-arm64-renesas-r8a774a1-add-ref-clock-to-msiof-n.patch
+patch patches/v1.0.2_patch/0409-media-i2c-ov5645-add-virtual_channel-parameter-suppo.patch
+patch patches/v1.0.2_patch/0410-media-rcar-vin-Add-memory-type-of-VB_USERPTR-support.patch
+patch patches/v1.0.2_patch/0411-media-rcar-vin-Add-UDS-function-support.patch
+patch patches/v1.0.2_patch/0412-media-rcar-vin-Add-each-V4L2-callback-function-when-.patch
+patch patches/v1.0.2_patch/0413-media-rcar-vin-Add-format-NV12-support-for-VIN-s-out.patch
+patch patches/v1.0.2_patch/0414-media-rcar-vin-Fix-FourCC-of-ARGB1555-format.patch
+patch patches/v1.0.2_patch/0415-media-rcar-vin-Add-ARGB8888-format-support-for-VIN-s.patch
