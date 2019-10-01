@@ -416,3 +416,5 @@ patch patches/v1.0.2_patch/0415-media-rcar-vin-Add-ARGB8888-format-support-for-V
 patch patches/v1.0.2_patch/0416-arm64-boot-dts-renesas-hihope-common-Add-Wifi-suppor.patch
 patch patches/v1.0.2_patch/0417-mm-rzg2_mfis_ecc-disable-interrupt-as-default.patch
 patch patches/v1.0.2_patch/0418-ARM64-DTS-r8a774c0-change-gpu-power-domain-to-PD_3DG.patch
+patch patches/v1.0.2_patch/0419-arm64-dts-renesas-r8a774c0-es10-Re-add-support-for-R.patch
+patch patches/v1.0.2_patch/0420-arm64-dts-renesas-r8a774c0-es10-cat874-ek874-Re-add-.patch
