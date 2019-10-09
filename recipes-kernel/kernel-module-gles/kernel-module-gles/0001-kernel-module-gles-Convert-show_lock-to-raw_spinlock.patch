@@ -1,0 +1,57 @@
+From 6b0a701c1a63f119e8f027df4453f72a34ea85c2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 8 Oct 2019 14:41:57 +0700
+Subject: [PATCH] kernel-module-gles: Convert show_lock to raw_spinlock_t
+
+Based on RT-patches with commit:
+"tty/sysrq: Convert show_lock to raw_spinlock_t"
+
+Systems which don't provide arch_trigger_cpumask_backtrace() will
+invoke showacpu() from a smp_call_function() function which is invoked
+with disabled interrupts even on -RT systems.
+
+The function acquires the show_lock lock which only purpose is to
+ensure that the CPUs don't print simultaneously. Otherwise the
+output would clash and it would be hard to tell the output from CPUx
+apart from CPUy.
+
+On -RT the spin_lock() can not be acquired from this context. A
+raw_spin_lock() is required. It will introduce the system's latency
+by performing the sysrq request and other CPUs will block on the lock
+until the request is done. This is okay because the user asked for a
+backtrace of all active CPUs and under "normal circumstances in
+production" this path should not be triggered.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ services/server/env/linux/osfunc_arm64.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/services/server/env/linux/osfunc_arm64.c b/services/server/env/linux/osfunc_arm64.c
+index da0f4f4..31aa2fc 100644
+--- a/services/server/env/linux/osfunc_arm64.c
++++ b/services/server/env/linux/osfunc_arm64.c
+@@ -63,9 +63,9 @@ static void per_cpu_cache_flush(void *arg)
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,2,0))
+ 	unsigned long irqflags;
+ 	signed long Clidr, Csselr, LoC, Assoc, Nway, Nsets, Level, Lsize, Var;
+-	static DEFINE_SPINLOCK(spinlock);
++	static DEFINE_RAW_SPINLOCK(spinlock);
+ 
+-	spin_lock_irqsave(&spinlock, irqflags);
++	raw_spin_lock_irqsave(&spinlock, irqflags);
+ 
+ 	/* Read cache level ID register */
+ 	asm volatile (
+@@ -141,7 +141,7 @@ e0:
+ 		"isb\n\t"
+ 		: : [val] "r" (Var));
+ 
+-	spin_unlock_irqrestore(&spinlock, irqflags);
++	raw_spin_unlock_irqrestore(&spinlock, irqflags);
+ #else
+ 	flush_cache_all();
+ #endif
+-- 
+2.7.4
+

@@ -1,0 +1,46 @@
+From c0ac3928723b011808b50a0d6facffe6c15e0d3e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 7 Oct 2019 18:15:32 +0700
+Subject: [PATCH] kernel-module-gles: fix compiling issue for real time kernel
+
+While compiling, there is an error about comparison of distinct
+pointer types lacks a cast [-Werror] in function:
+OSSpinLockRelease(psRgxDevInfo->hHWPerfHostSpinLock, ui64SpinLockFlags)
+
+To fix this issue, add a cast to SpinLockFlags.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ services/server/devices/rgx/rgxhwperf.c | 2 +-
+ services/server/include/osfunc.h        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/services/server/devices/rgx/rgxhwperf.c b/services/server/devices/rgx/rgxhwperf.c
+index bd56676..89c1019 100644
+--- a/services/server/devices/rgx/rgxhwperf.c
++++ b/services/server/devices/rgx/rgxhwperf.c
+@@ -1961,7 +1961,7 @@ static void _GetHWPerfHostPacketSpecifics(PVRSRV_RGXDEV_INFO *psRgxDevInfo,
+ 		}
+ 	}
+ 
+-	OSSpinLockRelease(psRgxDevInfo->hHWPerfHostSpinLock, ui64SpinLockFlags);
++	OSSpinLockRelease(psRgxDevInfo->hHWPerfHostSpinLock, &ui64SpinLockFlags);
+ }
+ 
+ static inline void _SetupHostPacketHeader(PVRSRV_RGXDEV_INFO *psRgxDevInfo,
+diff --git a/services/server/include/osfunc.h b/services/server/include/osfunc.h
+index e9e464a..c21a533 100644
+--- a/services/server/include/osfunc.h
++++ b/services/server/include/osfunc.h
+@@ -1490,7 +1490,7 @@ typedef spinlock_t *POS_SPINLOCK;
+ #define OSSpinLockDestroy(_psLock) ({OSFreeMem(_psLock);})
+ 
+ #define OSSpinLockAcquire(_pLock, _pFlags) {unsigned long *p = (unsigned long *)_pFlags; spin_lock_irqsave(_pLock, *p);}
+-#define OSSpinLockRelease(_pLock, _flags)  {spin_unlock_irqrestore(_pLock, _flags);}
++#define OSSpinLockRelease(_pLock, _flags)  {unsigned long *q = (unsigned long *)_flags; spin_unlock_irqrestore(_pLock, *q);}
+ 
+ #elif defined(LINUX) || defined(__QNXNTO__) || defined (INTEGRITY_OS)
+ /* User-mode unit tests use these definitions on Linux */
+-- 
+2.7.4
+

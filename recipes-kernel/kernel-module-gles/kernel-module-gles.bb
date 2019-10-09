@@ -18,6 +18,8 @@ SRC_URI_r8a774c0 = 'file://GSX_KM_E3.tar.bz2'
 
 SRC_URI_append = "\
 	file://0001-supporting-kernel-version-4.19-and-later.patch \
+	file://0001-kernel-module-gles-fix-compiling-issue-for-real-time.patch \
+	file://0001-kernel-module-gles-Convert-show_lock-to-raw_spinlock.patch \
 "
 
 S = "${WORKDIR}/rogue_km"
