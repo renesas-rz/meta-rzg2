@@ -7,7 +7,7 @@ require include/docker-control.inc
 
 PR = "r1"
 
-inherit debian-package
+inherit debian-package siteinfo
 PV = "1.0.1t"
 SRCREV = "d5761b52f35cf9733eac1da1ca3060cb7ba4d5f8"
 
