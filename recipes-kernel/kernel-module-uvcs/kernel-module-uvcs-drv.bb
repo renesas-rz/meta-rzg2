@@ -30,6 +30,8 @@ B="${S}/src/makefile"
 
 includedir = "${RENESAS_DATADIR}/include"
 
+do_fetch[file-checksums] = ""
+
 do_compile_prepend() {
     export UVCS_SRC="${S}/src"
     export UVCS_INC="${S}"

@@ -37,6 +37,8 @@ EXTRA_OEMAKE += "CROSS_COMPILE=${CROSS_COMPILE}"
 # Build GFX kernel module without suffix
 KERNEL_MODULE_PACKAGE_SUFFIX = ""
 
+do_fetch[file-checksums] = ""
+
 module_do_compile() {
     unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
     cd ${KBUILD_DIR}

@@ -120,6 +120,8 @@ OMX_AUDIO_SRC_LIST = " \
 
 S = "${WORKDIR}/omx/"
 
+do_fetch[file-checksums] = ""
+
 # Create ${S} directory
 do_unpack_prepend() {
     os.system("install -d ${S}")
