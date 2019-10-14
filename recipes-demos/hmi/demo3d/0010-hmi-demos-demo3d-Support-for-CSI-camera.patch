@@ -1,0 +1,203 @@
+From 72b750f8ba7bd218b2d36d246729986c2a326c40 Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Wed, 25 Sep 2019 10:33:09 +0700
+Subject: [PATCH 2/2] hmi-demos: demo3d: Support for CSI camera.
+
+Due to changes in VIN/CSI, this demo app needs to be updated
+to support both USB camera and CSI camera:
+- In function: camera_get_device():
+  Searchs for both USB and CSI camera. If no camera was found,
+  returns NULL.
+- In function: touch_handle():
+  If no camera was found, refuses to init gstreamer pipeline.
+  -> Eleminate error when setting state of NULL camera pipeline.
+- In function: main():
+  Checks for initialization state of camera and video stream
+  before deinit them.
+  -> Eleminate error when deinit a NULL pipeline.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ Demo3D.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 82 insertions(+), 28 deletions(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index 8882e92..6155c42 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -29,7 +29,7 @@
+ #include <math.h>
+ #include <assert.h>
+ #include <signal.h>
+-
++#include <unistd.h>
+ 
+ #include <linux/input.h>
+ #include <linux/videodev2.h>
+@@ -768,11 +768,21 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+             /*initialie Gstreamer camera pipeline*/
+             gc_init = 0;
+             cam_device = camera_get_device();
+-            sprintf(gst_cam.string, "v4l2src device=%s ! videoconvert ! appsink caps=video/x-raw,format=RGBA,width=%d,height=%d name=appsink", cam_device, cam_w, cam_h);  
++            if (!cam_device) {
++              gc_init = 1;
++              gtexture = gtexture_p;
++              gtexture_p = 0;
++              gtexture_c = 0;
++              gtexture_v = 0;
++              gles_reset_textureID(g_object3Ds,TEXID_SHADOW);
++              fprintf(stderr, "Unable to find any compatible camera.\n");
++              break;
++            }
++            sprintf(gst_cam.string, "v4l2src device=%s ! videoconvert ! appsink caps=video/x-raw,format=BGRA,width=%d,height=%d name=appsink", cam_device, cam_w, cam_h);  
+             gst_cam.gstapp_new_sample = gstapp_new_sample;
+             gst_cam.gst_bus_message = gst_bus_message;
+             gst_cam.type = 1; //camera
+-            
++
+             gstreamer_init(&gst_cam);
+           }
+           gles_reset_textureID(g_object3Ds,TEXID_CAM);
+@@ -781,8 +791,12 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+           if(gst_video.state == 1)
+             gstreamer_pause(&gst_video);
+           gstreamer_start(&gst_cam);
++          if (gst_element_get_state(gst_cam.pipeline, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_FAILURE)
++            fprintf(stderr, "Cannot play camera stream.\n");
+         }else{
+           gstreamer_pause(&gst_cam);
++          if (gst_element_get_state(gst_cam.pipeline, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_FAILURE)
++            fprintf(stderr, "Canot pause camera stream.\n");
+         }
+         break;
+       case BTFTEXTUREV:
+@@ -799,13 +813,17 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+             gstreamer_init(&gst_video);
+           }
+           gles_reset_textureID(g_object3Ds,TEXID_VIDEO);
+-          if(gst_cam.state == 1)
+-            gstreamer_pause(&gst_cam);
+-          gstreamer_start(&gst_video);          
+           gtexture_p = 0;
+           gtexture_c = 0;
++          if(gst_cam.state == 1 && !gc_init)
++            gstreamer_pause(&gst_cam);
++          gstreamer_start(&gst_video);
++          if (gst_element_get_state(gst_video.pipeline, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_FAILURE)
++            fprintf(stderr, "Cannot play video.\n");
+         }else{
+           gstreamer_pause(&gst_video);
++          if (gst_element_get_state(gst_video.pipeline, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_FAILURE)
++            fprintf(stderr, "Cannot pause video.\n");
+         }
+         break;
+       default:
+@@ -822,7 +840,9 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+               random_float(0.0,3.14)*180, 
+               random_float(0.0,3.14)*180, 
+               random_float(0.0,3.14)*180);
+-    
++
++      /* Using the shadow texture if no texture is assigned */
++      g_object3Ds->textureID = TEXID_SHADOW;
+       if (gtexture_v)
+         g_object3Ds->textureID = TEXID_VIDEO;  
+       if (gtexture_c)
+@@ -1258,30 +1278,62 @@ static GstFlowReturn gstapp_new_sample(GstElement * appsink, void * userptr)
+ 
+ char *camera_get_device()
+ { 
+-  char *cam_dev = (char*)malloc(20);
++  char *cam_dev = NULL;
+   int i = 0;
++  FILE *fp;
++  char output[40];
+ 
+-  //since the default video device usually is video0
+-  //this function intend to return the device have higher device number
+-  //in order to use default video0, remove all connection with other 
+-  //video input devices
+-  while(1){
+-    char device[20];
+-    int fd;
+-    sprintf (device, "/dev/video%d", i);
+-    if((fd = open(device, O_RDONLY)) == -1){              
++  const int VIN_CHANNEL_STRING_INDEX = 9;
++
++  while (1)
++  {
++    /* Checking for USB camera */
++    char device[40];
++    char line[20];
++    sprintf(device, "/sys/class/video4linux/video%d/name", i);
++    if (!(fp = fopen(device, "r"))) {
++      break;
++    } else {
++      fgets(line, 20, fp);
++      if (strstr(line, "UVC Camera") != NULL) {
++        cam_dev = (char *)malloc(sizeof(char) * 20);
++        sprintf(cam_dev, "/dev/video%d", i);
+         break;
+-    }          
+-    struct v4l2_fmtdesc v4l2_fmtdesc;
+-    v4l2_fmtdesc.index = 0;
+-    v4l2_fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+-    
+-    if (ioctl(fd, VIDIOC_ENUM_FMT , &v4l2_fmtdesc) != -1){        
+-      sprintf (cam_dev, "/dev/video%d", i);
++      }
+     }
+-    close(fd);
+     i++;
+-  }  
++  }
++
++  if (fp)
++    fclose(fp);
++  /* If USB camera is found, use it */
++  if (cam_dev)
++    return cam_dev;
++
++  /**
++   * If no USB camera was found, search for CSI camera.
++   * User have to run camera init script in order to use CSI camera
++   */
++  fp = popen("media-ctl -d /dev/media0 -p | grep \"VIN.*[ENABLE]\"", "r");
++  /**
++   * This command returns a string if it found a camera, for example:
++   *                -> "VIN5 output":0 [ENABLED]
++   * In this example, VIN channel for camera is 5
++   * and its index in the returned string is 9.
++   *
++   * If no camera was found, it returns an empty string.
++   */
++  if (fp == NULL) {
++    fprintf(stderr, "Failed to execute command.\n");
++    return NULL;
++  }
++  fgets(output, sizeof(output), fp);
++  if (strlen(output) > VIN_CHANNEL_STRING_INDEX && output[VIN_CHANNEL_STRING_INDEX] >= '0' && output[VIN_CHANNEL_STRING_INDEX] <= '9') {
++    /* Get the video device according to VIN channel */
++    cam_dev = (char *) malloc(sizeof(char) * 20);
++    sprintf(cam_dev, "/dev/video%c", output[VIN_CHANNEL_STRING_INDEX]);
++  }
++  pclose(fp);
+   return cam_dev;
+ }
+ 
+@@ -1682,8 +1734,10 @@ main(int argc, char **argv)
+   
+   gles_release(g_gl_text);
+ 
+-  gstreamer_denit(&gst_video);
+-  gstreamer_denit(&gst_cam);
++  if (!gv_init)
++    gstreamer_denit(&gst_video);
++  if (!gc_init)
++    gstreamer_denit(&gst_cam);
+   free(gv_data);
+   free(gc_data);
+    
+-- 
+2.7.1.windows.2
+

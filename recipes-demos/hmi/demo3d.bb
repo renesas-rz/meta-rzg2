@@ -14,6 +14,7 @@ SRC_URI = " \
  file://0007-Check-input-size-before-set-to-window.patch \
  file://0008-Change-offset-to-fix-with-text.patch \
  file://0009-HMI-demos-demo3d-Support-for-running-demo3d-in-fulls.patch \
+ file://0010-hmi-demos-demo3d-Support-for-CSI-camera.patch \
 "
 
 S = "${WORKDIR}/Demo3D"
