@@ -13,6 +13,7 @@ SRC_URI = " \
  file://0005-Demo3D-Video-use-vspfilter-to-scaling-element.patch \
  file://0007-Check-input-size-before-set-to-window.patch \
  file://0008-Change-offset-to-fix-with-text.patch \
+ file://0009-HMI-demos-demo3d-Support-for-running-demo3d-in-fulls.patch \
 "
 
 S = "${WORKDIR}/Demo3D"

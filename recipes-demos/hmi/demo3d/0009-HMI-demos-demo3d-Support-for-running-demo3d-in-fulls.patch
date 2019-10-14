@@ -1,0 +1,244 @@
+From 7c63b22e9865879b9cf70ac9b94f75d98fb08cfd Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Tue, 24 Sep 2019 09:13:09 +0700
+Subject: [PATCH 1/2] HMI-demos: demo3d: Support for running demo3d in
+ fullscreen.
+
+This patch supports 3D demo application run in fullscreen mode.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ Demo3D.c            |  26 ++++++------
+ Wayland_implement.c | 111 +++++++++++++++++++---------------------------------
+ Wayland_implement.h |   1 +
+ 3 files changed, 55 insertions(+), 83 deletions(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index 1a4656f..8882e92 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -1090,14 +1090,12 @@ keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
+ {
+ #if 0
+ 	struct display *d = data;
+-       	struct window *w = d->window;
+ 
+-	if (key == KEY_F11 && state)
+-		xdg_surface_request_change_state(w->xdg_surface,
+-						 XDG_SURFACE_STATE_FULLSCREEN,
+-						 !w->fullscreen, 0);
++	if (key == KEY_F11 && state) {
++		xdg_surface_set_fullscreen(d->window->xdg_surface, NULL);
++	}
+ 	else if (key == KEY_ESC && state)
+-		w->running = 0;
++		d->window->running = 0;
+ #endif
+ }
+ 
+@@ -1297,6 +1295,7 @@ static void
+ usage(int error_code)
+ {
+ 	fprintf(stderr, "Usage: Demo3D [OPTIONS]\n\n"
++		"  -f run in fullscreen\n"
+ 		"  -width <val> choose window width (800 is default)\n"
+ 		"  -height <val> choose window height (800 is default)\n"
+     "\n"
+@@ -1327,9 +1326,6 @@ main(int argc, char **argv)
+   
+   	window.display = &display;
+ 	display.window = &window;
+-	//window.window_size.width  = 800;
+-	//window.window_size.height = 800;
+-	//fixme
+ 	window.geometry.width  = 800;
+ 	window.geometry.height = 800;
+ 	window.buffer_size = 32;
+@@ -1363,7 +1359,7 @@ main(int argc, char **argv)
+          
+  
+ 
+-	wl_display_dispatch(display.display);
++	wl_display_roundtrip(display.display);
+ 
+ 	egl_init(&display, &window);
+ 	create_surface(&window);
+@@ -1623,9 +1619,13 @@ main(int argc, char **argv)
+   g_quad_bt = gles_gen_quad_mat(bt_w, bt_h);
+   g_quad_bg = gles_gen_quad_mat(bg_w, bg_h);  
+ 
+-	while (window.running && running) {     
+-		wl_display_dispatch_pending(display.display);
+-		redraw(&window, NULL, 0);     
++	while (window.running && running && ret != -1) {
++		if (window.wait_for_configure)
++			wl_display_dispatch(display.display);
++		else {
++			ret = wl_display_dispatch_pending(display.display);
++			redraw(&window, NULL, 0);
++		}
+ 	}
+ 
+ 	destroy_surface(&window);
+diff --git a/Wayland_implement.c b/Wayland_implement.c
+index 0007cb3..4b3d46e 100644
+--- a/Wayland_implement.c
++++ b/Wayland_implement.c
+@@ -31,9 +31,18 @@
+ 
+ static void
+ handle_surface_configure(void *data, struct xdg_surface *surface,
+-			 int32_t width, int32_t height)
++			 int32_t width, int32_t height,
++			 struct wl_array *states, uint32_t serial)
+ {
+ 	struct window *window = data;
++	uint32_t *p;
++
++	window->fullscreen = 0;
++	wl_array_for_each(p, states) {
++		uint32_t state = *p;
++		if (state == XDG_SURFACE_STATE_FULLSCREEN)
++			window->fullscreen = 1;
++	}
+ 
+ 	if (width > 0 && height > 0) {
+ 		if (!window->fullscreen) {
+@@ -48,38 +57,8 @@ handle_surface_configure(void *data, struct xdg_surface *surface,
+ 
+ 	if (window->native)
+ 		wl_egl_window_resize(window->native, width, height, 0, 0);
+-}
+-
+-static void
+-handle_surface_change_state(void *data, struct xdg_surface *xdg_surface,
+-			    uint32_t state,
+-			    uint32_t value,
+-			    uint32_t serial)
+-{
+-	struct window *window = data;
+-
+-	switch (state) {
+-	case XDG_SURFACE_STATE_FULLSCREEN:
+-		window->fullscreen = value;
+-
+-		if (!value)
+-			handle_surface_configure(window, window->xdg_surface,
+-						 window->window_size.width,
+-						 window->window_size.height);
+-		break;
+-	}
+-
+-	//xdg_surface_ack_change_state(xdg_surface, state, value, serial);
+-}
+-
+-static void
+-handle_surface_activated(void *data, struct xdg_surface *xdg_surface)
+-{
+-}
+-
+-static void
+-handle_surface_deactivated(void *data, struct xdg_surface *xdg_surface)
+-{
++	xdg_surface_ack_configure(window->xdg_surface, serial);
++	window->wait_for_configure = 0;
+ }
+ 
+ static void
+@@ -91,10 +70,6 @@ handle_surface_delete(void *data, struct xdg_surface *xdg_surface)
+ 
+ static const struct xdg_surface_listener xdg_surface_listener = {
+ 	handle_surface_configure,
+-	/*fixme: no use these API
+-	handle_surface_change_state,
+-	handle_surface_activated,
+-	handle_surface_deactivated,*/
+ 	handle_surface_delete,
+ };
+ 
+@@ -122,41 +97,37 @@ void create_surface(struct window *window)
+   struct display *display = window->display;
+   EGLBoolean ret;
+    
+-  window->surface = wl_compositor_create_surface(display->compositor);
+-  window->xdg_surface = xdg_shell_get_xdg_surface(display->shell,
+-              window->surface);
+- 
+-  xdg_surface_add_listener(window->xdg_surface,
+-         &xdg_surface_listener, window);
+-
+- /* fixme*/ 
+-#if 1
+-  window->native = (struct wl_egl_window *)
+-    wl_egl_window_create(window->surface,
+-             window->geometry.width,
+-             window->geometry.height);
+-  window->egl_surface =
+-    eglCreateWindowSurface(display->egl.dpy,
+-               display->egl.conf,
+-               window->native, NULL);
+-#endif 
+-
+-  xdg_surface_set_title(window->xdg_surface, "simple-egl");
+-
+-  ret = eglMakeCurrent(window->display->egl.dpy, window->egl_surface,
+-           window->egl_surface, window->display->egl.ctx);
+-  assert(ret == EGL_TRUE);
+- 
+-  if (!window->frame_sync)
+-    eglSwapInterval((EGLDisplay)display->egl.dpy, 0);
+-
+-/*fixme: replace new API 
+-  xdg_surface_request_change_state(window->xdg_surface,
+-           XDG_SURFACE_STATE_FULLSCREEN,
+-           window->fullscreen, 0);
+-*/
++	window->surface = wl_compositor_create_surface(display->compositor);
++	window->native =
++		wl_egl_window_create(window->surface,
++					window->geometry.width,
++					window->geometry.height);
++	window->egl_surface = eglCreateWindowSurface(display->egl.dpy,
++							display->egl.conf,
++							window->native, NULL);
++	window->xdg_surface = xdg_shell_get_xdg_surface(display->shell,
++							window->surface);
++	xdg_surface_add_listener(window->xdg_surface,
++		&xdg_surface_listener, window);
++	xdg_surface_set_title(window->xdg_surface, "simple-egl");
++
++	if (window->fullscreen)
++		window->wait_for_configure = 1;
++
++	wl_surface_commit(window->surface);
++	ret = eglMakeCurrent(window->display->egl.dpy,
++					window->egl_surface,
++					window->egl_surface,
++					window->display->egl.ctx);
++	assert(ret == EGL_TRUE);
++
++	if (!window->frame_sync)
++		eglSwapInterval((EGLDisplay)display->egl.dpy, 0);
+ 
+ 	if (!display->shell)
+ 		return;
+ 
++	if (window->fullscreen)
++		xdg_surface_set_fullscreen(window->xdg_surface, NULL);
++
+ }
+diff --git a/Wayland_implement.h b/Wayland_implement.h
+index b1e4ff4..a8cae5f 100644
+--- a/Wayland_implement.h
++++ b/Wayland_implement.h
+@@ -76,6 +76,7 @@ struct window {
+ 	struct wl_callback *callback;
+ 	int fullscreen, opaque, buffer_size, frame_sync;
+   int running;
++  int wait_for_configure;
+ };
+ 
+ void create_surface(struct window *window);
+-- 
+2.7.1.windows.2
+
