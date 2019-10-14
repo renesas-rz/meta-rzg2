@@ -6,6 +6,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI = " \
  file://RZ_scripts.tar.xz  \
  file://ATT93936.bashrc \
+ file://setup_ov5645.sh \
  file://0001-Add-CAM_DEV-variable-to-camera-encoding-script.patch \
  file://0002-PlayBack-Replace-pipeline-to-compatible-with-RCar-Ge.patch \
  file://0003-Network-receive-streaming-Scale-fix-to-display.patch \
@@ -19,6 +20,7 @@ SRC_URI = " \
  file://0011-hmi-demos-encoded-preview-change-order-of-element-du.patch \
  file://0012-hmi-demos-Encode-Preview-change-size-of-display-vide.patch \
  file://0013-hmi-demos-encode-preview-add-property-dmabuf.patch \
+ file://0014-hmi-demos-demos-Update-demo-scripts-to-support-camer.patch \
 "
 
 do_patch () {
@@ -26,11 +28,13 @@ do_patch () {
 	git init
 	git apply ../*.patch
 	chmod 755 ${S}/../RZ_scripts -Rf
+	chmod 755 ${S}/../setup_ov5645.sh -Rf
 }
 do_install () {
 	install -d ${D}/${ROOT_HOME}/RZ_scripts
 	cp ${S}/../RZ_scripts/* ${D}/${ROOT_HOME}/RZ_scripts
 	cp ${S}/../ATT93936.bashrc ${D}/${ROOT_HOME}/.bashrc
+	cp ${S}/../setup_ov5645.sh ${D}/${ROOT_HOME}/setup_ov5645.sh
 }
 
 INSANE_SKIP_${PN} += "ldflags debug-files file-rdeps"

@@ -1,0 +1,57 @@
+From d1f87c973de08aa1b980f934aa28b0a64ba77ee5 Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Thu, 26 Sep 2019 13:22:46 +0700
+Subject: [PATCH] hmi-demos: demos: Update demo scripts to support camera
+ function.
+
+This patch updates demo script to support camera functionality.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ RZ_GST-demo_camera-preview.sh | 6 ++++--
+ RZ_GST-demo_encoded-review.sh | 8 ++------
+ 2 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/RZ_GST-demo_camera-preview.sh b/RZ_GST-demo_camera-preview.sh
+index 5b70da3..f3e17d0 100755
+--- a/RZ_GST-demo_camera-preview.sh
++++ b/RZ_GST-demo_camera-preview.sh
+@@ -1,7 +1,9 @@
+ #!/bin/bash
+ 
++source /home/root/setup_ov5645.sh
++
+ gst-launch-1.0 -e \
+-v4l2src ! \
+-video/x-raw,format=UYVY,width=720,height=480 ! \
++v4l2src device=$CAM_DEV io-mode=dmabuf ! \
++video/x-raw,format=UYVY,width=1280,height=960 ! \
+ vspfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+ waylandsink qos=false
+diff --git a/RZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index b660ff1..d4e2290 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -1,9 +1,5 @@
+ #!/bin/bash
+-source /home/root/.bashrc
+-
+-if [ -z $CAM_DEV ]; then
+-	CAM_DEV="/dev/video0"
+-fi
++source /home/root/setup_ov5645.sh
+ 
+ if [ -z "$1" ]; then
+ 	TIME=10	#second
+@@ -22,7 +18,7 @@ function record()
+ 	printf "\e[34mRecording... $1\e[0m\n"
+ 	gst-launch-1.0 -e \
+ 	v4l2src num-buffers=$((TIME*30)) device=$CAM_DEV io-mode=dmabuf no-resurect-buf=true ! \
+-	video/x-raw,format=UYVY,width=720,height=480 ! \
++	video/x-raw,format=UYVY,width=1280,height=960 ! \
+ 	vspfilter ! \
+ 	video/x-raw,format=NV12,width=640,height=480 ! \
+ 	queue ! tee name=t t. ! \
+-- 
+2.7.4
+
