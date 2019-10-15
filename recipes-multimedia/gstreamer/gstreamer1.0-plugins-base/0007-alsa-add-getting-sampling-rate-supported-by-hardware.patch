@@ -1,0 +1,159 @@
+From 2a35f411f06202675fad3827c0c58d7bdcd57ec4 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 25 Sep 2019 13:45:56 +0700
+Subject: [PATCH] alsa: add getting sampling rate supported by hardware.
+
+When hardware can't support some sampling rate, playbin negotiate wrong
+caps.
+Then in PLAYING state, hardware can't handle that rate and get failure.
+Add function to check some common rate, get the range of rate
+hardware support and insert to alsa supported caps.
+
+This patch only support which rate higher than 44100, because the rate
+below 44100 is so poor quality.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ ext/alsa/gstalsa.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 108 insertions(+), 3 deletions(-)
+
+diff --git a/ext/alsa/gstalsa.c b/ext/alsa/gstalsa.c
+index a44e6e1..581a2e8 100644
+--- a/ext/alsa/gstalsa.c
++++ b/ext/alsa/gstalsa.c
+@@ -19,9 +19,112 @@
+ 
+ #include <gst/audio/audio.h>
+ 
++void
++gst_alsa_get_caps_rate_pcm_support ( GstObject * obj, snd_pcm_t * handle,
++snd_pcm_hw_params_t * hw_params, GstCaps *in_caps)
++{
++  gint err, i, flags, rate_count;
++  gint common_rate[] = {
++  //                     5512, 8000, 11025, 16000,
++  //                     22050, 32000,
++  // We won't propose the rate below 44100, since the quality is poor.
++                         44100, 48000, 64000, 88200,
++                         96000, 176400, 192000, 352800,
++                         384000,
++                       };
++
++  rate_count = sizeof (common_rate) / sizeof (common_rate[0]);
++  /* Create flags to determine if default range of rate is replaced or not*/
++  flags = 0;
++  /* Test if PCM have supported common rate */
++  err = snd_pcm_hw_params_set_access (handle, hw_params,
++            SND_PCM_ACCESS_RW_INTERLEAVED);  /* Set access to let us write data to device for checking */
++  if (err < 0) {
++    GST_DEBUG_OBJECT (obj, "failed to set access PCM: %s", snd_strerror(err));
++    GST_DEBUG_OBJECT (obj, "Using default range of rate");
++  } else  {
++    GstCaps *caps;
++    /* Fill full configurable space of PCM to params*/
++    snd_pcm_hw_params_any (handle, hw_params);
++    caps = gst_caps_copy (in_caps);
++    for (i = 0; i < rate_count - 1; i++) {
++      gint min_rate, max_rate;
++      min_rate = common_rate[i];
++      max_rate = common_rate[i+1];
++
++  /* Find the nearest rate for start of range */
++retry_min:
++      if (min_rate < max_rate &&
++          snd_pcm_hw_params_test_rate (handle, hw_params, min_rate, 0) < 0) {
++        /* If PCM can't use this rate,
++         * use the rate between common rate and the one we have tried.
++         */
++        min_rate = ( min_rate + common_rate[i+1] ) / 2 + 1; /* Use average between two rate */
++        snd_pcm_hw_params_set_rate_near (handle, hw_params, &min_rate, NULL);
++        snd_pcm_hw_params_any (handle, hw_params);
++        goto retry_min;
++      }
++  /* Find the nearest rate for end of range */
++retry_max:
++      if (min_rate < max_rate &&
++          snd_pcm_hw_params_test_rate (handle, hw_params, max_rate, 0) < 0) {
++        /* If PCM can't use this rate,
++         * use the rate between common rate and the one we have tried.
++         */
++        max_rate = ( max_rate + common_rate[i] ) / 2 - 1; /* Use average between two rate */
++        snd_pcm_hw_params_set_rate_near (handle, hw_params, &max_rate, NULL);
++        snd_pcm_hw_params_any (handle, hw_params);
++        goto retry_max;
++      }
++      /* We found the start and end of range that PCM support,
++       * Set that range to this element supported caps, upstream
++       * will use this caps to negotiate caps.
++       */
++      if (min_rate < max_rate) {
++        GstCaps *writable_caps, *caps_pcm;
++        gint j;
++
++        /* Make the writable caps to modify content. */
++        writable_caps = gst_caps_make_writable (in_caps);
++        caps_pcm = gst_caps_make_writable (caps);
++
++        for ( j = 0; j< gst_caps_get_size (caps_pcm); ++j)
++        {
++          GstStructure *s, *s_pcm;
++          s = gst_caps_get_structure (caps_pcm, j);
++          gst_structure_set (s, "rate", GST_TYPE_INT_RANGE,
++              min_rate, max_rate, NULL);
++
++          /* Copy structure because gst_caps_append_structure() wants to take ownership */
++          s_pcm = gst_structure_copy (s);
++          if (!flags)
++          {
++            /* The first time we found the supported range of rate,
++             * we will remove the default range of rate, and append
++             * the supported range of rate later.
++             */
++            gst_caps_remove_structure (writable_caps, 0);
++          }
++          /* Append the found range of rate that PCM support
++           * to the caps by structure.
++           */
++          gst_caps_append_structure (writable_caps, s_pcm);
++        }
++        /* After replaced all default range of rate,
++         * we won't need to replace anymore.
++         */
++        flags = 1;
++      }
++    }
++    gst_caps_unref (caps);
++    /* Fill full configurable space of PCM to params*/
++    snd_pcm_hw_params_any (handle, hw_params);
++  }
++}
++
+ static GstCaps *
+-gst_alsa_detect_rates (GstObject * obj, snd_pcm_hw_params_t * hw_params,
+-    GstCaps * in_caps)
++gst_alsa_detect_rates (GstObject * obj, snd_pcm_t * handle,
++snd_pcm_hw_params_t * hw_params, GstCaps * in_caps)
+ {
+   GstCaps *caps;
+   guint min, max;
+@@ -63,6 +166,8 @@ gst_alsa_detect_rates (GstObject * obj, snd_pcm_hw_params_t * hw_params,
+     }
+   }
+ 
++  gst_alsa_get_caps_rate_pcm_support (obj, handle, hw_params, caps);
++
+   return caps;
+ 
+   /* ERRORS */
+@@ -513,7 +618,7 @@ gst_alsa_probe_supported_formats (GstObject * obj, gchar * device,
+       goto subroutine_error;
+   }
+ 
+-  if (!(caps = gst_alsa_detect_rates (obj, hw_params, caps)))
++  if (!(caps = gst_alsa_detect_rates (obj, handle, hw_params, caps)))
+     goto subroutine_error;
+ 
+   if (!(caps = gst_alsa_detect_channels (obj, hw_params, caps)))
+-- 
+2.7.4
+

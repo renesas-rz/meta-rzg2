@@ -10,6 +10,7 @@ SRC_URI_append += " ${@bb.utils.contains("USE_MULTIMEDIA", "1", " \
     file://0004-gstplaybin-change-vspmfilter-as-default-converter.patch \
     file://0005-playback-add-set-property-dmabuf-use-for-video-filte.patch \
     file://0006-playback-Add-source-for-getting-video-filter-from-fi.patch \
+    file://0007-alsa-add-getting-sampling-rate-supported-by-hardware.patch \
     ", "", d)}"
 
 do_install_append() {
