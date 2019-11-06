@@ -1,0 +1,315 @@
+From f8e38c963f2c2d269a98977ea047e58077d88551 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 29 Oct 2019 18:30:31 +0700
+Subject: [PATCH 18/19] qtmultimedia: Add render by EGLImage with format NV12
+ on playback
+
+Now we can use EGLImageKHR to render video with format NV12.
+So we switch to use Format NV12 in order to reduce process step.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ .../qdeclarativevideooutput_render.cpp             |   2 +-
+ src/qtmultimediaquicktools/qsgvideonode_yuv.cpp    | 160 ++++++++++++++++++++-
+ src/qtmultimediaquicktools/qsgvideonode_yuv_p.h    |   2 +-
+ .../shaders/biplanaryuvvideo.frag                  |   8 +-
+ 4 files changed, 166 insertions(+), 6 deletions(-)
+
+diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+index 9ece104..f240a63 100644
+--- a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
++++ b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+@@ -440,7 +440,7 @@ QList<QVideoFrame::PixelFormat> QSGVideoItemSurface::supportedPixelFormats(
+             return formats;
+     }
+ 
+-    formats << QVideoFrame::Format_BGRA32;
++    formats << QVideoFrame::Format_NV12 << QVideoFrame::Format_BGRA32;
+ 
+     return formats;
+ }
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+index b2979f5..944484b 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+@@ -37,6 +37,30 @@
+ #include <QtGui/QOpenGLContext>
+ #include <QtGui/QOpenGLFunctions>
+ #include <QtGui/QOpenGLShaderProgram>
++#include <QApplication>
++#include <qpa/qplatformintegration.h>
++#include <qpa/qplatformnativeinterface.h>
++#include "private/qguiapplication_p.h"
++
++#include <drm/drm_fourcc.h>
++extern "C"
++{
++       #include "GLES2/gl2.h"
++       #include "GLES2/gl2ext.h"
++       #include "EGL/egl.h"
++       #include "EGL/eglext.h"
++       #include "EGL/eglext_REL.h"
++}
++
++#ifdef EGLIMAGE_USING
++struct EGLImage_arr {
++    struct EGLImage_arr * next;
++    EGLImageKHR eglimage;
++    int fd[3];
++};
++int eglimage_used;
++#endif
++
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -92,6 +116,9 @@ protected:
+         m_id_plane2Texture = program()->uniformLocation("plane2Texture");
+         m_id_colorMatrix = program()->uniformLocation("colorMatrix");
+         m_id_opacity = program()->uniformLocation("opacity");
++#ifdef EGLIMAGE_USING
++        m_id_eglimage = program()->uniformLocation("eglimage");
++#endif
+     }
+ 
+     int m_id_matrix;
+@@ -101,6 +128,9 @@ protected:
+     int m_id_plane2Texture;
+     int m_id_colorMatrix;
+     int m_id_opacity;
++#ifdef EGLIMAGE_USING
++    int m_id_eglimage;
++#endif
+ };
+ 
+ 
+@@ -192,6 +222,10 @@ public:
+         m_frame = frame;
+     }
+ 
++#ifdef EGLIMAGE_USING
++    struct EGLImage_arr* set_current_eglimage(EGLImage_arr *top);
++    void destroyEglImage();
++#endif
+     void bind();
+     void bindTexture(int id, int w, int h, const uchar *bits, GLenum format);
+ 
+@@ -207,6 +241,23 @@ public:
+ 
+     QVideoFrame m_frame;
+     QMutex m_frameMutex;
++private:
++
++#ifdef EGLIMAGE_USING
++    EGLImageKHR        eglimage = EGL_NO_IMAGE_KHR;
++    EGLDisplay eglDisplay;
++    QPlatformNativeInterface* nativeInterface;
++
++    // /* EGL image function */
++    typedef EGLImageKHR (*EGLCREATEIMAGEKHR)(EGLDisplay dpy, EGLContext ctx, EGLenum target, EGLClientBuffer buffer, EGLint* attr_list);
++    typedef EGLBoolean (*EGLDESTROYIMAGEKHR)(EGLDisplay dpy, EGLImageKHR image);
++    typedef void (*GLEGLIMAGETARGETRENDERBUFFERSTORAGEOES)(GLenum target, GLeglImageOES image);
++    EGLCREATEIMAGEKHR eglCreateImageKHR;
++    EGLDESTROYIMAGEKHR eglDestroyImageKHR;
++    GLEGLIMAGETARGETRENDERBUFFERSTORAGEOES glEGLImageTargetTexture2D;
++
++    struct EGLImage_arr *eglimage_arr;
++#endif
+ };
+ 
+ QSGVideoMaterial_YUV::QSGVideoMaterial_YUV(const QVideoSurfaceFormat &format) :
+@@ -254,6 +305,19 @@ QSGVideoMaterial_YUV::QSGVideoMaterial_YUV(const QVideoSurfaceFormat &format) :
+     }
+ 
+     setFlag(Blending, false);
++
++#ifdef EGLIMAGE_USING
++        QPlatformNativeInterface* nativeInterface = QGuiApplicationPrivate::platformIntegration()->nativeInterface();
++        Q_ASSERT(nativeInterface);
++        eglCreateImageKHR  = (EGLCREATEIMAGEKHR)eglGetProcAddress("eglCreateImageKHR");
++        eglDestroyImageKHR = (EGLDESTROYIMAGEKHR)eglGetProcAddress("eglDestroyImageKHR");
++        glEGLImageTargetTexture2D = (GLEGLIMAGETARGETRENDERBUFFERSTORAGEOES)eglGetProcAddress("glEGLImageTargetTexture2DOES");
++        eglDisplay = nativeInterface->nativeResourceForIntegration("egldisplay");
++        if(eglDisplay == EGL_NO_DISPLAY) printf("eglGetDisplay failed.\n");
++
++        eglimage_arr = NULL;
++        eglimage_used = 0;
++#endif
+ }
+ 
+ QSGVideoMaterial_YUV::~QSGVideoMaterial_YUV()
+@@ -266,6 +330,71 @@ QSGVideoMaterial_YUV::~QSGVideoMaterial_YUV()
+     }
+ }
+ 
++#ifdef EGLIMAGE_USING
++
++struct EGLImage_arr * QSGVideoMaterial_YUV::set_current_eglimage(struct EGLImage_arr * top)
++{
++       struct EGLImage_arr *cur = top;
++       struct EGLImage_arr *tmp;
++
++       while (cur != NULL) {
++               if (cur->fd[0] == m_frame.fd(0) && cur->fd[1] == m_frame.fd(1)){
++                       eglimage = cur->eglimage;
++                       return top;
++               }
++               cur = cur->next;
++       }
++
++       int attribs[] = {
++                   EGL_WIDTH, m_textureSize.width(),
++                   EGL_HEIGHT, m_textureSize.height(),
++                   EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_NV12,
++                   EGL_DMA_BUF_PLANE0_FD_EXT, m_frame.fd(0),
++                   EGL_DMA_BUF_PLANE0_OFFSET_EXT, 0,
++                   EGL_DMA_BUF_PLANE0_PITCH_EXT, m_frame.bytesPerLine(0),
++                   EGL_DMA_BUF_PLANE1_FD_EXT, m_frame.fd(1),
++                   EGL_DMA_BUF_PLANE1_OFFSET_EXT, 0,
++                   EGL_DMA_BUF_PLANE1_PITCH_EXT, m_frame.bytesPerLine(1),
++                   EGL_NONE
++       };
++
++       tmp = (struct EGLImage_arr *)malloc(sizeof (struct EGLImage_arr));
++       memset(tmp,0,sizeof (struct EGLImage_arr));
++
++       tmp->fd[0] = m_frame.fd(0);
++       tmp->fd[1] = m_frame.fd(1);
++       tmp->eglimage = eglCreateImageKHR(eglDisplay,
++                                               EGL_NO_CONTEXT,
++                                               EGL_LINUX_DMA_BUF_EXT,
++                                               NULL, attribs);
++
++       if (tmp->eglimage == EGL_NO_IMAGE_KHR){
++               printf ("eglCreateImageKHR failed for NV12 format with target: EGL_LINUX_DMA_BUF_EXT. %x\n", eglGetError());
++               free(tmp);
++               eglimage = top != NULL ? top->eglimage : EGL_NO_IMAGE_KHR;
++               return top;
++       }
++
++       eglimage = tmp->eglimage;
++       tmp->next = top;
++       return tmp;
++}
++
++void QSGVideoMaterial_YUV::destroyEglImage()
++{
++        struct EGLImage_arr *tmp;
++
++        while (eglimage_arr != NULL) {
++            if(eglimage_arr->eglimage) {
++                eglDestroyImageKHR(eglDisplay, eglimage_arr->eglimage);
++            }
++            tmp = eglimage_arr;
++            eglimage_arr = eglimage_arr->next;
++            free (tmp);
++        }
++}
++#endif
++
+ void QSGVideoMaterial_YUV::bind()
+ {
+     QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+@@ -281,6 +410,9 @@ void QSGVideoMaterial_YUV::bind()
+                     functions->glDeleteTextures(m_planeCount, m_textureIds);
+                 functions->glGenTextures(m_planeCount, m_textureIds);
+                 m_textureSize = m_frame.size();
++#ifdef EGLIMAGE_USING
++                eglimage_arr = set_current_eglimage(eglimage_arr);
++#endif
+             }
+ 
+             GLint previousAlignment;
+@@ -293,12 +425,28 @@ void QSGVideoMaterial_YUV::bind()
+                 const int uv = 1;
+ 
+                 m_planeWidth[0] = m_planeWidth[1] = qreal(fw) / m_frame.bytesPerLine(y);
++#ifdef EGLIMAGE_USING
++                if (eglimage_arr != NULL) {
++                       eglimage_used = 1;
++                       eglimage_arr = set_current_eglimage(eglimage_arr);
++                       functions->glActiveTexture(GL_TEXTURE0);
++                       functions->glBindTexture(GL_TEXTURE_2D, m_textureIds[0]);
++                       glEGLImageTargetTexture2D(GL_TEXTURE_2D, eglimage);
++                       functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
++                       functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
++                       functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++                       functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++                } else {
++#endif
++                eglimage_used = 0;
+ 
+                 functions->glActiveTexture(GL_TEXTURE1);
+                 bindTexture(m_textureIds[1], m_frame.bytesPerLine(uv) / 2, fh / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
+                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
+                 bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
+-
++#ifdef EGLIMAGE_USING
++                }
++#endif
+             } else { // YUV420P || YV12
+                 const int y = 0;
+                 const int u = m_frame.pixelFormat() == QVideoFrame::Format_YUV420P ? 1 : 2;
+@@ -349,6 +497,13 @@ QSGVideoNode_YUV::QSGVideoNode_YUV(const QVideoSurfaceFormat &format) :
+     setMaterial(m_material);
+ }
+ 
++#ifdef EGLIMAGE_USING
++void QSGVideoNode_YUV::destroyEglImage()
++{
++    m_material->destroyEglImage();
++}
++#endif
++
+ QSGVideoNode_YUV::~QSGVideoNode_YUV()
+ {
+ }
+@@ -371,6 +526,9 @@ void QSGVideoMaterialShader_YUV_BiPlanar::updateState(const RenderState &state,
+ 
+     mat->bind();
+ 
++#ifdef EGLIMAGE_USING
++    program()->setUniformValue(m_id_eglimage, GLfloat(eglimage_used));
++#endif
+     program()->setUniformValue(m_id_colorMatrix, mat->m_colorMatrix);
+     program()->setUniformValue(m_id_plane1Width, mat->m_planeWidth[0]);
+     program()->setUniformValue(m_id_plane2Width, mat->m_planeWidth[1]);
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h b/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h
+index c2f98e0..b2b08d9 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h
++++ b/src/qtmultimediaquicktools/qsgvideonode_yuv_p.h
+@@ -69,7 +69,7 @@ public:
+     }
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
+ #ifdef EGLIMAGE_USING
+-    virtual void destroyEglImage(){};
++    void destroyEglImage();
+ #endif
+ 
+ private:
+diff --git a/src/qtmultimediaquicktools/shaders/biplanaryuvvideo.frag b/src/qtmultimediaquicktools/shaders/biplanaryuvvideo.frag
+index 2ede910..220d8b1 100644
+--- a/src/qtmultimediaquicktools/shaders/biplanaryuvvideo.frag
++++ b/src/qtmultimediaquicktools/shaders/biplanaryuvvideo.frag
+@@ -2,13 +2,15 @@ uniform sampler2D plane1Texture;
+ uniform sampler2D plane2Texture;
+ uniform mediump mat4 colorMatrix;
+ uniform lowp float opacity;
++uniform lowp float eglimage;
+ varying highp vec2 plane1TexCoord;
+ varying highp vec2 plane2TexCoord;
+ 
+ void main()
+ {
+-    mediump float Y = texture2D(plane1Texture, plane1TexCoord).r;
++    mediump vec4 vec_plane1 = texture2D(plane1Texture, plane1TexCoord);
+     mediump vec2 UV = texture2D(plane2Texture, plane2TexCoord).ra;
+-    mediump vec4 color = vec4(Y, UV.x, UV.y, 1.);
+-    gl_FragColor = colorMatrix * color * opacity;
++    mediump vec4 color = vec4(vec_plane1.r, UV.x, UV.y, 1.);
++    gl_FragColor = ( colorMatrix * color * ( 1.0 - eglimage ) +
++                 ( vec_plane1 * eglimage )) * opacity;
+ }
+-- 
+2.7.4
+

@@ -1,0 +1,100 @@
+From c8b1922a57ccb3efcb0c8f5d7d67cfff771330f5 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 30 Oct 2019 18:12:11 +0700
+Subject: [PATCH 19/19] qtmultimedia: Add get plane offset for EGLImageKHR
+ attributes
+
+In case memory of buffer have offset, we need to send this offset to
+EGLImageKHR to get right data.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ src/qtmultimediaquicktools/qsgvideonode_rgb.cpp |  7 ++++++-
+ src/qtmultimediaquicktools/qsgvideonode_yuv.cpp | 13 +++++++++++--
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp b/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
+index 3e20523..c196133 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
+@@ -41,6 +41,8 @@
+ #include <qpa/qplatformintegration.h>
+ #include <qpa/qplatformnativeinterface.h>
+ #include "private/qguiapplication_p.h"
++
++#include <unistd.h>
+ #include <sys/time.h>
+ #include <drm/drm_fourcc.h>
+ extern "C"
+@@ -201,6 +203,7 @@ public:
+     {
+         struct EGLImage_arr *cur = top;
+         struct EGLImage_arr *tmp;
++        uintptr_t offset;
+ 
+         while (cur != NULL) {
+             if(cur->buffer == m_frame.bits() && cur->fd == m_frame.fd()) {
+@@ -210,12 +213,14 @@ public:
+             cur = cur->next;
+         }
+ 
++        offset = reinterpret_cast<uintptr_t>(m_frame.bits());
++        offset = offset & (getpagesize() - 1);
+         int attrib[] = {
+                    EGL_WIDTH, m_textureSize.width(),
+                    EGL_HEIGHT, m_textureSize.height(),
+                    EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_ARGB8888,
+                    EGL_DMA_BUF_PLANE0_FD_EXT, m_frame.fd(),
+-                   EGL_DMA_BUF_PLANE0_OFFSET_EXT, 0,
++                   EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
+                    EGL_DMA_BUF_PLANE0_PITCH_EXT, m_frame.bytesPerLine(),
+                    EGL_NONE
+         };
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+index 53f7745..2278820 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+@@ -42,6 +42,7 @@
+ #include <qpa/qplatformnativeinterface.h>
+ #include "private/qguiapplication_p.h"
+ 
++#include <unistd.h>
+ #include <drm/drm_fourcc.h>
+ extern "C"
+ {
+@@ -336,6 +337,8 @@ struct EGLImage_arr * QSGVideoMaterial_YUV::set_current_eglimage(struct EGLImage
+ {
+        struct EGLImage_arr *cur = top;
+        struct EGLImage_arr *tmp;
++       unsigned int page_size;
++       uintptr_t offset_plane0, offset_plane1;
+ 
+        while (cur != NULL) {
+                if (cur->fd[0] == m_frame.fd(0) && cur->fd[1] == m_frame.fd(1)){
+@@ -345,15 +348,21 @@ struct EGLImage_arr * QSGVideoMaterial_YUV::set_current_eglimage(struct EGLImage
+                cur = cur->next;
+        }
+ 
++       page_size = getpagesize();
++       offset_plane0 = reinterpret_cast<uintptr_t>(m_frame.bits(0));
++       offset_plane0 = offset_plane0 & (page_size - 1);
++       offset_plane1 = reinterpret_cast<uintptr_t>(m_frame.bits(1));
++       offset_plane1 = offset_plane1 & (page_size - 1);
++
+        int attribs[] = {
+                    EGL_WIDTH, m_textureSize.width(),
+                    EGL_HEIGHT, m_textureSize.height(),
+                    EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_NV12,
+                    EGL_DMA_BUF_PLANE0_FD_EXT, m_frame.fd(0),
+-                   EGL_DMA_BUF_PLANE0_OFFSET_EXT, 0,
++                   EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset_plane0,
+                    EGL_DMA_BUF_PLANE0_PITCH_EXT, m_frame.bytesPerLine(0),
+                    EGL_DMA_BUF_PLANE1_FD_EXT, m_frame.fd(1),
+-                   EGL_DMA_BUF_PLANE1_OFFSET_EXT, 0,
++                   EGL_DMA_BUF_PLANE1_OFFSET_EXT, offset_plane1,
+                    EGL_DMA_BUF_PLANE1_PITCH_EXT, m_frame.bytesPerLine(1),
+                    EGL_NONE
+        };
+-- 
+2.7.4
+
