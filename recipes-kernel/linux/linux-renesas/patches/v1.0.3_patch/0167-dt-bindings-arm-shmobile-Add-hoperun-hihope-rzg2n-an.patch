@@ -1,0 +1,40 @@
+From 973a16d8653605e1ee9a5fb39b10f937d4671e60 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 16:15:51 +0700
+Subject: [PATCH 167/328] dt-bindings: arm: shmobile: Add hoperun hihope-rzg2n
+ and hihope-rzg2n-ex boards
+
+This patch adds board hihope-rzg2n (powered by the RZ/G2N) and board
+hihope-rzg2n-ex (included hihope-rzg2n and sub board that sits on top of
+hihope-rzg2n). Both boards are made by Jiangsu Hoperun.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/arm/shmobile.txt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/arm/shmobile.txt b/Documentation/devicetree/bindings/arm/shmobile.txt
+index e24dd16..174220a 100644
+--- a/Documentation/devicetree/bindings/arm/shmobile.txt
++++ b/Documentation/devicetree/bindings/arm/shmobile.txt
+@@ -91,11 +91,16 @@ Boards:
+     compatible = "renesas,h3ulcb", "renesas,r8a7795"
+   - Henninger
+     compatible = "renesas,henninger", "renesas,r8a7791"
+-  - HopeRun expansion board for HiHope RZ/G2 platforms
++  - HopeRun expansion board for HiHope RZ/G2M platforms
+     compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m",
+                  "renesas,r8a774a1"
+   - HopeRun HiHope RZ/G2M platform
+     compatible = "hoperun,hihope-rzg2m", "renesas,r8a774a1"
++  - HopeRun expansion board for HiHope RZ/G2N platforms
++    compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2n",
++                 "renesas,r8a774b1"
++  - HopeRun HiHope RZ/G2N platform
++    compatible = "hoperun,hihope-rzg2n", "renesas,r8a774b1"
+   - iWave Systems RZ/G1C Single Board Computer (iW-RainboW-G23S)
+     compatible = "iwave,g23s", "renesas,r8a77470"
+   - iWave Systems RZ/G1E SODIMM SOM Development Platform (iW-RainboW-G22D)
+-- 
+1.9.1
+

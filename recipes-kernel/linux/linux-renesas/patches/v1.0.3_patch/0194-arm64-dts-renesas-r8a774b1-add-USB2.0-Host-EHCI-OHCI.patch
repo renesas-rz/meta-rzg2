@@ -1,0 +1,78 @@
+From f7982646df71fb52f2b3a198f7f392f5f31dabcf Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 12 Aug 2019 13:26:29 +0700
+Subject: [PATCH 194/328] arm64: dts: renesas: r8a774b1: add USB2.0 Host
+ (EHCI/OHCI) device nodes
+
+Add USB2.0 host (EHCI/OHCI) device tree nodes to R8A774B1 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 38 +++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 9d55944..10601e3d 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -841,23 +841,53 @@
+ 		};
+ 
+ 		ohci0: usb@ee080000 {
++			compatible = "generic-ohci";
+ 			reg = <0 0xee080000 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 703>, <&cpg CPG_MOD 704>;
++			phys = <&usb2_phy0>;
++			phy-names = "usb";
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 703>, <&cpg 704>;
++			status = "disabled";
+ 		};
+ 
+ 		ohci1: usb@ee0a0000 {
++			compatible = "generic-ohci";
+ 			reg = <0 0xee0a0000 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 702>;
++			phys = <&usb2_phy1>;
++			phy-names = "usb";
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 702>;
++			status = "disabled";
+ 		};
+ 
+ 		ehci0: usb@ee080100 {
++			compatible = "generic-ehci";
+ 			reg = <0 0xee080100 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 703>, <&cpg CPG_MOD 704>;
++			phys = <&usb2_phy0>;
++			phy-names = "usb";
++			companion= <&ohci0>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 703>, <&cpg 704>;
++			status = "disabled";
+ 		};
+ 
+ 		ehci1: usb@ee0a0100 {
++			compatible = "generic-ehci";
+ 			reg = <0 0xee0a0100 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 702>;
++			phys = <&usb2_phy1>;
++			phy-names = "usb";
++			companion= <&ohci1>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 702>;
++			status = "disabled";
+ 		};
+ 
+ 		usb2_phy0: usb-phy@ee080200 {
+-- 
+1.9.1
+

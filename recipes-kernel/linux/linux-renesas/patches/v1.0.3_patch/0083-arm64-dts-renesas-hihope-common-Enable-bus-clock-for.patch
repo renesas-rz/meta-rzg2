@@ -1,0 +1,32 @@
+From 0dc54c8b48052bdbbcc2ff8199a8221ccf0f2c84 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 11:04:27 +0700
+Subject: [PATCH 083/328] arm64: dts: renesas: hihope-common: Enable bus clock
+ for PCIe
+
+This patch enables bus clock PCIE for the HiHope board.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 2ad1248..3954cbc 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -93,6 +93,10 @@
+ 	};
+ };
+ 
++&pcie_bus_clk {
++	clock-frequency = <100000000>;
++};
++
+ &ehci0 {
+ 	status = "okay";
+ };
+-- 
+1.9.1
+

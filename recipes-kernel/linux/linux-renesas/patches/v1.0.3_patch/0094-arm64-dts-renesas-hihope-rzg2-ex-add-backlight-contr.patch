@@ -1,0 +1,36 @@
+From a0e5c70809e248ddd0c1ce28e13aad46ef005cbc Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 11:52:13 +0700
+Subject: [PATCH 094/328] arm64: dts: renesas: hihope-rzg2-ex: add backlight
+ control support
+
+This patch adds backlight support for the sub board to control the
+brightness of LVDS panel.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+index 00a8c465..de34038 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+@@ -41,6 +41,14 @@
+ 			};
+ 		};
+ 	};
++
++	backlight {
++		compatible = "pwm-backlight";
++		pwms = <&pwm0 0 5000000>;
++
++		brightness-levels = <0 4 8 16 32 64 128 255>;
++		default-brightness-level = <6>;
++	};
+ };
+ 
+ &avb {
+-- 
+1.9.1
+

@@ -1,0 +1,56 @@
+From 562030977aeaa7199c630923cb3d475c85345f30 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 11:18:45 +0700
+Subject: [PATCH 088/328] arm64: dts: renesas: hihope-rzg2-ex: enable CAN{0,1}
+
+This patch enable CAN0 and CAN1 for the sub board
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+index b1e45944..a02c2d5 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+@@ -31,6 +31,20 @@
+ 	};
+ };
+ 
++&can0 {
++	pinctrl-0 = <&can0_pins>;
++	pinctrl-names = "default";
++	renesas,can-clock-select = <0x0>;
++	status = "okay";
++};
++
++&can1 {
++	pinctrl-0 = <&can1_pins>;
++	pinctrl-names = "default";
++	renesas,can-clock-select = <0x0>;
++	status = "okay";
++};
++
+ &pfc {
+ 	pinctrl-0 = <&scif_clk_pins>;
+ 	pinctrl-names = "default";
+@@ -52,4 +66,14 @@
+ 			drive-strength = <12>;
+ 		};
+ 	};
++
++	can0_pins: can0 {
++		groups = "can0_data_a";
++		function = "can0";
++	};
++
++	can1_pins: can1 {
++		groups = "can1_data";
++		function = "can1";
++	};
+ };
+-- 
+1.9.1
+

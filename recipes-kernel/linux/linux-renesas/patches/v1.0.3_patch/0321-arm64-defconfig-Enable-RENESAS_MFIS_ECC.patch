@@ -1,0 +1,28 @@
+From 424cd6648fe6489fafa8c2def5da43cbe77b3457 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 25 Nov 2019 13:48:44 +0700
+Subject: [PATCH 321/328] arm64: defconfig: Enable RENESAS_MFIS_ECC
+
+Enable RENESAS_MFIS_ECC to support DRAM ECC error interrupt.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index c941dd1..72e287b 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -367,6 +367,7 @@ CONFIG_E1000E=y
+ CONFIG_USB_MASS_STORAGE=m
+ CONFIG_USB_G_SERIAL=m
+ CONFIG_USB_ETH=m
++CONFIG_RENESAS_MFIS_ECC=y
+ 
+ #Enable RT config
+ CONFIG_PREEMPT_RT_FULL=y
+-- 
+1.9.1
+

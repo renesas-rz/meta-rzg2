@@ -1,0 +1,31 @@
+From a99a92c3b345d59f57a79b1c691b463656bcb720 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 16:54:34 +0700
+Subject: [PATCH 065/328] arm64: dts: renesas: hihope-common: enable CMT{0,1}
+
+This patch enables CMT{0,1} support for common platform.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index de1c75f..51b7d1b 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -259,3 +259,11 @@
+ 
+ 	status = "okay";
+ };
++
++&cmt0 {
++	status = "okay";
++};
++
++&cmt1 {
++	status = "okay";
++};
+-- 
+1.9.1
+

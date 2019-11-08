@@ -1,0 +1,27 @@
+From 52dbb4c9b8b7287506ba0ac94db70501244d98e1 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 1 Jul 2019 14:54:29 +0700
+Subject: [PATCH 017/328] defconfig: config to enable DRM_TILCD and
+ DRM_I2C_NXP_TDA998x
+
+Enable: CONFIG_DRM_TILCDC=y, CONFIG_DRM_I2C_NXP_TDA998X=y
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index b16a0f2..cb1a53f 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -754,3 +754,6 @@ CONFIG_HAS_IOMEM=y
+ 
+ # Enable PTP clock drivers
+ CONFIG_PTP_1588_CLOCK=y
++
++CONFIG_DRM_TILCDC=y
++CONFIG_DRM_I2C_NXP_TDA998X=y
+-- 
+1.9.1
+

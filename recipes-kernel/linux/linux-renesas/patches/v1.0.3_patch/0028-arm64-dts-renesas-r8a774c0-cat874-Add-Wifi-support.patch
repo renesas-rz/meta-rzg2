@@ -1,0 +1,82 @@
+From 272a8e456280c17241db48a3ceb978b2352de79e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 16:21:22 +0700
+Subject: [PATCH 028/328] arm64: dts: renesas: r8a774c0-cat874: Add Wifi
+ support
+
+This patch enables Wifi for RZ/G2E (R8A774C0 SoC).
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 40 +++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index aac01d2..d2af6ec 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -90,6 +90,18 @@
+ 			  1800000 0>;
+ 	};
+ 
++	wlan_en_reg: fixedregulator {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <70000>;
++
++		/* WLAN_EN GPIO for this board - Bank2, pin25 */
++		gpio = <&gpio2 25 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
+ 	sound {
+ 		compatible = "simple-audio-card";
+ 		simple-audio-card,format = "i2s";
+@@ -175,6 +187,12 @@
+ 		power-source = <1800>;
+ 	};
+ 
++	sdhi3_pins_uhs: sd3_uhs {
++		groups = "sdhi3_data4", "sdhi3_ctrl";
++		function = "sdhi3";
++		power-source = <1800>;
++	};
++
+ 	sound_pins: sound {
+ 		groups = "ssi349_ctrl", "ssi3_data", "ssi4_data";
+ 		function = "ssi";
+@@ -213,6 +231,28 @@
+ 	status = "okay";
+ };
+ 
++&sdhi3 {
++	/* used for on-board WIFI */
++	status = "okay";
++	pinctrl-0 = <&sdhi3_pins_uhs>;
++	pinctrl-names = "default";
++
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	non-removable;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@2 {
++		compatible = "ti,wl1837";
++		reg = <2>;
++		interrupt-parent = <&gpio1>;
++		interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
++	};
++};
++
+ &usb2_phy0 {
+ 	renesas,no-otg-pins;
+ 	status = "okay";
+-- 
+1.9.1
+

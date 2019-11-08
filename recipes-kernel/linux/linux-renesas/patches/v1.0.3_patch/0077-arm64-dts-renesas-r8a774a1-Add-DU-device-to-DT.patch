@@ -1,0 +1,66 @@
+From bb2196e2ec339f362c2476367c15f16b06065ad9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 10:53:18 +0700
+Subject: [PATCH 077/328] arm64: dts: renesas: r8a774a1: Add DU device to DT
+
+Add the DU device to r8a774a1.dtsi in a disabled state.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 40 +++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index c384720..b802672 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -1897,6 +1897,46 @@
+ 			renesas,fcp = <&fcpvd0>;
+ 		};
+ 
++		du: display@feb00000 {
++			compatible = "renesas,du-r8a774a1";
++			reg = <0 0xfeb00000 0 0x70000>;
++			interrupts =	<GIC_SPI 256 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 268 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 269 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 724>,
++				 <&cpg CPG_MOD 723>,
++				 <&cpg CPG_MOD 722>;
++			clock-names = "du.0", "du.1", "du.2";
++			resets = <&cpg 724>, <&cpg 724>, <&cpg 722>;
++			reset-names = "du.0", "du.1", "du.2";
++			status = "disabled";
++
++			vsps = <&vspd0 &vspd1 &vspd2>;
++
++			ports {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				port@0 {
++					reg = <0>;
++					du_out_rgb: endpoint {
++					};
++				};
++
++				port@1 {
++					reg = <1>;
++					du_out_hdmi0: endpoint {
++					};
++				};
++
++				port@2 {
++					reg = <2>;
++					du_out_lvds0: endpoint {
++					};
++				};
++			};
++		};
++
+ 		prr: chipid@fff00044 {
+ 			compatible = "renesas,prr";
+ 			reg = <0 0xfff00044 0 4>;
+-- 
+1.9.1
+

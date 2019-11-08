@@ -1,0 +1,31 @@
+From 9c3712a5e63463da11c3c38a9479d529e776c101 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 17:12:26 +0700
+Subject: [PATCH 069/328] usb: renesas_usbhs: add suppot for RZ/G2M
+
+This patch adds support for r8a774a1 (RZ/G2M).
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/usb/renesas_usbhs/common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/usb/renesas_usbhs/common.c b/drivers/usb/renesas_usbhs/common.c
+index 00a55a9..f09af9e 100644
+--- a/drivers/usb/renesas_usbhs/common.c
++++ b/drivers/usb/renesas_usbhs/common.c
+@@ -568,6 +568,10 @@ static int usbhsc_drvcllbck_notify_hotplug(struct platform_device *pdev)
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN3_WITH_PLL,
+ 	},
+ 	{
++		.compatible = "renesas,usbhs-r8a774a1",
++		.data = (void *)USBHS_TYPE_RCAR_GEN3,
++	},
++	{
+ 		.compatible = "renesas,usbhs-r8a774c0",
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN3_WITH_PLL,
+ 	},
+-- 
+1.9.1
+

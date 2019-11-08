@@ -1,0 +1,33 @@
+From 14b9c7b13a6564eb040cea2d26fa19ee4cca2153 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 12 Aug 2019 13:34:08 +0700
+Subject: [PATCH 196/328] usb: renesas_usbhs: remove duplicate compatible
+ string
+
+for r8a774c0
+
+Remove duplicate compatible string for r8a774c0.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/usb/renesas_usbhs/common.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/usb/renesas_usbhs/common.c b/drivers/usb/renesas_usbhs/common.c
+index f09af9e..d26614a 100644
+--- a/drivers/usb/renesas_usbhs/common.c
++++ b/drivers/usb/renesas_usbhs/common.c
+@@ -540,10 +540,6 @@ static int usbhsc_drvcllbck_notify_hotplug(struct platform_device *pdev)
+  */
+ static const struct of_device_id usbhs_of_match[] = {
+ 	{
+-		.compatible = "renesas,usbhs-r8a774c0",
+-		.data = (void *)USBHS_TYPE_RCAR_GEN3_WITH_PLL,
+-	},
+-	{
+ 		.compatible = "renesas,usbhs-r8a7790",
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN2,
+ 	},
+-- 
+1.9.1
+

@@ -1,0 +1,28 @@
+From 535b68ba16d76ad17dd267417f39b350ad629899 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 24 Jul 2019 13:34:31 +0700
+Subject: [PATCH 158/328] dt-bindings: power: rcar-sysc: Document r8a774b1 sysc
+
+Document bindings for the RZ/G2N (a.k.a. R8A774B1) system
+controller.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt b/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt
+index 4cb97d4..20008c8d 100644
+--- a/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt
++++ b/Documentation/devicetree/bindings/power/renesas,rcar-sysc.txt
+@@ -11,6 +11,7 @@ Required properties:
+       - "renesas,r8a7745-sysc" (RZ/G1E)
+       - "renesas,r8a77470-sysc" (RZ/G1C)
+       - "renesas,r8a774a1-sysc" (RZ/G2M)
++      - "renesas,r8a774b1-sysc" (RZ/G2N)
+       - "renesas,r8a774c0-sysc" (RZ/G2E)
+       - "renesas,r8a7779-sysc" (R-Car H1)
+       - "renesas,r8a7790-sysc" (R-Car H2)
+-- 
+1.9.1
+

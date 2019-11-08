@@ -1,0 +1,122 @@
+From c532bc26fa795e4befc5974c3b94ab2940ccaaaf Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 13:27:17 +0700
+Subject: [PATCH 096/328] arm64: dts: renesas: hihope-common: Enable sound
+ support
+
+This patch enables sound support with PCM5102 codec
+(External I2S Board in Low speed Connector).
+Also add the audio-graph-card device node to interconnect
+the SoC sound device and codec.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 81 ++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 025443d..8dcb15b 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -94,6 +94,27 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <25000000>;
+ 	};
++
++	pcm5102a: pcm5102a {
++		compatible = "ti,pcm5102a";
++		#sound-dai-cells = <0>;
++
++		port {
++			pcm5102a_endpoint: endpoint {
++				remote-endpoint = <&rsnd_endpoint0>;
++			};
++		};
++	};
++
++	sound_card: sound {
++		compatible = "audio-graph-card";
++		label = "rcar-sound";
++		dais = <&rsnd_port0>;
++	};
++};
++
++&audio_clk_a {
++	clock-frequency = <22579200>;
+ };
+ 
+ &pcie_bus_clk {
+@@ -211,6 +232,16 @@
+ 		groups = "du_rgb888", "du_sync", "du_oddf", "du_clk_out_0";
+ 		function = "du";
+ 	};
++
++	sound_pins: sound {
++		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
++		function = "ssi";
++	};
++
++	sound_clk_pins: sound_clk {
++		groups = "audio_clk_a_a";
++		function = "audio_clk";
++	};
+ };
+ 
+ &rwdt {
+@@ -378,3 +409,53 @@
+ 	clock-names =	"du.0", "du.1", "du.2",
+ 			"dclkin.0", "dclkin.1", "dclkin.2";
+ };
++
++&rcar_sound {
++	pinctrl-0 = <&sound_pins &sound_clk_pins>;
++	pinctrl-names = "default";
++
++	/* Single DAI */
++	#sound-dai-cells = <0>;
++
++	/* audio_clkout0/1/2/3 */
++	#clock-cells = <1>;
++	clock-frequency = <11289600>;
++
++	status = "okay";
++
++	/* update <audio_clk_b> to <cs2000> */
++	clocks = <&cpg CPG_MOD 1005>,
++		 <&cpg CPG_MOD 1006>, <&cpg CPG_MOD 1007>,
++		 <&cpg CPG_MOD 1008>, <&cpg CPG_MOD 1009>,
++		 <&cpg CPG_MOD 1010>, <&cpg CPG_MOD 1011>,
++		 <&cpg CPG_MOD 1012>, <&cpg CPG_MOD 1013>,
++		 <&cpg CPG_MOD 1014>, <&cpg CPG_MOD 1015>,
++		 <&cpg CPG_MOD 1022>, <&cpg CPG_MOD 1023>,
++		 <&cpg CPG_MOD 1024>, <&cpg CPG_MOD 1025>,
++		 <&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
++		 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
++		 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
++		 <&audio_clk_a>, <&audio_clk_b>, <&audio_clk_c>,
++		 <&cpg CPG_CORE CPG_AUDIO_CLK_I>;
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		rsnd_port0: port@0 {
++			reg = <0>;
++			rsnd_endpoint0: endpoint {
++				remote-endpoint = <&pcm5102a_endpoint>;
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint0>;
++				frame-master = <&rsnd_endpoint0>;
++
++				playback = <&ssi1 &src1 &dvc0>;
++			};
++		};
++	};
++};
+-- 
+1.9.1
+

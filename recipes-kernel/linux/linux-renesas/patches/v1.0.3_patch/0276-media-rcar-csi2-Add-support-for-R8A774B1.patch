@@ -1,0 +1,31 @@
+From dc4809300a884d48a5e880126bf5c47e6f990c08 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 10 Sep 2019 11:54:32 +0700
+Subject: [PATCH 276/328] media: rcar-csi2: Add support for R8A774B1
+
+This patch adds support for r8a774b1 SoC.
+This is similar with RCar M3N SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-csi2.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-csi2.c b/drivers/media/platform/rcar-vin/rcar-csi2.c
+index 0f0fea0..f294b2d 100644
+--- a/drivers/media/platform/rcar-vin/rcar-csi2.c
++++ b/drivers/media/platform/rcar-vin/rcar-csi2.c
+@@ -979,6 +979,10 @@ static int rcsi2_probe_resources(struct rcar_csi2 *priv,
+ 		.data = &rcar_csi2_info_r8a7796,
+ 	},
+ 	{
++		.compatible = "renesas,r8a774b1-csi2",
++		.data = &rcar_csi2_info_r8a77965,
++	},
++	{
+ 		.compatible = "renesas,r8a774c0-csi2",
+ 		.data = &rcar_csi2_info_r8a77990,
+ 	},
+-- 
+1.9.1
+

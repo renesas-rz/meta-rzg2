@@ -1,0 +1,27 @@
+From d09df51f53063308bd5bd41c900743e13d9e74ff Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Thu, 21 Mar 2019 14:37:52 +0700
+Subject: [PATCH 030/328] dt-bindings: pwm: pwm-rcar: Add r8a774c0 support
+
+Document RZ/G2E (R8A774C0) SoC bindings.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+index 3627516..789b162 100644
+--- a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
++++ b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+@@ -16,6 +16,7 @@ Required Properties:
+  - "renesas,pwm-r8a77965": for R-Car M3-N
+  - "renesas,pwm-r8a77990": for R-Car E3
+  - "renesas,pwm-r8a77995": for R-Car D3
++ - "renesas,pwm-r8a774c0": for RZ/G2E
+ - reg: base address and length of the registers block for the PWM.
+ - #pwm-cells: should be 2. See pwm.txt in this directory for a description of
+   the cells format.
+-- 
+1.9.1
+

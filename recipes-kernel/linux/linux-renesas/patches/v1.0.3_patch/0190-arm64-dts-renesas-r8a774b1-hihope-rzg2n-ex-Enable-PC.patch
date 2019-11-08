@@ -1,0 +1,47 @@
+From 788d23e59db8518b143a59fd55af3ddb9b297e2b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 16:53:59 +0700
+Subject: [PATCH 190/328] arm64: dts: renesas: r8a774b1-hihope-rzg2n-ex: Enable
+ PCIE1 as default instead of SATA
+
+In RZ/G2N, we can choose the output between PCIE1 and SATA by
+GP7_03 and SW43=OFF with following selections:
+
+GPIO7_03 = HIGH -> PCIE1
+GPIO7_03 = LOW -> SATA
+Currently, we enable PCIE1 as default environment.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+index 565d8dc..afacdd2 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+@@ -7,6 +7,7 @@
+ 
+ #include "r8a774b1-hihope-rzg2n.dts"
+ #include "hihope-rzg2-ex.dtsi"
++#include <dt-bindings/gpio/gpio.h>
+ 
+ / {
+ 	model = "HopeRun HiHope RZ/G2N with sub board";
+@@ -21,3 +22,12 @@
+ &pciec1 {
+ 	status = "okay";
+ };
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "pcie-en-gpio";
++	};
++};
+-- 
+1.9.1
+

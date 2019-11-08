@@ -1,0 +1,51 @@
+From 2b1704e4e3b758bf65e2e3fc39b380ba7f156f68 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Fri, 6 Sep 2019 18:36:33 +0700
+Subject: [PATCH 239/328] arm64: dts: renesas: r8a774b1-hihope-rzg2n: Add
+ reserved memory regions
+
+This patch adds reserved memory regions:
+- Lossy Decompression
+	48 MiB : 0x0054000000 -> 0x0056ffffff
+- CMA area for MMP
+	256 MiB : 0x0070000000 -> 0x007fffffff
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index 16f7ebc..5f003eb 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -30,6 +30,12 @@
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		/* device specific region for Lossy Decompression */
++		lossy_decompress: linux,lossy_decompress@54000000 {
++			no-map;
++			reg = <0x00000000 0x54000000 0x0 0x03000000>;
++		};
++
+ 		/* global autoconfigured region for contiguous allocations */
+ 		linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+@@ -37,6 +43,13 @@
+ 			reg = <0x00000000 0x58000000 0x0 0x18000000>;
+ 			linux,cma-default;
+ 		};
++
++		/* device specific region for contiguous allocations */
++		mmp_reserved: linux,multimedia@70000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x70000000 0x0 0x10000000>;
++		};
+ 	};
+ };
+ 
+-- 
+1.9.1
+

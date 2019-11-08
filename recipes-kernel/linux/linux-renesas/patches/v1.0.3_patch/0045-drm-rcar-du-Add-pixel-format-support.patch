@@ -1,0 +1,100 @@
+From 040dd9d75fc36448881f42877e762e9ea105c3b2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 18 Apr 2019 17:48:11 +0700
+Subject: [PATCH 045/328] drm: rcar-du: Add pixel format support
+
+This patch supports pixel format of RGB332, ARGB4444, XRGB4444,
+BGR888, RGB888, BGRA8888, BGRX8888 and YVYU.
+VYUY pixel format is not supported by H/W specification.
+
+Signed-off-by: Koji Matsuoka <koji.matsuoka.xm@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_kms.c | 36 +++++++++++++++++++++++++++++++++++
+ drivers/gpu/drm/rcar-du/rcar_du_vsp.c |  2 --
+ 2 files changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_kms.c b/drivers/gpu/drm/rcar-du/rcar_du_kms.c
+index 0386b45..0349d4f 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_kms.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_kms.c
+@@ -128,6 +128,38 @@
+ 		.fourcc = DRM_FORMAT_YVU444,
+ 		.bpp = 24,
+ 		.planes = 3,
++	}, {
++		.fourcc = DRM_FORMAT_RGB332,
++		.bpp = 8,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_ARGB4444,
++		.bpp = 16,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_XRGB4444,
++		.bpp = 16,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_BGR888,
++		.bpp = 24,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_RGB888,
++		.bpp = 24,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_BGRA8888,
++		.bpp = 32,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_BGRX8888,
++		.bpp = 32,
++		.planes = 1,
++	}, {
++		.fourcc = DRM_FORMAT_YVYU,
++		.bpp = 16,
++		.planes = 1,
+ 	},
+ };
+ 
+@@ -186,6 +218,9 @@ int rcar_du_dumb_create(struct drm_file *file, struct drm_device *dev,
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
++	if (rcar_du_has(rcdu, RCAR_DU_FEATURE_VSP1_SOURCE))
++		goto done;
++
+ 	/*
+ 	 * The pitch and alignment constraints are expressed in pixels on the
+ 	 * hardware side and in bytes in the DRM API.
+@@ -213,6 +248,7 @@ int rcar_du_dumb_create(struct drm_file *file, struct drm_device *dev,
+ 		}
+ 	}
+ 
++done:
+ 	return drm_gem_fb_create(dev, file_priv, mode_cmd);
+ }
+ 
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_vsp.c b/drivers/gpu/drm/rcar-du/rcar_du_vsp.c
+index a042f11..3b71f5e 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_vsp.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_vsp.c
+@@ -130,7 +130,6 @@ void rcar_du_vsp_atomic_flush(struct rcar_du_crtc *crtc)
+ 	DRM_FORMAT_ARGB8888,
+ 	DRM_FORMAT_XRGB8888,
+ 	DRM_FORMAT_UYVY,
+-	DRM_FORMAT_VYUY,
+ 	DRM_FORMAT_YUYV,
+ 	DRM_FORMAT_YVYU,
+ 	DRM_FORMAT_NV12,
+@@ -159,7 +158,6 @@ void rcar_du_vsp_atomic_flush(struct rcar_du_crtc *crtc)
+ 	V4L2_PIX_FMT_ABGR32,
+ 	V4L2_PIX_FMT_XBGR32,
+ 	V4L2_PIX_FMT_UYVY,
+-	V4L2_PIX_FMT_VYUY,
+ 	V4L2_PIX_FMT_YUYV,
+ 	V4L2_PIX_FMT_YVYU,
+ 	V4L2_PIX_FMT_NV12M,
+-- 
+1.9.1
+

@@ -1,0 +1,29 @@
+From 1712f54646faaf037c26f1fb2359c3bd691081bc Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Fri, 19 Jul 2019 14:15:43 +0700
+Subject: [PATCH 150/328] arm64: dts: r8a774a1-hihope-rzg2m: pass
+ lossy_decompress to mmngr
+
+Add lossy_decompress to mmngr memory-region
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index d044a60..a3a073a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -53,7 +53,7 @@
+ 
+ 	mmngr {
+ 		compatible = "renesas,mmngr";
+-		memory-region = <&mmp_reserved>;
++		memory-region = <&mmp_reserved>, <&lossy_decompress>;
+ 	};
+ 
+ 	mmngrbuf {
+-- 
+1.9.1
+

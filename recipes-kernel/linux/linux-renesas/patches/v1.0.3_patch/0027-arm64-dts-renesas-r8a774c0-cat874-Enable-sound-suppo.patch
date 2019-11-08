@@ -1,0 +1,119 @@
+From 2b613e7ff7435c7b01f387ddc7574907d2951ced Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 16:17:36 +0700
+Subject: [PATCH 027/328] arm64: dts: renesas: r8a774c0-cat874: Enable sound
+ support
+
+This patch enable sound support for the CAT874 board on the R8A774C0
+SoC.
+
+Add the device node of the PCM5102 codec (External I2S Board in Low
+speed Connector). Then add the simple-audio-card device node to
+interconnect the SoC sound device and codec.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 76 +++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index acff7cf..aac01d2 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -89,6 +89,30 @@
+ 		states = <3300000 1
+ 			  1800000 0>;
+ 	};
++
++	sound {
++		compatible = "simple-audio-card";
++		simple-audio-card,format = "i2s";
++
++		sndcpu: simple-audio-card,cpu {
++			sound-dai = <&rcar_sound>;
++			bitclock-master;
++			frame-master;
++		};
++
++		sndcodec: simple-audio-card,codec {
++			sound-dai = <&pcm5102a>;
++		};
++	};
++
++	pcm5102a: pcm5102a {
++		compatible = "ti,pcm5102a";
++		#sound-dai-cells = <0>;
++	};
++};
++
++&audio_clk_a {
++	clock-frequency = <22579200>;
+ };
+ 
+ &ehci0 {
+@@ -150,6 +174,17 @@
+ 		function = "sdhi0";
+ 		power-source = <1800>;
+ 	};
++
++	sound_pins: sound {
++		groups = "ssi349_ctrl", "ssi3_data", "ssi4_data";
++		function = "ssi";
++	};
++
++	sound_clk_pins: sound_clk {
++		groups = "audio_clk_a", "audio_clk_b_a", "audio_clk_c_a",
++			 "audio_clkout_a", "audio_clkout1_a";
++		function = "audio_clk";
++	};
+ };
+ 
+ &rwdt {
+@@ -210,3 +245,44 @@
+ &tmu4 {
+ 	status = "okay";
+ };
++
++&rcar_sound {
++	pinctrl-0 = <&sound_pins &sound_clk_pins>;
++	pinctrl-names = "default";
++
++	/* Single DAI */
++	#sound-dai-cells = <0>;
++
++	/* audio_clkout0/1/2/3 */
++	#clock-cells = <1>;
++	clock-frequency = <11289600>;
++
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 1005>,
++		<&cpg CPG_MOD 1006>, <&cpg CPG_MOD 1007>,
++		<&cpg CPG_MOD 1008>, <&cpg CPG_MOD 1009>,
++		<&cpg CPG_MOD 1010>, <&cpg CPG_MOD 1011>,
++		<&cpg CPG_MOD 1012>, <&cpg CPG_MOD 1013>,
++		<&cpg CPG_MOD 1014>, <&cpg CPG_MOD 1015>,
++		<&cpg CPG_MOD 1022>, <&cpg CPG_MOD 1023>,
++		<&cpg CPG_MOD 1024>, <&cpg CPG_MOD 1025>,
++		<&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
++		<&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
++		<&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++		<&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		<&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		<&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
++		<&audio_clk_a>, <&audio_clk_b>, <&audio_clk_c>,
++		<&cpg CPG_CORE R8A774C0_CLK_ZA2>;
++
++	rcar_sound,dai {
++		dai0 {
++			playback = <&ssi4 &src4 &dvc0>;
++		};
++	};
++};
++
++&ssi4 {
++	shared-pin;
++};
+-- 
+1.9.1
+

@@ -1,0 +1,56 @@
+From 56391ff7e91e67ff8f53b7cdfb0a7bba6a27c804 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 16:28:39 +0700
+Subject: [PATCH 175/328] arm64: dts: renesas: r8a774c0-cat874: enable msiof0
+ node
+
+This patch enable MSIOF0 on SoC R8A774C0 for CAT874 Board.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 7a6c9dc..426c3b3 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -18,6 +18,10 @@
+ 		serial1 = &hscif2;
+ 		serial2 = &hscif3;
+ 		serial3 = &hscif4;
++		spi0 = &msiof0;
++		spi1 = &msiof1;
++		spi2 = &msiof2;
++		spi3 = &msiof3;
+ 	};
+ 
+ 	chosen {
+@@ -298,6 +302,12 @@
+ 			"du_disp", "du_clk_in_0";
+ 		function = "du";
+ 	};
++
++	msiof0_pins: spi0 {
++		groups = "msiof0_clk", "msiof0_sync",
++			"msiof0_rxd", "msiof0_txd";
++		function = "msiof0";
++	};
+ };
+ 
+ &rwdt {
+@@ -597,3 +607,10 @@
+ 		};
+ 	};
+ };
++
++&msiof0 {
++	pinctrl-0 = <&msiof0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+1.9.1
+

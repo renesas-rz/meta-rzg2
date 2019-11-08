@@ -1,0 +1,28 @@
+From b8f7eda298ea9432fe440ae8c363dd19af5b89da Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:40:41 +0700
+Subject: [PATCH 123/328] arm64: defconfig: Enable Touchscreen Config support
+ for RZ/G2 SoC
+
+This patch enables config touchscreen for panel lvds support in
+RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 38268cb..0a3415c 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -767,3 +767,6 @@ CONFIG_DRM_PANEL_LVDS=y
+ 
+ # Enable Common Clock VC5
+ CONFIG_COMMON_CLK_VC5=y
++
++# Enable Touchscreen driver
++CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+-- 
+1.9.1
+
