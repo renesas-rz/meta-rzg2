@@ -1,0 +1,26 @@
+From 4dbd2164c6de55532391a55295d4c823c7a396d4 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 13:50:17 +0700
+Subject: [PATCH 063/326] arm64: defconfig: enable Panel LVDS for RZ/G2 SoC
+
+This patch enables config for supporting LVDS Panel in RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 2ca6ac4..664111b 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -761,3 +761,6 @@ CONFIG_DRM_I2C_NXP_TDA998X=y
+ # Enable Audio support
+ CONFIG_SND_SOC_ALL_CODECS=y
+ CONFIG_COMPILE_TEST=y
++
++# Enable LVDS support
++CONFIG_DRM_PANEL_LVDS=y
+-- 
+1.9.1
+

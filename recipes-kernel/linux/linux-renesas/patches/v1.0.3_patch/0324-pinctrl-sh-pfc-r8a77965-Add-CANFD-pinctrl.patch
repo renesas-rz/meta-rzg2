@@ -1,0 +1,103 @@
+From 6a368c811e7d02ddf6cb228d01c16bd26ed6136d Mon Sep 17 00:00:00 2001
+From: Duy Bao Dang <duy.dang.yb@renesas.com>
+Date: Thu, 28 Nov 2019 11:28:39 +0700
+Subject: [PATCH 324/326] pinctrl: sh-pfc: r8a77965: Add CANFD pinctrl
+
+This patch adds support CANFD pins, pin functions and pin groups for
+the R8A77965 and R8A774B1 SoC
+
+Signed-off-by: Duy Bao Dang <duy.dang.yb@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a77965.c | 41 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77965.c b/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
+index 8176d13..263dc7c 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
+@@ -1823,6 +1823,29 @@ enum {
+ 	CAN_CLK_MARK,
+ };
+ 
++/* - CAN FD --------------------------------------------------------------- */
++static const unsigned int canfd0_data_a_pins[] = {
++	/* TX, RX */
++	RCAR_GP_PIN(1, 23),	RCAR_GP_PIN(1, 24),
++};
++static const unsigned int canfd0_data_a_mux[] = {
++	CANFD0_TX_A_MARK,	CANFD0_RX_A_MARK,
++};
++static const unsigned int canfd0_data_b_pins[] = {
++	/* TX, RX */
++	RCAR_GP_PIN(2, 0),	RCAR_GP_PIN(2, 1),
++};
++static const unsigned int canfd0_data_b_mux[] = {
++	CANFD0_TX_B_MARK,	CANFD0_RX_B_MARK,
++};
++static const unsigned int canfd1_data_pins[] = {
++	/* TX, RX */
++	RCAR_GP_PIN(1, 22),	RCAR_GP_PIN(1, 26),
++};
++static const unsigned int canfd1_data_mux[] = {
++	CANFD1_TX_MARK,		CANFD1_RX_MARK,
++};
++
+ /* - DU --------------------------------------------------------------------- */
+ static const unsigned int du_rgb666_pins[] = {
+ 	/* R[7:2], G[7:2], B[7:2] */
+@@ -4073,7 +4096,7 @@ enum {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_pin_group common[309];
++	struct sh_pfc_pin_group common[312];
+ 	struct sh_pfc_pin_group automotive[0];
+ } pinmux_groups = {
+ 	.common = {
+@@ -4109,6 +4132,9 @@ enum {
+ 		SH_PFC_PIN_GROUP(can0_data_b),
+ 		SH_PFC_PIN_GROUP(can1_data),
+ 		SH_PFC_PIN_GROUP(can_clk),
++		SH_PFC_PIN_GROUP(canfd0_data_a),
++		SH_PFC_PIN_GROUP(canfd0_data_b),
++		SH_PFC_PIN_GROUP(canfd1_data),
+ 		SH_PFC_PIN_GROUP(du_rgb666),
+ 		SH_PFC_PIN_GROUP(du_rgb888),
+ 		SH_PFC_PIN_GROUP(du_clk_out_0),
+@@ -4437,6 +4463,15 @@ enum {
+ 	"can_clk",
+ };
+ 
++static const char * const canfd0_groups[] = {
++	"canfd0_data_a",
++	"canfd0_data_b",
++};
++
++static const char * const canfd1_groups[] = {
++	"canfd1_data",
++};
++
+ static const char * const du_groups[] = {
+ 	"du_rgb666",
+ 	"du_rgb888",
+@@ -4840,7 +4875,7 @@ enum {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_function common[47];
++	struct sh_pfc_function common[49];
+ 	struct sh_pfc_function automotive[0];
+ } pinmux_functions = {
+ 	.common = {
+@@ -4849,6 +4884,8 @@ enum {
+ 		SH_PFC_FUNCTION(can0),
+ 		SH_PFC_FUNCTION(can1),
+ 		SH_PFC_FUNCTION(can_clk),
++		SH_PFC_FUNCTION(canfd0),
++		SH_PFC_FUNCTION(canfd1),
+ 		SH_PFC_FUNCTION(du),
+ 		SH_PFC_FUNCTION(hscif0),
+ 		SH_PFC_FUNCTION(hscif1),
+-- 
+1.9.1
+

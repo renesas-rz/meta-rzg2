@@ -1,0 +1,45 @@
+From beb3cc902ed9546f408f1579499e699685bd6dc0 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Mon, 9 Sep 2019 16:00:52 +0700
+Subject: [PATCH 286/326] iommu: ipmmu-vmsa: add support for r8a774b1
+
+Add support for RZ/G2N (R8A774B1) IPMMU.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ drivers/iommu/ipmmu-vmsa.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/iommu/ipmmu-vmsa.c b/drivers/iommu/ipmmu-vmsa.c
+index 6797ddc..ea4d19d 100644
+--- a/drivers/iommu/ipmmu-vmsa.c
++++ b/drivers/iommu/ipmmu-vmsa.c
+@@ -759,6 +759,7 @@ static int ipmmu_init_platform_device(struct device *dev,
+ 
+ static const struct soc_device_attribute soc_rcar_gen3[] = {
+ 	{ .soc_id = "r8a774a1", },
++	{ .soc_id = "r8a774b1", },
+ 	{ .soc_id = "r8a774c0", },
+ 	{ .soc_id = "r8a7795", },
+ 	{ .soc_id = "r8a7796", },
+@@ -769,6 +770,7 @@ static int ipmmu_init_platform_device(struct device *dev,
+ };
+ 
+ static const struct soc_device_attribute soc_rcar_gen3_whitelist[] = {
++	{ .soc_id = "r8a774b1", },
+ 	{ .soc_id = "r8a774c0", },
+ 	{ .soc_id = "r8a7795", .revision = "ES3.*" },
+ 	{ .soc_id = "r8a77965", },
+@@ -968,6 +970,9 @@ static void ipmmu_device_reset(struct ipmmu_vmsa_device *mmu)
+ 		.compatible = "renesas,ipmmu-r8a774a1",
+ 		.data = &ipmmu_features_rcar_gen3,
+ 	}, {
++		.compatible = "renesas,ipmmu-r8a774b1",
++		.data = &ipmmu_features_rcar_gen3,
++	}, {
+ 		.compatible = "renesas,ipmmu-r8a774c0",
+ 		.data = &ipmmu_features_rcar_gen3,
+ 	}, {
+-- 
+1.9.1
+

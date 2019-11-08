@@ -1,0 +1,27 @@
+From 13eefa8ba223292b1e058f1fe7067f70ea2c4f92 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 22 Nov 2019 09:39:32 +0700
+Subject: [PATCH 318/326] arm64: defconfig: Enable kernel module for USB Gadget
+ Function
+
+This patch add default build kernel module for USB Gadget Function.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index a056780..e20026f 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -365,3 +365,6 @@ CONFIG_DEVFREQ_GOV_USERSPACE=y
+ CONFIG_DEVFREQ_GOV_PASSIVE=y
+ CONFIG_E1000E=y
+ CONFIG_RENESAS_MFIS_ECC=y
++CONFIG_USB_MASS_STORAGE=m
++CONFIG_USB_G_SERIAL=m
++CONFIG_USB_ETH=m
+-- 
+1.9.1
+

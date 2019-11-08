@@ -1,0 +1,28 @@
+From 128967094954c38925674644d431c698f4127a01 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 26 Aug 2019 14:08:14 +0700
+Subject: [PATCH 203/326] usb: gadget: udc: renesas_usb3: Add bindings for
+ r8a774b1
+
+Add Document for R8A774B1 (RZ/G2N)
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas_usb3.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas_usb3.txt b/Documentation/devicetree/bindings/usb/renesas_usb3.txt
+index 9551e8c..51a7b37 100644
+--- a/Documentation/devicetree/bindings/usb/renesas_usb3.txt
++++ b/Documentation/devicetree/bindings/usb/renesas_usb3.txt
+@@ -3,6 +3,7 @@ Renesas Electronics USB3.0 Peripheral driver
+ Required properties:
+   - compatible: Must contain one of the following:
+ 	- "renesas,r8a774a1-usb3-peri"
++	- "renesas,r8a774b1-usb3-peri"
+ 	- "renesas,r8a774c0-usb3-peri"
+ 	- "renesas,r8a7795-usb3-peri"
+ 	- "renesas,r8a7796-usb3-peri"
+-- 
+1.9.1
+

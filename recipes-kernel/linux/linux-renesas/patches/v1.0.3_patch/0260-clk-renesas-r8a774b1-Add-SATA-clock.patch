@@ -1,0 +1,27 @@
+From 79f43a38dbc6666954dd9bf010849b6f1e79bff6 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Mon, 9 Sep 2019 13:09:24 +0700
+Subject: [PATCH 260/326] clk: renesas: r8a774b1: Add SATA clock
+
+This patch adds SATA clock to the R8A774B1 SoC.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774b1-cpg-mssr.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/renesas/r8a774b1-cpg-mssr.c b/drivers/clk/renesas/r8a774b1-cpg-mssr.c
+index 28962e4..617d2e4 100644
+--- a/drivers/clk/renesas/r8a774b1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774b1-cpg-mssr.c
+@@ -193,6 +193,7 @@ enum clk_ids {
+ 	DEF_MOD("vin1",			 810,	R8A774B1_CLK_S0D2),
+ 	DEF_MOD("vin0",			 811,	R8A774B1_CLK_S0D2),
+ 	DEF_MOD("etheravb",		 812,	R8A774B1_CLK_S0D6),
++	DEF_MOD("sata0",		 815,	R8A774B1_CLK_S3D2),
+ 	DEF_MOD("gpio7",		 905,	R8A774B1_CLK_S3D4),
+ 	DEF_MOD("gpio6",		 906,	R8A774B1_CLK_S3D4),
+ 	DEF_MOD("gpio5",		 907,	R8A774B1_CLK_S3D4),
+-- 
+1.9.1
+

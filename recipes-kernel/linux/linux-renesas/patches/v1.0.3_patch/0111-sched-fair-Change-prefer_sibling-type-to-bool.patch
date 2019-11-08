@@ -1,0 +1,43 @@
+From 292083376621326c64717d3cf33c9649586fbdac Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 30 May 2019 14:47:41 +0700
+Subject: [PATCH 111/326] sched/fair: Change prefer_sibling type to bool
+
+This variable is entirely local to update_sd_lb_stats, so we can
+safely change its type and slightly clean up its initialisation.
+
+Cherry-picked from https://patchwork.kernel.org/patch/10506531/
+
+cc: Ingo Molnar <mingo@redhat.com>
+cc: Peter Zijlstra <peterz@infradead.org>
+
+Signed-off-by: Valentin Schneider <valentin.schneider@arm.com>
+Signed-off-by: Morten Rasmussen <morten.rasmussen@arm.com>
+Signed-off-by: Gaku Inami <gaku.inami.xh@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ kernel/sched/fair.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 64479ee..7c3d7a2 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -8173,11 +8173,11 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd
+ 	struct sched_group *sg = env->sd->groups;
+ 	struct sg_lb_stats *local = &sds->local_stat;
+ 	struct sg_lb_stats tmp_sgs;
+-	int load_idx, prefer_sibling = 0;
++	int load_idx;
+ 	bool overload = false;
+ 
+-	if (child && child->flags & SD_PREFER_SIBLING)
+-		prefer_sibling = 1;
++
++	bool prefer_sibling = child && child->flags & SD_PREFER_SIBLING;
+ 
+ #ifdef CONFIG_NO_HZ_COMMON
+ 	if (env->idle == CPU_NEWLY_IDLE && READ_ONCE(nohz.has_blocked))
+-- 
+1.9.1
+

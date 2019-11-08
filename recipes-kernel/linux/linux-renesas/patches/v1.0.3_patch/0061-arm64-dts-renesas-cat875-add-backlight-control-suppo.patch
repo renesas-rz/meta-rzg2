@@ -1,0 +1,48 @@
+From 90b5bcfa5bf66a756012c045c26614576eb8c34e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 2 May 2019 13:29:02 +0700
+Subject: [PATCH 061/326] arm64: dts: renesas: cat875: add backlight control
+ support
+
+This patch adds backlight support for the sub board to control the
+brightness of LVDS panel.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat875.dtsi | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+index 10ac3a6..3f09dce 100644
+--- a/arch/arm64/boot/dts/renesas/cat875.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -65,6 +65,26 @@
+ 			};
+ 		};
+ 	};
++
++	vdd_bl_reg: bl-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-12V";
++		regulator-min-microvolt = <12000000>;
++		regulator-max-microvolt = <12000000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	backlight {
++		compatible = "pwm-backlight";
++		pwms = <&pwm5 0 5000000>;
++
++		brightness-levels = <0 4 8 16 32 64 128 255>;
++		default-brightness-level = <6>;
++
++		power-supply = <&vdd_bl_reg>;
++		enable-gpios = <&gpio6 12 GPIO_ACTIVE_HIGH>;
++	};
+ };
+ 
+ &avb {
+-- 
+1.9.1
+

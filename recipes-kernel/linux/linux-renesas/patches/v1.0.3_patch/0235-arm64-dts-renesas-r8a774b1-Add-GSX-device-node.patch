@@ -1,0 +1,35 @@
+From d0798964b49e5310a6aad96f348def6df9c71dc9 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Fri, 6 Sep 2019 13:20:38 +0700
+Subject: [PATCH 235/326] arm64: dts: renesas: r8a774b1: Add GSX device node
+
+This commit adds GSX device nodes for the R8A774B1 SoC.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 03b064c..5e42fa6 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -1089,6 +1089,15 @@
+ 			/* placeholder */
+ 		};
+ 
++		gsx: gsx@fd000000 {
++			compatible = "renesas,gsx";
++			reg = <0 0xfd000000 0 0x40000>;
++			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 112>;
++			power-domains = <&sysc R8A774B1_PD_3DG_B>;
++			resets = <&cpg 112>;
++		};
++
+ 		fcpci0: vcp4@fe8df000 {
+ 			reg = <0 0xfe8df000 0 0x200>;
+ 			/* placeholder */
+-- 
+1.9.1
+

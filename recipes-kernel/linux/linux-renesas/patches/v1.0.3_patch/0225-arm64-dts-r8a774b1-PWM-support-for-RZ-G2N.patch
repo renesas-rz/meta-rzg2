@@ -1,0 +1,100 @@
+From 9874996594a5523869fb42769133f767da4daf03 Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Mon, 12 Aug 2019 13:33:18 +0700
+Subject: [PATCH 225/326] arm64: dts: r8a774b1: PWM support for RZ/G2N
+
+This patch adds PWM device nodes for R8A774B1 SoC.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 49 ++++++++++++++++++++++++++-----
+ 1 file changed, 42 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 6cfe0ed..61307e0 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -476,38 +476,73 @@
+ 		};
+ 
+ 		pwm0: pwm@e6e30000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e30000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm1: pwm@e6e31000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e31000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm2: pwm@e6e32000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e32000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm3: pwm@e6e33000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e33000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm4: pwm@e6e34000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e34000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm5: pwm@e6e35000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e35000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm6: pwm@e6e36000 {
++			compatible = "renesas,pwm-r8a774b1", "renesas,pwm-rcar";
+ 			reg = <0 0xe6e36000 0 8>;
+-			/* placeholder */
++			#pwm-cells = <2>;
++			clocks = <&cpg CPG_MOD 523>;
++			resets = <&cpg 523>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 		};
+ 
+ 		tpu: pwm@e6e80000 {
+-- 
+1.9.1
+

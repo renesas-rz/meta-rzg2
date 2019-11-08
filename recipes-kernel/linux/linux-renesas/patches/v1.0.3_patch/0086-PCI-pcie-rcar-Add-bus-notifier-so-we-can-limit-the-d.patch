@@ -1,0 +1,53 @@
+From 69b6c7783fa946b289aa306a43b828c9036ec4a0 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
+Date: Tue, 30 Apr 2019 13:38:59 +0700
+Subject: [PATCH 086/326] PCI: pcie-rcar: Add bus notifier so we can limit the
+ dma range
+
+The PCIe DMA controller on R-Car Gen2 and earlier is on 32bit bus,
+so limit the DMA range to 32bit.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+---
+ drivers/pci/controller/pcie-rcar.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/pci/controller/pcie-rcar.c b/drivers/pci/controller/pcie-rcar.c
+index 9b9c677..c6c0087 100644
+--- a/drivers/pci/controller/pcie-rcar.c
++++ b/drivers/pci/controller/pcie-rcar.c
+@@ -1255,3 +1255,31 @@ static int rcar_pcie_resume_noirq(struct device *dev)
+ 	.probe = rcar_pcie_probe,
+ };
+ builtin_platform_driver(rcar_pcie_driver);
++
++static int rcar_pcie_pci_notifier(struct notifier_block *nb,
++				unsigned long action, void *data)
++{
++	struct device *dev = data;
++
++	switch (action) {
++	case BUS_NOTIFY_BOUND_DRIVER:
++		/* Force the DMA mask to lower 32-bits */
++		dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
++		break;
++	default:
++		return NOTIFY_DONE;
++	}
++
++	return NOTIFY_OK;
++}
++
++static struct notifier_block device_nb = {
++	.notifier_call = rcar_pcie_pci_notifier,
++};
++
++static int __init register_rcar_pcie_pci_notifier(void)
++{
++	return bus_register_notifier(&pci_bus_type, &device_nb);
++}
++
++arch_initcall(register_rcar_pcie_pci_notifier);
+-- 
+1.9.1
+

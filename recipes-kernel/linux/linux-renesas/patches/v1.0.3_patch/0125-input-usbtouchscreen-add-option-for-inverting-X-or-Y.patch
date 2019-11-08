@@ -1,0 +1,49 @@
+From 9104a6bbe1f3ac39a509e2b6c2a57434de74bc81 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 5 Jun 2019 14:12:41 +0700
+Subject: [PATCH 125/326] input: usbtouchscreen: add option for inverting X or
+ Y axis
+
+Some touchscreen type eGalax need invert X or Y (maybe together with
+swap XY) to behave properly.
+This patch adds parameters for inverting X or Y in user.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/input/touchscreen/usbtouchscreen.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/input/touchscreen/usbtouchscreen.c b/drivers/input/touchscreen/usbtouchscreen.c
+index e74f813..3980d50 100644
+--- a/drivers/input/touchscreen/usbtouchscreen.c
++++ b/drivers/input/touchscreen/usbtouchscreen.c
+@@ -64,6 +64,14 @@
+ module_param(hwcalib_xy, bool, 0644);
+ MODULE_PARM_DESC(hwcalib_xy, "If set hw-calibrated X/Y are used if available");
+ 
++static bool invert_x;
++module_param(invert_x, bool, 0644);
++MODULE_PARM_DESC(invert_x, " If set invert X axis.");
++
++static bool invert_y;
++module_param(invert_y, bool, 0644);
++MODULE_PARM_DESC(invert_y, "If set invert Y axis.");
++
+ /* device specifc data/functions */
+ struct usbtouch_usb;
+ struct usbtouch_device_info {
+@@ -1404,6 +1412,11 @@ static void usbtouch_process_pkt(struct usbtouch_usb *usbtouch,
+ 			return;
+ 
+ 	input_report_key(usbtouch->input, BTN_TOUCH, usbtouch->touch);
++	if (invert_x)
++		usbtouch->x = type->max_xc - usbtouch->x + type->min_xc;
++
++	if (invert_y)
++		usbtouch->y = type->max_yc - usbtouch->y + type->min_yc;
+ 
+ 	if (swap_xy) {
+ 		input_report_abs(usbtouch->input, ABS_X, usbtouch->y);
+-- 
+1.9.1
+

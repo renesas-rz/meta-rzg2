@@ -1,0 +1,67 @@
+From a012445019cd6819db75c33a4e570a8b111d7d79 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 27 Aug 2019 10:51:06 +0700
+Subject: [PATCH 280/326] arm64: dts: renesas: r8a774b1: Add OPPs table for cpu
+ devices
+
+This patch adds OPPs table for CA57{0,1} cpu devices
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index bec7201..811b41e 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -132,6 +132,30 @@
+ 		method = "smc";
+ 	};
+ 
++	cluster0_opp: opp_table0 {
++		compatible = "operating-points-v2";
++		opp-shared;
++
++		opp-500000000 {
++			opp-hz = /bits/ 64 <500000000>;
++			opp-microvolt = <830000>;
++			clock-latency-ns = <300000>;
++		};
++
++		opp-1000000000 {
++			opp-hz = /bits/ 64 <1000000000>;
++			opp-microvolt = <830000>;
++			clock-latency-ns = <300000>;
++		};
++
++		opp-1500000000 {
++			opp-hz = /bits/ 64 <1500000000>;
++			opp-microvolt = <830000>;
++			clock-latency-ns = <300000>;
++			opp-suspend;
++		};
++	};
++
+ 	cpus {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+@@ -144,6 +168,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774B1_CLK_Z>;
++			operating-points-v2 = <&cluster0_opp>;
+ 		};
+ 
+ 		a57_1: cpu@1 {
+@@ -154,6 +179,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774B1_CLK_Z>;
++			operating-points-v2 = <&cluster0_opp>;
+ 		};
+ 
+ 		L2_CA57: cache-controller-0 {
+-- 
+1.9.1
+

@@ -1,0 +1,62 @@
+From 14cedd4f2a0e247a8e92dfffb0c79dc7d592222b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 16:49:22 +0700
+Subject: [PATCH 062/326] arm64: dts: renesas: r8a774c0-cat874: enable Display
+ Unit
+
+This patch enable DU (Display Unit) in CAT874 Board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index e7a2fcb..b3caa49 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -143,6 +143,13 @@
+ 		compatible = "ti,pcm5102a";
+ 		#sound-dai-cells = <0>;
+ 	};
++
++	/* External DU dot clocks */
++	x13_clk: x13 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <74250000>;
++	};
+ };
+ 
+ &audio_clk_a {
+@@ -250,6 +257,12 @@
+ 		groups = "usb30", "usb30_id";
+ 		function = "usb30";
+ 	};
++
++	du_pins: du {
++		groups = "du_rgb888", "du_sync", "du_clk_out_0",
++			"du_disp", "du_clk_in_0";
++		function = "du";
++	};
+ };
+ 
+ &rwdt {
+@@ -424,3 +437,14 @@
+ &vspi0 {
+ 	status = "okay";
+ };
++
++&du {
++	pinctrl-0 = <&du_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 724>,
++		 <&cpg CPG_MOD 723>,
++		 <&x13_clk>;
++	clock-names = "du.0", "du.1", "dclkin.0";
++};
+-- 
+1.9.1
+

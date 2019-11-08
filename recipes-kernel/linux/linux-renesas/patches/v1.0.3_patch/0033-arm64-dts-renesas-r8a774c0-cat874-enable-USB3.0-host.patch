@@ -1,0 +1,45 @@
+From 0021debffb8ae8cac1beb27825332a58478c68c5 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 16:32:27 +0700
+Subject: [PATCH 033/326] arm64: dts: renesas: r8a774c0-cat874: enable USB3.0
+ host
+
+This patch enables USB3.0 host device for the RZ/G2E board on
+the R8A774C0 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index a8a77c3..aaf9669 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -225,6 +225,11 @@
+ 			 "audio_clkout_a", "audio_clkout1_a";
+ 		function = "audio_clk";
+ 	};
++
++	usb30_pins: usb30 {
++		groups = "usb30", "usb30_id";
++		function = "usb30";
++	};
+ };
+ 
+ &rwdt {
+@@ -378,3 +383,10 @@
+ &ssi4 {
+ 	shared-pin;
+ };
++
++&xhci0 {
++	pinctrl-0 = <&usb30_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+1.9.1
+

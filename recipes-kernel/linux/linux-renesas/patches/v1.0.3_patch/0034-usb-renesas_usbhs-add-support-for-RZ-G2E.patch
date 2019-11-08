@@ -1,0 +1,34 @@
+From 2fa19c62423c96944c53b2124336077c40d03f81 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 1 Mar 2019 20:40:36 +0700
+Subject: [PATCH 034/326] usb: renesas_usbhs: add support for RZ/G2E
+
+HS-USB found in RZ/G2E (a.k.a. r8a774c0) is very similar to the
+one found in R-Car E3 (a.k.a. r8a77990), as it needs to release
+the PLL reset by the UGCTRL register like R-Car E3, therefore add
+r8a774c0 support in a similar fashion to what was done for the
+r8a77990.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/usb/renesas_usbhs/common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/usb/renesas_usbhs/common.c b/drivers/usb/renesas_usbhs/common.c
+index 4b5621d..00a55a9 100644
+--- a/drivers/usb/renesas_usbhs/common.c
++++ b/drivers/usb/renesas_usbhs/common.c
+@@ -568,6 +568,10 @@ static int usbhsc_drvcllbck_notify_hotplug(struct platform_device *pdev)
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN3_WITH_PLL,
+ 	},
+ 	{
++		.compatible = "renesas,usbhs-r8a774c0",
++		.data = (void *)USBHS_TYPE_RCAR_GEN3_WITH_PLL,
++	},
++	{
+ 		.compatible = "renesas,rcar-gen2-usbhs",
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN2,
+ 	},
+-- 
+1.9.1
+

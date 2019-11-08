@@ -1,0 +1,49 @@
+From 991f1fb905555d4c226518914cb84cdf32a48e79 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 23 Sep 2019 15:23:10 +0700
+Subject: [PATCH 300/326] media: rcar-vin: Add ARGB8888 format support for
+ VIN's output
+
+Based on repo horms/renesas-bsp with commit id:
+<b354fffb0c5e7680113d9c1ab42077bd3d7dcb18>
+
+This patch adds ARGB8888 format support for VIN's output in RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-dma.c  | 3 +++
+ drivers/media/platform/rcar-vin/rcar-v4l2.c | 4 ++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-dma.c b/drivers/media/platform/rcar-vin/rcar-dma.c
+index 4f35ab4..bbeebcc 100644
+--- a/drivers/media/platform/rcar-vin/rcar-dma.c
++++ b/drivers/media/platform/rcar-vin/rcar-dma.c
+@@ -825,6 +825,9 @@ static int rvin_setup(struct rvin_dev *vin)
+ 	case V4L2_PIX_FMT_RGB565:
+ 		dmr = 0;
+ 		break;
++	case V4L2_PIX_FMT_ABGR32:
++		dmr = VNDMR_EXRGB | VNDMR_DTMD_ARGB;
++		break;
+ 	case V4L2_PIX_FMT_XBGR32:
+ 		/* Note: not supported on M1 */
+ 		dmr = VNDMR_EXRGB;
+diff --git a/drivers/media/platform/rcar-vin/rcar-v4l2.c b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+index 3d544f8..a49e508 100644
+--- a/drivers/media/platform/rcar-vin/rcar-v4l2.c
++++ b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+@@ -55,6 +55,10 @@
+ 		.bpp			= 2,
+ 	},
+ 	{
++		.fourcc			= V4L2_PIX_FMT_ABGR32,
++		.bpp			= 4,
++	},
++	{
+ 		.fourcc			= V4L2_PIX_FMT_XBGR32,
+ 		.bpp			= 4,
+ 	},
+-- 
+1.9.1
+

@@ -1,0 +1,144 @@
+From edb55b0e47979c68a6759aadf9ee24e9a11e5e48 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Tue, 10 Sep 2019 09:53:20 +0700
+Subject: [PATCH 291/326] ARM64: DTS: r8a774b1: Un-tie IPMMU with devices
+
+This commit un-tie devices with IPMMU, also disable some of IPMMUs
+to support similar to r8a77965 in v4.14.75-ltsi/rcar-3.9.6
+
+Without this commit, an error encountered when run dmatest with or
+without CONFIG_IPMMU_VMSA
+...
+[   58.199431] dmatest: dma3chan12-copy: dstbuf[0x1508] not copied!
+Expected d7, got 37
+[   58.207523] dmatest: dma3chan12-copy: dstbuf[0x1509] not copied!
+Expected d6, got 36
+[   58.215615] dmatest: dma3chan12-copy: dstbuf[0x150a] not copied!
+Expected d5, got 35
+[   58.223705] dmatest: dma3chan12-copy: dstbuf[0x150b] not copied!
+Expected d4, got 34
+[   58.231796] dmatest: dma3chan12-copy: dstbuf[0x150c] not copied!
+Expected d3, got 33
+...
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 32 +++++++------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index c7ac2d9..8f5a9ac 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -348,7 +348,6 @@
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 812>;
+ 			phy-mode = "rgmii";
+-			iommus = <&ipmmu_ds0 16>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			status = "disabled";
+@@ -797,14 +796,6 @@
+ 			resets = <&cpg 219>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds0 0>, <&ipmmu_ds0 1>,
+-			       <&ipmmu_ds0 2>, <&ipmmu_ds0 3>,
+-			       <&ipmmu_ds0 4>, <&ipmmu_ds0 5>,
+-			       <&ipmmu_ds0 6>, <&ipmmu_ds0 7>,
+-			       <&ipmmu_ds0 8>, <&ipmmu_ds0 9>,
+-			       <&ipmmu_ds0 10>, <&ipmmu_ds0 11>,
+-			       <&ipmmu_ds0 12>, <&ipmmu_ds0 13>,
+-			       <&ipmmu_ds0 14>, <&ipmmu_ds0 15>;
+ 		};
+ 
+ 		dmac1: dma-controller@e7300000 {
+@@ -839,14 +830,6 @@
+ 			resets = <&cpg 218>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds1 0>, <&ipmmu_ds1 1>,
+-			       <&ipmmu_ds1 2>, <&ipmmu_ds1 3>,
+-			       <&ipmmu_ds1 4>, <&ipmmu_ds1 5>,
+-			       <&ipmmu_ds1 6>, <&ipmmu_ds1 7>,
+-			       <&ipmmu_ds1 8>, <&ipmmu_ds1 9>,
+-			       <&ipmmu_ds1 10>, <&ipmmu_ds1 11>,
+-			       <&ipmmu_ds1 12>, <&ipmmu_ds1 13>,
+-			       <&ipmmu_ds1 14>, <&ipmmu_ds1 15>;
+ 		};
+ 
+ 		dmac2: dma-controller@e7310000 {
+@@ -881,14 +864,6 @@
+ 			resets = <&cpg 217>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds1 16>, <&ipmmu_ds1 17>,
+-			       <&ipmmu_ds1 18>, <&ipmmu_ds1 19>,
+-			       <&ipmmu_ds1 20>, <&ipmmu_ds1 21>,
+-			       <&ipmmu_ds1 22>, <&ipmmu_ds1 23>,
+-			       <&ipmmu_ds1 24>, <&ipmmu_ds1 25>,
+-			       <&ipmmu_ds1 26>, <&ipmmu_ds1 27>,
+-			       <&ipmmu_ds1 28>, <&ipmmu_ds1 29>,
+-			       <&ipmmu_ds1 30>, <&ipmmu_ds1 31>;
+ 		};
+ 
+ 		ipmmu_ds0: mmu@e6740000 {
+@@ -897,6 +872,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 0>;
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_ds1: mmu@e7740000 {
+@@ -913,6 +889,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 2>;
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_mm: mmu@e67b0000 {
+@@ -930,6 +907,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 4>;
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_pv0: mmu@fd800000 {
+@@ -938,6 +916,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 6>;
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vc0: mmu@fe6b0000 {
+@@ -946,6 +925,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 12>;
+ 			power-domains = <&sysc R8A774B1_PD_A3VC>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vi0: mmu@febd0000 {
+@@ -954,6 +934,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 14>;
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vp0: mmu@fe990000 {
+@@ -962,6 +943,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 16>;
+ 			power-domains = <&sysc R8A774B1_PD_A3VP>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		cmt0: timer@e60f0000 {
+-- 
+1.9.1
+

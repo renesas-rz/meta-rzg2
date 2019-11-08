@@ -1,0 +1,46 @@
+From 3c0194e6fede9cd5c5c9234ff35e3e379407d84d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 24 Jul 2019 15:34:17 +0700
+Subject: [PATCH 166/326] soc: renesas: rcar-rst: Add support for RZ/G2N
+
+This patch adds support for RZ/G2N.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig    | 7 ++++---
+ drivers/soc/renesas/rcar-rst.c | 1 +
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 3a2dd64..cf660e5 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -3,9 +3,10 @@ config SOC_RENESAS
+ 	default y if ARCH_RENESAS
+ 	select SOC_BUS
+ 	select RST_RCAR if ARCH_RCAR_GEN1 || ARCH_RCAR_GEN2 || \
+-			   ARCH_R8A774A1 || ARCH_R8A774C0 || ARCH_R8A7795 || \
+-			   ARCH_R8A7796 || ARCH_R8A77965 || ARCH_R8A77970 || \
+-			   ARCH_R8A77980 || ARCH_R8A77990 || ARCH_R8A77995
++			   ARCH_R8A774A1 || ARCH_R8A774B1 || ARCH_R8A774C0 || \
++			   ARCH_R8A7795 || ARCH_R8A7796 || ARCH_R8A77965 || \
++			   ARCH_R8A77970 || ARCH_R8A77980 || ARCH_R8A77990 || \
++			   ARCH_R8A77995
+ 	select SYSC_R8A7743 if ARCH_R8A7743
+ 	select SYSC_R8A7745 if ARCH_R8A7745
+ 	select SYSC_R8A77470 if ARCH_R8A77470
+diff --git a/drivers/soc/renesas/rcar-rst.c b/drivers/soc/renesas/rcar-rst.c
+index d5e31f4..6c17ec5 100644
+--- a/drivers/soc/renesas/rcar-rst.c
++++ b/drivers/soc/renesas/rcar-rst.c
+@@ -47,6 +47,7 @@ struct rst_config {
+ 	{ .compatible = "renesas,r8a77470-rst", .data = &rcar_rst_gen2 },
+ 	/* RZ/G2 is handled like R-Car Gen3 */
+ 	{ .compatible = "renesas,r8a774a1-rst", .data = &rcar_rst_gen3 },
++	{ .compatible = "renesas,r8a774b1-rst", .data = &rcar_rst_gen3 },
+ 	{ .compatible = "renesas,r8a774c0-rst", .data = &rcar_rst_gen3 },
+ 	/* R-Car Gen1 */
+ 	{ .compatible = "renesas,r8a7778-reset-wdt", .data = &rcar_rst_gen1 },
+-- 
+1.9.1
+

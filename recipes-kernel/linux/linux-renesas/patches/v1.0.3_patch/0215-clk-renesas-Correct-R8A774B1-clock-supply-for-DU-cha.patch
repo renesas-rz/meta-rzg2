@@ -1,0 +1,30 @@
+From 7359a2e2241bb50a1dcff2478041023f4026286f Mon Sep 17 00:00:00 2001
+From: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+Date: Thu, 5 Sep 2019 15:47:43 +0700
+Subject: [PATCH 215/326] clk: renesas: Correct R8A774B1 clock supply for DU
+ channel 3
+
+DU of G2N (r8a774b1) is using clock supply du channel 3 instead of du
+channel 2. This patch is to correct it.
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+---
+ drivers/clk/renesas/r8a774b1-cpg-mssr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/renesas/r8a774b1-cpg-mssr.c b/drivers/clk/renesas/r8a774b1-cpg-mssr.c
+index e32db10..eb3f326 100644
+--- a/drivers/clk/renesas/r8a774b1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774b1-cpg-mssr.c
+@@ -175,7 +175,7 @@ enum clk_ids {
+ 	DEF_MOD("hsusb",		 704,	R8A774B1_CLK_S3D2),
+ 	DEF_MOD("csi20",		 714,	R8A774B1_CLK_CSI0),
+ 	DEF_MOD("csi40",		 716,	R8A774B1_CLK_CSI0),
+-	DEF_MOD("du2",			 722,	R8A774B1_CLK_S2D1),
++	DEF_MOD("du3",			 721,	R8A774B1_CLK_S2D1),
+ 	DEF_MOD("du1",			 723,	R8A774B1_CLK_S2D1),
+ 	DEF_MOD("du0",			 724,	R8A774B1_CLK_S2D1),
+ 	DEF_MOD("lvds",			 727,	R8A774B1_CLK_S2D1),
+-- 
+1.9.1
+

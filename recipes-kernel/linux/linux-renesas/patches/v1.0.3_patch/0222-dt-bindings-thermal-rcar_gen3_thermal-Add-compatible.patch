@@ -1,0 +1,29 @@
+From ca6c772b31ee2f52902aca5c34fe757c659f9811 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 17:19:45 +0700
+Subject: [PATCH 222/326] dt-bindings: thermal: rcar_gen3_thermal: Add
+ compatible string for r8a774b1
+
+This patch adds compatible string for R8A774B1.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+index 098bf95..ebf684c 100644
+--- a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
++++ b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+@@ -8,6 +8,7 @@ Required properties:
+ - compatible		: "renesas,<soctype>-thermal",
+ 			  Examples with soctypes are:
+ 			    - "renesas,r8a774a1-thermal" (RZ/G2M)
++			    - "renesas,r8a774b1-thermal" (RZ/G2N)
+ 			    - "renesas,r8a7795-thermal" (R-Car H3)
+ 			    - "renesas,r8a7796-thermal" (R-Car M3-W)
+ 			    - "renesas,r8a77965-thermal" (R-Car M3-N)
+-- 
+1.9.1
+

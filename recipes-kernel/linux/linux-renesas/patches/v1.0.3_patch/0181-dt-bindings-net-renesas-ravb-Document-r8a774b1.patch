@@ -1,0 +1,27 @@
+From ab6b5fd2a32c5d51c0747c553d9f2bbda1669773 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Wed, 14 Aug 2019 19:24:33 +0700
+Subject: [PATCH 181/326] dt-bindings: net: renesas: ravb: Document r8a774b1
+
+This patch adds document for AVB driver on RZ/G2N (a.k.a R8A774B1)
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ Documentation/devicetree/bindings/net/renesas,ravb.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/renesas,ravb.txt b/Documentation/devicetree/bindings/net/renesas,ravb.txt
+index 9e3d768..10a6cc02 100644
+--- a/Documentation/devicetree/bindings/net/renesas,ravb.txt
++++ b/Documentation/devicetree/bindings/net/renesas,ravb.txt
+@@ -18,6 +18,7 @@ Required properties:
+ 
+       - "renesas,etheravb-r8a774a1" for the R8A774A1 SoC.
+       - "renesas,etheravb-r8a774c0" for the R8A774C0 SoC.
++      - "renesas,etheravb-r8a774b1" for the R8A774B1 SoC.
+       - "renesas,etheravb-r8a7795" for the R8A7795 SoC.
+       - "renesas,etheravb-r8a7796" for the R8A7796 SoC.
+       - "renesas,etheravb-r8a77965" for the R8A77965 SoC.
+-- 
+1.9.1
+

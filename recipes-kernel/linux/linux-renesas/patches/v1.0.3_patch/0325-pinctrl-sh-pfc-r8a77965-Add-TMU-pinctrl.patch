@@ -1,0 +1,108 @@
+From 7b8f87f3af5a957dcd9c9671456f8a672459d22b Mon Sep 17 00:00:00 2001
+From: Duy Bao Dang <duy.dang.yb@renesas.com>
+Date: Thu, 28 Nov 2019 11:37:10 +0700
+Subject: [PATCH 325/326] pinctrl: sh-pfc: r8a77965: Add TMU pinctrl
+
+This patch adds support TMU pins, pin functions and pin groups for
+the R8A77965 and R8A774B1 SoC
+
+Signed-off-by: Duy Bao Dang <duy.dang.yb@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a77965.c | 46 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77965.c b/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
+index 263dc7c..2349456 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
+@@ -3777,6 +3777,36 @@ enum {
+ 	SSI_SCK9_B_MARK, SSI_WS9_B_MARK,
+ };
+ 
++/* - TMU -------------------------------------------------------------------- */
++static const unsigned int tmu_tclk1_a_pins[] = {
++	/* TCLK */
++	RCAR_GP_PIN(6, 23),
++};
++static const unsigned int tmu_tclk1_a_mux[] = {
++	TCLK1_A_MARK,
++};
++static const unsigned int tmu_tclk1_b_pins[] = {
++	/* TCLK */
++	RCAR_GP_PIN(5, 19),
++};
++static const unsigned int tmu_tclk1_b_mux[] = {
++	TCLK1_B_MARK,
++};
++static const unsigned int tmu_tclk2_a_pins[] = {
++	/* TCLK */
++	RCAR_GP_PIN(6, 19),
++};
++static const unsigned int tmu_tclk2_a_mux[] = {
++	TCLK2_A_MARK,
++};
++static const unsigned int tmu_tclk2_b_pins[] = {
++	/* TCLK */
++	RCAR_GP_PIN(6, 28),
++};
++static const unsigned int tmu_tclk2_b_mux[] = {
++	TCLK2_B_MARK,
++};
++
+ /* - USB0 ------------------------------------------------------------------- */
+ static const unsigned int usb0_pins[] = {
+ 	/* PWEN, OVC */
+@@ -4096,7 +4126,7 @@ enum {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_pin_group common[312];
++	struct sh_pfc_pin_group common[316];
+ 	struct sh_pfc_pin_group automotive[0];
+ } pinmux_groups = {
+ 	.common = {
+@@ -4381,6 +4411,10 @@ enum {
+ 		SH_PFC_PIN_GROUP(ssi9_data_b),
+ 		SH_PFC_PIN_GROUP(ssi9_ctrl_a),
+ 		SH_PFC_PIN_GROUP(ssi9_ctrl_b),
++		SH_PFC_PIN_GROUP(tmu_tclk1_a),
++		SH_PFC_PIN_GROUP(tmu_tclk1_b),
++		SH_PFC_PIN_GROUP(tmu_tclk2_a),
++		SH_PFC_PIN_GROUP(tmu_tclk2_b),
+ 		SH_PFC_PIN_GROUP(usb0),
+ 		SH_PFC_PIN_GROUP(usb1),
+ 		SH_PFC_PIN_GROUP(usb30),
+@@ -4828,6 +4862,13 @@ enum {
+ 	"ssi9_ctrl_b",
+ };
+ 
++static const char * const tmu_groups[] = {
++	"tmu_tclk1_a",
++	"tmu_tclk1_b",
++	"tmu_tclk2_a",
++	"tmu_tclk2_b",
++};
++
+ static const char * const usb0_groups[] = {
+ 	"usb0",
+ };
+@@ -4875,7 +4916,7 @@ enum {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_function common[49];
++	struct sh_pfc_function common[50];
+ 	struct sh_pfc_function automotive[0];
+ } pinmux_functions = {
+ 	.common = {
+@@ -4923,6 +4964,7 @@ enum {
+ 		SH_PFC_FUNCTION(sdhi2),
+ 		SH_PFC_FUNCTION(sdhi3),
+ 		SH_PFC_FUNCTION(ssi),
++		SH_PFC_FUNCTION(tmu),
+ 		SH_PFC_FUNCTION(usb0),
+ 		SH_PFC_FUNCTION(usb1),
+ 		SH_PFC_FUNCTION(usb30),
+-- 
+1.9.1
+

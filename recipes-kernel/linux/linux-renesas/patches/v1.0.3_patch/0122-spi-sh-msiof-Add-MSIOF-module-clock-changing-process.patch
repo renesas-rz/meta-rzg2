@@ -1,0 +1,76 @@
+From 404ea8602eb626c7b392a4d9d831f1f10d7d35c0 Mon Sep 17 00:00:00 2001
+From: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
+Date: Fri, 30 Mar 2018 14:46:57 +0900
+Subject: [PATCH 122/326] spi: sh-msiof: Add MSIOF module clock changing
+ processing for R-Car Gen3
+
+This patch adds processing to set MSIOF module clock.
+
+To use this processing, make the following preparations to the device tree.
+1.Add a pointer to the "msiof_ref_clk" node to the clocks property.
+
+2.Define the module clock to Hz in the "clock-frequency" property
+  of the msiof_ref_clk node. Please set a value based on electrical
+  characteristics.
+
+/* module clock */
+&msiof_ref_clk {
+	clock-frequency = <133333333>;
+};
+
+Signed-off-by: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Documentation/devicetree/bindings/spi/sh-msiof.txt |  4 +++-
+ drivers/spi/spi-sh-msiof.c                         | 13 +++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/spi/sh-msiof.txt b/Documentation/devicetree/bindings/spi/sh-msiof.txt
+index 4dd4455..14115a5 100644
+--- a/Documentation/devicetree/bindings/spi/sh-msiof.txt
++++ b/Documentation/devicetree/bindings/spi/sh-msiof.txt
+@@ -36,7 +36,9 @@ Required properties:
+ - #size-cells          : Must be <0>
+ 
+ Optional properties:
+-- clocks               : Must contain a reference to the functional clock.
++- clocks               : Specify a clock handling and a module clock.
++			 If HW supports the change of module clock, specify the module clock.
++			 Otherwise, not specify the module clock.
+ - num-cs               : Total number of chip selects (default is 1).
+ 			 Up to 3 native chip selects are supported:
+ 			   0: MSIOF_SYNC
+diff --git a/drivers/spi/spi-sh-msiof.c b/drivers/spi/spi-sh-msiof.c
+index 5567f22..98cb6e0 100644
+--- a/drivers/spi/spi-sh-msiof.c
++++ b/drivers/spi/spi-sh-msiof.c
+@@ -1323,6 +1323,8 @@ static int sh_msiof_spi_probe(struct platform_device *pdev)
+ 	const struct sh_msiof_chipdata *chipdata;
+ 	struct sh_msiof_spi_info *info;
+ 	struct sh_msiof_spi_priv *p;
++	struct clk *ref_clk;
++	u32 clk_rate = 0;
+ 	int i;
+ 	int ret;
+ 
+@@ -1426,6 +1428,17 @@ static int sh_msiof_spi_probe(struct platform_device *pdev)
+ 		goto err2;
+ 	}
+ 
++	/* MSIOF module clock setup */
++	ref_clk = devm_clk_get(&pdev->dev, "msiof_ref_clk");
++	if (!IS_ERR(ref_clk)) {
++		clk_rate = clk_get_rate(ref_clk);
++		if (clk_rate) {
++			clk_prepare_enable(p->clk);
++			clk_set_rate(p->clk, clk_rate);
++			clk_disable_unprepare(p->clk);
++		}
++	}
++
+ 	return 0;
+ 
+  err2:
+-- 
+1.9.1
+

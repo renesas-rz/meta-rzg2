@@ -1,0 +1,130 @@
+From 9d9410ff0b00e160d4ab54f2fccd864e4b7b10ab Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 20 Jun 2019 18:22:50 +0700
+Subject: [PATCH 128/326] media: i2c: OV5645: ensure clock lane in LP-11 state
+ before streaming on
+
+This commit based on upstream commit support for ov5647:
+<7bc9f038d02c2fc14e53e4aaca651deaf6d0de3f>
+
+Also based on setting register processing flow of OV5640.
+
+Detailed of this commit:
+- This driver have some issues with renesas's mipi-csi driver.
+  It didn't place clock lane in LP-11 state before performing
+  D-PHY initialisation.
+  LP-11 state is not achieved while BIT(5)-0x4800 is cleared.
+  So let's set BIT(5) and BIT(0) both while not streaming, in order to
+  coax the clock lane into LP-11 state.
+
+    0x4800 : MIPI CTRL 00
+        BIT(5) : clock lane gate enable
+                0: continuous
+                1: none-continuous
+        BIT(0) : manually set clock lane
+                0: Not used
+                1: used
+
+- Follow ov5640 power on and stream on flow to modify this ov5645 driver
+flow to ensure clock lane in LP-11 state before streaming on.
+
+    0x300e : IO_MIPI_CTRL00
+    BIT(7:5) : Mipi lane mode
+              000: 1 data lanes mode
+              001: 2 data lanes mode
+    BIT(4) = 1 : Power up MIPI HS Tx
+    BIT(3) = 1 : Power up MIPI LS Rx
+    BIT(2) = 1 : MIPI interface disabled
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/i2c/ov5645.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/media/i2c/ov5645.c b/drivers/media/i2c/ov5645.c
+index 1722cda..e0ff260 100644
+--- a/drivers/media/i2c/ov5645.c
++++ b/drivers/media/i2c/ov5645.c
+@@ -406,7 +406,6 @@ static inline struct ov5645 *to_ov5645(struct v4l2_subdev *sd)
+ 	{ 0x4004, 0x02 },
+ 	{ 0x4005, 0x18 },
+ 	{ 0x4300, 0x32 },
+-	{ 0x4202, 0x00 }
+ };
+ 
+ static const struct reg_value ov5645_setting_1080p[] = {
+@@ -455,7 +454,6 @@ static inline struct ov5645 *to_ov5645(struct v4l2_subdev *sd)
+ 	{ 0x4004, 0x06 },
+ 	{ 0x4005, 0x18 },
+ 	{ 0x4300, 0x32 },
+-	{ 0x4202, 0x00 },
+ 	{ 0x4837, 0x0b }
+ };
+ 
+@@ -506,7 +504,6 @@ static inline struct ov5645 *to_ov5645(struct v4l2_subdev *sd)
+ 	{ 0x4005, 0x18 },
+ 	{ 0x4300, 0x32 },
+ 	{ 0x4837, 0x0b },
+-	{ 0x4202, 0x00 }
+ };
+ 
+ static const s64 link_freq[] = {
+@@ -745,12 +742,20 @@ static int ov5645_s_power(struct v4l2_subdev *sd, int on)
+ 				goto exit;
+ 			}
+ 
+-			ret = ov5645_write_reg(ov5645, OV5645_SYSTEM_CTRL0,
+-					       OV5645_SYSTEM_CTRL0_STOP);
++			ret = ov5645_write_reg(ov5645, 0x300e, 0x40);
+ 			if (ret < 0) {
+ 				ov5645_set_power_off(ov5645);
+ 				goto exit;
+ 			}
++
++			ret = ov5645_write_reg(ov5645, 0x4800, 0x25);
++			if (ret < 0) {
++				ov5645_set_power_off(ov5645);
++				goto exit;
++			}
++
++			/* Give lanes some time to coax into LP11 state. */
++			usleep_range(500, 1000);
+ 		} else {
+ 			ov5645_set_power_off(ov5645);
+ 		}
+@@ -1057,13 +1062,28 @@ static int ov5645_s_stream(struct v4l2_subdev *subdev, int enable)
+ 			dev_err(ov5645->dev, "could not sync v4l2 controls\n");
+ 			return ret;
+ 		}
+-		ret = ov5645_write_reg(ov5645, OV5645_SYSTEM_CTRL0,
+-				       OV5645_SYSTEM_CTRL0_START);
++
++		ret = ov5645_write_reg(ov5645, 0x300e, 0x45);
++		if (ret < 0)
++			return ret;
++
++		ret = ov5645_write_reg(ov5645, 0x4800, 0x04);
++		if (ret < 0)
++			return ret;
++
++		ret = ov5645_write_reg(ov5645, 0x4202, 0x00);
+ 		if (ret < 0)
+ 			return ret;
+ 	} else {
+-		ret = ov5645_write_reg(ov5645, OV5645_SYSTEM_CTRL0,
+-				       OV5645_SYSTEM_CTRL0_STOP);
++		ret = ov5645_write_reg(ov5645, 0x300e, 0x40);
++		if (ret < 0)
++			return ret;
++
++		ret = ov5645_write_reg(ov5645, 0x4800, 0x25);
++		if (ret < 0)
++			return ret;
++
++		ret = ov5645_write_reg(ov5645, 0x4202, 0x0f);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+-- 
+1.9.1
+

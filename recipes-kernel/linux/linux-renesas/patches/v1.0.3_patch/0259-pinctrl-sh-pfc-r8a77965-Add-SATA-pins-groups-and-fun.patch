@@ -1,0 +1,93 @@
+From b08947d21169004cf9eddda95f748730d1870f99 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Tue, 10 Sep 2019 10:30:08 +0700
+Subject: [PATCH 259/326] pinctrl: sh-pfc: r8a77965: Add SATA pins, groups and
+ functions
+
+This patch adds SATA0 pin, group and function to the R8A774B1 SoC.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a77965.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a77965.c b/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
+index 762d77f..e53a7f3 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a77965.c
+@@ -3058,6 +3058,25 @@ enum {
+ 	PWM6_B_MARK,
+ };
+ 
++/* - SATA --------------------------------------------------------------------*/
++static const unsigned int sata0_devslp_a_pins[] = {
++	/* DEVSLP */
++	RCAR_GP_PIN(6, 16),
++};
++
++static const unsigned int sata0_devslp_a_mux[] = {
++	SATA_DEVSLP_A_MARK,
++};
++
++static const unsigned int sata0_devslp_b_pins[] = {
++	/* DEVSLP */
++	RCAR_GP_PIN(4, 6),
++};
++
++static const unsigned int sata0_devslp_b_mux[] = {
++	SATA_DEVSLP_B_MARK,
++};
++
+ /* - SCIF0 ------------------------------------------------------------------ */
+ static const unsigned int scif0_data_pins[] = {
+ 	/* RX, TX */
+@@ -3735,7 +3754,7 @@ enum {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_pin_group common[276];
++	struct sh_pfc_pin_group common[278];
+ 	struct sh_pfc_pin_group automotive[0];
+ } pinmux_groups = {
+ 	.common = {
+@@ -3932,6 +3951,8 @@ enum {
+ 		SH_PFC_PIN_GROUP(pwm5_b),
+ 		SH_PFC_PIN_GROUP(pwm6_a),
+ 		SH_PFC_PIN_GROUP(pwm6_b),
++		SH_PFC_PIN_GROUP(sata0_devslp_a),
++		SH_PFC_PIN_GROUP(sata0_devslp_b),
+ 		SH_PFC_PIN_GROUP(scif0_data),
+ 		SH_PFC_PIN_GROUP(scif0_clk),
+ 		SH_PFC_PIN_GROUP(scif0_ctrl),
+@@ -4290,6 +4311,11 @@ enum {
+ 	"pwm6_b",
+ };
+ 
++static const char * const sata0_groups[] = {
++	"sata0_devslp_a",
++	"sata0_devslp_b",
++};
++
+ static const char * const scif0_groups[] = {
+ 	"scif0_data",
+ 	"scif0_clk",
+@@ -4418,7 +4444,7 @@ enum {
+ };
+ 
+ static const struct {
+-	struct sh_pfc_function common[41];
++	struct sh_pfc_function common[42];
+ 	struct sh_pfc_function automotive[0];
+ } pinmux_functions = {
+ 	.common = {
+@@ -4448,6 +4474,7 @@ enum {
+ 		SH_PFC_FUNCTION(pwm4),
+ 		SH_PFC_FUNCTION(pwm5),
+ 		SH_PFC_FUNCTION(pwm6),
++		SH_PFC_FUNCTION(sata0),
+ 		SH_PFC_FUNCTION(scif0),
+ 		SH_PFC_FUNCTION(scif1),
+ 		SH_PFC_FUNCTION(scif2),
+-- 
+1.9.1
+
