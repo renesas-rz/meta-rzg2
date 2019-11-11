@@ -12,7 +12,7 @@ require include/rzg2-path-common.inc
 
 DEPENDS += "omx-user-module mmngrbuf-user-module"
 
-SRCREV_base = "ed1ee64763113abb3286e203f08f84922a42e9c6"
+SRCREV_base = "b836b899f9036221377302fa8e19c03ad5f92f96"
 SRCREV_common = "48a5d85ebf4a0bad1c997c83100f710fe2154fbf"
 SRCREV_FORMAT = "base"
 
