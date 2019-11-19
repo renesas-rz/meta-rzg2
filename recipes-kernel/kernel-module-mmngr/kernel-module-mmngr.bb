@@ -12,6 +12,7 @@ MMNGR_DRV_DIR = "mmngr_drv/mmngr/mmngr-module/files/mmngr"
 SRC_URI_append = " \
     file://0001-Add-physical-address-translating-feature.patch \
     file://0002-mmngr_drv-mmngr-Add-checking-NULL-vma-in-mm_cnv_addr.patch \
+    file://0003-mmngr-Get-start-address-of-MMP-area-from-DT.patch \
 "
 
 MMNGR_CFG_ek874 = "MMNGR_EBISU"
