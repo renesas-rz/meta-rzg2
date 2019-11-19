@@ -17,6 +17,9 @@ IMAGE_FEATURES += " \
 
 IMAGE_INSTALL_append = " kernel-devsrc ltp"
 
+# Add some necessary tool
+TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex "
+
 # Post process after installed sdk
 sdk_post_process () {
 	# Set up kernel for building kernel config now
@@ -60,3 +63,9 @@ setup_qt_env () {
         fi
 }
 ROOTFS_POSTPROCESS_COMMAND += 'setup_qt_env;'
+
+# qt multimedia needs alsa-dev when self-compiling
+IMAGE_INSTALL_append = " alsa-dev "
+
+# weston drm-backend need xkeyboard-config
+IMAGE_INSTALL_append = " xkeyboard-config "

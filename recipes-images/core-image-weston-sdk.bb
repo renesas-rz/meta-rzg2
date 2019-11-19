@@ -15,6 +15,9 @@ IMAGE_FEATURES += " \
 
 IMAGE_INSTALL_append = " kernel-devsrc ltp"
 
+# Add some necessary tool
+TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex "
+
 # Post process after installed sdk
 sdk_post_process () {
 	# Set up kernel for building kernel config now
@@ -29,3 +32,9 @@ fakeroot append_setup () {
     cp ${SOURCE_DIR}/environment-setup-append.sh ${SDK_OUTPUT}/${SDKPATH}/sysroots/${SDK_SYS}/environment-setup.d/
 }
 SDK_POSTPROCESS_COMMAND_prepend = " append_setup; "
+
+# Add below modules to support self-compile for GStreamer app
+IMAGE_INSTALL_append = " \
+	gstreamer1.0-plugins-base-app \
+	gstreamer1.0-rtsp-server \
+"
