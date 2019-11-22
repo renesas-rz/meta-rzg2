@@ -9,7 +9,7 @@ LICENSE = "CLOSED"
 export SOURCE_DIR="${THISDIR}/${PN}"
 
 setup_weston () {
-    cp ${SOURCE_DIR}/weston.ini ${IMAGE_ROOTFS}/etc/xdg/weston/weston.ini 
+    cat ${SOURCE_DIR}/weston.ini >> ${IMAGE_ROOTFS}/etc/xdg/weston/weston.ini 
 }
 
 ROOTFS_POSTPROCESS_COMMAND_append = "setup_weston;"
