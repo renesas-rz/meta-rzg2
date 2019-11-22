@@ -23,4 +23,4 @@ getUser() {
 export D_WIDTH=`getWestonWidth`
 export D_HEIGHT=`getWestonHeight`
 
-./setup_ov5645.sh
+source /home/root/setup_ov5645.sh
