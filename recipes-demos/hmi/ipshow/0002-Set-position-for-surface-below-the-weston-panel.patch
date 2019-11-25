@@ -1,0 +1,30 @@
+From a92317e4bcb7b68be4d61bb8aa4a3fae6314415c Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 25 Nov 2019 07:41:50 +0700
+Subject: [PATCH] Set position for surface below the weston panel
+
+We created surface with position (0,0) but the weston panel
+override it.
+So we move down 50px as weston panel's height in order to avoid.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ ipshow.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ipshow.c b/ipshow.c
+index 25e618c..f2bc8b1 100755
+--- a/ipshow.c
++++ b/ipshow.c
+@@ -154,7 +154,7 @@ main (int argc, char *argv[])
+   box_h = available_height_screen[0];
+ 
+   //Initialize egl, cairo
+-  cairo_display_init (box_w, box_h, 0, 0);
++  cairo_display_init (box_w, box_h, 0, 50);
+ 
+   cairo_cap = cairo_create (get_cairo_surface());
+   size = font_select_size(text)/2;
+-- 
+2.17.1
+
