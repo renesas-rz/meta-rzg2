@@ -6,6 +6,7 @@ DEPENDS += " libegl gles-user-module weston wayland cairo"
 SRC_URI = " \
  file://IPShow.tar \
  file://0001-remove-created-file-from-weston-info-and-udhcpc.patch \
+ file://0002-Set-position-for-surface-below-the-weston-panel.patch \
 "
 
 S = "${WORKDIR}/IPShow"
