@@ -23,6 +23,7 @@ SRC_URI_append += " \
     file://0001-waylandsink-Add-set-window-position.patch \
     file://0002-waylandsink-Add-set-window-scale-feature.patch \
     file://0003-waylandsink-Add-fullscreen-display-feature.patch \
+    file://0004-gstreamer-waylandsink-disable-subsurface-in-fullscre.patch \
 "
 
 RDEPENDS_gstreamer1.0-plugins-bad += "libwayland-egl"
