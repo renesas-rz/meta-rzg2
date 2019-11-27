@@ -30,6 +30,10 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0013-plat-renesas-bl2_fusa-Add-ECC-support-for-HIHOPE-RZG.patch \
             file://0014-plat-renesas-add-support-emmc-boot.patch \
             file://0015-plat-renesas-bugfix-RCAR_SECURE_BOOT_Disable.patch \
+            file://0016-plat-renesas-bl2_fusa-hihope-rzg2m-do-not-enable-ECC.patch \
+            file://0017-plat-renesas-bl2_fusa-Add-mem-initialization-b-f-and.patch \
+            file://0018-plat-rcar-M3-qos_init_m3_v11-prevent-DRAM-Split-set-.patch \
+            file://0019-plat-rcar-timer-bl2_swdt-increase-WDT-count-when-ECC.patch \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"
