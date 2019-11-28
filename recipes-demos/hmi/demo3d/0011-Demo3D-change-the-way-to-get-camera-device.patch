@@ -1,0 +1,100 @@
+From f5d5d914a05bc2176de7e734deb9d6dd1393460d Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 29 Nov 2019 12:09:41 +0700
+Subject: [PATCH] demo3d: change way to get capture device.
+
+The previous code can't detect almost device and hard to control, switch
+to the new implement.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Demo3D.c | 66 +++++++++++++++++++---------------------------------------------
+ 1 file changed, 19 insertions(+), 47 deletions(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index 6155c42..eb876b3 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -1281,60 +1281,32 @@ char *camera_get_device()
+   char *cam_dev = NULL;
+   int i = 0;
+   FILE *fp;
+-  char output[40];
+ 
+-  const int VIN_CHANNEL_STRING_INDEX = 9;
+-
+-  while (1)
++  while (i >= 0)
+   {
+-    /* Checking for USB camera */
+-    char device[40];
+-    char line[20];
+-    sprintf(device, "/sys/class/video4linux/video%d/name", i);
+-    if (!(fp = fopen(device, "r"))) {
+-      break;
+-    } else {
+-      fgets(line, 20, fp);
+-      if (strstr(line, "UVC Camera") != NULL) {
+-        cam_dev = (char *)malloc(sizeof(char) * 20);
+-        sprintf(cam_dev, "/dev/video%d", i);
+-        break;
++    char command[50], line[40];
++
++    /* Set the command to get device info, and always output to stdout */
++    sprintf(command,"v4l2-ctl -d /dev/video%d --all &> /dev/fd/1", i);
++    if (fp = popen(command, "r")) {
++      while(fgets(line, 40, fp)) {
++        if (strstr(line, "Crop Capability Video Capture")) {
++          cam_dev = (char *)malloc(sizeof(char) * 20);
++          sprintf(cam_dev, "/dev/video%d",i);
++          break;
++        } else if (strstr(line, "Failed to open")) {
++          i = -2;
++          break;
++        }
+       }
++      pclose(fp);
+     }
++    if (cam_dev)
++      return cam_dev;
+     i++;
+   }
+ 
+-  if (fp)
+-    fclose(fp);
+-  /* If USB camera is found, use it */
+-  if (cam_dev)
+-    return cam_dev;
+-
+-  /**
+-   * If no USB camera was found, search for CSI camera.
+-   * User have to run camera init script in order to use CSI camera
+-   */
+-  fp = popen("media-ctl -d /dev/media0 -p | grep \"VIN.*[ENABLE]\"", "r");
+-  /**
+-   * This command returns a string if it found a camera, for example:
+-   *                -> "VIN5 output":0 [ENABLED]
+-   * In this example, VIN channel for camera is 5
+-   * and its index in the returned string is 9.
+-   *
+-   * If no camera was found, it returns an empty string.
+-   */
+-  if (fp == NULL) {
+-    fprintf(stderr, "Failed to execute command.\n");
+-    return NULL;
+-  }
+-  fgets(output, sizeof(output), fp);
+-  if (strlen(output) > VIN_CHANNEL_STRING_INDEX && output[VIN_CHANNEL_STRING_INDEX] >= '0' && output[VIN_CHANNEL_STRING_INDEX] <= '9') {
+-    /* Get the video device according to VIN channel */
+-    cam_dev = (char *) malloc(sizeof(char) * 20);
+-    sprintf(cam_dev, "/dev/video%c", output[VIN_CHANNEL_STRING_INDEX]);
+-  }
+-  pclose(fp);
+-  return cam_dev;
++  return NULL;
+ }
+ 
+ static void
+-- 
+2.7.4
+
