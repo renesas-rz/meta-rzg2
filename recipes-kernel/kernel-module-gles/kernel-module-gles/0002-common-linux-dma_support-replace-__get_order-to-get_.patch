@@ -1,0 +1,55 @@
+From f5896de08dee58d25091765f2428e5ddf26fe6f7 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 29 Nov 2019 07:09:23 +0700
+Subject: [PATCH] common: linux: dma_support: replace __get_order to get_order
+
+Linux kernel 4.19.67 change __get_order to get_order. So we change the
+function to compatible with kernel.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ services/system/common/env/linux/dma_support.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/services/system/common/env/linux/dma_support.c b/services/system/common/env/linux/dma_support.c
+index 7b2a6a5..d835050 100644
+--- a/services/system/common/env/linux/dma_support.c
++++ b/services/system/common/env/linux/dma_support.c
+@@ -226,14 +226,22 @@ PVRSRV_ERROR SysDmaAllocMem(DMA_ALLOC *psDmaAlloc)
+ 				psDmaAlloc->sBusAddr.uiAddr,
+ 				psDmaAlloc->ui64Size));
+ 	}
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 67))
+ 	else if ((page = alloc_pages(GFP_KERNEL, __get_order(psDmaAlloc->ui64Size))))
++#else
++	else if ((page = alloc_pages(GFP_KERNEL, get_order(psDmaAlloc->ui64Size))))
++#endif
+ 	{
+ 		psDmaAlloc->pvVirtAddr = SysDmaAcquireKernelAddress(page,
+ 													  		psDmaAlloc->ui64Size,
+ 													  		psDmaAlloc->pvOSDevice);
+ 		if (! psDmaAlloc->pvVirtAddr)
+ 		{
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 67))
+ 			__free_pages(page, __get_order(psDmaAlloc->ui64Size));
++#else
++			__free_pages(page, get_order(psDmaAlloc->ui64Size));
++#endif
+ 			goto e0;
+ 		}
+ 
+@@ -292,7 +300,11 @@ void SysDmaFreeMem(DMA_ALLOC *psDmaAlloc)
+ 		struct page *page = pfn_to_page(dma_to_pfn((struct device *)psDmaAlloc->pvOSDevice, psDmaAlloc->sBusAddr.uiAddr));
+ #endif
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 67))
+ 		__free_pages(page, __get_order(psDmaAlloc->ui64Size));
++#else
++		__free_pages(page, get_order(psDmaAlloc->ui64Size));
++#endif
+ 		return;
+ 	}
+ 
+-- 
+2.17.1
+
