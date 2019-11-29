@@ -16,9 +16,9 @@ SRC_URI += " \
 "
 
 do_compile() {
-        if [ ${MACHINE} == "hihope-rzg2n" ] || [ ${MACHINE} == "hihope-rzg2m" ]; then
+        if [ "${MACHINE}" = "hihope-rzg2n" -o "${MACHINE}" = "hihope-rzg2m" ]; then
                 BOARD="HIHOPE";
-        elif [ ${MACHINE} == "ek874" ]; then
+        elif [ "${MACHINE}" = "ek874" ]; then
                 BOARD="EK874";
         fi
         cd ${S}
