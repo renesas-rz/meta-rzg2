@@ -49,7 +49,7 @@ index 74d1ab4..9bf4b99 100644
  static const uint32_t adsplcr3 = 0;
  #endif //(RZG_DRAM_ECC_FULL == 1)
  
-+#if FUSA_DRAM_CLEAR
++#if ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1))
 +/* Write zero-valued octa-byte words */
 +static void bzero64(uintptr_t start, uint64_t size)
 +{
@@ -60,7 +60,7 @@ index 74d1ab4..9bf4b99 100644
 +	while (ptr < end)
 +		*ptr++ = 0;
 +}
-+#endif //FUSA_DRAM_CLEAR
++#endif //((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1))
 +
  /* Setup DRAM ECC configuration registers */
  void bl2_enable_ecc_ek874(void)
