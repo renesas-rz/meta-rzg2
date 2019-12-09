@@ -9,6 +9,7 @@ BRANCH = "master"
 
 SRC_URI = "${FLASH_WRITER_URL};branch=${BRANCH}"
 SRCREV = "54191c580bb8cd79251c7d75b5f6ccc7f67b5dd5"
+inherit deploy
 S = "${WORKDIR}/git"
 
 SRC_URI += " \
@@ -25,6 +26,10 @@ do_compile() {
         oe_runmake BOARD=${BOARD}
 }
 
-do_install() {
-        install -m 644 ${S}/AArch64_output/*.mot ${DEPLOY_DIR_IMAGE}
+do_install[noexec] = "1"
+
+do_deploy() {
+        install -d ${DEPLOYDIR}
+        install -m 644 ${S}/AArch64_output/*.mot ${DEPLOYDIR}
 }
+addtask deploy after do_compile
