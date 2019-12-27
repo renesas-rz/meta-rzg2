@@ -1,0 +1,30 @@
+From fc1e8c40806c74aeb1e1756f71ee5a2ba72e72e9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 9 Dec 2019 13:31:27 +0700
+Subject: [PATCH 331/334] arm64: defconfig: Enable SATA_AHCI and
+ SATA_AHCI_PLATFORM
+
+This patch enables config for SATA driver
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 72e287b65cbb..bfc573705162 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -368,6 +368,8 @@ CONFIG_USB_MASS_STORAGE=m
+ CONFIG_USB_G_SERIAL=m
+ CONFIG_USB_ETH=m
+ CONFIG_RENESAS_MFIS_ECC=y
++CONFIG_SATA_AHCI=y
++CONFIG_SATA_AHCI_PLATFORM=y
+ 
+ #Enable RT config
+ CONFIG_PREEMPT_RT_FULL=y
+-- 
+2.17.1
+
