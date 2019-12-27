@@ -324,3 +324,9 @@ patch patches/v1.0.3_patch/0323-arm64-dts-renesas-r8a774b1-add-device-node-for-m
 patch patches/v1.0.3_patch/0324-pinctrl-sh-pfc-r8a77965-Add-CANFD-pinctrl.patch
 patch patches/v1.0.3_patch/0325-pinctrl-sh-pfc-r8a77965-Add-TMU-pinctrl.patch
 patch patches/v1.0.3_patch/0326-pinctrl-sh-pfc-r8a77965-Add-TPU-pinctrl.patch
+patch patches/v1.0.3_patch/0327-thermal-rcar-thermal-rework-rcar_thermal_work-functi.patch
+patch patches/v1.0.3_patch/0328-arm64-dts-renesas-r8a774a1-add-misisng-enabled-tempe.patch
+patch patches/v1.0.3_patch/0329-arm64-defconfig-Enable-SATA_AHCI-and-SATA_AHCI_PLATF.patch
+patch patches/v1.0.3_patch/0330-mmc-renesas_sdhi-add-support-HS400-4TAP-for-r8a774a1.patch
+patch patches/v1.0.3_patch/0331-arm64-dts-renesas-hihope-common-Enable-HS400-mode-in.patch
+patch patches/v1.0.3_patch/0332-clk-renesas-rcar-gen3-Fix-SD-divider-setting.patch

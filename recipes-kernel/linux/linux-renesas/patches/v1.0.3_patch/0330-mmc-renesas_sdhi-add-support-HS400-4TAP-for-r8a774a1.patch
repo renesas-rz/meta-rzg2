@@ -1,0 +1,288 @@
+From 4dac04abc7f8ccc43135a09ac9ed44c171c87575 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Wed, 25 Dec 2019 21:06:23 +0700
+Subject: [PATCH 330/332] mmc: renesas_sdhi: add support HS400 4TAP for
+ r8a774a1 SoC revision ES1.[012]
+
+This patch adds support HS400 mode for r8a774a1 SoC. It is configured same
+ as r8a7796 because eMMC in both SoC are similar.
+Besides, this patch is created based on series:
+- https://patchwork.kernel.org/cover/11271843/
+In this series, they did following works:
+- Removed TMIO flag TMIO_MMC_HAVE_4TAP_HS400 for HS400 with 4TAP and
+  replace by a quirk struct which is accessible in private
+  renesas_sdhi struct.
+- Removed compatible string for RCar M3-W and H3 and replace by
+  soc_device_attribute struct.
+- Correct the warning when probe because this is not solely used for
+  SDR104 anymore, but for all which require tuning.
+- Updated new value for HS400 with 4taps: tap_hs400_4tap=0x00000100
+
+Before adding this patch, if enabled HS400 mode in device tree, for
+ RZ/G2M board revision ES1.[012], the error below will occur and kernel
+ will hang after that:
+        mmc0: mmc_select_hs400 failed, error -84
+        mmc0: error -84 whilst initialising MMC card
+
+Referred repository:
+ git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux.git
+Branch:
+ renesas/sdhi/new_manual_calib
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi.h               |  9 ++++--
+ drivers/mmc/host/renesas_sdhi_core.c          | 29 +++++++++++++++++--
+ drivers/mmc/host/renesas_sdhi_internal_dmac.c | 20 +------------
+ drivers/mmc/host/renesas_sdhi_sys_dmac.c      | 15 ----------
+ drivers/mmc/host/tmio_mmc_core.c              |  4 ++-
+ include/linux/mfd/tmio.h                      |  3 --
+ 6 files changed, 37 insertions(+), 43 deletions(-)
+
+diff --git a/drivers/mmc/host/renesas_sdhi.h b/drivers/mmc/host/renesas_sdhi.h
+index d58fcfaa8d50..68d284d74733 100644
+--- a/drivers/mmc/host/renesas_sdhi.h
++++ b/drivers/mmc/host/renesas_sdhi.h
+@@ -17,8 +17,8 @@
+ 
+ struct renesas_sdhi_scc {
+ 	unsigned long clk_rate;	/* clock rate for SDR104 */
+-	u32 tap;		/* sampling clock position for SDR104 */
+-	u32 tap_hs400;		/* sampling clock position for HS400 */
++	u32 tap;         /* sampling clock position for SDR104/HS400 (8 TAP) */
++	u32 tap_hs400_4tap;     /* sampling clock position for HS400 (4 TAP) */
+ };
+ 
+ struct renesas_sdhi_of_data {
+@@ -36,6 +36,10 @@ struct renesas_sdhi_of_data {
+ 	unsigned short max_segs;
+ };
+ 
++struct renesas_sdhi_quirks {
++	bool hs400_4taps;
++};
++
+ struct tmio_mmc_dma {
+ 	enum dma_slave_buswidth dma_buswidth;
+ 	bool (*filter)(struct dma_chan *chan, void *arg);
+@@ -49,6 +53,7 @@ struct renesas_sdhi {
+ 	struct clk *clk_cd;
+ 	struct tmio_mmc_data mmc_data;
+ 	struct tmio_mmc_dma dma_priv;
++	const struct renesas_sdhi_quirks *quirks;
+ 	struct pinctrl *pinctrl;
+ 	struct pinctrl_state *pins_default, *pins_uhs;
+ 	void __iomem *scc_ctl;
+diff --git a/drivers/mmc/host/renesas_sdhi_core.c b/drivers/mmc/host/renesas_sdhi_core.c
+index 8ed44ad8626b..957dab1e4a5d 100644
+--- a/drivers/mmc/host/renesas_sdhi_core.c
++++ b/drivers/mmc/host/renesas_sdhi_core.c
+@@ -35,6 +35,7 @@
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/pinctrl/pinctrl-state.h>
+ #include <linux/regulator/consumer.h>
++#include <linux/sys_soc.h>
+ 
+ #include "renesas_sdhi.h"
+ #include "tmio_mmc.h"
+@@ -312,7 +313,7 @@ static void renesas_sdhi_hs400_complete(struct tmio_mmc_host *host)
+ 		       0x4 << SH_MOBILE_SDHI_SCC_DTCNTL_TAPNUM_SHIFT);
+ 
+ 
+-	if (host->pdata->flags & TMIO_MMC_HAVE_4TAP_HS400)
++	if (priv->quirks && priv->quirks->hs400_4taps)
+ 		sd_scc_write32(host, priv, SH_MOBILE_SDHI_SCC_TAPSET,
+ 			       host->tap_set / 2);
+ 
+@@ -553,11 +554,25 @@ static void renesas_sdhi_enable_dma(struct tmio_mmc_host *host, bool enable)
+ 	renesas_sdhi_sdbuf_width(host, enable ? width : 16);
+ }
+ 
++static const struct renesas_sdhi_quirks sdhi_quirks_4tap = {
++	.hs400_4taps = true,
++};
++
++static const struct soc_device_attribute sdhi_quirks_match[]  = {
++	{ .soc_id = "r8a774a1", .revision = "ES1.[012]",
++				.data = &sdhi_quirks_4tap },
++	{ .soc_id = "r8a7795",  .data = &sdhi_quirks_4tap },
++	{ .soc_id = "r8a7796",  .data = &sdhi_quirks_4tap },
++	{ /* sentinel */ }
++};
++
+ int renesas_sdhi_probe(struct platform_device *pdev,
+ 		       const struct tmio_mmc_dma_ops *dma_ops)
+ {
+ 	struct tmio_mmc_data *mmd = pdev->dev.platform_data;
++	const struct renesas_sdhi_quirks *quirks = NULL;
+ 	const struct renesas_sdhi_of_data *of_data;
++	const struct soc_device_attribute *attr;
+ 	struct tmio_mmc_data *mmc_data;
+ 	struct tmio_mmc_dma *dma_priv;
+ 	struct tmio_mmc_host *host;
+@@ -568,6 +583,10 @@ int renesas_sdhi_probe(struct platform_device *pdev,
+ 
+ 	of_data = of_device_get_match_data(&pdev->dev);
+ 
++	attr = soc_device_match(sdhi_quirks_match);
++	if (attr)
++		quirks = attr->data;
++
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	if (!res)
+ 		return -EINVAL;
+@@ -577,6 +596,7 @@ int renesas_sdhi_probe(struct platform_device *pdev,
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
++	priv->quirks = quirks;
+ 	mmc_data = &priv->mmc_data;
+ 	dma_priv = &priv->dma_priv;
+ 
+@@ -698,6 +718,7 @@ int renesas_sdhi_probe(struct platform_device *pdev,
+ 	     host->mmc->caps2 & (MMC_CAP2_HS200_1_8V_SDR |
+ 				 MMC_CAP2_HS400_1_8V))) {
+ 		const struct renesas_sdhi_scc *taps = of_data->taps;
++		bool use_4tap = priv->quirks && priv->quirks->hs400_4taps;
+ 		bool hit = false;
+ 
+ 		host->mmc->caps |= MMC_CAP_HW_RESET;
+@@ -706,14 +727,16 @@ int renesas_sdhi_probe(struct platform_device *pdev,
+ 			if (taps[i].clk_rate == 0 ||
+ 			    taps[i].clk_rate == host->mmc->f_max) {
+ 				priv->scc_tappos = taps->tap;
+-				priv->scc_tappos_hs400 = taps->tap_hs400;
++				priv->scc_tappos_hs400 = use_4tap ?
++							taps->tap_hs400_4tap :
++							taps->tap;
+ 				hit = true;
+ 				break;
+ 			}
+ 		}
+ 
+ 		if (!hit)
+-			dev_warn(&host->pdev->dev, "Unknown clock rate for SDR104\n");
++			dev_warn(&host->pdev->dev, "Unknown clock rate for tuning\n");
+ 
+ 		priv->scc_ctl = host->ctl + of_data->scc_offset;
+ 		host->init_tuning = renesas_sdhi_init_tuning;
+diff --git a/drivers/mmc/host/renesas_sdhi_internal_dmac.c b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+index d15615852de6..5a16a7c703ee 100644
+--- a/drivers/mmc/host/renesas_sdhi_internal_dmac.c
++++ b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+@@ -81,26 +81,10 @@ static struct renesas_sdhi_scc rcar_gen3_scc_taps[] = {
+ 	{
+ 		.clk_rate = 0,
+ 		.tap = 0x00000300,
+-		.tap_hs400 = 0x00000704,
++		.tap_hs400_4tap = 0x00000100,
+ 	},
+ };
+ 
+-static const struct renesas_sdhi_of_data of_rcar_r8a7795_compatible = {
+-	.tmio_flags	= TMIO_MMC_HAS_IDLE_WAIT | TMIO_MMC_CLK_ACTUAL |
+-			  TMIO_MMC_HAVE_CBSY | TMIO_MMC_MIN_RCAR2 |
+-			  TMIO_MMC_HAVE_4TAP_HS400,
+-	.capabilities	= MMC_CAP_SD_HIGHSPEED | MMC_CAP_SDIO_IRQ |
+-			  MMC_CAP_CMD23,
+-	.capabilities2	= MMC_CAP2_NO_WRITE_PROTECT,
+-	.bus_shift	= 2,
+-	.scc_offset	= 0x1000,
+-	.taps		= rcar_gen3_scc_taps,
+-	.taps_num	= ARRAY_SIZE(rcar_gen3_scc_taps),
+-	/* DMAC can handle 32bit blk count but only 1 segment */
+-	.max_blk_count	= UINT_MAX / TMIO_MAX_BLK_SIZE,
+-	.max_segs	= 1,
+-};
+-
+ static const struct renesas_sdhi_of_data of_rcar_gen3_compatible = {
+ 	.tmio_flags	= TMIO_MMC_HAS_IDLE_WAIT | TMIO_MMC_CLK_ACTUAL |
+ 			  TMIO_MMC_HAVE_CBSY | TMIO_MMC_MIN_RCAR2,
+@@ -117,8 +101,6 @@ static const struct renesas_sdhi_of_data of_rcar_gen3_compatible = {
+ };
+ 
+ static const struct of_device_id renesas_sdhi_internal_dmac_of_match[] = {
+-	{ .compatible = "renesas,sdhi-r8a7795", .data = &of_rcar_r8a7795_compatible, },
+-	{ .compatible = "renesas,sdhi-r8a7796", .data = &of_rcar_r8a7795_compatible, },
+ 	{ .compatible = "renesas,rcar-gen3-sdhi", .data = &of_rcar_gen3_compatible, },
+ 	{},
+ };
+diff --git a/drivers/mmc/host/renesas_sdhi_sys_dmac.c b/drivers/mmc/host/renesas_sdhi_sys_dmac.c
+index 80ee74559dd0..96f8c624daea 100644
+--- a/drivers/mmc/host/renesas_sdhi_sys_dmac.c
++++ b/drivers/mmc/host/renesas_sdhi_sys_dmac.c
+@@ -79,19 +79,6 @@ static struct renesas_sdhi_scc rcar_gen3_scc_taps[] = {
+ 	},
+ };
+ 
+-static const struct renesas_sdhi_of_data of_rcar_r8a7795_compatible = {
+-	.tmio_flags	= TMIO_MMC_HAS_IDLE_WAIT | TMIO_MMC_CLK_ACTUAL |
+-			  TMIO_MMC_HAVE_CBSY | TMIO_MMC_MIN_RCAR2 |
+-			  TMIO_MMC_HAVE_4TAP_HS400,
+-	.capabilities	= MMC_CAP_SD_HIGHSPEED | MMC_CAP_SDIO_IRQ |
+-			  MMC_CAP_CMD23,
+-	.capabilities2	= MMC_CAP2_NO_WRITE_PROTECT,
+-	.bus_shift	= 2,
+-	.scc_offset	= 0x1000,
+-	.taps		= rcar_gen3_scc_taps,
+-	.taps_num	= ARRAY_SIZE(rcar_gen3_scc_taps),
+-};
+-
+ static const struct renesas_sdhi_of_data of_rcar_gen3_compatible = {
+ 	.tmio_flags	= TMIO_MMC_HAS_IDLE_WAIT | TMIO_MMC_CLK_ACTUAL |
+ 			  TMIO_MMC_HAVE_CBSY | TMIO_MMC_MIN_RCAR2,
+@@ -118,8 +105,6 @@ static const struct of_device_id renesas_sdhi_sys_dmac_of_match[] = {
+ 	{ .compatible = "renesas,sdhi-r8a7792", .data = &of_rcar_gen2_compatible, },
+ 	{ .compatible = "renesas,sdhi-r8a7793", .data = &of_rcar_gen2_compatible, },
+ 	{ .compatible = "renesas,sdhi-r8a7794", .data = &of_rcar_gen2_compatible, },
+-	{ .compatible = "renesas,sdhi-r8a7795", .data = &of_rcar_r8a7795_compatible, },
+-	{ .compatible = "renesas,sdhi-r8a7796", .data = &of_rcar_r8a7795_compatible, },
+ 	{ .compatible = "renesas,rcar-gen1-sdhi", .data = &of_rcar_gen1_compatible, },
+ 	{ .compatible = "renesas,rcar-gen2-sdhi", .data = &of_rcar_gen2_compatible, },
+ 	{ .compatible = "renesas,rcar-gen3-sdhi", .data = &of_rcar_gen3_compatible, },
+diff --git a/drivers/mmc/host/tmio_mmc_core.c b/drivers/mmc/host/tmio_mmc_core.c
+index daf48030139c..ea6dbda3de34 100644
+--- a/drivers/mmc/host/tmio_mmc_core.c
++++ b/drivers/mmc/host/tmio_mmc_core.c
+@@ -51,6 +51,7 @@
+ #include <linux/swiotlb.h>
+ #include <linux/workqueue.h>
+ 
++#include "renesas_sdhi.h"
+ #include "tmio_mmc.h"
+ 
+ static inline void tmio_mmc_start_dma(struct tmio_mmc_host *host,
+@@ -195,6 +196,7 @@ static void tmio_mmc_set_clock(struct tmio_mmc_host *host,
+ 			       unsigned int new_clock)
+ {
+ 	u32 clk = 0, clock;
++	struct renesas_sdhi *priv = host_to_priv(host);
+ 
+ 	if (new_clock == 0) {
+ 		tmio_mmc_clk_stop(host);
+@@ -205,7 +207,7 @@ static void tmio_mmc_set_clock(struct tmio_mmc_host *host,
+ 	 * set 400MHz to distinguish the CPG settings in HS400.
+ 	 */
+ 	if (host->mmc->ios.timing == MMC_TIMING_MMC_HS400 &&
+-	    host->pdata->flags & TMIO_MMC_HAVE_4TAP_HS400 &&
++	    priv->quirks && priv->quirks->hs400_4taps &&
+ 	    new_clock == 200000000)
+ 		new_clock = 400000000;
+ 
+diff --git a/include/linux/mfd/tmio.h b/include/linux/mfd/tmio.h
+index 77866214ab51..91f92215ca74 100644
+--- a/include/linux/mfd/tmio.h
++++ b/include/linux/mfd/tmio.h
+@@ -90,9 +90,6 @@
+ /* Some controllers have a CBSY bit */
+ #define TMIO_MMC_HAVE_CBSY		BIT(11)
+ 
+-/* Some controllers that support HS400 use use 4 taps while others use 8. */
+-#define TMIO_MMC_HAVE_4TAP_HS400	BIT(13)
+-
+ int tmio_core_mmc_enable(void __iomem *cnf, int shift, unsigned long base);
+ int tmio_core_mmc_resume(void __iomem *cnf, int shift, unsigned long base);
+ void tmio_core_mmc_pwr(void __iomem *cnf, int shift, int state);
+-- 
+2.17.1
+
