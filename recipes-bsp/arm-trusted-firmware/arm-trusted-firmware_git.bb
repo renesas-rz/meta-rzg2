@@ -13,7 +13,7 @@ S = "${WORKDIR}/git"
 
 BRANCH = "rcar_gen3"
 SRC_URI = "git://github.com/renesas-rcar/arm-trusted-firmware.git;branch=${BRANCH}"
-SRCREV = "236f8fbb57af7f899980bbd5a03feb12d6462970"
+SRCREV = "c8b88aa5dc11be44dee1f67a894bb0076fb5f1db"
 
 SRC_URI += "${@'file://0001-Fix-ld-error-unrecognized-option-with-old-binutils.patch' \
            if '${BINUVERSION}' == '2.25' else ''}"
