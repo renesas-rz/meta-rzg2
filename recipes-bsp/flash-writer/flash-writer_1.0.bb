@@ -14,6 +14,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI += " \
         file://0001-flash-writer-makefile-Modify-Makefile.patch \
+        file://0002-flash-writer-Makefile-Modify-variable-name-in-Makefi.patch \
 "
 
 do_compile() {
