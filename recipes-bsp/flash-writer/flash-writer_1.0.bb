@@ -32,4 +32,5 @@ do_deploy() {
         install -d ${DEPLOYDIR}
         install -m 644 ${S}/AArch64_output/*.mot ${DEPLOYDIR}
 }
+PARALLEL_MAKE = "-j 1"
 addtask deploy after do_compile
