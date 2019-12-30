@@ -1,0 +1,29 @@
+From 3c41f754fce6d55492bf8947c9c398d057d3edf6 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Mon, 2 Dec 2019 10:49:26 +0700
+Subject: [PATCH 2/3] flash writer: Makefile: Modify variable name in Makefile
+
+This patch modifies variable from OBJDMP to OBJDUMP to
+prevent the systax error in build process.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/makefile b/makefile
+index 84d9d08..f9a7c4d 100644
+--- a/makefile
++++ b/makefile
+@@ -241,7 +241,7 @@ $(OUTPUT_FILE): $(OBJ_FILE_BOOT) $(OBJ_FILE) $(MEMORY_DEF)
+ 	$(OBJCOPY) -O binary "$(OUTPUT_FILE)" "$(FILE_NAME).bin"
+ 
+ #   Dis assemble
+-	$(OBJDMP) -d -S "$(OUTPUT_FILE)" > "$(FILE_NAME)_disasm.txt"
++	$(OBJDUMP) -d -S "$(OUTPUT_FILE)" > "$(FILE_NAME)_disasm.txt"
+ 
+ #	Time Stamp
+ 	@echo ==========  %date% %time%  ==========
+-- 
+1.9.1
+
