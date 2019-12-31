@@ -1,5 +1,5 @@
-From 3cc3730db82eedbb1cb72ce6969d4799dcadc320 Mon Sep 17 00:00:00 2001
-From: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+From e227810be98f88c9b7738855ec688ec00e361f01 Mon Sep 17 00:00:00 2001
+From: Toan Nguyen <toan.nguyen.yw@renesas.com>
 Date: Thu, 5 Sep 2019 15:41:16 +0700
 Subject: [PATCH 211/328] dt-bindings: display: renesas: du: Document the
  r8a774b1 bindings
