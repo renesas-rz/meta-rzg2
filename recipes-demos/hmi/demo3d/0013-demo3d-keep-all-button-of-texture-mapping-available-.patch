@@ -1,0 +1,80 @@
+From 72023b46d6aed7baf921fe667207ac257931a1f9 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 2 Jan 2020 10:47:42 +0700
+Subject: [PATCH] demo3d: Keep all button of texture mapping available on scrren
+
+This patch will keep the display order Texture Mapping > Camera > Camera List 
+instead of Texture Mapping > Camera List
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ Demo3D.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
+
+diff --git a/Demo3D.c b/Demo3D.c
+index f224b5d..a6e0d65 100644
+--- a/Demo3D.c
++++ b/Demo3D.c
+@@ -504,15 +504,11 @@ redraw(void *data, struct wl_callback *callback, uint32_t time)
+     gles_drawobjects (g_object3Ds_bt_f, g_gl_bt, -1, &triangles);
+   }
+   
+-  if (g_bt == BTTEXTURE){
++  if (g_bt == BTTEXTURE || g_bt == BTFTEXTUREC){
+     glUseProgram(g_gl_bt->program_id);     
+     gles_drawobjects (g_object3Ds_bt_f, g_gl_bt, -1, &triangles);   
+   }
+ 
+-  if (g_bt == BTFTEXTUREC){
+-    glUseProgram(g_gl_bt->program_id);
+-    gles_drawobjects (g_object3Ds_bt_f, g_gl_bt, -1, &triangles); 
+-  }
+   /*DEBUG Log*/
+   /*Note : Framerate will decrease when enable debug log displaying, */
+   /*       since it also take time to draw the Debug log on screen  */ 
+@@ -774,8 +770,31 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+         }
+         break;
+       case BTFTEXTUREC:
++        g_object3Ds_bt_f = gles_addobject(g_object3Ds_bt_f, Quad,
++                                   d->window->geometry.width,
++                                   d->window->geometry.height, &g_quad_bt);
++        g_object3Ds_bt_f->bt = BTFTEXTUREP;
++        g_object3Ds_bt_f->textureID = gtexture_p?TEXID_BTFPIC_ON:TEXID_BTFPIC_OFF;
++        gles_transform_object(g_object3Ds_bt_f, -screen_ratio/2 + bt_w + 0.02, 0.26, 0.9);
++
++        /* New texture from camera*/
++        g_object3Ds_bt_f = gles_addobject(g_object3Ds_bt_f, Quad,
++                                   d->window->geometry.width,
++                                   d->window->geometry.height, &g_quad_bt);
++        g_object3Ds_bt_f->bt = BTFTEXTUREC;
++        g_object3Ds_bt_f->textureID = gtexture_c?TEXID_BTFCAM_ON:TEXID_BTFCAM_OFF;
++        gles_transform_object(g_object3Ds_bt_f, -screen_ratio/2 + bt_w + 0.02, 0.15, 0.9);
++
++        // /* texture from video*/
++        g_object3Ds_bt_f = gles_addobject(g_object3Ds_bt_f, Quad,
++                                   d->window->geometry.width,
++                                   d->window->geometry.height, &g_quad_bt);
++        g_object3Ds_bt_f->bt = BTFTEXTUREV;
++        g_object3Ds_bt_f->textureID = gtexture_v?TEXID_BTFVID_ON:TEXID_BTFVID_OFF;
++        gles_transform_object(g_object3Ds_bt_f, -screen_ratio/2 + bt_w + 0.02, 0.04, 0.9);
++
+         if(bt == g_bt){
+-          g_bt = BTNONE;
++          g_bt = BTTEXTURE;
+           goto END;
+         }
+         int count = get_available_camera(list_cam_device);
+@@ -802,7 +821,8 @@ touch_handle(void *data, wl_fixed_t x_w, wl_fixed_t y_w)
+           gles_transform_object(g_object3Ds_bt_f, -screen_ratio/2 + 2*bt_w + 0.04,
+                                    0.14 , 0.9);
+         }
+-        goto END;
++	g_bt = BTFTEXTUREC;
++	goto END;
+         break;
+       case BTFDEVICE:
+         if (obj_text) {
+-- 
+2.17.1
+

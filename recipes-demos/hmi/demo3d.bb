@@ -17,6 +17,7 @@ SRC_URI = " \
  file://0010-hmi-demos-demo3d-Support-for-CSI-camera.patch \
  file://0011-Demo3D-change-the-way-to-get-camera-device.patch \
  file://0012-demo3d-add-feature-to-select-camera-when-display-cam.patch \
+ file://0013-demo3d-keep-all-button-of-texture-mapping-available-.patch \
 "
 
 S = "${WORKDIR}/Demo3D"
