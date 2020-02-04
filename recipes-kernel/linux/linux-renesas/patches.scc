@@ -330,3 +330,5 @@ patch patches/v1.0.3_patch/0329-arm64-defconfig-Enable-SATA_AHCI-and-SATA_AHCI_P
 patch patches/v1.0.3_patch/0330-mmc-renesas_sdhi-add-support-HS400-4TAP-for-r8a774a1.patch
 patch patches/v1.0.3_patch/0331-arm64-dts-renesas-hihope-common-Enable-HS400-mode-in.patch
 patch patches/v1.0.3_patch/0332-clk-renesas-rcar-gen3-Fix-SD-divider-setting.patch
+patch patches/v1.0.3_patch/0335-HiHope-Rev3.0-board-support.patch
+patch patches/v1.0.3_patch/0336-HiHope-Rev3.0-board-disable-eMMC-HS400.patch

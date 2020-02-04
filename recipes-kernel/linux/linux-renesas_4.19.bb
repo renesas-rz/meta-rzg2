@@ -63,9 +63,13 @@ SRC_URI_append = " \
 REGULATORY_DB = "https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git/plain/regulatory.db?h=master-2019-06-03;md5sum=ce7cdefff7ba0223de999c9c18c2ff6f;downloadfilename=regulatory.db"
 REGULATORY_DB_P7S = "https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git/plain/regulatory.db.p7s?h=master-2019-06-03;md5sum=489924336479385e2c35c21d10eb3ca2;downloadfilename=regulatory.db.p7s"
 
+# Install Bluetooth firmware to rootfs
+BLUETOOTH_FW = " https://git.ti.com/cgit/wilink8-bt/ti-bt-firmware/plain/TIInit_11.8.32.bts;md5sum=665b7c25be21933acc30dda44cfcace6;downloadfilename=TIInit_11.8.32.bts"
+
 SRC_URI_append = " \
     ${REGULATORY_DB} \
     ${REGULATORY_DB_P7S} \
+    ${BLUETOOTH_FW} \
     file://wifi.cfg \
     file://bluetooth.cfg \
 "
@@ -77,6 +81,8 @@ SRC_URI_append = "\
 do_download_firmware () {
     install -m 755 ${WORKDIR}/r8a779x_usb3_v*.dlmem ${STAGING_KERNEL_DIR}/firmware
     install -m 755 ${WORKDIR}/regulatory* ${STAGING_KERNEL_DIR}/firmware
+    mkdir -p ${STAGING_KERNEL_DIR}/firmware/ti-connectivity
+    install -m 755 ${WORKDIR}/TIInit_11.8.32.bts ${STAGING_KERNEL_DIR}/firmware/ti-connectivity
 }
 
 do_kernel_metadata_af_patch() {

@@ -1,0 +1,13 @@
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 6ffb453..2cb93dc 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -414,7 +414,7 @@
+ 	vqmmc-supply = <&reg_1p8v>;
+ 	bus-width = <8>;
+ 	mmc-hs200-1_8v;
+-	mmc-hs400-1_8v;
++
+ 	non-removable;
+ 	fixed-emmc-driver-type = <1>;
+ 	status = "okay";
