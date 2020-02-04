@@ -1,0 +1,198 @@
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 9de9dc9..16f3c40 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -2,7 +2,7 @@
+ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb
+ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb
+-dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex.dtb
++dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex.dtb r8a774b1-hihope-rzg2n-ex-sata.dts
+ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb r8a774c0-ek874.dtb
+ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-es10-cat874.dtb r8a774c0-es10-ek874.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-x.dtb r8a7795-h3ulcb.dtb
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 647a9360..6ffb453 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -24,6 +24,16 @@
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
++	audio_clkout: audio-clkout {
++		/*
++		 * This is same as <&rcar_sound 0>
++		 * but needed to avoid cs2000/rcar_sound probe dead-lock
++		 */
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <12288000>;
++	};
++
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+@@ -150,6 +160,12 @@
+ 		clock-frequency = <24000000>;
+ 	};
+ 
++	x1801_clk: x1801 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <24576000>;
++	};
++
+ 	wlan_en_reg: regulator-wlan_en {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "wlan-en-regulator";
+@@ -157,7 +173,7 @@
+ 		regulator-max-microvolt = <1800000>;
+ 		startup-delay-us = <70000>;
+ 
+-		gpio = <&pca9654 1 GPIO_ACTIVE_HIGH>;
++		gpio = <&gpio4 6 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 	};
+ };
+@@ -298,16 +314,10 @@
+ 	};
+ 
+ 	sound_clk_pins: sound_clk {
+-		groups = "audio_clk_a_a";
++		groups = "audio_clk_a_a", "audio_clk_b_a", "audio_clkout_a";
+ 		function = "audio_clk";
+ 	};
+ 
+-	msiof0_pins: spi0 {
+-		groups = "msiof0_clk", "msiof0_sync",
+-			 "msiof0_rxd", "msiof0_txd";
+-		function = "msiof0";
+-	};
+-
+ 	i2c2_pins: i2c2 {
+ 		groups = "i2c2_a";
+ 		function = "i2c2";
+@@ -336,6 +346,11 @@
+ 
+ 	uart-has-rtscts;
+ 	status = "okay";
++
++	bluetooth {
++		compatible = "ti,wl1837-st";
++		enable-gpios = <&gpio3 13 GPIO_ACTIVE_HIGH>;
++	};
+ };
+ 
+ &hscif1 {
+@@ -480,13 +495,6 @@
+ 	status = "okay";
+ 	clock-frequency = <400000>;
+ 
+-	pca9654: gpio@20 {
+-		compatible = "onnn,pca9654";
+-		reg = <0x20>;
+-		gpio-controller;
+-		#gpio-cells = <2>;
+-	};
+-
+ 	versaclock5: clock-generator@6a {
+ 		compatible = "idt,5p49v5923";
+ 		reg = <0x6a>;
+@@ -505,7 +513,7 @@
+ 
+ 	/* audio_clkout0/1/2/3 */
+ 	#clock-cells = <1>;
+-	clock-frequency = <11289600>;
++	clock-frequency = <112288000 11289600>;
+ 
+ 	status = "okay";
+ 
+@@ -524,7 +532,7 @@
+ 		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
+ 		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
+ 		 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
+-		 <&audio_clk_a>, <&audio_clk_b>, <&audio_clk_c>,
++		 <&audio_clk_a>, <&cs2000>, <&audio_clk_c>,
+ 		 <&cpg CPG_CORE CPG_AUDIO_CLK_I>;
+ 
+ 	ports {
+@@ -558,22 +566,6 @@
+ 	status = "okay";
+ };
+ 
+-&msiof0 {
+-	pinctrl-0 = <&msiof0_pins>;
+-	pinctrl-names = "default";
+-
+-	status = "okay";
+-};
+-
+-&pca9654 {
+-	bluetooth-en-gpio {
+-		gpio-hog;
+-		gpios = <2 GPIO_ACTIVE_HIGH>;
+-		output-high;
+-		line-name = "bluetooth-en-gpio";
+-	};
+-};
+-
+ &vin0 {
+ 	status = "okay";
+ };
+@@ -650,4 +642,15 @@
+ 			};
+ 		};
+ 	};
++
++	cs2000: clk_multiplier@4f {
++		#clock-cells = <0>;
++		compatible = "cirrus,cs2000-cp";
++		reg = <0x4f>;
++		clocks = <&audio_clkout>, <&x1801_clk>;
++		clock-names = "clk_in", "ref_clk";
++
++		assigned-clocks = <&cs2000>;
++		assigned-clock-rates = <24576000>; /* 1/1 divide */
++	};
+ };
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-sata.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-sata.dts
+new file mode 100644
+index 0000000..a374965
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-sata.dts
+@@ -0,0 +1,33 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2M sub board
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include "r8a774b1-hihope-rzg2n.dts"
++#include "hihope-rzg2-ex.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++
++/ {
++	model = "HopeRun HiHope RZ/G2N with sub board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2n",
++		     "renesas,r8a774b1";
++};
++
++&pciec0 {
++	status = "okay";
++};
++
++&sata {
++	status = "okay";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "pcie-en-gpio";
++	};
++};
