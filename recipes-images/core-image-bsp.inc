@@ -25,6 +25,7 @@ IMAGE_INSTALL_append = " \
     bluez-alsa \
     rt-tests \
     ltp \
+    openssl \
 "
 
 # Additional tools for support Tool develop
