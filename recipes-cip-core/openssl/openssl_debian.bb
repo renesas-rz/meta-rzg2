@@ -27,7 +27,7 @@ file://find.pl \
 "
 
 SRC_URI_append = "\
-  ${@base_conditional("USE_DOCKER", "1", " file://0001-Fix-dnf-error-when-installing-openssl-at-do_rootfs.patch ", "", d)} \
+  file://0001-Fix-dnf-error-when-installing-openssl-at-do_rootfs.patch \
   file://0002-util-perlpath-require-find.pl-in-current-directory-i.patch \
 "
 
