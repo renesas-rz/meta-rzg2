@@ -23,6 +23,7 @@ IMAGE_INSTALL_append = " \
     bt-fw \
     obexftp \
     bluez-alsa \
+    openssl \
 "
 
 # Additional tools for support Tool develop
