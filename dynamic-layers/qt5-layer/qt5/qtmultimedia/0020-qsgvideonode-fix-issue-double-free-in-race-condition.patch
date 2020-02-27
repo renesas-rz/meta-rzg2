@@ -1,0 +1,178 @@
+From 3ca9911eeb514a008ce814a7b55d4d5318cea4cf Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Thu, 6 Feb 2020 09:36:41 +0700
+Subject: [PATCH] qsgvideonode: fix issue double free in race condition
+
+in race condition (play 3 videos) there is crash issue randomly
+occur as below log:
+
+Error in `/qmlvideofx': double free or corruption (out)
+
+This commit fix the issue by moving EGLImage destroyment step
+right before deleting TextureID
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ .../qtmultimediaquicktools_headers/qsgvideonode_p.h |  3 ---
+ src/plugins/videonode/egl/qsgvideonode_egl.h        |  3 ---
+ .../qdeclarativevideooutput_render.cpp              |  6 ------
+ src/qtmultimediaquicktools/qsgvideonode_rgb.cpp     | 17 ++++++++++-------
+ src/qtmultimediaquicktools/qsgvideonode_texture_p.h |  3 ---
+ src/qtmultimediaquicktools/qsgvideonode_yuv.cpp     | 21 +++++++++++----------
+ 6 files changed, 21 insertions(+), 32 deletions(-)
+
+diff --git a/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h b/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h
+index 45d9d67..ab6b9b4 100644
+--- a/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h
++++ b/src/multimedia/qtmultimediaquicktools_headers/qsgvideonode_p.h
+@@ -73,9 +73,6 @@ public:
+     virtual QAbstractVideoBuffer::HandleType handleType() const = 0;
+ 
+     void setTexturedRectGeometry(const QRectF &boundingRect, const QRectF &textureRect, int orientation);
+-#ifdef EGLIMAGE_USING
+-    virtual void destroyEglImage() = 0;
+-#endif
+ 
+ private:
+     QRectF m_rect;
+diff --git a/src/plugins/videonode/egl/qsgvideonode_egl.h b/src/plugins/videonode/egl/qsgvideonode_egl.h
+index b8ba7b4..81c8164 100644
+--- a/src/plugins/videonode/egl/qsgvideonode_egl.h
++++ b/src/plugins/videonode/egl/qsgvideonode_egl.h
+@@ -81,9 +81,6 @@ public:
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
+     QVideoFrame::PixelFormat pixelFormat() const;
+     QAbstractVideoBuffer::HandleType handleType() const;
+-#ifdef EGLIMAGE_USING
+-    virtual void destroyEglImage(){};
+-#endif
+ private:
+     QSGVideoMaterial_EGL m_material;
+     QVideoFrame::PixelFormat m_pixelFormat;
+diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+index f240a63..d869d14 100644
+--- a/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
++++ b/src/qtmultimediaquicktools/qdeclarativevideooutput_render.cpp
+@@ -405,12 +405,6 @@ void QDeclarativeVideoRendererBackend::present(const QVideoFrame &frame)
+ void QDeclarativeVideoRendererBackend::stop()
+ {
+     present(QVideoFrame());
+-#ifdef EGLIMAGE_USING
+-    if(m_videoNode != NULL) {
+-        m_videoNode->destroyEglImage();
+-        m_videoNode = NULL;
+-    }
+-#endif
+ 
+ }
+ 
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp b/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
+index c196133..ccf56c6 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_rgb.cpp
+@@ -167,8 +167,12 @@ public:
+ 
+     ~QSGVideoMaterial_RGB()
+     {
+-        if (m_textureId)
++        if (m_textureId) {
++#ifdef EGLIMAGE_USING
++            destroyEglImage();
++#endif
+             QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
++        }
+     }
+ 
+     virtual QSGMaterialType *type() const {
+@@ -286,8 +290,12 @@ public:
+                 textureSize.setWidth(stride);
+ 
+                 if (m_textureSize != textureSize) {
+-                    if (!m_textureSize.isEmpty())
++                    if (!m_textureSize.isEmpty()) {
++#ifdef EGLIMAGE_USING
++                        destroyEglImage();
++#endif
+                         functions->glDeleteTextures(1, &m_textureId);
++                    }
+                     functions->glGenTextures(1, &m_textureId);
+                     m_textureSize = textureSize;
+ #ifdef EGLIMAGE_USING
+@@ -406,11 +414,6 @@ void QSGVideoNode_RGB::setCurrentFrame(const QVideoFrame &frame, FrameFlags)
+     markDirty(DirtyMaterial);
+ }
+ 
+-void QSGVideoNode_RGB::destroyEglImage()
+-{
+-    m_material->destroyEglImage();
+-}
+-
+ void QSGVideoMaterialShader_RGB::updateState(const RenderState &state,
+                                                 QSGMaterial *newMaterial,
+                                                 QSGMaterial *oldMaterial)
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_texture_p.h b/src/qtmultimediaquicktools/qsgvideonode_texture_p.h
+index e24bd2a..073eceb 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_texture_p.h
++++ b/src/qtmultimediaquicktools/qsgvideonode_texture_p.h
+@@ -69,9 +69,6 @@ public:
+         return QAbstractVideoBuffer::GLTextureHandle;
+     }
+     void setCurrentFrame(const QVideoFrame &frame, FrameFlags flags);
+-#ifdef EGLIMAGE_USING
+-    virtual void destroyEglImage(){};
+-#endif
+ 
+ private:
+     QVideoSurfaceFormat m_format;
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+index 65fb072..7e361a6 100644
+--- a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+@@ -324,10 +324,14 @@ QSGVideoMaterial_YUV::QSGVideoMaterial_YUV(const QVideoSurfaceFormat &format) :
+ QSGVideoMaterial_YUV::~QSGVideoMaterial_YUV()
+ {
+     if (!m_textureSize.isEmpty()) {
+-        if (QOpenGLContext *current = QOpenGLContext::currentContext())
++        if (QOpenGLContext *current = QOpenGLContext::currentContext()) {
++#ifdef EGLIMAGE_USING
++            destroyEglImage();
++#endif
+             current->functions()->glDeleteTextures(m_planeCount, m_textureIds);
+-        else
++        } else {
+             qWarning() << "QSGVideoMaterial_YUV: Cannot obtain GL context, unable to delete textures";
++        }
+     }
+ }
+ 
+@@ -415,8 +419,12 @@ void QSGVideoMaterial_YUV::bind()
+ 
+             // Frame has changed size, recreate textures...
+             if (m_textureSize != m_frame.size()) {
+-                if (!m_textureSize.isEmpty())
++                if (!m_textureSize.isEmpty()){
++#ifdef EGLIMAGE_USING
++                    destroyEglImage();
++#endif
+                     functions->glDeleteTextures(m_planeCount, m_textureIds);
++                }
+                 functions->glGenTextures(m_planeCount, m_textureIds);
+                 m_textureSize = m_frame.size();
+ #ifdef EGLIMAGE_USING
+@@ -506,13 +514,6 @@ QSGVideoNode_YUV::QSGVideoNode_YUV(const QVideoSurfaceFormat &format) :
+     setMaterial(m_material);
+ }
+ 
+-#ifdef EGLIMAGE_USING
+-void QSGVideoNode_YUV::destroyEglImage()
+-{
+-    m_material->destroyEglImage();
+-}
+-#endif
+-
+ QSGVideoNode_YUV::~QSGVideoNode_YUV()
+ {
+ }
+-- 
+2.7.4
+

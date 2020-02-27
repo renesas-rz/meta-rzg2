@@ -34,6 +34,7 @@ SRC_URI_append = " \
     file://0017-qtmultimedia-Add-function-to-get-array-of-fd.patch \
     file://0018-qtmultimedia-Add-render-by-EGLImage-with-format-NV12.patch \
     file://0019-qtmultimedia-Add-get-plane-offset-for-EGLImageKHR-at.patch \
+    file://0020-qsgvideonode-fix-issue-double-free-in-race-condition.patch \
 "
 
 RDEPENDS_${PN}-plugins += " \
