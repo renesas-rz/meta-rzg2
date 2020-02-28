@@ -20,6 +20,7 @@ IMAGE_INSTALL_append = " \
     iw \
     wpa-supplicant \
     kernel-module-wlcore-sdio \
+    kernel-module-mousedev \
     bt-fw \
     obexftp \
     bluez-alsa \
