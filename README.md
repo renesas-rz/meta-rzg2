@@ -55,7 +55,7 @@ Below git configuration is required:
     $ git config --global user.name "Your Name"
 ```
 
-Download evaluation version of proprietary graphics and multimedia drivers from Renesas.
+Download proprietary graphics and multimedia drivers from Renesas.
 
 To download Multimedia and Graphics library and related Linux drivers, please use the following link:
 
