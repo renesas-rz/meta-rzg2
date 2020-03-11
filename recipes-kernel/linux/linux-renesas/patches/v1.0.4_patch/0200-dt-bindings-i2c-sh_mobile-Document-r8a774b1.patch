@@ -1,0 +1,27 @@
+From e2893cce3ac3e26deaeff24d9d12cdf39587f62e Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Wed, 11 Sep 2019 10:23:28 +0700
+Subject: [PATCH 200/268] dt-bindings: i2c: sh_mobile: Document r8a774b1
+
+This patch adds compatible string for iic driver.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt b/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt
+index 392162a..a139e58 100644
+--- a/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt
++++ b/Documentation/devicetree/bindings/i2c/i2c-sh_mobile.txt
+@@ -7,6 +7,7 @@ Required properties:
+ 			- "renesas,iic-r8a7743" (RZ/G1M)
+ 			- "renesas,iic-r8a7745" (RZ/G1E)
+ 			- "renesas,iic-r8a774a1" (RZ/G2M)
++			- "renesas,iic-r8a774b1" (RZ/G2N)
+ 			- "renesas,iic-r8a774c0" (RZ/G2E)
+ 			- "renesas,iic-r8a7790" (R-Car H2)
+ 			- "renesas,iic-r8a7791" (R-Car M2-W)
+-- 
+2.7.4
+

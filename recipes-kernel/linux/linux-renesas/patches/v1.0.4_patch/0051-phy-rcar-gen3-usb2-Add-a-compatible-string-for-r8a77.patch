@@ -1,0 +1,32 @@
+From ec7892c21014bb0f1c04fc6fac67519d6a6fefe8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 13:51:00 +0700
+Subject: [PATCH 051/268] phy: rcar-gen3-usb2: Add a compatible string for
+ r8a774a1
+
+This patch adds a compatible string for r8a774a1.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/phy/renesas/phy-rcar-gen3-usb2.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/phy/renesas/phy-rcar-gen3-usb2.c b/drivers/phy/renesas/phy-rcar-gen3-usb2.c
+index dccd66a..eb1a08d 100644
+--- a/drivers/phy/renesas/phy-rcar-gen3-usb2.c
++++ b/drivers/phy/renesas/phy-rcar-gen3-usb2.c
+@@ -529,6 +529,10 @@ static const struct of_device_id rcar_gen3_phy_usb2_match_table[] = {
+ 		.data = &rz_g1c_phy_usb2_ops,
+ 	},
+ 	{
++		.compatible = "renesas,usb2-phy-r8a774a1",
++		.data = &rcar_gen3_phy_usb2_ops,
++	},
++	{
+ 		.compatible = "renesas,usb2-phy-r8a774c0",
+ 		.data = &rcar_gen3_phy_usb2_ops,
+ 	},
+-- 
+2.7.4
+

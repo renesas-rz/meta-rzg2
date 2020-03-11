@@ -1,0 +1,71 @@
+From ca4da4f1548fec587b2d445fb3c76f54d46c7a93 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 15:08:52 +0700
+Subject: [PATCH 114/268] arch: arm64: renesas: r8a774c0-cat874: Add support
+ USB Type C HD3SS3220 chip.
+
+This patch will add using USB Type C HD3SS3220 chip for USB Type C port.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 39 +++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index cd7ade0..1a1e909 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -536,6 +536,17 @@
+ 	companion = <&xhci0>;
+ 
+ 	status = "okay";
++	renesas,usb-role-switch;
++
++	port {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		usb3peri_role_switch: endpoint@0 {
++			reg = <0>;
++			remote-endpoint = <&hd3ss3220_ep>;
++		};
++	};
+ };
+ 
+ &vspb {
+@@ -604,3 +615,31 @@
+ 
+ 	status = "okay";
+ };
++
++&i2c0 {
++	status = "okay";
++	clock-frequency = <100000>;
++
++	hd3ss3220@47 {
++		compatible = "ti,hd3ss3220";
++		reg = <0x47>;
++		interrupt-parent = <&gpio6>;
++		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
++
++		usb_con: connector {
++			compatible = "usb-c-connector";
++			label = "USB-C";
++			data-role = "dual";
++		};
++
++		port {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			hd3ss3220_ep: endpoint@0 {
++				reg = <0>;
++				remote-endpoint = <&usb3peri_role_switch>;
++			};
++		};
++	};
++};
+-- 
+2.7.4
+
