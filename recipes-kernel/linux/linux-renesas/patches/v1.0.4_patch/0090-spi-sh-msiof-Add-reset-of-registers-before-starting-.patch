@@ -1,0 +1,67 @@
+From c253ce8043daa5be7873fcbca6d2f6a93c33e636 Mon Sep 17 00:00:00 2001
+From: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
+Date: Thu, 16 Mar 2017 15:12:06 +0900
+Subject: [PATCH 090/268] spi: sh-msiof: Add reset of registers before starting
+ transfer
+
+In accordance with hardware specification Ver 1.0, reset register
+transmission / reception setting before transfer.
+
+Signed-off-by: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/spi/spi-sh-msiof.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/drivers/spi/spi-sh-msiof.c b/drivers/spi/spi-sh-msiof.c
+index 30ea0a2..5567f22 100644
+--- a/drivers/spi/spi-sh-msiof.c
++++ b/drivers/spi/spi-sh-msiof.c
+@@ -134,6 +134,8 @@ struct sh_msiof_spi_priv {
+ #define CTR_TFSE	0x00004000 /* Transmit Frame Sync Signal Output Enable */
+ #define CTR_TXE		0x00000200 /* Transmit Enable */
+ #define CTR_RXE		0x00000100 /* Receive Enable */
++#define CTR_TXRST	0x00000002 /* Transmit Reset */
++#define CTR_RXRST	0x00000001 /* Receive Reset */
+ 
+ /* FCTR */
+ #define FCTR_TFWM_MASK	0xe0000000 /* Transmit FIFO Watermark */
+@@ -250,6 +252,25 @@ static irqreturn_t sh_msiof_spi_irq(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
++static void sh_msiof_spi_reset_regs(struct sh_msiof_spi_priv *p)
++{
++	u32 mask = CTR_TXRST | CTR_RXRST;
++	u32 data;
++	int k;
++
++	data = sh_msiof_read(p, CTR);
++	data |= mask;
++
++	sh_msiof_write(p, CTR, data);
++
++	for (k = 100; k > 0; k--) {
++		if (!(sh_msiof_read(p, CTR) & mask))
++			break;
++
++		udelay(1);
++	}
++}
++
+ static const u32 sh_msiof_spi_div_array[] = {
+ 	SCR_BRDV_DIV_1, SCR_BRDV_DIV_2,	 SCR_BRDV_DIV_4,
+ 	SCR_BRDV_DIV_8,	SCR_BRDV_DIV_16, SCR_BRDV_DIV_32,
+@@ -929,6 +950,9 @@ static int sh_msiof_transfer_one(struct spi_master *master,
+ 	bool swab;
+ 	int ret;
+ 
++	/* reset registers */
++	sh_msiof_spi_reset_regs(p);
++
+ 	/* setup clocks (clock already enabled in chipselect()) */
+ 	if (!spi_controller_is_slave(p->master))
+ 		sh_msiof_spi_set_clk_regs(p, clk_get_rate(p->clk), t->speed_hz);
+-- 
+2.7.4
+

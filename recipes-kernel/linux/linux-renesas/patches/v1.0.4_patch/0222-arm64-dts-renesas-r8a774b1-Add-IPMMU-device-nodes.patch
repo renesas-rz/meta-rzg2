@@ -1,0 +1,100 @@
+From 7c47b33d8bee7bf1c60e72c271cf51f5e255678b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 14:32:34 +0700
+Subject: [PATCH 222/268] arm64: dts: renesas: r8a774b1: Add IPMMU device nodes
+
+Add r8a774b1 IPMMU nodes and keep all enabled by default.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 73 +++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 3bc83f7..ad32b23 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -482,6 +482,79 @@
+ 			dma-channels = <16>;
+ 		};
+ 
++		ipmmu_ds0: mmu@e6740000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xe6740000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 0>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_ds1: mmu@e7740000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xe7740000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 1>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_hc: mmu@e6570000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xe6570000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 2>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_mm: mmu@e67b0000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xe67b0000 0 0x1000>;
++			interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
++			<GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_mp: mmu@ec670000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xec670000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 4>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_pv0: mmu@fd800000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xfd800000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 6>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_vc0: mmu@fe6b0000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xfe6b0000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 12>;
++			power-domains = <&sysc R8A774B1_PD_A3VC>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_vi0: mmu@febd0000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xfebd0000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 14>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			#iommu-cells = <1>;
++		};
++
++		ipmmu_vp0: mmu@fe990000 {
++			compatible = "renesas,ipmmu-r8a774b1";
++			reg = <0 0xfe990000 0 0x1000>;
++			renesas,ipmmu-main = <&ipmmu_mm 16>;
++			power-domains = <&sysc R8A774B1_PD_A3VP>;
++			#iommu-cells = <1>;
++		};
++
+ 		i2c0: i2c@e6500000 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+-- 
+2.7.4
+

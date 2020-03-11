@@ -1,0 +1,54 @@
+From 6e9c35348281d0f57de71b587350d16c6ec21a8b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 13:54:08 +0700
+Subject: [PATCH 193/268] arm64: dts: renesas: r8a774b1: add Sound DVC support
+
+This patch adds DVC[0.1] support for R8A774B1 SoC.
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 49c4e76..6367fb6 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -848,6 +848,7 @@
+ 				 <&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
+ 				 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
+ 				 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++				 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
+ 				 <&audio_clk_a>, <&audio_clk_b>,
+ 				 <&audio_clk_c>,
+ 				 <&cpg CPG_CORE R8A774B1_CLK_S0D4>;
+@@ -858,6 +859,7 @@
+ 					"src.9", "src.8", "src.7", "src.6",
+ 					"src.5", "src.4", "src.3", "src.2",
+ 					"src.1", "src.0",
++					"dvc.0", "dvc.1",
+ 					"clk_a", "clk_b", "clk_c", "clk_i";
+ 			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 1005>,
+@@ -1007,6 +1009,17 @@
+ 					dma-names = "rx", "tx";
+ 				};
+ 			};
++
++			rcar_sound,dvc {
++				dvc0: dvc-0 {
++					dmas = <&audma1 0xbc>;
++					dma-names = "tx";
++				};
++				dvc1: dvc-1 {
++					dmas = <&audma1 0xbe>;
++					dma-names = "tx";
++				};
++			};
+ 		};
+ 
+ 		xhci0: usb@ee000000 {
+-- 
+2.7.4
+

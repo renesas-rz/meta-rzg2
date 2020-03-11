@@ -1,0 +1,29 @@
+From 6ef060bd03ad4cde5ff35eab14ecbd7f3e0359dd Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 17:26:37 +0700
+Subject: [PATCH 196/268] arm64: dts: renesas: r8a774b1: define CPG_AUDIO_CLK_I
+ for sound's internal clock source
+
+This patch adds define macro CPG_AUDIO_CLK_I for sound's internal
+clock source.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 478e3b6..b0a685e 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -10,6 +10,7 @@
+ #include <dt-bindings/clock/r8a774b1-cpg-mssr.h>
+ #include <dt-bindings/power/r8a774b1-sysc.h>
+ 
++#define CPG_AUDIO_CLK_I		R8A774B1_CLK_S0D4
+ / {
+ 	compatible = "renesas,r8a774b1";
+ 	#address-cells = <2>;
+-- 
+2.7.4
+

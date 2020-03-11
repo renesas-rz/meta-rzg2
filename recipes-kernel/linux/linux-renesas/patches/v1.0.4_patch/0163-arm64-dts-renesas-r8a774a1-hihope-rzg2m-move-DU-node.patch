@@ -1,0 +1,65 @@
+From b261c5caf2a466f01ad3198d7b3b5bc5a9552241 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 11:42:49 +0700
+Subject: [PATCH 163/268] arm64: dts: renesas: r8a774a1-hihope-rzg2m: move DU
+ node from common parts
+
+This patch moves DU node from common part to specific Hihope RZ/G2M
+board because channels of DU support in G2M is different from G2N
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi        | 12 ------------
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts | 15 +++++++++++++++
+ 2 files changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 5100c22..8cc04f5 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -151,18 +151,6 @@
+ 	clock-frequency = <22579200>;
+ };
+ 
+-&du {
+-	clocks = <&cpg CPG_MOD 724>,
+-		 <&cpg CPG_MOD 723>,
+-		 <&cpg CPG_MOD 722>,
+-		 <&versaclock5 1>,
+-		 <&x302_clk>,
+-		 <&versaclock5 2>;
+-	clock-names = "du.0", "du.1", "du.2",
+-		      "dclkin.0", "dclkin.1", "dclkin.2";
+-	status = "okay";
+-};
+-
+ &ehci0 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index a3a073a..02ae755 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -60,3 +60,18 @@
+ 		compatible = "renesas,mmngrbuf";
+ 	};
+ };
++
++&du {
++	pinctrl-0 = <&du_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 724>,
++		 <&cpg CPG_MOD 723>,
++		 <&cpg CPG_MOD 722>,
++		 <&versaclock5 1>,
++		 <&x302_clk>,
++		 <&versaclock5 2>;
++	clock-names =	"du.0", "du.1", "du.2",
++			"dclkin.0", "dclkin.1", "dclkin.2";
++};
+-- 
+2.7.4
+

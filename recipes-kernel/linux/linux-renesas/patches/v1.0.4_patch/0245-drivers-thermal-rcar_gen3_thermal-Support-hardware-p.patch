@@ -1,0 +1,122 @@
+From 3e481b9ccfbcb0956f3cd56d1a62d46112d5f43c Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
+Date: Tue, 8 Oct 2019 01:08:42 +0700
+Subject: [PATCH 245/268] drivers: thermal: rcar_gen3_thermal: Support hardware
+ parameters
+
+1. Based on R-CAR patch:
+    - Repository: renesas-bsp
+    - Branch: v4.14.75-ltsi/rcar-3.9.6
+    - Commit <fe7d0d1c77f9> ("thermal: rcar_gen3_thermal: Use FUSE
+    values if they are available")
+
+2. Use FUSE values if they are available:
+    FUSE values are required for temperature calculation.
+    Currently, they are missing so pseudo values are used.
+    However, if they are available, the values should be fetched from
+    registers.
+
+    THSCP.COR_PARA_VLD[1:0] is used to check whether FUSE values
+    are available or not.
+
+    When COR_PARA_VLD[1:0] = b'11, it uses hardware FUSE values,
+    pseudo fixed ones otherwise.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 48 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index 9c834d0..dbe22c4 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -55,15 +55,24 @@
+ #define THCTR_PONM	BIT(6)
+ #define THCTR_THSST	BIT(0)
+ 
++/* Fuse registers and base offsets */
++#define PTAT_BASE                      0xE6198000
++#define REG_GEN3_PTAT1         0x5C
++#define REG_GEN3_PTAT2         0x60
++#define REG_GEN3_PTAT3         0x64
++#define REG_GEN3_THSCP         0x68
++#define REG_GEN3_MAX_SIZE      (REG_GEN3_THSCP + 0x4)
++
+ #define CTEMP_MASK	0xFFF
++#define GEN3_FUSE_MASK 0xFFF
++#define COR_PARA_VLD (0x3 << 14)
+ 
+ #define MCELSIUS(temp)	((temp) * 1000)
+-#define GEN3_FUSE_MASK	0xFFF
+ 
+ #define TSC_MAX_NUM	3
+ 
+ /* default THCODE values if FUSEs are missing */
+-static const int thcode[TSC_MAX_NUM][3] = {
++static int thcode[TSC_MAX_NUM][3] = {
+ 	{ 3397, 2800, 2221 },
+ 	{ 3393, 2795, 2216 },
+ 	{ 3389, 2805, 2237 },
+@@ -370,9 +379,10 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 	struct thermal_zone_device *zone;
+ 	int ret, irq, i;
+ 	char *irqname;
++	void __iomem *ptat_base = NULL;
++	unsigned int cor_para_value = 0;
+ 
+ 	/* default values if FUSEs are missing */
+-	/* TODO: Read values from hardware on supported platforms */
+ 	int ptat[3] = { 2631, 1509, 435 };
+ 
+ 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+@@ -410,6 +420,28 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 	pm_runtime_enable(dev);
+ 	pm_runtime_get_sync(dev);
+ 
++	ptat_base = ioremap_nocache(PTAT_BASE, REG_GEN3_MAX_SIZE);
++	if (!ptat_base) {
++		dev_err(dev, "Cannot map FUSE registers");
++		ret = -ENOMEM;
++		goto error_unregister;
++	}
++
++	cor_para_value = ioread32(ptat_base + REG_GEN3_THSCP) &
++						COR_PARA_VLD;
++	if (cor_para_value != COR_PARA_VLD)
++		dev_info(dev, "is using pseudo fixed FUSE values\n");
++	else {
++		dev_info(dev, "is using hardware FUSE values\n");
++		ptat[0] = ioread32(ptat_base + REG_GEN3_PTAT1) &
++					GEN3_FUSE_MASK;
++		ptat[1] = ioread32(ptat_base + REG_GEN3_PTAT2) &
++					GEN3_FUSE_MASK;
++		ptat[2] = ioread32(ptat_base + REG_GEN3_PTAT3) &
++					GEN3_FUSE_MASK;
++	}
++	iounmap(ptat_base);
++
+ 	for (i = 0; i < TSC_MAX_NUM; i++) {
+ 		struct rcar_gen3_thermal_tsc *tsc;
+ 
+@@ -433,6 +465,16 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
+ 		priv->tscs[i] = tsc;
+ 
+ 		priv->thermal_init(tsc);
++
++		if (cor_para_value == COR_PARA_VLD) {
++			thcode[i][0] = GEN3_FUSE_MASK &
++				rcar_gen3_thermal_read(tsc, REG_GEN3_THCODE1);
++			thcode[i][1] = GEN3_FUSE_MASK &
++				rcar_gen3_thermal_read(tsc, REG_GEN3_THCODE2);
++			thcode[i][2] = GEN3_FUSE_MASK &
++				rcar_gen3_thermal_read(tsc, REG_GEN3_THCODE3);
++		}
++
+ 		rcar_gen3_thermal_calc_coefs(tsc, ptat, thcode[i],
+ 					     *rcar_gen3_ths_tj_1);
+ 
+-- 
+2.7.4
+
