@@ -1,0 +1,132 @@
+From e65a5391e37c22cd9e08f80f5ce5879cbca6d365 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 13:44:44 +0700
+Subject: [PATCH 041/268] arm64: dts: renesas: cat875: add LVDS panels support
+ for RZ/G2E
+
+This patch add LVDS panels support for the sub board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat875.dtsi | 101 ++++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+index aaefc3a..b743fbc 100644
+--- a/arch/arm64/boot/dts/renesas/cat875.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -11,6 +11,60 @@
+ 	aliases {
+ 		ethernet0 = &avb;
+ 	};
++
++	panel@0 {
++		compatible = "panel-lvds";
++
++		width-mm = <476>;
++		height-mm = <268>;
++
++		data-mapping = "vesa-24";
++
++		panel-timing {
++			clock-frequency = <148500000>;
++			hactive = <1920>;
++			vactive = <1080>;
++			hsync-len = <44>;
++			hfront-porch = <88>;
++			hback-porch = <148>;
++			vfront-porch = <4>;
++			vback-porch = <36>;
++			vsync-len = <5>;
++		};
++
++		port {
++			lvds0_panel_in: endpoint {
++				remote-endpoint = <&lvds0_out>;
++			};
++		};
++	};
++
++	panel@1 {
++		compatible = "panel-lvds";
++
++		width-mm = <476>;
++		height-mm = <268>;
++
++		data-mapping = "vesa-24";
++
++		panel-timing {
++			clock-frequency = <148500000>;
++			hactive = <1920>;
++			vactive = <1080>;
++			hsync-len = <44>;
++			hfront-porch = <88>;
++			hback-porch = <148>;
++			vfront-porch = <4>;
++			vback-porch = <36>;
++			vsync-len = <5>;
++		};
++
++		port {
++			lvds1_panel_in: endpoint {
++				remote-endpoint = <&lvds1_out>;
++			};
++		};
++	};
+ };
+ 
+ &avb {
+@@ -64,3 +118,50 @@
+ 		function = "can1";
+ 	};
+ };
++
++&lvds0 {
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 727>,
++		 <&x13_clk>;
++	clock-names = "fck", "dclkin.0";
++
++	ports {
++		port@1 {
++			lvds0_out: endpoint {
++				remote-endpoint = <&lvds0_panel_in>;
++			};
++		};
++	};
++};
++
++&lvds1 {
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 727>,
++		 <&x13_clk>;
++	clock-names = "fck", "dclkin.0";
++
++	ports {
++		port@1 {
++			lvds1_out: endpoint {
++				remote-endpoint = <&lvds1_panel_in>;
++			};
++		};
++	};
++};
++
++/* GP0_17 is used to select (SEL) output direction for LVDS-IF
++ * SEL = L => To LVDS Connector
++ * SEL = H => To MIPI-DSI
++ *
++ * Currently just support LVDS Connector so that set LOW for GP0_17
++ */
++&gpio0 {
++	lvds-connector-en-gpio{
++		gpio-hog;
++		gpios = <17 GPIO_ACTIVE_HIGH>;
++		output-low;
++		line-name = "lvds-connector-en-gpio";
++	};
++};
+-- 
+2.7.4
+

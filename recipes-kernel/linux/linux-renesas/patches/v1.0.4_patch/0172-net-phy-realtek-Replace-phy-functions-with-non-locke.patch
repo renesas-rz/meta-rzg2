@@ -1,0 +1,47 @@
+From aec91806f903ab6562f794e933fbebb4f9e5443f Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Fri, 6 Sep 2019 15:43:33 +0700
+Subject: [PATCH 172/268] net: phy: realtek: Replace phy functions with
+ non-locked version in rtl8211e_config_init()
+
+After calling phy_select_page() and until calling phy_restore_page(),
+the mutex 'mdio_lock' is already locked, so the driver should use
+non-locked version of phy functions. Or there will be a deadlock with
+'mdio_lock'.
+
+This replaces phy functions called from rtl8211e_config_init() to avoid
+the deadlock issue.
+
+Fixes: f81dadbcf7fd ("net: phy: realtek: Add rtl8211e rx/tx delays config")
+Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit dffe7d2e04670ff98e4dacf258df30446e2e80d4)
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/net/phy/realtek.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index b3f3e2a..dfa6d52 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -201,12 +201,12 @@ static int rtl8211e_config_init(struct phy_device *phydev)
+ 	if (oldpage < 0)
+ 		goto err_restore_page;
+ 
+-	ret = phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0xa4);
++	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0xa4);
+ 	if (ret)
+ 		goto err_restore_page;
+ 
+-	ret = phy_modify(phydev, 0x1c, RTL8211E_TX_DELAY | RTL8211E_RX_DELAY,
+-			 val);
++	ret = __phy_modify(phydev, 0x1c, RTL8211E_TX_DELAY
++			  | RTL8211E_RX_DELAY, val);
+ 
+ err_restore_page:
+ 	return phy_restore_page(phydev, oldpage, ret);
+-- 
+2.7.4
+

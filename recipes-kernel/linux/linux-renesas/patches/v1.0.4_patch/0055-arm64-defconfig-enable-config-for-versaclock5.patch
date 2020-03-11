@@ -1,0 +1,27 @@
+From 67d84dfd3f8421fad2c19d2f7a7201f5036185be Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:09:47 +0700
+Subject: [PATCH 055/268] arm64: defconfig: enable config for versaclock5
+
+This patch enables config for versaclock5 to use it for produce
+display dot clock in RZ/G2M.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index c7bbe14..e85b8ac 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -766,3 +766,6 @@ CONFIG_COMPILE_TEST=y
+ 
+ # Enable LVDS support
+ CONFIG_DRM_PANEL_LVDS=y
++
++# Enable Common Clock VC5
++CONFIG_COMMON_CLK_VC5=y
+-- 
+2.7.4
+

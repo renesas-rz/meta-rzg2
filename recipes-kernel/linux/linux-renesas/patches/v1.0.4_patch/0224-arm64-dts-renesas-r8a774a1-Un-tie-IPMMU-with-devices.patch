@@ -1,0 +1,141 @@
+From 7b5741298fc93d2d008e779158b3a9762c3f1a81 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 14:36:59 +0700
+Subject: [PATCH 224/268] arm64: dts: renesas: r8a774a1: Un-tie IPMMU with
+ devices
+
+This commit un-tie devices with IPMMU, also disable some of IPMMUs
+to support similar to r8a7796 in v4.14.75-ltsi/rcar-3.9.6
+
+Without this commit, an error encountered when run dmatest with or
+without CONFIG_IPMMU_VMSA
+...
+[   58.199431] dmatest: dma3chan12-copy: dstbuf[0x1508] not copied!
+Expected d7, got 37
+[   58.207523] dmatest: dma3chan12-copy: dstbuf[0x1509] not copied!
+Expected d6, got 36
+[   58.215615] dmatest: dma3chan12-copy: dstbuf[0x150a] not copied!
+Expected d5, got 35
+[   58.223705] dmatest: dma3chan12-copy: dstbuf[0x150b] not copied!
+Expected d4, got 34
+[   58.231796] dmatest: dma3chan12-copy: dstbuf[0x150c] not copied!
+Expected d3, got 33
+...
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index a92491d..0b20bf4 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -1070,6 +1070,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 0>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_ds1: mmu@e7740000 {
+@@ -1078,6 +1079,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 1>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_hc: mmu@e6570000 {
+@@ -1086,6 +1088,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 2>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_mm: mmu@e67b0000 {
+@@ -1095,6 +1098,7 @@
+ 				     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_mp: mmu@ec670000 {
+@@ -1102,6 +1106,7 @@
+ 			reg = <0 0xec670000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 4>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			status = "disabled";
+ 			#iommu-cells = <1>;
+ 		};
+ 
+@@ -1111,6 +1116,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 5>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_pv1: mmu@fd950000 {
+@@ -1119,6 +1125,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 6>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vc0: mmu@fe6b0000 {
+@@ -1127,6 +1134,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 8>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		ipmmu_vi0: mmu@febd0000 {
+@@ -1135,6 +1143,7 @@
+ 			renesas,ipmmu-main = <&ipmmu_mm 9>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			#iommu-cells = <1>;
++			status = "disabled";
+ 		};
+ 
+ 		avb: ethernet@e6800000 {
+@@ -2298,7 +2307,6 @@
+ 			clocks = <&cpg CPG_MOD 603>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 603>;
+-			iommus = <&ipmmu_vi0 8>;
+ 		};
+ 
+ 		fcpvd1: fcp@fea2f000 {
+@@ -2307,7 +2315,6 @@
+ 			clocks = <&cpg CPG_MOD 602>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 602>;
+-			iommus = <&ipmmu_vi0 9>;
+ 		};
+ 
+ 		fcpvd2: fcp@fea37000 {
+@@ -2316,7 +2323,6 @@
+ 			clocks = <&cpg CPG_MOD 601>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 601>;
+-			iommus = <&ipmmu_vi0 10>;
+ 		};
+ 
+ 		fcpvi0: fcp@fe9af000 {
+@@ -2325,7 +2331,6 @@
+ 			clocks = <&cpg CPG_MOD 611>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+ 			resets = <&cpg 611>;
+-			iommus = <&ipmmu_vc0 19>;
+ 		};
+ 
+ 		vsp@fe960000 {
+-- 
+2.7.4
+

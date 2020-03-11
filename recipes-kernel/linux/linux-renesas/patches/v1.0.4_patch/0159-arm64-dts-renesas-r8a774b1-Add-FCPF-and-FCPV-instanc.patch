@@ -1,0 +1,69 @@
+From f2b753401fdfc760493c6141974bc19661f71e72 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 11:33:08 +0700
+Subject: [PATCH 159/268] arm64: dts: renesas: r8a774b1: Add FCPF and FCPV
+ instances
+
+The FCPs handle the interface between various IP cores and memory.
+This patch adds the instances related to the FDPs and VSP2s.i.
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@rvc.renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 40 +++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index f10f1c67..31634dc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -920,6 +920,46 @@
+ 			status = "disabled";
+ 		};
+ 
++		fcpf0: fcp@fe950000 {
++			compatible = "renesas,fcpf";
++			reg = <0 0xfe950000 0 0x200>;
++			clocks = <&cpg CPG_MOD 615>;
++			power-domains = <&sysc R8A774B1_PD_A3VP>;
++			resets = <&cpg 615>;
++		};
++
++		fcpvb0: fcp@fe96f000 {
++			compatible = "renesas,fcpv";
++			reg = <0 0xfe96f000 0 0x200>;
++			clocks = <&cpg CPG_MOD 607>;
++			power-domains = <&sysc R8A774B1_PD_A3VP>;
++			resets = <&cpg 607>;
++		};
++
++		fcpvi0: fcp@fe9af000 {
++			compatible = "renesas,fcpv";
++			reg = <0 0xfe9af000 0 0x200>;
++			clocks = <&cpg CPG_MOD 611>;
++			power-domains = <&sysc R8A774B1_PD_A3VP>;
++			resets = <&cpg 611>;
++		};
++
++		fcpvd0: fcp@fea27000 {
++			compatible = "renesas,fcpv";
++			reg = <0 0xfea27000 0 0x200>;
++			clocks = <&cpg CPG_MOD 603>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 603>;
++		};
++
++		fcpvd1: fcp@fea2f000 {
++			compatible = "renesas,fcpv";
++			reg = <0 0xfea2f000 0 0x200>;
++			clocks = <&cpg CPG_MOD 602>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 602>;
++		};
++
+ 		hdmi0: hdmi@fead0000 {
+ 			reg = <0 0xfead0000 0 0x10000>;
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+From b2d917878bb91182cd35599668bcf5588d75eb9a Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 16:23:26 +0700
+Subject: [PATCH 263/268] arm64: defconfig: Fix cannot create virtual mouse
+
+This patch is created to make loadable modules of UINPUT
+and MOUSEDEV for creating virtual mouse.
+
+Signed-off-by: Loc Xuan. Vu's avatarLoc Vu <loc.vu.zn@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 721ab77..4c1b23d 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -373,3 +373,5 @@ CONFIG_USB_G_SERIAL=m
+ CONFIG_USB_ETH=m
+ CONFIG_SATA_AHCI=y
+ CONFIG_SATA_AHCI_PLATFORM=y
++CONFIG_INPUT_UINPUT=m
++CONFIG_INPUT_MOUSEDEV=m
+-- 
+2.7.4
+
