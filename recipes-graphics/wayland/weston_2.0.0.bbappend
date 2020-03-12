@@ -15,6 +15,7 @@ SRC_URI_append = " \
     file://xwayland.weston-start \
     file://weston.ini \
     file://weston_v4l2.ini \
+    file://weston_ek874.ini \
     file://weston.sh \
     file://1001-Share-toytoolkit-lib.patch \
     file://1008-larger-weston-bar-suitable-for-touch-screen.patch \
@@ -35,10 +36,17 @@ do_install_append() {
     install -d ${D}/${sysconfdir}/xdg/weston
     if [ "X${USE_MULTIMEDIA}" = "X1" ]; then
         # install weston.ini as sample settings of v4l2-renderer
-        if [ "${MACHINE}" = "m3ulcb" -o "${MACHINE}" = "h3ulcb" ] ; then
-            sed -i 's|media1|media0|g' ${WORKDIR}/weston_v4l2.ini
+        if [ "${MACHINE}" = "ek874" ] ; then
+            install -m 644 ${WORKDIR}/weston_ek874.ini ${D}/${sysconfdir}/xdg/weston/weston.ini
         fi
-        install -m 644 ${WORKDIR}/weston_v4l2.ini ${D}/${sysconfdir}/xdg/weston/weston.ini
+
+        if [ "${MACHINE}" = "hihope-rzg2m" ] ; then
+            install -m 644 ${WORKDIR}/weston_v4l2.ini ${D}/${sysconfdir}/xdg/weston/weston.ini
+        fi
+
+        if [ "${MACHINE}" = "hihope-rzg2n" ] ; then
+            install -m 644 ${WORKDIR}/weston_v4l2.ini ${D}/${sysconfdir}/xdg/weston/weston.ini
+        fi
     else
         # install weston.ini as sample settings of gl-renderer
         install -m 644 ${WORKDIR}/weston.ini ${D}/${sysconfdir}/xdg/weston/
