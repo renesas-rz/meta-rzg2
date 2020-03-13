@@ -1,0 +1,53 @@
+From 519d41f376963e1845857cfa346f50caf40c30a5 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Thu, 13 Feb 2020 16:09:25 +0700
+Subject: [PATCH 2/3] mmngr-module: mmngr_drv: add support IPMMU for RZG2N
+
+This commit add support IPMMU for r8a774b1 (RZG2N) to support
+Reuse code from r8a77965 since these two SoCs are similar.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+index 794ff31..c6f4af7 100644
+--- a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
++++ b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+@@ -201,6 +201,12 @@ static const struct soc_device_attribute r8a774a1[]  = {
+ 	{}
+ };
+ 
++/* G2N */
++static const struct soc_device_attribute r8a774b1[]  = {
++	{ .soc_id = "r8a774b1" },
++	{}
++};
++
+ /* For IPMMU Main Memory (IPMMUMM) */
+ static struct hw_register ipmmumm_ip_regs[] = {
+ 	{"IMCTR",	IMCTRn_OFFSET(CUR_TTSEL)},
+@@ -1611,7 +1617,7 @@ static int ipmmu_probe(struct platform_device *pdev)
+ 
+ 	if (soc_device_match(r8a7796) || soc_device_match(r8a774a1))
+ 		ipmmu_mmu_trans_table = m3_mmu_table;
+-	else if (soc_device_match(r8a77965))
++	else if (soc_device_match(r8a77965) || soc_device_match(r8a774b1))
+ 		ipmmu_mmu_trans_table = m3n_mmu_table;
+ 	else if (soc_device_match(r8a77990))
+ 		ipmmu_mmu_trans_table = e3_mmu_table;
+@@ -1670,6 +1676,10 @@ static const struct of_device_id ipmmu_of_match[] = {
+ 	  .compatible   = "renesas,ipmmu-mmu-r8a774a1",
+ 	  .data = &r8a7796_ipmmu_data
+ 	},
++	{
++	  .compatible = "renesas,ipmmu-mmu-r8a774b1",
++	  .data = &r8a77965_ipmmu_data
++	},
+ 	{ },
+ };
+ 
+-- 
+2.7.4
+
