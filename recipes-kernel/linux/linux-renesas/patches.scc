@@ -272,3 +272,7 @@ patch patches/v1.0.4_patch/0271-mmc-renesas_sdhi_core-Disable-check-SCC-error-in
 patch patches/v1.0.4_patch/0272-arm64-defconfig-Add-CONFIG_TMPFS_POSIX_ACL.patch
 patch patches/v1.0.4_patch/0273-arm64-defconfig-enable-PREEMPT_RT-config.patch
 patch patches/v1.0.4_patch/0274-gpio-gpio-rcar-gpio-rcar-prevent-to-force-the-interr.patch
+patch patches/v1.0.4_patch/0275-drm-rcar-du-add-support-interlace-mode-for-R8A774C0.patch
+patch patches/v1.0.4_patch/0276-mmc-tmio-Add-support-for-pre_req-and-post_req.patch
+patch patches/v1.0.4_patch/0277-mmc-renesas_sdhi-Add-support-for-pre_req-and-post_re.patch
+patch patches/v1.0.4_patch/0278-serial-sh-sci-fix-issue-of-handling-parity-error-in-.patch
