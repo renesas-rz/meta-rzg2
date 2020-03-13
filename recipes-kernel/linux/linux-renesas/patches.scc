@@ -270,3 +270,7 @@ patch patches/v1.0.4_patch/0269-arm64-dts-renesas-hihope-common-Enable-Audio-sup
 patch patches/v1.0.4_patch/0270-arm64-dts-renesas-r8a774b1-hihope-rzg2n-disable-HDMI.patch
 patch patches/v1.0.4_patch/0271-mmc-renesas_sdhi_core-Disable-check-SCC-error-in-som.patch
 patch patches/v1.0.4_patch/0272-arm64-defconfig-Add-CONFIG_TMPFS_POSIX_ACL.patch
+patch patches/v1.0.4_patch/0273-drm-rcar-du-add-support-interlace-mode-for-R8A774C0.patch
+patch patches/v1.0.4_patch/0274-mmc-tmio-Add-support-for-pre_req-and-post_req.patch
+patch patches/v1.0.4_patch/0275-mmc-renesas_sdhi-Add-support-for-pre_req-and-post_re.patch
+patch patches/v1.0.4_patch/0276-serial-sh-sci-fix-issue-of-handling-parity-error-in-.patch
