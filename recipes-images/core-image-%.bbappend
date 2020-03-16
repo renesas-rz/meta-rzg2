@@ -1,6 +1,6 @@
 update_issue() {
     # Set BSP version
-    BSP_VERSION="1.0.3-RT"
+    BSP_VERSION="1.0.4-RT-alpha"
 
     # Set SoC and Board info
     case "${MACHINE}" in
