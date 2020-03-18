@@ -14,7 +14,5 @@ case "$hostname" in
     amixer set 'DVC Out',1 20%
     ;;
   *)
-    exit 1
+    ;;
 esac
-
-exit 0
