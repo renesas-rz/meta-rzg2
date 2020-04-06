@@ -1,0 +1,43 @@
+From b5e565e2fb12ecc9826056bbaaecdbadbc0e4639 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Mon, 3 Jun 2019 15:03:18 +0700
+Subject: [PATCH 067/197] arm64: dts: renesas: r8a774a1-hihope-rzg2m: add
+ mmngr, mmngrbuf
+
+Add device node for mmngr, mmngrbuf. Reserve 256M for MMP CMA.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index ba4f01c..72f9554 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -36,6 +36,22 @@
+ 			reg = <0x00000000 0x58000000 0x0 0x18000000>;
+ 			linux,cma-default;
+ 		};
++
++		/* device specific region for contiguous allocations */
++		mmp_reserved: linux,multimedia@70000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x70000000 0x0 0x10000000>;
++		};
++	};
++
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>;
++	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
+ 	};
+ };
+ 
+-- 
+2.7.4
+

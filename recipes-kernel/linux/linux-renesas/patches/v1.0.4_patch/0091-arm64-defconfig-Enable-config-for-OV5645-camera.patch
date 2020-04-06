@@ -1,0 +1,26 @@
+From bc8970ba542a0e997767c46de505db111adb134d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:49:03 +0700
+Subject: [PATCH 091/197] arm64: defconfig: Enable config for OV5645 camera.
+
+This patch enables config for ov5645 camera.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 6446a3c..2dd9529 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -772,3 +772,6 @@ CONFIG_COMMON_CLK_VC5=y
+ 
+ # Enable Touchscreen driver
+ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
++
++# Enable Camera Sensor
++CONFIG_VIDEO_OV5645=y
+-- 
+2.7.4
+

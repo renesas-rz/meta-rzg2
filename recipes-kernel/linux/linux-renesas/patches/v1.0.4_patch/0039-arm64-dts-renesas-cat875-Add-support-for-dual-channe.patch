@@ -1,0 +1,38 @@
+From 0d435d49611a4b80d0882bac8b1eed3eea75a097 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 25 Apr 2019 14:09:39 +0700
+Subject: [PATCH 039/197] arm64: dts: renesas: cat875: Add support for dual
+ channels LVDS
+
+In order to support dual LVDS, we must set "dual-link" mode in lvds
+nodes in devicetree.
+This patch does this thing.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat875.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat875.dtsi b/arch/arm64/boot/dts/renesas/cat875.dtsi
+index b743fbc..6d00e7d4 100644
+--- a/arch/arm64/boot/dts/renesas/cat875.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat875.dtsi
+@@ -125,6 +125,7 @@
+ 	clocks = <&cpg CPG_MOD 727>,
+ 		 <&x13_clk>;
+ 	clock-names = "fck", "dclkin.0";
++	mode = "dual-link";
+ 
+ 	ports {
+ 		port@1 {
+@@ -141,6 +142,7 @@
+ 	clocks = <&cpg CPG_MOD 727>,
+ 		 <&x13_clk>;
+ 	clock-names = "fck", "dclkin.0";
++	mode = "dual-link";
+ 
+ 	ports {
+ 		port@1 {
+-- 
+2.7.4
+

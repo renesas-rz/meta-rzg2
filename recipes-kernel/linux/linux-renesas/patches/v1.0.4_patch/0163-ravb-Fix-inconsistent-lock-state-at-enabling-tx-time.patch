@@ -1,0 +1,195 @@
+From c3f235a4fcadba99f2a90720b9814650fa5265a3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 21 Oct 2019 11:36:53 +0700
+Subject: [PATCH 163/197] ravb: Fix inconsistent lock state at enabling tx
+ timestamp
+
+[   58.490829] =================================
+[   58.495205] [ INFO: inconsistent lock state ]
+[   58.499583] 4.9.0-yocto-standard-00007-g2ef7caf #57 Not tainted
+[   58.505529] ---------------------------------
+[   58.509904] inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
+[   58.515939] swapper/0/0 [HC1[1]:SC1[1]:HE0:SE0] takes:
+[   58.521099]  (&(&list->lock)->rlock#2){?.-...}, at: [<ffff00000899f474>] skb_queue_tail+0x2c/0x68
+{HARDIRQ-ON-W} state was registered at:
+[   58.533654]   [   58.535155] [<ffff000008127e94>] mark_lock+0x1c4/0x718
+[   58.540318]   [   58.541814] [<ffff000008129068>] __lock_acquire+0x660/0x1890
+[   58.547501]   [   58.548997] [<ffff00000812a840>] lock_acquire+0xd0/0x290
+[   58.554334]   [   58.555834] [<ffff000008acfd28>] _raw_spin_lock_bh+0x50/0x90
+[   58.561520]   [   58.563018] [<ffff000008a31908>] first_packet_length+0x40/0x2b0
+[   58.568965]   [   58.570461] [<ffff000008a31bd0>] udp_ioctl+0x58/0x120
+[   58.575535]   [   58.577032] [<ffff000008a41df8>] inet_ioctl+0x58/0x128
+[   58.582194]   [   58.583691] [<ffff0000089938e0>] sock_do_ioctl+0x40/0x88
+[   58.589028]   [   58.590523] [<ffff000008994824>] sock_ioctl+0x284/0x350
+[   58.595773]   [   58.597271] [<ffff000008295b88>] do_vfs_ioctl+0xb0/0x7c0
+[   58.602607]   [   58.604103] [<ffff00000829632c>] SyS_ioctl+0x94/0xa8
+[   58.609090]   [   58.610588] [<ffff00000808374c>] __sys_trace_return+0x0/0x4
+[   58.616187] irq event stamp: 335205
+[   58.619690] hardirqs last  enabled at (335204): [<ffff00000808180c>] __do_softirq+0xdc/0x5c4
+[   58.628168] hardirqs last disabled at (335205): [<ffff000008082f70>] el1_irq+0x70/0x12c
+[   58.636211] softirqs last  enabled at (335202): [<ffff0000080d7168>] _local_bh_enable+0x28/0x50
+[   58.644950] softirqs last disabled at (335203): [<ffff0000080d76e4>] irq_exit+0xd4/0x100
+[   58.653076]
+[   58.653076] other info that might help us debug this:
+[   58.659632]  Possible unsafe locking scenario:
+[   58.659632]
+[   58.665577]        CPU0
+[   58.668031]        ----
+[   58.670484]   lock(&(&list->lock)->rlock#2);
+[   58.674799]   <Interrupt>
+[   58.677427]     lock(&(&list->lock)->rlock#2);
+[   58.681916]
+[   58.681916]  *** DEADLOCK ***
+[   58.681916]
+[   58.687863] 1 lock held by swapper/0/0:
+[   58.691713]  #0:  (&(&priv->lock)->rlock){-.-...}, at: [<ffff0000087981b0>] ravb_multi_interrupt+0x28/0x98
+[   58.701456]
+[   58.701456] stack backtrace:
+[   58.705833] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.9.0-yocto-standard-00007-g2ef7caf #57
+[   58.714396] Hardware name: Renesas Salvator-X board based on r8a7796 (DT)
+[   58.721214] Call trace:
+[   58.723672] [<ffff00000808a478>] dump_backtrace+0x0/0x1d8
+[   58.729095] [<ffff00000808a674>] show_stack+0x24/0x30
+[   58.734170] [<ffff000008490858>] dump_stack+0xb0/0xe8
+[   58.740285] [<ffff0000081eb668>] print_usage_bug.part.24+0x264/0x27c
+[   58.747697] [<ffff000008127e20>] mark_lock+0x150/0x718
+[   58.753892] [<ffff000008129618>] __lock_acquire+0xc10/0x1890
+[   58.760602] [<ffff00000812a840>] lock_acquire+0xd0/0x290
+[   58.766956] [<ffff000008acfe50>] _raw_spin_lock_irqsave+0x58/0x98
+[   58.774089] [<ffff00000899f474>] skb_queue_tail+0x2c/0x68
+[   58.780518] [<ffff0000089a1678>] sock_queue_err_skb+0xc8/0x138
+[   58.787364] [<ffff0000089a1774>] __skb_complete_tx_timestamp+0x8c/0xb8
+[   58.794888] [<ffff0000089a7168>] __skb_tstamp_tx+0xd8/0x130
+[   58.801437] [<ffff0000089a71f0>] skb_tstamp_tx+0x30/0x40
+[   58.807723] [<ffff000008798144>] ravb_timestamp_interrupt+0x164/0x1a8
+[   58.815144] [<ffff000008798210>] ravb_multi_interrupt+0x88/0x98
+[   58.822043] [<ffff00000813add4>] __handle_irq_event_percpu+0x94/0x418
+[   58.829464] [<ffff00000813b180>] handle_irq_event_percpu+0x28/0x60
+[   58.836622] [<ffff00000813b208>] handle_irq_event+0x50/0x80
+[   58.843166] [<ffff00000813f0f4>] handle_fasteoi_irq+0xdc/0x1e0
+[   58.849968] [<ffff000008139cac>] generic_handle_irq+0x34/0x50
+[   58.856681] [<ffff00000813a41c>] __handle_domain_irq+0x8c/0x100
+[   58.863568] [<ffff000008081570>] gic_handle_irq+0x60/0xb8
+[   58.869930] Exception stack(0xffff80063b0f9de0 to 0xffff80063b0f9f10)
+[   58.877348] 9de0: ffff80063b0f9e10 0001000000000000 ffff80063b0f9f40 ffff000008081810
+[   58.886159] 9e00: 0000000060000145 ffff000008082f70 ffff000009194b00 0000000000190f2c
+[   58.894961] 9e20: 0000800632171000 000000000000000a 0000000000000000 000000000003a4d0
+[   58.903767] 9e40: 0000000000000016 0000000000000023 ffff0000091952f8 0000000000000000
+[   58.912568] 9e60: 0000000000000040 0000000000000000 0000000034d5d91d 0000000000000000
+[   58.921363] 9e80: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+[   58.930133] 9ea0: 0000000000000000 ffff000009180000 ffff0000080d76e4 0000000000000052
+[   58.938897] 9ec0: ffff000008d70000 0000000000000008 0000000000000000 0000000000000001
+[   58.947660] 9ee0: ffff80063a428000 ffff000009185000 ffff000009180000 ffff80063b0f9f40
+[   58.956430] 9f00: ffff00000808180c ffff80063b0f9f40
+[   58.962253] [<ffff000008082fb4>] el1_irq+0xb4/0x12c
+[   58.968096] [<ffff0000080d76e4>] irq_exit+0xd4/0x100
+[   58.974025] [<ffff00000813a420>] __handle_domain_irq+0x90/0x100
+[   58.980916] [<ffff000008081570>] gic_handle_irq+0x60/0xb8
+[   58.987281] Exception stack(0xffff000009183d20 to 0xffff000009183e50)
+[   58.994708] 3d20: ffff000009194b00 0000000000190f2b 0000800632171000 8c6318c6318c6320
+[   59.003554] 3d40: 0000000000000000 000000000003a4d0 0000000000000016 000000000000002a
+[   59.012416] 3d60: ffff0000091952f8 0000000000000000 0000000000001000 0000000000000000
+[   59.021279] 3d80: 0000000034d5d91d 0000000000000000 0000000000000000 0000000000000000
+[   59.030111] 3da0: 0000000000000000 0000000000000000 0000000000000000 0000000d9e3b53c4
+[   59.038913] 3dc0: ffff800638fb1800 0000000000000001 ffff00000925ad40 0000000000000004
+[   59.047726] 3de0: 0000000d9e0899ee 0000000000000001 ffff000008e3cc90 ffff00000918b000
+[   59.056521] 3e00: ffff00000918b000 ffff000009183e50 ffff0000088d0acc ffff000009183e50
+[   59.065298] 3e20: ffff0000088d0ad0 0000000060000145 0000000000000001 ffff0000088d0b70
+[   59.074068] 3e40: ffffffffffffffff ffff0000088d0acc
+[   59.079878] [<ffff000008082fb4>] el1_irq+0xb4/0x12c
+[   59.085696] [<ffff0000088d0ad0>] cpuidle_enter_state+0x130/0x408
+[   59.092656] [<ffff0000088d0e1c>] cpuidle_enter+0x34/0x48
+[   59.098909] [<ffff00000811ff50>] call_cpuidle+0x40/0x70
+[   59.105070] [<ffff00000812026c>] cpu_startup_entry+0x144/0x1f0
+[   59.111845] [<ffff000008ac7f98>] rest_init+0x150/0x160
+[   59.117925] [<ffff000008ec0b54>] start_kernel+0x38c/0x3a0
+[   59.124261] [<ffff000008ec01d8>] __primary_switched+0x5c/0x64
+
+Signed-off-by: Masaru Nagai <masaru.nagai.vx@renesas.com>
+Signed-off-by: Kazuya Mizuguchi <kazuya.mizuguchi.ks@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 1530d7b..b996edd 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -477,7 +477,7 @@ static int ravb_dmac_init(struct net_device *ndev)
+ 	/* Receive FIFO full error, descriptor empty */
+ 	ravb_write(ndev, RIC2_QFE0 | RIC2_QFE1 | RIC2_RFFE, RIC2);
+ 	/* Frame transmitted, timestamp FIFO updated */
+-	ravb_write(ndev, TIC_FTE0 | TIC_FTE1 | TIC_TFUE, TIC);
++	ravb_write(ndev, TIC_FTE0 | TIC_FTE1, TIC);
+ 
+ 	/* Setting the control will start the AVB-DMAC process. */
+ 	ravb_modify(ndev, CCC, CCC_OPC, CCC_OPC_OPERATION);
+@@ -795,18 +795,6 @@ static bool ravb_queue_interrupt(struct net_device *ndev, int q)
+ 	return false;
+ }
+ 
+-static bool ravb_timestamp_interrupt(struct net_device *ndev)
+-{
+-	u32 tis = ravb_read(ndev, TIS);
+-
+-	if (tis & TIS_TFUF) {
+-		ravb_write(ndev, ~(TIS_TFUF | TIS_RESERVED), TIS);
+-		ravb_get_tx_tstamp(ndev);
+-		return true;
+-	}
+-	return false;
+-}
+-
+ static irqreturn_t ravb_interrupt(int irq, void *dev_id)
+ {
+ 	struct net_device *ndev = dev_id;
+@@ -819,13 +807,9 @@ static irqreturn_t ravb_interrupt(int irq, void *dev_id)
+ 	iss = ravb_read(ndev, ISS);
+ 
+ 	/* Received and transmitted interrupts */
+-	if (iss & (ISS_FRS | ISS_FTS | ISS_TFUS)) {
++	if (iss & (ISS_FRS | ISS_FTS)) {
+ 		int q;
+ 
+-		/* Timestamp updated */
+-		if (ravb_timestamp_interrupt(ndev))
+-			result = IRQ_HANDLED;
+-
+ 		/* Network control and best effort queue RX/TX */
+ 		for (q = RAVB_NC; q >= RAVB_BE; q--) {
+ 			if (ravb_queue_interrupt(ndev, q))
+@@ -856,7 +840,7 @@ static irqreturn_t ravb_interrupt(int irq, void *dev_id)
+ 	return result;
+ }
+ 
+-/* Timestamp/Error/gPTP interrupt handler */
++/* Error/gPTP interrupt handler */
+ static irqreturn_t ravb_multi_interrupt(int irq, void *dev_id)
+ {
+ 	struct net_device *ndev = dev_id;
+@@ -868,10 +852,6 @@ static irqreturn_t ravb_multi_interrupt(int irq, void *dev_id)
+ 	/* Get interrupt status */
+ 	iss = ravb_read(ndev, ISS);
+ 
+-	/* Timestamp updated */
+-	if ((iss & ISS_TFUS) && ravb_timestamp_interrupt(ndev))
+-		result = IRQ_HANDLED;
+-
+ 	/* Error status summary */
+ 	if (iss & ISS_ES) {
+ 		ravb_error_interrupt(ndev);
+@@ -942,6 +922,10 @@ static int ravb_poll(struct napi_struct *napi, int budget)
+ 		/* Processing TX Descriptor Ring */
+ 		if (tis & mask) {
+ 			spin_lock_irqsave(&priv->lock, flags);
++			/* Timestamp updated */
++			if (q == RAVB_NC)
++				ravb_get_tx_tstamp(ndev);
++
+ 			/* Clear TX interrupt */
+ 			ravb_write(ndev, ~(mask | TIS_RESERVED), TIS);
+ 			ravb_tx_free(ndev, q, true);
+-- 
+2.7.4
+

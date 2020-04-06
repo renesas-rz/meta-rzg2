@@ -1,0 +1,36 @@
+From 9b7100d2e5d4de1c832bd146e3b6c479a0b61609 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 30 Mar 2020 14:45:45 +0700
+Subject: [PATCH 059/197] arm64: dts: renesas: hiphope-rzg2-ex: add LVDS panel
+ support
+
+This patch adds LVDS panel support for the sub board by including
+Advantech 1110wr panel device file.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+index 28fe17e..32583fd 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+@@ -70,7 +70,7 @@
+ 	 * to enable LVDS panel connected to RZ/G2[MN] boards.
+ 	 */
+ 
+-	/* status = "okay"; */
++	status = "okay";
+ 
+ 	ports {
+ 		port@1 {
+@@ -128,3 +128,5 @@
+ 
+ 	status = "okay";
+ };
++
++#include "rzg2-advantech-idk-1110wr-panel.dtsi"
+-- 
+2.7.4
+

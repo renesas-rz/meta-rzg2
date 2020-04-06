@@ -1,7 +1,7 @@
-From 389877736b6fbdf1685b5f51b4d4a8f04d0b2980 Mon Sep 17 00:00:00 2001
+From 035c3ba0a4a780a917b12a63e6c485525dd52cb4 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 14:53:16 +0700
-Subject: [PATCH 003/268] clk: renesas: r8a774c0: Add ZG clock
+Subject: [PATCH 003/197] clk: renesas: r8a774c0: Add ZG clock
 
 This patch adds ZG clock for the R8A774C0 SoC.
 

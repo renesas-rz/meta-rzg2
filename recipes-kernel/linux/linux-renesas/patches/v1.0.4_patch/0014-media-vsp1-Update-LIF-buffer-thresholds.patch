@@ -1,7 +1,7 @@
-From fe0822d339b176740a5916d5723d7e412f6b4c90 Mon Sep 17 00:00:00 2001
+From 93ce791a5338e6d1a99c3f31f134a768468bf853 Mon Sep 17 00:00:00 2001
 From: Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
 Date: Thu, 26 Oct 2017 02:27:51 -0400
-Subject: [PATCH 014/268] media: vsp1: Update LIF buffer thresholds
+Subject: [PATCH 014/197] media: vsp1: Update LIF buffer thresholds
 
 The LIF module has a data buffer to accommodate clock rate differences
 between the DU and the VSP. Several programmable threshold values

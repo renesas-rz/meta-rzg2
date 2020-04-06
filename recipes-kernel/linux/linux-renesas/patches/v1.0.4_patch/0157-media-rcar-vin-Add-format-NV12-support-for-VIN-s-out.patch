@@ -1,0 +1,98 @@
+From 2255a7abf7380144807f6e148ae391ed9f7cf825 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 23 Sep 2019 15:08:50 +0700
+Subject: [PATCH 157/197] media: rcar-vin: Add format NV12 support for VIN's
+ output
+
+This patch adds format NV12 support for VIN's output  in RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-dma.c  | 14 ++++++++++++--
+ drivers/media/platform/rcar-vin/rcar-v4l2.c | 10 +++++++++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-dma.c b/drivers/media/platform/rcar-vin/rcar-dma.c
+index fb78670..3230b73 100644
+--- a/drivers/media/platform/rcar-vin/rcar-dma.c
++++ b/drivers/media/platform/rcar-vin/rcar-dma.c
+@@ -120,6 +120,7 @@
+ #define VNDMR_BPSM		(1 << 4)
+ #define VNDMR_DTMD_YCSEP	(1 << 1)
+ #define VNDMR_DTMD_ARGB1555	(1 << 0)
++#define VNDMR_DTMD_YCSEP_YCBCR420	(3 << 0)
+ 
+ /* Video n Data Mode Register 2 bits */
+ #define VNDMR2_VPS		(1 << 30)
+@@ -676,7 +677,8 @@ void rvin_crop_scale_comp(struct rvin_dev *vin)
+ 	else
+ 		rvin_crop_scale_comp_gen3(vin);
+ 
+-	if (vin->format.pixelformat == V4L2_PIX_FMT_NV16)
++	if (vin->format.pixelformat == V4L2_PIX_FMT_NV16 ||
++		vin->format.pixelformat == V4L2_PIX_FMT_NV12)
+ 		rvin_write(vin, ALIGN(vin->format.width, 0x20), VNIS_REG);
+ 	else
+ 		rvin_write(vin, ALIGN(vin->format.width, 0x10), VNIS_REG);
+@@ -795,6 +797,13 @@ static int rvin_setup(struct rvin_dev *vin)
+ 	 * Output format
+ 	 */
+ 	switch (vin->format.pixelformat) {
++	case V4L2_PIX_FMT_NV12:
++		rvin_write(vin,
++			ALIGN(vin->format.width * vin->format.height, 0x80),
++			VNUVAOF_REG);
++		dmr = VNDMR_DTMD_YCSEP_YCBCR420;
++		output_is_yuv = true;
++		break;
+ 	case V4L2_PIX_FMT_NV16:
+ 		rvin_write(vin,
+ 			   ALIGN(vin->format.width * vin->format.height, 0x80),
+@@ -841,7 +850,8 @@ static int rvin_setup(struct rvin_dev *vin)
+ 			vnmc |= VNMC_DPINE;
+ 	}
+ 
+-	if (rvin_is_scaling(vin))
++	if (vin->format.pixelformat != V4L2_PIX_FMT_NV12 &&
++	    rvin_is_scaling(vin))
+ 		vnmc |= VNMC_SCLE;
+ 
+ 	/* Progressive or interlaced mode */
+diff --git a/drivers/media/platform/rcar-vin/rcar-v4l2.c b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+index 56edcd2..304a393 100644
+--- a/drivers/media/platform/rcar-vin/rcar-v4l2.c
++++ b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+@@ -31,6 +31,10 @@
+ 
+ static const struct rvin_video_format rvin_formats[] = {
+ 	{
++		.fourcc			= V4L2_PIX_FMT_NV12,
++		.bpp			= 1,
++	},
++	{
+ 		.fourcc			= V4L2_PIX_FMT_NV16,
+ 		.bpp			= 1,
+ 	},
+@@ -84,6 +88,9 @@ static u32 rvin_format_sizeimage(struct v4l2_pix_format *pix)
+ 	if (pix->pixelformat == V4L2_PIX_FMT_NV16)
+ 		return pix->bytesperline * pix->height * 2;
+ 
++	if (pix->pixelformat == V4L2_PIX_FMT_NV12)
++		return pix->bytesperline * pix->height * 3 / 2;
++
+ 	return pix->bytesperline * pix->height;
+ }
+ 
+@@ -119,7 +126,8 @@ static void rvin_format_align(struct rvin_dev *vin, struct v4l2_pix_format *pix)
+ 	}
+ 
+ 	/* HW limit width to a multiple of 32 (2^5) for NV16 else 2 (2^1) */
+-	walign = vin->format.pixelformat == V4L2_PIX_FMT_NV16 ? 5 : 1;
++	walign = vin->format.pixelformat ==
++			(V4L2_PIX_FMT_NV16 || V4L2_PIX_FMT_NV12) ? 5 : 1;
+ 
+ 	/* Limit to VIN capabilities */
+ 	v4l_bound_align_image(&pix->width, 2, vin->info->max_width, walign,
+-- 
+2.7.4
+

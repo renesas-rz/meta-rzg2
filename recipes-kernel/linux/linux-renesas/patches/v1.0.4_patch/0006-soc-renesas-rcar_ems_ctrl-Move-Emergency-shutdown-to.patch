@@ -1,7 +1,7 @@
-From 06d76b2fe11349473f596506e53000ccb8f85fb5 Mon Sep 17 00:00:00 2001
+From b1b580a2d73b613c00afd9266acb1dfab12a34fd Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
-Date: Thu, 21 Mar 2019 15:04:59 +0700
-Subject: [PATCH 006/268] soc: renesas: rcar_ems_ctrl: Move Emergency shutdown
+Date: Fri, 27 Mar 2020 16:20:06 +0700
+Subject: [PATCH 006/197] soc: renesas: rcar_ems_ctrl: Move Emergency shutdown
  to platform driver
 
 Emergency shutdown is a specific driver for R-Car Gen3 platform.
@@ -23,7 +23,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  create mode 100644 include/linux/soc/renesas/rcar_ems_ctrl.h
 
 diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 2619af6..50d9dee 100644
+index 3b17500..074ab7a 100644
 --- a/arch/arm64/configs/defconfig
 +++ b/arch/arm64/configs/defconfig
 @@ -372,6 +372,7 @@ CONFIG_THERMAL_EMULATION=y
@@ -32,10 +32,10 @@ index 2619af6..50d9dee 100644
  CONFIG_RCAR_GEN3_THERMAL=y
 +CONFIG_RCAR_THERMAL_EMS_ENABLED=y
  CONFIG_ARMADA_THERMAL=y
+ CONFIG_BCM2835_THERMAL=m
  CONFIG_BRCMSTB_THERMAL=m
- CONFIG_EXYNOS_THERMAL=y
 diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
-index f3727aa..cbb52ba 100644
+index f3727aa..178cdc0 100644
 --- a/drivers/soc/renesas/Kconfig
 +++ b/drivers/soc/renesas/Kconfig
 @@ -108,4 +108,14 @@ config RST_RCAR
@@ -49,12 +49,12 @@ index f3727aa..cbb52ba 100644
 +	tristate "Renesas R-Car Gen3 Enable Emergency Shutdown"
 +	depends on RCAR_GEN3_THERMAL || RCAR_THERMAL
 +	help
-+	  Enable this option if you want to have support for Emergency Shutdown
-+	  in R-Car Gen3.
++	 Enable this option if you want to have support for Emergency Shutdown
++	 in R-Car Gen3.
 +
  endif # SOC_RENESAS
 diff --git a/drivers/soc/renesas/Makefile b/drivers/soc/renesas/Makefile
-index c2263f4..f625ec5 100644
+index c2263f4..3308fca 100644
 --- a/drivers/soc/renesas/Makefile
 +++ b/drivers/soc/renesas/Makefile
 @@ -28,3 +28,6 @@ endif
@@ -63,7 +63,7 @@ index c2263f4..f625ec5 100644
  obj-$(CONFIG_SYSC_RCAR)		+= rcar-sysc.o
 +
 +# EMS for R-Car Gen3
-+obj-$(CONFIG_RCAR_THERMAL_EMS_ENABLED)	+= rcar_ems_ctrl.o
++obj-$(CONFIG_RCAR_THERMAL_EMS_ENABLED) += rcar_ems_ctrl.o
 diff --git a/drivers/soc/renesas/rcar_ems_ctrl.c b/drivers/soc/renesas/rcar_ems_ctrl.c
 new file mode 100644
 index 0000000..c7c23fe

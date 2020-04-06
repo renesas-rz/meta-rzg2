@@ -1,0 +1,33 @@
+From 28661d62017c70cb82d0f577e4b57292201338eb Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 15:05:57 +0700
+Subject: [PATCH 179/197] arm64: dts: renesas: r8a774a1: add missing enabled
+ temperature for IPA
+
+This patch adds missing enabled temperature for IPA.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 1c12586..f0e44aa 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -2967,6 +2967,12 @@
+ 			sustainable-power = <3874>;
+ 
+ 			trips {
++				threshold: trip-point0 {
++					temperature = <90000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
+ 				target: trip-point1 {
+ 					temperature = <100000>;
+ 					hysteresis = <1000>;
+-- 
+2.7.4
+

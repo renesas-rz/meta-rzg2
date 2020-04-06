@@ -1,0 +1,95 @@
+From bcb353f6a89d029131c3be7158172c73838dfd76 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 7 Nov 2019 19:06:20 +0700
+Subject: [PATCH 174/197] media: rcar-vin: add support for
+ MEDIA_BUS_FMT_SRGGB8_1X8
+
+By setting VNMC, rcar-vin can support input video in
+MEDIA_BUS_FMT_SRGGB8_1X8 format.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-core.c |  1 +
+ drivers/media/platform/rcar-vin/rcar-dma.c  | 10 ++++++++++
+ drivers/media/platform/rcar-vin/rcar-v4l2.c |  4 ++++
+ 3 files changed, 15 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-core.c b/drivers/media/platform/rcar-vin/rcar-core.c
+index 0c49d00..7346868 100644
+--- a/drivers/media/platform/rcar-vin/rcar-core.c
++++ b/drivers/media/platform/rcar-vin/rcar-core.c
+@@ -447,6 +447,7 @@ static int rvin_parallel_subdevice_attach(struct rvin_dev *vin,
+ 		case MEDIA_BUS_FMT_UYVY8_2X8:
+ 		case MEDIA_BUS_FMT_UYVY10_2X10:
+ 		case MEDIA_BUS_FMT_RGB888_1X24:
++		case MEDIA_BUS_FMT_SRGGB8_1X8:
+ 			vin->mbus_code = code.code;
+ 			vin_dbg(vin, "Found media bus format for %s: %d\n",
+ 				subdev->name, vin->mbus_code);
+diff --git a/drivers/media/platform/rcar-vin/rcar-dma.c b/drivers/media/platform/rcar-vin/rcar-dma.c
+index bbeebcc..4e8532e 100644
+--- a/drivers/media/platform/rcar-vin/rcar-dma.c
++++ b/drivers/media/platform/rcar-vin/rcar-dma.c
+@@ -90,6 +90,7 @@
+ #define VNMC_INF_YUV8_BT601	(1 << 16)
+ #define VNMC_INF_YUV10_BT656	(2 << 16)
+ #define VNMC_INF_YUV10_BT601	(3 << 16)
++#define VNMC_INF_RAW8		(4 << 16)
+ #define VNMC_INF_YUV16		(5 << 16)
+ #define VNMC_INF_RGB888		(6 << 16)
+ #define VNMC_VUP		(1 << 10)
+@@ -680,6 +681,8 @@ void rvin_crop_scale_comp(struct rvin_dev *vin)
+ 	if (vin->format.pixelformat == V4L2_PIX_FMT_NV16 ||
+ 		vin->format.pixelformat == V4L2_PIX_FMT_NV12)
+ 		rvin_write(vin, ALIGN(vin->format.width, 0x20), VNIS_REG);
++	else if (vin->format.pixelformat == V4L2_PIX_FMT_SRGGB8)
++		rvin_write(vin, ALIGN(vin->format.width / 2, 0x10), VNIS_REG);
+ 	else
+ 		rvin_write(vin, ALIGN(vin->format.width, 0x10), VNIS_REG);
+ }
+@@ -769,6 +772,9 @@ static int rvin_setup(struct rvin_dev *vin)
+ 
+ 		input_is_yuv = true;
+ 		break;
++	case MEDIA_BUS_FMT_SRGGB8_1X8:
++		vnmc |= VNMC_INF_RAW8 | VNMC_BPS;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -832,6 +838,9 @@ static int rvin_setup(struct rvin_dev *vin)
+ 		/* Note: not supported on M1 */
+ 		dmr = VNDMR_EXRGB;
+ 		break;
++	case V4L2_PIX_FMT_SRGGB8:
++		dmr = 0;
++		break;
+ 	default:
+ 		vin_err(vin, "Invalid pixelformat (0x%x)\n",
+ 			vin->format.pixelformat);
+@@ -1160,6 +1169,7 @@ static int rvin_mc_validate_format(struct rvin_dev *vin, struct v4l2_subdev *sd,
+ 	case MEDIA_BUS_FMT_UYVY8_2X8:
+ 	case MEDIA_BUS_FMT_UYVY10_2X10:
+ 	case MEDIA_BUS_FMT_RGB888_1X24:
++	case MEDIA_BUS_FMT_SRGGB8_1X8:
+ 		vin->mbus_code = fmt.format.code;
+ 		break;
+ 	default:
+diff --git a/drivers/media/platform/rcar-vin/rcar-v4l2.c b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+index a337972..a0f9f19 100644
+--- a/drivers/media/platform/rcar-vin/rcar-v4l2.c
++++ b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+@@ -62,6 +62,10 @@ static const struct rvin_video_format rvin_formats[] = {
+ 		.fourcc			= V4L2_PIX_FMT_XBGR32,
+ 		.bpp			= 4,
+ 	},
++	{
++		.fourcc			= V4L2_PIX_FMT_SRGGB8,
++		.bpp			= 1,
++	},
+ };
+ 
+ const struct rvin_video_format *rvin_format_from_pixel(u32 pixelformat)
+-- 
+2.7.4
+

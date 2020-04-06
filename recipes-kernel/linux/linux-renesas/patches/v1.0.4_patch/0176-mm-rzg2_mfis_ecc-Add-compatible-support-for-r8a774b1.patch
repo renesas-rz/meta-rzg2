@@ -1,0 +1,28 @@
+From 4967396a5be1b6a596cffb8ee4fdbea35832048d Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Mon, 25 Nov 2019 14:36:56 +0700
+Subject: [PATCH 176/197] mm: rzg2_mfis_ecc : Add compatible support for
+ r8a774b1
+
+Add support for RZ/G2N (r8a774b1)
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ mm/rzg2_mfis_ecc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mm/rzg2_mfis_ecc.c b/mm/rzg2_mfis_ecc.c
+index 28f42ab..76724af 100644
+--- a/mm/rzg2_mfis_ecc.c
++++ b/mm/rzg2_mfis_ecc.c
+@@ -435,6 +435,7 @@ static int mfis_ecc_remove(struct platform_device *pdev)
+ 
+ static const struct of_device_id mfis_ecc_of_table[] = {
+ 	{ .compatible = "renesas,mfis-ecc-r8a774c0" },
++	{ .compatible = "renesas,mfis-ecc-r8a774b1" },
+ 	{ }
+ };
+ 
+-- 
+2.7.4
+

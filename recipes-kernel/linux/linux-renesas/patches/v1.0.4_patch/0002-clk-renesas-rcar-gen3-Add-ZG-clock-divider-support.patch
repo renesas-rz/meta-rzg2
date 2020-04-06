@@ -1,7 +1,7 @@
-From ad50b7eda6a8368b2729ebfd26ce380a6ff7d140 Mon Sep 17 00:00:00 2001
+From ce3b428a07ee92997bffebe54d4c853ec9eae3db Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 14:45:41 +0700
-Subject: [PATCH 002/268] clk: renesas: rcar-gen3: Add ZG clock divider support
+Subject: [PATCH 002/197] clk: renesas: rcar-gen3: Add ZG clock divider support
 
 This patch adds ZG clock divider support for R-Car Gen3 SoC.
 
