@@ -1,7 +1,7 @@
-From 806dbc2c20cf26a50b0351e6038b2e710e5f1729 Mon Sep 17 00:00:00 2001
+From afe51c669b8f9817482eef70c5db7c9dcc12adb5 Mon Sep 17 00:00:00 2001
 From: Koji Matsuoka <koji.matsuoka.xm@renesas.com>
 Date: Thu, 23 Aug 2018 15:34:59 +0900
-Subject: [PATCH 011/268] v4l: vsp1: Add pixel alpha blending supoprt
+Subject: [PATCH 011/197] v4l: vsp1: Add pixel alpha blending supoprt
 
 The pixel alpha blending is supported about ARGB1555, ARGB4444,
 BGRA8888, and ARGB8888.

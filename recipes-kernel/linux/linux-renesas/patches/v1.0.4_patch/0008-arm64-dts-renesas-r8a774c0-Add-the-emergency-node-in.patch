@@ -1,7 +1,7 @@
-From c36e6ec3f8587da0f5848538640b8f965ae2cf35 Mon Sep 17 00:00:00 2001
+From caf3738e97cc1aed5b256c0dc93f4b4265f6b8fa Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:24:56 +0700
-Subject: [PATCH 008/268] arm64: dts:renesas: r8a774c0: Add the emergency node
+Subject: [PATCH 008/197] arm64: dts:renesas: r8a774c0: Add the emergency node
  in thermal-zones
 
 This patch adds the emergency node in thermal zones to support

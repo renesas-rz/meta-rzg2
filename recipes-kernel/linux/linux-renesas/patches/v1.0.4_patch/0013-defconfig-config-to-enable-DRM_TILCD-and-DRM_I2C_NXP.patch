@@ -1,21 +1,29 @@
-From de2f4c5ac3362b7fa22ad559cabfb282f6017711 Mon Sep 17 00:00:00 2001
+From e566d7625265cedc726ae9ff45bdf9141b7482a1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
-Date: Mon, 1 Jul 2019 14:54:29 +0700
-Subject: [PATCH 013/268] defconfig: config to enable DRM_TILCD and
+Date: Fri, 27 Mar 2020 16:24:55 +0700
+Subject: [PATCH 013/197] defconfig: config to enable DRM_TILCD and
  DRM_I2C_NXP_TDA998x
 
 Enable: CONFIG_DRM_TILCDC=y, CONFIG_DRM_I2C_NXP_TDA998X=y
 
 Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
 ---
- arch/arm64/configs/defconfig | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/configs/defconfig | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 50d9dee..8555fe9 100644
+index 074ab7a..df3fd69 100644
 --- a/arch/arm64/configs/defconfig
 +++ b/arch/arm64/configs/defconfig
-@@ -756,3 +756,6 @@ CONFIG_HAS_IOMEM=y
+@@ -435,7 +435,6 @@ CONFIG_VIDEO_SAMSUNG_EXYNOS_GSC=m
+ CONFIG_VIDEO_RENESAS_FCP=y
+ CONFIG_VIDEO_RENESAS_VSP1=y
+ CONFIG_DRM=y
+-CONFIG_DRM_I2C_NXP_TDA998X=m
+ CONFIG_DRM_NOUVEAU=m
+ CONFIG_DRM_EXYNOS=m
+ CONFIG_DRM_EXYNOS5433_DECON=y
+@@ -757,3 +756,6 @@ CONFIG_HAS_IOMEM=y
  
  # Enable PTP clock drivers
  CONFIG_PTP_1588_CLOCK=y

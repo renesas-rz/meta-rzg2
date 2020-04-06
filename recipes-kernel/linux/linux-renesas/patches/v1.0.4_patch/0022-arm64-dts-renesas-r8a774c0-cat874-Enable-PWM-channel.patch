@@ -1,0 +1,56 @@
+From 82a47e2875f98ef432c5e79ac5abc52af3bd0777 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 27 Mar 2020 16:28:27 +0700
+Subject: [PATCH 022/197] arm64: dts: renesas: r8a774c0-cat874: Enable PWM
+ channels 5 and 6
+
+This patch enables PWM{5,6} for RZ/G2E boards.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 6127af96..0a8d891 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -355,6 +355,16 @@
+ 		groups = "usb30", "usb30_id";
+ 		function = "usb30";
+ 	};
++
++	pwm5_pins: pwm5 {
++		groups = "pwm5_a";
++		function = "pwm5";
++	};
++
++	pwm6_pins: pwm6 {
++		groups = "pwm6_a";
++		function = "pwm6";
++	};
+ };
+ 
+ &rcar_sound {
+@@ -475,3 +485,17 @@
+ &tmu4 {
+ 	status = "okay";
+ };
++
++&pwm5 {
++	pinctrl-0 = <&pwm5_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
++&pwm6 {
++	pinctrl-0 = <&pwm6_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

@@ -1,0 +1,38 @@
+From 9452c8825281fdab2d73b3a1711dfd3f74ed28dd Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 5 Jun 2019 14:07:14 +0700
+Subject: [PATCH 087/197] input: usbtouchscreen: fix eGalax HID ignoring
+
+Fix the eGalax/EETI HID device ignoring by adding a match for the
+protocol too.
+This is what the marco USB_DEVICE_HID_CLASS() was supposed to do
+anyways.
+
+Devices confirmed to be real HID have the class set to HID and the
+protocol set to 'mouse'.  Some have HID class but protocol set to
+'none'. Those are not HID and should be driven by usbtouchscreen.
+
+Cherry picks from:
+https://lore.kernel.org/lkml/200902081701.58602.daniel.ritz-ml@swissonline.ch/#r
+
+Signed-off-by: Daniel Ritz <daniel.ritz@gmx.ch>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/input/touchscreen/usbtouchscreen.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/input/touchscreen/usbtouchscreen.c b/drivers/input/touchscreen/usbtouchscreen.c
+index 48304e2..e74f813 100644
+--- a/drivers/input/touchscreen/usbtouchscreen.c
++++ b/drivers/input/touchscreen/usbtouchscreen.c
+@@ -145,6 +145,7 @@ enum {
+ 
+ #define USB_DEVICE_HID_CLASS(vend, prod) \
+ 	.match_flags = USB_DEVICE_ID_MATCH_INT_CLASS \
++		| USB_DEVICE_ID_MATCH_INT_PROTOCOL \
+ 		| USB_DEVICE_ID_MATCH_DEVICE, \
+ 	.idVendor = (vend), \
+ 	.idProduct = (prod), \
+-- 
+2.7.4
+

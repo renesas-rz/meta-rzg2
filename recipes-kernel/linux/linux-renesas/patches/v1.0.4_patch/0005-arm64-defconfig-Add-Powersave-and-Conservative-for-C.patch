@@ -1,7 +1,7 @@
-From 08219bba97f0aaa2fe1035f031d1cfddaa0aab99 Mon Sep 17 00:00:00 2001
+From fda29091dce4de1957f234f8209f86b65730e177 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 5 Mar 2019 14:35:40 +0700
-Subject: [PATCH 005/268] arm64: defconfig: Add Powersave and Conservative for
+Subject: [PATCH 005/197] arm64: defconfig: Add Powersave and Conservative for
  CPUFREQ
 
 This patch enables Powersave and Conservative functionalities for
@@ -13,7 +13,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 3b69040..2619af6 100644
+index 70b0f65..3b17500 100644
 --- a/arch/arm64/configs/defconfig
 +++ b/arch/arm64/configs/defconfig
 @@ -108,10 +108,10 @@ CONFIG_WQ_POWER_EFFICIENT_DEFAULT=y
