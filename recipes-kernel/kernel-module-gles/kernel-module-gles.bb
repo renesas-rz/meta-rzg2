@@ -9,9 +9,10 @@ require include/rzg2-modules-common.inc
 PN = "kernel-module-gles"
 PR = "r0"
 
-COMPATIBLE_MACHINE = "(r8a774a1|r8a774b1|r8a774c0)"
+COMPATIBLE_MACHINE = "(r8a774a1|r8a774b1|r8a774c0|r8a774e1)"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+SRC_URI_r8a774e1 = 'file://GSX_KM_H3.tar.bz2'
 SRC_URI_r8a774b1 = 'file://GSX_KM_M3N.tar.bz2'
 SRC_URI_r8a774a1 = 'file://GSX_KM_M3.tar.bz2'
 SRC_URI_r8a774c0 = 'file://GSX_KM_E3.tar.bz2'
@@ -25,9 +26,11 @@ SRC_URI_append = "\
 
 S = "${WORKDIR}/rogue_km"
 
+KBUILD_DIR_r8a774e1 = "${S}/build/linux/r8a7795_linux"
 KBUILD_DIR_r8a774b1 = "${S}/build/linux/r8a77965_linux"
 KBUILD_DIR_r8a774a1 = "${S}/build/linux/r8a7796_linux"
 KBUILD_DIR_r8a774c0 = "${S}/build/linux/r8a7799_linux"
+KBUILD_OUTDIR_r8a774e1 = "binary_r8a7795_linux_release/target_aarch64/kbuild/"
 KBUILD_OUTDIR_r8a774b1 = "binary_r8a77965_linux_release/target_aarch64/kbuild/"
 KBUILD_OUTDIR_r8a774a1 = "binary_r8a7796_linux_release/target_aarch64/kbuild/"
 KBUILD_OUTDIR_r8a774c0 = "binary_r8a7799_linux_release/target_aarch64/kbuild/"
