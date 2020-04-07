@@ -35,16 +35,18 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0018-plat-rcar-M3-qos_init_m3_v11-prevent-DRAM-Split-set-.patch \
             file://0019-plat-rcar-timer-bl2_swdt-increase-WDT-count-when-ECC.patch \
             file://0020-HiHope-Rev3.0-board-support.patch \
+            file://0021-Plat-renesas-add-support-for-Hihope-RZG2H-board.patch \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"
 
-COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n)"
+COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rcar"
 ATFW_OPT_LOSSY = "${@base_conditional("USE_MULTIMEDIA", "1", "RCAR_LOSSY_ENABLE=1", "", d)}"
 ATFW_OPT_r8a774c0 = "LSI=G2E RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RZG_EK874=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none""
 ATFW_OPT_r8a774a1 = "LSI=G2M RCAR_DRAM_SPLIT=2 RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2M=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 RCAR_SECURE_BOOT=0 SPD="none""
 ATFW_OPT_r8a774b1 = "LSI=G2N RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2N=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 SPD="none""
+ATFW_OPT_r8a774e1 = "LSI=G2H RCAR_DRAM_SPLIT=2 RCAR_DRAM_LPDDR4_MEMCONF=1 RCAR_DRAM_CHANNEL=5 RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2H=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 SPD="none""
 
 ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_EK874_ECC=1 ", "",d)}"
 
