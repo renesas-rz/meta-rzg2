@@ -47,6 +47,10 @@ do_install_append() {
         if [ "${MACHINE}" = "hihope-rzg2n" ] ; then
             install -m 644 ${WORKDIR}/weston_v4l2.ini ${D}/${sysconfdir}/xdg/weston/weston.ini
         fi
+
+        if [ "${MACHINE}" = "hihope-rzg2h" ] ; then
+            install -m 644 ${WORKDIR}/weston_v4l2.ini ${D}/${sysconfdir}/xdg/weston/weston.ini
+        fi
     else
         # install weston.ini as sample settings of gl-renderer
         install -m 644 ${WORKDIR}/weston.ini ${D}/${sysconfdir}/xdg/weston/
