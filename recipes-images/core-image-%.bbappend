@@ -4,6 +4,10 @@ update_issue() {
 
     # Set SoC and Board info
     case "${MACHINE}" in
+    hihope-rzg2h)
+      BSP_SOC="RZG2H"
+      BSP_BOARD="HIHOPE-RZG2H"
+      ;;
     hihope-rzg2m)
       BSP_SOC="RZG2M"
       BSP_BOARD="HIHOPE-RZG2M"
