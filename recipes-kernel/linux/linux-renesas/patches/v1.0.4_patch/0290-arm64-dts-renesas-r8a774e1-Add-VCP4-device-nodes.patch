@@ -1,0 +1,75 @@
+From 796efb975d4fab6ab200cb779a79a19a7281e068 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Tue, 14 Apr 2020 21:13:22 +0700
+Subject: [PATCH 290/309] arm64: dts: renesas: r8a774e1: Add VCP4 device nodes
+
+This commit adds VCP4 device nodes (fcpcs, vcplf, vdpb)
+used by UVCS driver.
+
+In addition, this commit removes:
+- ivdp1c because we do not support
+- fcpci because this module just have on RZ/G2M
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 34 +++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 4ff45ad..a800286 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1848,29 +1848,37 @@
+ 			status = "disabled";
+ 		};
+ 
+-		fcpci0: vcp4@fe8df000 {
+-			reg = <0 0xfe8df000 0 0x200>;
+-			/* placeholder */
+-		};
+-
+ 		fcpcs: vcp4@fe90f000 {
++			compatible = "renesas,vcp4-fcpcs";
+ 			reg = <0 0xfe90f000 0 0x200>;
+-			/* placeholder */
+-		};
+-
+-		ivdp1c: vcp4@fe8d0000 {
+-			reg = <0 0xfe8d0000 0 0x200>, <0 0xfe8d0200 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 619>;
++			power-domains = <&sysc R8A774E1_PD_A3VC>;
++			resets = <&cpg 619>;
++			renesas,#ch = <0>;
+ 		};
+ 
+ 		vcplf: vcp4@fe910000 {
++			compatible = "renesas,vcp4-vcplf";
+ 			reg = <0 0xfe910000 0 0x200>, <0 0xfe910200 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 260 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 261 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 130>;
++			power-domains = <&sysc R8A774E1_PD_A2VC1>;
++			resets = <&cpg 130>;
++			renesas,#ch = <0>;
++			renesas,#fcp_ch = <0>;
+ 		};
+ 
+ 		vdpb: vcp4@fe900000 {
++			compatible = "renesas,vcp4-vdpb";
+ 			reg = <0 0xfe900000 0 0x200>, <0 0xfe900200 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 131>;
++			power-domains = <&sysc R8A774E1_PD_A2VC1>;
++			resets = <&cpg 131>;
++			renesas,#ch = <1>;
++			renesas,#fcp_ch = <0>;
+ 		};
+ 
+ 		fdp0: fdpm@fe940000 {
+-- 
+2.7.4
+

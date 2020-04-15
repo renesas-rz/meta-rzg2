@@ -1,0 +1,48 @@
+From f2b3cff4410d9037ea700ca8786959a075ccd199 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Wed, 8 Apr 2020 10:19:54 +0700
+Subject: [PATCH 289/309] arm64: dts: renesas: r8a774e1: add support fdp
+
+This commit adds device node for fdp used by fdpm.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 7c7ce6f..4ff45ad 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1874,8 +1874,27 @@
+ 		};
+ 
+ 		fdp0: fdpm@fe940000 {
++			compatible = "renesas,fdpm";
+ 			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 262 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 119>, <&cpg CPG_MOD 615>;
++			clock-names = "fdp", "fcp";
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 119>, <&cpg 615>;
++			reset-names = "fdp", "fcp";
++			renesas,#ch = <0>;
++		};
++
++		fdp1: fdpm@fe944000 {
++			compatible = "renesas,fdpm";
++			reg = <0 0xfe944000 0 0x2400>, <0 0xfe951000 0 0x200>;
++			interrupts = <GIC_SPI 263 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 118>, <&cpg CPG_MOD 614>;
++			clock-names = "fdp", "fcp";
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 118>, <&cpg 614>;
++			reset-names = "fdp", "fcp";
++			renesas,#ch = <1>;
+ 		};
+ 
+ 		fcpf0: fcp@fe950000 {
+-- 
+2.7.4
+

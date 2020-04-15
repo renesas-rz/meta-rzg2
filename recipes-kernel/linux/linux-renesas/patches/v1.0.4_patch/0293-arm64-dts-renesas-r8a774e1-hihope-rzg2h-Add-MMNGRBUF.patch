@@ -1,0 +1,32 @@
+From 3c2fe97fbcc556b579c0e0b8ac633d687fafbb8c Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Thu, 9 Apr 2020 14:38:43 +0700
+Subject: [PATCH 293/309] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
+ MMNGRBUF driver support
+
+This patch adds MMNGRBUF driver support for the R8A774E1 SoC
+on the Hihope-rzg2h board.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 360049f..fb2b1f7 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -55,6 +55,10 @@
+ 		compatible = "renesas,mmngr";
+ 		memory-region = <&mmp_reserved>, <&lossy_decompress>;
+ 	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
++	};
+ };
+ 
+ &sound_card {
+-- 
+2.7.4
+

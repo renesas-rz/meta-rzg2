@@ -1,0 +1,29 @@
+From 8b2c14a14b18af07262573c287a556f95e5de8be Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 7 Apr 2020 18:58:06 +0700
+Subject: [PATCH 225/309] dt-bindings: timer: renesas: tmu: Document r8a774e1
+ TMU
+
+Document TMU module bindings for RZ/G2H (r8a774e1) SoC
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/timer/renesas,tmu.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/timer/renesas,tmu.txt b/Documentation/devicetree/bindings/timer/renesas,tmu.txt
+index a720242..784fb1d 100644
+--- a/Documentation/devicetree/bindings/timer/renesas,tmu.txt
++++ b/Documentation/devicetree/bindings/timer/renesas,tmu.txt
+@@ -13,6 +13,7 @@ Required Properties:
+     - "renesas,tmu-r8a774a1" for the r8a774A1 TMU
+     - "renesas,tmu-r8a774b1" for the r8a774B1 TMU
+     - "renesas,tmu-r8a774c0" for the r8a774C0 TMU
++    - "renesas,tmu-r8a774e1" for the r8a774E1 TMU
+     - "renesas,tmu-r8a7778" for the r8a7778 TMU
+     - "renesas,tmu-r8a7779" for the r8a7779 TMU
+     - "renesas,tmu" for any TMU.
+-- 
+2.7.4
+

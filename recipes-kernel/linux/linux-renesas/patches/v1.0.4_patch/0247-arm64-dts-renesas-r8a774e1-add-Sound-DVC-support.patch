@@ -1,0 +1,48 @@
+From 7445c3202dc893fe57a0c58e357049af07665b02 Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Tue, 7 Apr 2020 16:47:00 +0700
+Subject: [PATCH 247/309] arm64: dts: renesas: r8a774e1: add Sound DVC support
+
+This patch adds DVC[0.1] support for R8A774E1 SoC.
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 47f967b..12ee908 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1152,6 +1152,7 @@
+ 				 <&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
+ 				 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
+ 				 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++				 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
+ 				 <&audio_clk_a>, <&audio_clk_b>,
+ 				 <&audio_clk_c>,
+ 				 <&cpg CPG_CORE R8A774E1_CLK_S0D4>;
+@@ -1162,6 +1163,7 @@
+ 					"src.9", "src.8", "src.7", "src.6",
+ 					"src.5", "src.4", "src.3", "src.2",
+ 					"src.1", "src.0",
++					"dvc.0", "dvc.1",
+ 					"clk_a", "clk_b", "clk_c", "clk_i";
+ 
+ 			resets = <&cpg 1005>,
+@@ -1180,8 +1182,12 @@
+ 
+ 			rcar_sound,dvc {
+ 				dvc0: dvc-0 {
++					dmas = <&audma1 0xbc>;
++					dma-names = "tx";
+ 				};
+ 				dvc1: dvc-1 {
++					dmas = <&audma1 0xbe>;
++					dma-names = "tx";
+ 				};
+ 			};
+ 
+-- 
+2.7.4
+

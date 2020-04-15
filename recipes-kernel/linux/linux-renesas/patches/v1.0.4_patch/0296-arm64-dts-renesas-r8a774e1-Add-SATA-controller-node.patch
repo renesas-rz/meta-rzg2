@@ -1,0 +1,38 @@
+From ac75e0eafadf3fb54863c0ef1897656f87a09bbf Mon Sep 17 00:00:00 2001
+From: Dat Nguyen <dat.nguyen.ra@rensas.com>
+Date: Tue, 14 Apr 2020 19:02:21 +0700
+Subject: [PATCH 296/309] arm64: dts: renesas: r8a774e1: Add SATA controller
+ node
+
+This patch adds SATA controller node for the R8A774E1 SoC.
+
+Signed-off-by: Dat Nguyen <dat.nguyen.ra@rensas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index a800286..3717c1e 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1786,6 +1786,17 @@
+ 			resets = <&cpg 112>;
+ 		};
+ 
++		sata: sata@ee300000 {
++			compatible = "renesas,sata-r8a774e1",
++						"renesas,rcar-gen3-sata";
++			reg = <0 0xee300000 0 0x200000>;
++			interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 815>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 815>;
++			status = "disabled";
++		};
++
+ 		pciec0: pcie@fe000000 {
+ 			compatible = "renesas,pcie-r8a774e1",
+ 				"renesas,pcie-rcar-gen3";
+-- 
+2.7.4
+

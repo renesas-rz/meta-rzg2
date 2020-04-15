@@ -1,0 +1,30 @@
+From c5fe43ecb8a6e7bb196b77fc318f8c728a3f99d8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 7 Apr 2020 18:56:24 +0700
+Subject: [PATCH 223/309] dt-bindings: timer: renesas, cmt: Document r8a774e1
+ CMT
+
+Document CMT module bindings for RZ/G2H (r8a774e1) SoC
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/timer/renesas,cmt.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/timer/renesas,cmt.txt b/Documentation/devicetree/bindings/timer/renesas,cmt.txt
+index 2779769..c37705a 100644
+--- a/Documentation/devicetree/bindings/timer/renesas,cmt.txt
++++ b/Documentation/devicetree/bindings/timer/renesas,cmt.txt
+@@ -32,6 +32,8 @@ Required Properties:
+     - "renesas,r8a774b1-cmt1" for the 48-bit CMT devices included in r8a774b1.
+     - "renesas,r8a774c0-cmt0" for the 32-bit CMT0 device included in r8a774c0.
+     - "renesas,r8a774c0-cmt1" for the 48-bit CMT1 device included in r8a774c0.
++    - "renesas,r8a774e1-cmt0" for the 32-bit CMT0 device included in r8a774e1.
++    - "renesas,r8a774e1-cmt1" for the 48-bit CMT1 device included in r8a774e1.
+     - "renesas,r8a7790-cmt0" for the 32-bit CMT0 device included in r8a7790.
+     - "renesas,r8a7790-cmt1" for the 48-bit CMT1 device included in r8a7790.
+     - "renesas,r8a7791-cmt0" for the 32-bit CMT0 device included in r8a7791.
+-- 
+2.7.4
+

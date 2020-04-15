@@ -1,0 +1,58 @@
+From 151a9dec0cb8ef6c63b218898f8441c95079374e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 14 Apr 2020 08:56:18 +0700
+Subject: [PATCH 260/309] arm64: dts: renesas: r8a774e1: Add CAN nodes
+
+This patch adds CAN nodes for (RZ/G2H) R8A774E1 SoC.
+
+Signed-off-by: Quynh Nguyen <quynhnguyen.xb@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 987053e..34d976a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1027,13 +1027,35 @@
+ 		};
+ 
+ 		can0: can@e6c30000 {
++			compatible = "renesas,can-r8a774e1",
++					"renesas,rcar-gen3-can";
+ 			reg = <0 0xe6c30000 0 0x1000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 916>,
++				 <&cpg CPG_CORE R8A774E1_CLK_CANFD>,
++				 <&can_clk>;
++			clock-names = "clkp1", "clkp2", "can_clk";
++			assigned-clocks = <&cpg CPG_CORE R8A774E1_CLK_CANFD>;
++			assigned-clock-rates = <80000000>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 916>;
++			status = "disabled";
+ 		};
+ 
+ 		can1: can@e6c38000 {
++			compatible = "renesas,can-r8a774e1",
++					"renesas,rcar-gen3-can";
+ 			reg = <0 0xe6c38000 0 0x1000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 187 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 915>,
++				 <&cpg CPG_CORE R8A774E1_CLK_CANFD>,
++				 <&can_clk>;
++			clock-names = "clkp1", "clkp2", "can_clk";
++			assigned-clocks = <&cpg CPG_CORE R8A774E1_CLK_CANFD>;
++			assigned-clock-rates = <80000000>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 915>;
++			status = "disabled";
+ 		};
+ 
+ 		pwm0: pwm@e6e30000 {
+-- 
+2.7.4
+

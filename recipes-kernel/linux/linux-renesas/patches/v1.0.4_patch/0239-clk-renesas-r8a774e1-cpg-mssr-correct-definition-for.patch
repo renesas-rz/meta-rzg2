@@ -1,0 +1,36 @@
+From bd68350f27a4a002cad52cf86c9a05909ff4cb6e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 Apr 2020 10:15:48 +0700
+Subject: [PATCH 239/309] clk: renesas: r8a774e1-cpg-mssr: correct definition
+ for osc clock
+
+Correct right definition for OSC clock in RZ/G2H (r8a774e1) because:
+1. OSC clock is a clock which used EXTAL predivider with fixed divider.
+2. In commit "clk: renesas: rcar-gen3: Add support for OSC EXTAL
+predivider", macro for using OSC EXTAL predivider clock is defined.
+3. Based on Table 8.2a "List of Clocks [RZ/G2H]" in HW Manual of RZ/G
+Series, 2nd Generation Rev0.8, OSC Clock has a fixed division ratio
+equal to 8 and EXTAl divider ratio depends on MD pins value (which
+defined by osc_prediv variable in rcar_gen3_cpg_pll_config struct).
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774e1-cpg-mssr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/clk/renesas/r8a774e1-cpg-mssr.c b/drivers/clk/renesas/r8a774e1-cpg-mssr.c
+index 92a600c..9f755ac 100644
+--- a/drivers/clk/renesas/r8a774e1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774e1-cpg-mssr.c
+@@ -108,7 +108,7 @@ static const struct cpg_core_clk r8a774e1_core_clks[] __initconst = {
+ 	DEF_DIV6P1("mso",       R8A774E1_CLK_MSO,   CLK_PLL1_DIV4, 0x014),
+ 	DEF_DIV6P1("hdmi",      R8A774E1_CLK_HDMI,  CLK_PLL1_DIV4, 0x250),
+ 
+-	DEF_DIV6_RO("osc",      R8A774E1_CLK_OSC,   CLK_EXTAL, CPG_RCKCR,  8),
++	DEF_GEN3_OSC("osc",     R8A774E1_CLK_OSC,   CLK_EXTAL,     8),
+ 
+ 	DEF_BASE("r",           R8A774E1_CLK_R,     CLK_TYPE_GEN3_R, CLK_RINT),
+ };
+-- 
+2.7.4
+
