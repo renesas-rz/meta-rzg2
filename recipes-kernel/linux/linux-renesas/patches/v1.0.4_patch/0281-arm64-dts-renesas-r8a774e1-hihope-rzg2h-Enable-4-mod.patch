@@ -1,0 +1,40 @@
+From 5ff3d040e823a5acd94907a9596fef87d4d34a47 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Tue, 14 Apr 2020 16:56:03 +0700
+Subject: [PATCH 281/307] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Enable 4
+ modules vsp.
+
+This patch enables 4 modules: vspbc, vspbd, vspi0 and vspi1.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 7f93f65..b5f7aed 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -48,3 +48,19 @@
+ 		/delete-node/ rsnd_port0;
+ 	};
+ };
++
++&vspbc {
++	status = "okay";
++};
++
++&vspbd {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
++&vspi1 {
++	status = "okay";
++};
+-- 
+2.7.4
+

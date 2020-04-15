@@ -1,0 +1,37 @@
+From 41750a319788f8833fbed70081161d6d84303fa8 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Wed, 15 Apr 2020 13:56:03 +0700
+Subject: [PATCH 299/307] arm64: dts: renesas: r8a774e1: Add USB3.0 peripheral
+ device node
+
+This patch adds USB3.0 peripheral channel 0 device node
+for SoC R8A774E1
+:
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 5087541..db3faea 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1702,8 +1702,14 @@
+ 		};
+ 
+ 		usb3_peri0: usb@ee020000 {
++			compatible = "renesas,r8a774e1-usb3-peri",
++				"renesas,rcar-gen3-usb3-peri";
+ 			reg = <0 0xee020000 0 0x400>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 328>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 328>;
++			status = "disabled";
+ 		};
+ 
+ 		ohci0: usb@ee080000 {
+-- 
+2.7.4
+

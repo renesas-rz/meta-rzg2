@@ -1,0 +1,31 @@
+From b3a9f03dee45946a0854e21110dfc83e3ee39fd7 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 Apr 2020 11:29:17 +0700
+Subject: [PATCH 234/307] clk: renesas: r8a774e1-cpg-mssr: Add clock for
+ intc-ap and intc-ex
+
+This commit adds clock input support for intc-ap and intc-ex module:
+- INTC-AP: Clock S0D3
+- INTC-EX: Clock CP
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774e1-cpg-mssr.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/clk/renesas/r8a774e1-cpg-mssr.c b/drivers/clk/renesas/r8a774e1-cpg-mssr.c
+index 06c45db..92a600c 100644
+--- a/drivers/clk/renesas/r8a774e1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774e1-cpg-mssr.c
+@@ -151,6 +151,8 @@ static const struct mssr_mod_clk r8a774e1_mod_clks[] __initconst = {
+ 	DEF_MOD("usb-dmac0",		 330,	R8A774E1_CLK_S3D1),
+ 	DEF_MOD("usb-dmac1",		 331,	R8A774E1_CLK_S3D1),
+ 	DEF_MOD("rwdt",			 402,	R8A774E1_CLK_R),
++	DEF_MOD("intc-ex",		 407,	R8A774E1_CLK_CP),
++	DEF_MOD("intc-ap",		 408,	R8A774E1_CLK_S0D3),
+ 	DEF_MOD("audmac1",		 501,	R8A774E1_CLK_S1D2),
+ 	DEF_MOD("audmac0",		 502,	R8A774E1_CLK_S1D2),
+ 	DEF_MOD("hscif4",		 516,	R8A774E1_CLK_S3D1),
+-- 
+2.7.4
+

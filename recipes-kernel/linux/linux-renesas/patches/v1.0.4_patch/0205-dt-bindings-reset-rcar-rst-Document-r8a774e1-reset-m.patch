@@ -1,0 +1,28 @@
+From bf75d9c9de28ba44aa1fdb52af21b2e24f809533 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 19 Mar 2020 10:00:51 +0700
+Subject: [PATCH 205/307] dt-bindings: reset: rcar-rst: Document r8a774e1 reset
+ module
+
+Document bindings for the RZ/G2H (R8A774E1) reset module.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/reset/renesas,rst.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/reset/renesas,rst.txt b/Documentation/devicetree/bindings/reset/renesas,rst.txt
+index 99d0930..beb56db 100644
+--- a/Documentation/devicetree/bindings/reset/renesas,rst.txt
++++ b/Documentation/devicetree/bindings/reset/renesas,rst.txt
+@@ -21,6 +21,7 @@ Required properties:
+ 		  - "renesas,r8a774a1-rst" (RZ/G2M)
+ 		  - "renesas,r8a774b1-rst" (RZ/G2N)
+ 		  - "renesas,r8a774c0-rst" (RZ/G2E)
++		  - "renesas,r8a774e1-rst" (RZ/G2H)
+ 		  - "renesas,r8a7778-reset-wdt" (R-Car M1A)
+ 		  - "renesas,r8a7779-reset-wdt" (R-Car H1)
+ 		  - "renesas,r8a7790-rst" (R-Car H2)
+-- 
+2.7.4
+
