@@ -1,0 +1,75 @@
+From 36345fa3d48558d9419dcffa9c6ac2f162eb81c3 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Fri, 3 Apr 2020 08:49:47 +0700
+Subject: [PATCH 312/313] arm64: dts: renesas: r8a774e1: Add SDHI nodes
+
+Add SHDI nodes to devicetree of R8A774E1(RZ/G2H).
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 36 +++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index aa38176..3113669 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1794,23 +1794,51 @@
+ 		};
+ 
+ 		sdhi0: sd@ee100000 {
++			compatible = "renesas,sdhi-r8a774e1",
++				     "renesas,rcar-gen3-sdhi";
+ 			reg = <0 0xee100000 0 0x2000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 165 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 314>;
++			max-frequency = <200000000>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 314>;
++			status = "disabled";
+ 		};
+ 
+ 		sdhi1: sd@ee120000 {
++			compatible = "renesas,sdhi-r8a774e1",
++				     "renesas,rcar-gen3-sdhi";
+ 			reg = <0 0xee120000 0 0x2000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 166 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 313>;
++			max-frequency = <200000000>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 313>;
++			status = "disabled";
+ 		};
+ 
+ 		sdhi2: sd@ee140000 {
++			compatible = "renesas,sdhi-r8a774e1",
++				     "renesas,rcar-gen3-sdhi";
+ 			reg = <0 0xee140000 0 0x2000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 167 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 312>;
++			max-frequency = <200000000>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 312>;
++			status = "disabled";
+ 		};
+ 
+ 		sdhi3: sd@ee160000 {
++			compatible = "renesas,sdhi-r8a774e1",
++				     "renesas,rcar-gen3-sdhi";
+ 			reg = <0 0xee160000 0 0x2000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 168 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 311>;
++			max-frequency = <200000000>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 311>;
++			status = "disabled";
+ 		};
+ 
+ 		gic: interrupt-controller@f1010000 {
+-- 
+2.7.4
+

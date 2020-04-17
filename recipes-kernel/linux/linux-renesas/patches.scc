@@ -307,3 +307,7 @@ patch patches/v1.0.4_patch/0306-media-dt-bindings-rcar-csi2-Add-R8A774E1-support
 patch patches/v1.0.4_patch/0307-media-rcar-vin-Add-support-for-R8A774E1.patch
 patch patches/v1.0.4_patch/0308-media-rcar-csi2-Add-support-for-R8A774E1.patch
 patch patches/v1.0.4_patch/0309-arm64-dts-renesas-r8a774e1-add-VIN-and-CSI-2-nodes.patch
+patch patches/v1.0.4_patch/0310-dt-bindings-tmio_mmc-Document-r8a774e1-eMMC-SDHI.patch
+patch patches/v1.0.4_patch/0311-mmc-renesas_sdhi_internal_dmac-Add-r8a774e1-support.patch
+patch patches/v1.0.4_patch/0312-arm64-dts-renesas-r8a774e1-Add-SDHI-nodes.patch
+patch patches/v1.0.4_patch/0313-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-mode.patch
