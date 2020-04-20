@@ -60,10 +60,8 @@ Download proprietary graphics and multimedia drivers from Renesas.
 
 To download Multimedia and Graphics library and related Linux drivers, please use the following link:
 
-    America: https://mp.renesas.com/en-us/rzg/marketplace/linux_package/index.html
-    Europe : https://mp.renesas.com/en-eu/rzg/marketplace/linux_package/index.html
-    Asia : https://mp.renesas.com/en-sg/rzg/marketplace/linux_package/index.html
-    Japan : https://mp.renesas.com/ja-jp/rzg/marketplace/linux_package/index.html
+    English: https://www.renesas.com/us/en/products/rzg-linux-platform/rzg-marcketplace.html
+    Japanese: https://www.renesas.com/jp/ja/products/rzg-linux-platform/rzg-marcketplace.html
 
 Graphic drivers are required for Wayland. Multimedia drivers are optional.
 
