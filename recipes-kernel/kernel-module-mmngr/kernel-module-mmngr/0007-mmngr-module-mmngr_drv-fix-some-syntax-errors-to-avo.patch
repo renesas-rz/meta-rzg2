@@ -1,0 +1,39 @@
+From 67804365417ef4f92c1eafb861e37d1aab37c156 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 7 May 2020 15:14:56 +0700
+Subject: [PATCH 1/2] mmngr-module: mmngr_drv: fix some syntax errors to avoid
+ failure when compile with enabling IPMMU_MMU_SUPPORT
+
+This commit is created to fix some syntax errors to avoid failure
+when compile with enabling IPMMU_MMU_SUPPORT.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+index 63f9328..8153ee2 100644
+--- a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
++++ b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+@@ -1625,7 +1625,7 @@ static int ipmmu_probe(struct platform_device *pdev)
+ 		ipmmu_mmu_trans_table = m3_mmu_table;
+ 	else if (soc_device_match(r8a77965) || soc_device_match(r8a774b1))
+ 		ipmmu_mmu_trans_table = m3n_mmu_table;
+-	else if (soc_device_match(r8a77990) || (soc_device_match(r8a774c0))
++	else if (soc_device_match(r8a77990) || (soc_device_match(r8a774c0)))
+ 		ipmmu_mmu_trans_table = e3_mmu_table;
+ 	else /* H3 */
+ 		ipmmu_mmu_trans_table = h3_mmu_table;
+@@ -1827,7 +1827,7 @@ static int mm_probe(struct platform_device *pdev)
+ 	if (ret) {
+ 		pr_err("MMD dma_set_coherent_mask ERROR\n");
+ 		return -1;
+-	}$
++	}
+ #endif
+ 	pkernel_virt_addr = dma_alloc_coherent(p->mm_dev_reserve,
+ 					mm_kernel_reserve_size,
+-- 
+2.7.4
+

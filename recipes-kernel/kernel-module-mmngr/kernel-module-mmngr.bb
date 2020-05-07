@@ -16,6 +16,8 @@ SRC_URI_append = " \
     file://0004-mmngr-module-mmngr_drv-add-support-IPMMU-for-RZG2M.patch \
     file://0005-mmngr-module-mmngr_drv-add-support-IPMMU-for-RZG2N.patch \
     file://0006-mmngr-module-mmngr_drv-add-support-IPMMU-for-RZG2E.patch \
+    file://0007-mmngr-module-mmngr_drv-fix-some-syntax-errors-to-avo.patch \
+    file://0008-mmngr-module-mmngr_drv-add-support-IPMMU-for-RZ-G2H.patch \
 "
 
 MMNGR_CFG_ek874 = "MMNGR_EBISU"
