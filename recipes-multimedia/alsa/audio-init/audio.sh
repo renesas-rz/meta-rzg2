@@ -9,7 +9,7 @@ case "$hostname" in
     amixer set 'DVC In',1 20%
     amixer set 'DVC Out',1 20%
     ;;
-  hihope-rzg2m | hihope-rzg2n)
+  hihope-rzg2m | hihope-rzg2n | hihope-rzg2h)
     amixer set 'DVC In',1 20%
     amixer set 'DVC Out',1 20%
     ;;
