@@ -20,6 +20,8 @@ SRCREV_FORMAT = "renesas_officialgit"
 SRC_URI = " \
     git://github.com/renesas-rcar/optee_os.git;branch=${BRANCH};name=renesas \
     git://github.com/OP-TEE/optee_os.git;branch=master;name=officialgit;destsuffix=git_official \
+    file://0001-plat-rcar-Change-check-of-load-address-and-size-of-T.patch \
+    file://0002-plat-rcar-Update-optee_os-Rev2.0.6.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"

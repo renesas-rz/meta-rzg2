@@ -1,0 +1,37 @@
+From c20fa00ff94bb6c40c11330ca280aa3f2807b8e8 Mon Sep 17 00:00:00 2001
+From: Toshiyuki Ogasahara <toshiyuki.ogasahara.bo@hitachi.com>
+Date: Fri, 7 Feb 2020 11:07:50 +0900
+Subject: [PATCH 2/2] plat-rcar: Update optee_os Rev2.0.6
+
+Update the revision number in the revision management file.
+
+Signed-off-by: Toshiyuki Ogasahara <toshiyuki.ogasahara.bo@hitachi.com>
+Signed-off-by: Yoshifumi Hosoya <yoshifumi.hosoya.wj@renesas.com>
+---
+ core/arch/arm/plat-rcar/rcar_version.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/arch/arm/plat-rcar/rcar_version.h b/core/arch/arm/plat-rcar/rcar_version.h
+index de43e02..df655f0 100644
+--- a/core/arch/arm/plat-rcar/rcar_version.h
++++ b/core/arch/arm/plat-rcar/rcar_version.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: BSD-2-Clause */
+ /*
+- * Copyright (c) 2015-2019, Renesas Electronics Corporation
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation
+  */
+ 
+ #ifndef RCAR_VERSION_H
+@@ -8,7 +8,7 @@
+ 
+ #include <stdint.h>
+ 
+-#define VERSION_OF_RENESAS	"2.0.4"
++#define VERSION_OF_RENESAS	"2.0.6"
+ 
+ extern const int8_t version_of_renesas[];
+ 
+-- 
+1.9.1
+
