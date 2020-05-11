@@ -25,6 +25,7 @@ IMAGE_INSTALL_append = " \
     obexftp \
     bluez-alsa \
     openssl \
+    vin-init \
 "
 
 # Additional tools for support Tool develop
