@@ -8,12 +8,12 @@ FLASH_WRITER_URL = "git://github.com/renesas-rz/rzg2_flash_writer.git"
 BRANCH = "master"
 
 SRC_URI = "${FLASH_WRITER_URL};branch=${BRANCH}"
-SRCREV = "7540e6e1e0cf12879256d7a5a1129ea1a218f0a4"
+SRCREV = "2d108f425c528efa585db60ead9f0bdd4a677c75"
 inherit deploy
 S = "${WORKDIR}/git"
 
 do_compile() {
-        if [ "${MACHINE}" = "hihope-rzg2n" -o "${MACHINE}" = "hihope-rzg2m" ]; then
+        if [ "${MACHINE}" = "hihope-rzg2n" -o "${MACHINE}" = "hihope-rzg2m" -o "${MACHINE}" = "hihope-rzg2h" ]; then
                 BOARD="HIHOPE";
         elif [ "${MACHINE}" = "ek874" ]; then
                 BOARD="EK874";
