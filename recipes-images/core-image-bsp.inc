@@ -27,6 +27,7 @@ IMAGE_INSTALL_append = " \
     rt-tests \
     ltp \
     openssl \
+    vin-init \
 "
 
 # Additional tools for support Tool develop
