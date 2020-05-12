@@ -20,15 +20,15 @@ SRC_URI_append += "\
 "
 
 SRC_URI_append_r8a774c0 += "\
-  ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "",d)} \
+  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "")} \
 "
 
 SRC_URI_append_r8a774a1 += "\
-  ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch ", "",d)} \
+  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch ", "")} \
 "
 
 SRC_URI_append_r8a774b1 += "\
-  ${@base_conditional("ECC_FULL", "1", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch ", "",d)} \
+  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch ", "")} \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
