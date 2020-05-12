@@ -1,0 +1,28 @@
+From b751351d1c6dc37a5b70aa6d814a6e4418f499b9 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Mon, 11 May 2020 14:48:17 +0700
+Subject: [PATCH 328/332] mmc: renesas_sdhi: Add support HS400 4TAP for
+ r8a774e1 SoC
+
+This patch adds support mode HS400 for r8a774e1 SoC.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_core.c b/drivers/mmc/host/renesas_sdhi_core.c
+index 2c67634..594ee22 100644
+--- a/drivers/mmc/host/renesas_sdhi_core.c
++++ b/drivers/mmc/host/renesas_sdhi_core.c
+@@ -567,6 +567,7 @@ static const struct renesas_sdhi_quirks sdhi_quirks_4tap = {
+ static const struct soc_device_attribute sdhi_quirks_match[]  = {
+ 	{ .soc_id = "r8a774a1", .revision = "ES1.*",
+ 				.data = &sdhi_quirks_4tap },
++	{ .soc_id = "r8a774e1", .data = &sdhi_quirks_4tap },
+ 	{ .soc_id = "r8a7795",  .data = &sdhi_quirks_4tap },
+ 	{ .soc_id = "r8a7796",  .data = &sdhi_quirks_4tap },
+ 	{ /* sentinel */ }
+-- 
+2.7.4
+

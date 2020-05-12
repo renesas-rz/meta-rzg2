@@ -1,0 +1,34 @@
+From 0e2f66e2d9d83f0d9d515e9b35b58e6bbc7cdaa3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 27 Apr 2020 18:50:55 +0700
+Subject: [PATCH 318/332] arm64: dts: renesas: hihope-common: add property to
+ set virtual channel for OV5645 camera
+
+This commit is created to add property "virtual-channel" to set virtual
+channel index for OV5645 camera.
+In HiHope common platform of G2M/N/H, virtual channel is support with:
+_ CSI: From 0 to 3.
+_ OV5645: From 0 to 3.
+And currently, set 0 to virtual channel as default.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 685eff8..360ae97 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -659,6 +659,8 @@
+ 		vdda-supply = <&camera_vdda_2v8>;
+ 		vddd-supply = <&camera_vddd_1v5>;
+ 
++		virtual-channel = /bits/ 8 <0>;
++
+ 		port {
+ 			ov5645_csi20: endpoint {
+ 				clock-lanes = <0>;
+-- 
+2.7.4
+

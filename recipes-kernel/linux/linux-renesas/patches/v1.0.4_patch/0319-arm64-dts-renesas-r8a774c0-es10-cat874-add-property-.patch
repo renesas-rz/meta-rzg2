@@ -1,0 +1,48 @@
+From 211fc92cc8b5afc4aa649fcd2edb66d8b7fe8463 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 27 Apr 2020 19:03:35 +0700
+Subject: [PATCH 319/332] arm64: dts: renesas: r8a774c0-{es10,}-cat874: add
+ property to set virtual channel for OV5645 camera
+
+This commit is created to add property "virtual-channel" to set virtual
+channel index for OV5645 camera.
+In RZ/G2E, this virtual channel is support with:
+_ CSI: From 0 to 1.
+_ OV5645: From 0 to 3.
+And currently, set 0 to virtual channel as default.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts      | 2 ++
+ arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index b1579d0..3034da9 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -662,6 +662,8 @@
+ 		vdda-supply = <&camera_vdda_2v8>;
+ 		vddd-supply = <&camera_vddd_1v5>;
+ 
++		virtual-channel = /bits/ 8 <0>;
++
+ 		port {
+ 			ov5645_csi40: endpoint {
+ 				clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+index c8c778f..cb87a37 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+@@ -662,6 +662,8 @@
+ 		vdda-supply = <&camera_vdda_2v8>;
+ 		vddd-supply = <&camera_vddd_1v5>;
+ 
++		virtual-channel = /bits/ 8 <0>;
++
+ 		port {
+ 			ov5645_csi40: endpoint {
+ 				clock-lanes = <0>;
+-- 
+2.7.4
+
