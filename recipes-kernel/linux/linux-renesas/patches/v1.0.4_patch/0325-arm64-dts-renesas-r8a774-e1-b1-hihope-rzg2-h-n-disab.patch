@@ -1,0 +1,53 @@
+From c80a6a9a6074a4c1959d0f3ac6733b16a3519273 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 8 May 2020 14:22:12 +0700
+Subject: [PATCH 325/337] arm64: dts: renesas: r8a774{e1,b1}-hihope-rzg2{h,n}:
+ disable CSI40
+
+This commit is created to disable CSI40 in default environment to
+ensure working of VIN devices for Hihope G2N and G2H platform.
+Reason:
+- VIN/CSI2 can work normally when connect 2 cameras in 2 CSI2-IF
+(CSI20, CSI40) at the same time.
+- VIN/CSI2 can not work when disconnect 1 camera in CSI20 or CSI40.
+
+Therefore, please delete the commenting out at status property if want
+to use 2 cameras at the same time.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts | 3 ++-
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index afa7de07..ec2ad1c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -92,7 +92,8 @@
+ };
+ 
+ &csi40 {
+-	status = "okay";
++	/* Remove below commenting out if want to use 2 cameras */
++	/* status = "okay"; */
+ 
+ 	ports {
+ 		port@0 {
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 9dc463c..4343303 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -110,7 +110,8 @@
+ };
+ 
+ &csi40 {
+-	status = "okay";
++	/* Remove below commenting out if want to use 2 cameras */
++	/* status = "okay"; */
+ 
+ 	ports {
+ 		port@0 {
+-- 
+2.7.4
+

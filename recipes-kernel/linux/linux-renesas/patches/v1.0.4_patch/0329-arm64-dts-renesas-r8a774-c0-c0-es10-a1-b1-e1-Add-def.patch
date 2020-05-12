@@ -1,0 +1,216 @@
+From 6c3e5cb17a33b4007ddd858490486d09d923558a Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 17 Apr 2020 11:46:09 +0700
+Subject: [PATCH 329/337] arm64: dts: renesas: r8a774{c0,c0-es10,a1,b1,e1}: Add
+ default cma memory for usb controller
+
+Usb media device need reserved memory to allocate dma-contig memory, so
+we
+will use the default cma memory for this reserved memory.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ .../boot/dts/renesas/r8a774a1-hihope-rzg2m.dts     | 22 +++++++++++++++++++++-
+ .../boot/dts/renesas/r8a774b1-hihope-rzg2n.dts     | 22 +++++++++++++++++++++-
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts    |  5 ++++-
+ .../boot/dts/renesas/r8a774c0-es10-cat874.dts      |  5 ++++-
+ .../boot/dts/renesas/r8a774e1-hihope-rzg2h.dts     | 22 +++++++++++++++++++++-
+ 5 files changed, 71 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index 5705cc9..04302dd 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -36,7 +36,7 @@
+ 		};
+ 
+ 		/* global autoconfigured region for contiguous allocations */
+-		linux,cma@58000000 {
++		global_cma: linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+ 			reg = <0x00000000 0x58000000 0x0 0x20000000>;
+@@ -61,6 +61,26 @@
+ 	};
+ };
+ 
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
++
+ &vspb {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index ec2ad1c..a6cc412 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -36,7 +36,7 @@
+ 		};
+ 
+ 		/* global autoconfigured region for contiguous allocations */
+-		linux,cma@58000000 {
++		global_cma: linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+ 			reg = <0x00000000 0x58000000 0x0 0x20000000>;
+@@ -61,6 +61,26 @@
+ 	};
+ };
+ 
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
++
+ &vspb {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 3034da9..009863c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -74,7 +74,7 @@
+ 		ranges;
+ 
+ 		/* global autoconfigured region for contiguous allocations */
+-		linux,cma@58000000 {
++		global_cma: linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+ 			reg = <0x00000000 0x58000000 0x0 0x10000000>;
+@@ -250,6 +250,7 @@
+ 
+ &ehci0 {
+ 	dr_mode = "host";
++	memory-region = <&global_cma>;
+ 	status = "okay";
+ };
+ 
+@@ -370,6 +371,7 @@
+ 
+ &ohci0 {
+ 	dr_mode = "host";
++	memory-region = <&global_cma>;
+ 	status = "okay";
+ };
+ 
+@@ -566,6 +568,7 @@
+ &xhci0 {
+ 	pinctrl-0 = <&usb30_pins>;
+ 	pinctrl-names = "default";
++	memory-region = <&global_cma>;
+ 
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+index cb87a37..e78be76 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+@@ -74,7 +74,7 @@
+ 		ranges;
+ 
+ 		/* global autoconfigured region for contiguous allocations */
+-		linux,cma@58000000 {
++		global_cma: linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+ 			reg = <0x00000000 0x58000000 0x0 0x10000000>;
+@@ -249,6 +249,7 @@
+ };
+ 
+ &ehci0 {
++	memory-region = <&global_cma>;
+ 	dr_mode = "host";
+ 	status = "okay";
+ };
+@@ -369,6 +370,7 @@
+ };
+ 
+ &ohci0 {
++	memory-region = <&global_cma>;
+ 	dr_mode = "host";
+ 	status = "okay";
+ };
+@@ -566,6 +568,7 @@
+ &xhci0 {
+ 	pinctrl-0 = <&usb30_pins>;
+ 	pinctrl-names = "default";
++	memory-region = <&global_cma>;
+ 
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 4343303..f1a6270 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -36,7 +36,7 @@
+ 		};
+ 
+ 		/* global autoconfigured region for contiguous allocations */
+-		linux,cma@58000000 {
++		global_cma: linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+ 			reg = <0x00000000 0x58000000 0x0 0x20000000>;
+@@ -71,6 +71,26 @@
+ 	};
+ };
+ 
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
++
+ &vspbc {
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

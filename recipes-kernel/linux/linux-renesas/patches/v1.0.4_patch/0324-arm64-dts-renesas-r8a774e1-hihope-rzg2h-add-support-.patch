@@ -1,0 +1,82 @@
+From 9d2173e51d38aedfc9f800f326f5bc841b798a59 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 27 Apr 2020 18:49:06 +0700
+Subject: [PATCH 324/337] arm64: dts: renesas: r8a774e1-hihope-rzg2h: add
+ support CSI40 IF
+
+This commit is created to support CSI40 IF in HiHope RZ/G2H platform.
+This CSI is linked with OV5645 camera sensor which is controlled by
+I2C channel 3.
+Currently, set virtual channel 0 for ov5645 camera sensor as default.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ .../boot/dts/renesas/r8a774e1-hihope-rzg2h.dts     | 55 ++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 30dd950..9dc463c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -101,3 +101,58 @@
+ &sdhi3 {
+ 	/delete-property/ mmc-hs400-1_8v;
+ };
++
++&pfc {
++	i2c3_pins: i2c3 {
++		groups = "i2c3";
++		function = "i2c3";
++	};
++};
++
++&csi40 {
++	status = "okay";
++
++	ports {
++		port@0 {
++			reg = <0>;
++
++			csi40_in: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&ov5645_csi40>;
++			};
++		};
++	};
++};
++
++&i2c3 {
++	pinctrl-0 = <&i2c3_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	ov5645_i2c3: ov5645@3c {
++		compatible = "ovti,ov5645";
++		reg = <0x3c>;
++
++		enable-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
++
++		clocks = <&camera_clk>;
++		clock-names = "xclk";
++		clock-frequency = <24000000>;
++
++		vdddo-supply = <&camera_vdddo_1v8>;
++		vdda-supply = <&camera_vdda_2v8>;
++		vddd-supply = <&camera_vddd_1v5>;
++
++		virtual-channel = /bits/ 8 <0>;
++
++		port {
++			ov5645_csi40: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&csi40_in>;
++			};
++		};
++	};
++};
+-- 
+2.7.4
+

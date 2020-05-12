@@ -1,0 +1,47 @@
+From 212c7f703eb78aa91ea6cd4134615e938c4d908f Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Tue, 12 May 2020 13:51:38 +0700
+Subject: [PATCH 335/337] arm64: dts: renesas: r8a774e1-hihope-rzg2h-ex: enable
+ SATA
+
+In RZ/G2H, we can choose the output between PCIE1 and SATA by:
+ - If we choose PCIE1:
+   + Pin 7 of SW1001 on Main Board = ON
+   + SW43 on Sub Board = OFF
+
+ - If we choose SATA:
+   + Pin 7 of SW1001 on Main Board = OFF
+   + SW43 on Sub Board = ON
+
+We do not need to set GPIO7_03 to choose PCIE1 or SATA,
+so GPIO07_03 is set to input mode.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts
+index e90f2cd..d185713 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts
+@@ -20,11 +20,15 @@
+ 		status = "okay";
+ };
+ 
++&sata {
++		status = "okay";
++};
++
+ &gpio7 {
+ 	pcie-en-gpio {
+ 		gpio-hog;
+ 		gpios = <3 GPIO_ACTIVE_HIGH>;
+-		output-high;
++		input;
+ 		line-name = "pcie-en-gpio";
+ 	};
+ };
+-- 
+2.7.4
+

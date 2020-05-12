@@ -1,0 +1,61 @@
+From d392aab5f0aebda43e50e1e6a5ea9102875966fb Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 23 Apr 2020 16:20:57 +0700
+Subject: [PATCH 314/337] watchdog: Init late Renesas watchdog timer
+
+This patch lets watchdog timer init later than other
+ drivers, to ensure that if any hang up occurs while
+ probing any driver before watchdog. Board can be
+ reset automatically.
+
+Before watchdog in kernel is probed, the watchdog
+ timer counter in U-boot is still counting up. So,
+ when any hang up occurs, the counter will be overflowed,
+ reset is generated.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/watchdog/renesas_wdt.c   | 13 ++++++++++++-
+ drivers/watchdog/watchdog_core.c |  2 +-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/watchdog/renesas_wdt.c b/drivers/watchdog/renesas_wdt.c
+index 2496397..f8f36f3 100644
+--- a/drivers/watchdog/renesas_wdt.c
++++ b/drivers/watchdog/renesas_wdt.c
+@@ -318,7 +318,18 @@ static struct platform_driver rwdt_driver = {
+ 	.probe = rwdt_probe,
+ 	.remove = rwdt_remove,
+ };
+-module_platform_driver(rwdt_driver);
++
++static int __init rwdt_init(void)
++{
++	platform_driver_register(&rwdt_driver);
++	return 0;
++}
++static void __exit rwdt_exit(void)
++{
++	platform_driver_unregister(&rwdt_driver);
++}
++late_initcall_sync(rwdt_init);
++module_exit(rwdt_exit);
+ 
+ MODULE_DESCRIPTION("Renesas WDT Watchdog Driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/watchdog/watchdog_core.c b/drivers/watchdog/watchdog_core.c
+index 8b1f37f..2ff92ce 100644
+--- a/drivers/watchdog/watchdog_core.c
++++ b/drivers/watchdog/watchdog_core.c
+@@ -401,7 +401,7 @@ static void __exit watchdog_exit(void)
+ 	ida_destroy(&watchdog_ida);
+ }
+ 
+-subsys_initcall_sync(watchdog_init);
++late_initcall_sync(watchdog_init);
+ module_exit(watchdog_exit);
+ 
+ MODULE_AUTHOR("Alan Cox <alan@lxorguk.ukuu.org.uk>");
+-- 
+2.7.4
+

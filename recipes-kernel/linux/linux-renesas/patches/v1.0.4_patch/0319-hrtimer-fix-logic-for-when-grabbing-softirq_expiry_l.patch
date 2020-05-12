@@ -1,0 +1,79 @@
+From 1e4ea8f7f18a0e54e934d699a592a1b844d5120e Mon Sep 17 00:00:00 2001
+From: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
+Date: Tue, 28 Apr 2020 16:40:26 +0200
+Subject: [PATCH 319/337] hrtimer: fix logic for when grabbing
+ softirq_expiry_lock can be elided
+
+Currently, before applying this patch on RT environment, when disconnecting
+ Wifi and then re-connect to Wifi hotspot, kernel will hang and give
+ the log below:
+
+[   86.465040] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[   86.465047] rcu:     Tasks blocked on level-0 rcu_node (CPUs 0-5): P10
+[   86.465050] rcu:     (detected by 0, t=5252 jiffies, g=3145, q=12)
+[   86.465058] ktimersoftd/0   R  running task        0    10      2 0x00000028
+[   86.465064] Call trace:
+[   86.465079]  __switch_to+0xe8/0x140
+[   86.465087]  __schedule+0x200/0x5a8
+[   86.465091]  preempt_schedule_common+0x24/0x50
+[   86.465093]  preempt_schedule+0x40/0x48
+[   86.465098]  _raw_spin_unlock_irqrestore+0x38/0x58
+[   86.465103]  try_to_wake_up+0x204/0x3e8
+[   86.465106]  wake_up_process+0x14/0x20
+[   86.465111]  hrtimer_wakeup+0x1c/0x30
+[   86.465114]  __hrtimer_run_queues+0x11c/0x1b8
+[   86.465116]  hrtimer_run_softirq+0x78/0xb8
+[   86.465121]  do_current_softirqs+0x19c/0x248
+[   86.465124]  run_ksoftirqd+0x24/0x40
+[   86.465128]  smpboot_thread_fn+0x1b0/0x2b8
+[   86.465131]  kthread+0x128/0x130
+[   86.465133]  ret_from_fork+0x10/0x1c
+[   86.465135] ktimersoftd/0   R  running task        0    10      2 0x00000028
+
+To fix this issue, referring commit ("1f4e684") from linux-stable-rt
+ repository.
+
+For detail, commit:
+
+  hrtimer: Add a missing bracket and hide `migration_base' on !SMP
+
+which is 47b6de0b7f22 in 5.2-rt and 40aae5708e7a in 4.19-rt,
+inadvertently changed the logic from base != &migration_base to base
+== &migration_base.
+
+On !CONFIG_SMP, the effect was to effectively always elide this
+lock/unlock pair (since is_migration_base() is unconditionally false),
+which for me consistently causes lockups during reboot, and reportedly
+also often causes a hang during boot.
+
+Adding this logical negation (or, what is effectively the same thing
+on !CONFIG_SMP, reverting the above commit as well as "hrtimer:
+Prevent using hrtimer_grab_expiry_lock() on migration_base") fixes
+that lockup.
+
+Fixes: 40aae5708e7a (hrtimer: Add a missing bracket and hide `migration_base' on !SMP) # 4.19-rt
+Fixes: 47b6de0b7f22 (hrtimer: Add a missing bracket and hide `migration_base' on !SMP) # 5.2-rt
+Signed-off-by: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
+Reviewed-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+Signed-off-by: Tom Zanussi <zanussi@kernel.org>
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ kernel/time/hrtimer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
+index e54a95d..c3966c0 100644
+--- a/kernel/time/hrtimer.c
++++ b/kernel/time/hrtimer.c
+@@ -953,7 +953,7 @@ void hrtimer_grab_expiry_lock(const struct hrtimer *timer)
+ {
+ 	struct hrtimer_clock_base *base = READ_ONCE(timer->base);
+ 
+-	if (timer->is_soft && is_migration_base(base)) {
++	if (timer->is_soft && !is_migration_base(base)) {
+ 		spin_lock(&base->cpu_base->softirq_expiry_lock);
+ 		spin_unlock(&base->cpu_base->softirq_expiry_lock);
+ 	}
+-- 
+2.7.4
+
