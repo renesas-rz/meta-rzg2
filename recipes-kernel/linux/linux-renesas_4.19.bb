@@ -31,6 +31,11 @@ SRC_URI_append_r8a774b1 += "\
   ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch ", "")} \
 "
 
+SRC_URI_append_r8a774e1 += "\
+  ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch ", "")} \
+  ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Reduce-memor.patch ", "")} \
+"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 LINUX_VERSION ?= "4.19.106"
 
