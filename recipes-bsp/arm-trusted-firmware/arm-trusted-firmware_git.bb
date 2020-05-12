@@ -36,6 +36,8 @@ SRC_URI += "file://0002-plat-renesas-add-support-for-EK874-RZG2E.patch \
             file://0019-plat-rcar-timer-bl2_swdt-increase-WDT-count-when-ECC.patch \
             file://0020-HiHope-Rev3.0-board-support.patch \
             file://0021-Plat-renesas-add-support-for-Hihope-RZG2H-board.patch \
+            file://0022-plat-renesas-rcar-Change-value-condition-of-RZG_DRAM.patch \
+            file://0023-plat-renesas-rcar-bl2_fusa-Add-ECC-support-for-RZ-G2.patch \
 "
 
 PV = "v1.5+renesas+git${SRCPV}"
@@ -53,6 +55,8 @@ ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PRO
 ATFW_OPT_append_r8a774a1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_HIHOPE_RZG2M_ECC=1 RCAR_DRAM_SPLIT=0", " ${ATFW_OPT_LOSSY} ",d)}"
 
 ATFW_OPT_append_r8a774b1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_HIHOPE_RZG2N_ECC=1", " ${ATFW_OPT_LOSSY} ",d)}"
+
+ATFW_OPT_append_r8a774e1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_HIHOPE_RZG2H_ECC=1 RCAR_DRAM_SPLIT=0", " ${ATFW_OPT_LOSSY} ",d)}"
 
 ATFW_OPT_append = "${@base_conditional("ECC_FULL", "1", " RZG_DRAM_ECC_FULL=1 ", "",d)}"
 
