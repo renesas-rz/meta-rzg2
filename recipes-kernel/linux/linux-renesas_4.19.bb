@@ -33,7 +33,8 @@ SRC_URI_append_r8a774b1 += "\
 
 SRC_URI_append_r8a774e1 += "\
   ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch ", "")} \
-  ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Reduce-memor.patch ", "")} \
+  ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Reduce-memor.patch \
+					 file://patches/option_patch/0002-arm64-dts-renesas-r8a774e1-hihope-rzg2h-remove-lossy.patch ", "")} \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
