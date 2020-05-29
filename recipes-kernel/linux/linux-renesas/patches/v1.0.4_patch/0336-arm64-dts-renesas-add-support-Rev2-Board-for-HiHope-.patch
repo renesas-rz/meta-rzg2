@@ -1,0 +1,1020 @@
+From b9b71f4bd31110983516b117531fee6ccefcc187 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 19 May 2020 15:04:38 +0700
+Subject: [PATCH 336/339] arm64: dts: renesas: add support Rev2 Board for
+ HiHope RZ/G2M and RZ/G2N.
+
+This commit is created to support Rev2 Board for HiHope RZ/G2M and
+RZ/G2N. Rev2 board has some differences with Rev4 board:
+- Use GPIO Expander PCA9654 to control enabling of BT/Wifi chip.
+- Do not support audio sampling rate 48kHz.
+- Support MSIOF0.
+- Support active LEDs for Bluetooth(GP7_0) and Wifi(GP7_1) status.
+- RZ/G2N Rev 2 does not support SATA and CSI40.
+
+Moreover, all standard devicetree files for RZ/G2M and RZ/G2N without
+"rev2" are used for Rev 4 and above board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |   4 +
+ .../arm64/boot/dts/renesas/hihope-common-rev2.dtsi | 672 +++++++++++++++++++++
+ .../dts/renesas/r8a774a1-hihope-rzg2m-ex-rev2.dts  |  30 +
+ .../dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts     | 101 ++++
+ .../dts/renesas/r8a774b1-hihope-rzg2n-ex-rev2.dts  |  30 +
+ .../dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts     | 105 ++++
+ 6 files changed, 942 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/hihope-common-rev2.dtsi
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-rev2.dts
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-rev2.dts
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index b39a433..c278296 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -1,8 +1,12 @@
+ # SPDX-License-Identifier: GPL-2.0
+ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb
+ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-ex.dtb
++dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-rev2.dtb
++dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-ex-rev2.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex.dtb
++dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-rev2.dtb
++dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex-rev2.dtb
+ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb r8a774c0-ek874.dtb
+ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-es10-cat874.dtb r8a774c0-es10-ek874.dtb
+ dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h.dtb
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common-rev2.dtsi b/arch/arm64/boot/dts/renesas/hihope-common-rev2.dtsi
+new file mode 100644
+index 0000000..0ef9c6f
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/hihope-common-rev2.dtsi
+@@ -0,0 +1,672 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2[MN] Rev 2 main board common parts
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++
++/ {
++	aliases {
++		serial0 = &scif2;
++		serial1 = &hscif0;
++		serial2 = &hscif1;
++		serial3 = &scif0;
++		spi0 = &msiof0;
++		spi1 = &msiof1;
++		spi2 = &msiof2;
++		spi3 = &msiof3;
++	};
++
++	chosen {
++		bootargs = "ignore_loglevel";
++		stdout-path = "serial0:115200n8";
++	};
++
++	hdmi0-out {
++		compatible = "hdmi-connector";
++		type = "a";
++
++		port {
++			hdmi0_con: endpoint {
++				remote-endpoint = <&rcar_dw_hdmi0_out>;
++			};
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		bt_active_led {
++			label = "blue:bt";
++			gpios = <&gpio7  0 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "hci0-power";
++			default-state = "off";
++		};
++
++		led0 {
++			gpios = <&gpio6 11 GPIO_ACTIVE_HIGH>;
++		};
++
++		led1 {
++			gpios = <&gpio6 12 GPIO_ACTIVE_HIGH>;
++		};
++
++		led2 {
++			gpios = <&gpio6 13 GPIO_ACTIVE_HIGH>;
++		};
++
++		led3 {
++			gpios = <&gpio0  0 GPIO_ACTIVE_HIGH>;
++		};
++
++		wlan_active_led {
++			label = "yellow:wlan";
++			gpios = <&gpio7  1 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "phy0tx";
++			default-state = "off";
++		};
++	};
++
++	reg_1p8v: regulator0 {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-1.8V";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	reg_3p3v: regulator1 {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	sound_card: sound {
++		compatible = "audio-graph-card";
++
++		label = "rcar-sound";
++
++		dais = <&rsnd_port0	/* HDMI Audio */
++			&rsnd_port1>;	/* External PCM5102A Codec */
++	};
++
++	vbus0_usb2: regulator-vbus0-usb2 {
++		compatible = "regulator-fixed";
++
++		regulator-name = "USB20_VBUS0";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++
++		gpio = <&gpio6 16 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	vccq_sdhi0: regulator-vccq-sdhi0 {
++		compatible = "regulator-gpio";
++
++		regulator-name = "SDHI0 VccQ";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++
++		gpios = <&gpio6 30 GPIO_ACTIVE_HIGH>;
++		gpios-states = <1>;
++		states = <3300000 1
++			  1800000 0>;
++	};
++
++	wlan_en_reg: regulator-wlan_en {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <70000>;
++
++		gpio = <&gpio_expander 1 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	x302_clk: x302-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <33000000>;
++	};
++
++	x304_clk: x304-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <25000000>;
++	};
++
++	vspm_if {
++		compatible = "renesas,vspm_if";
++	};
++
++	camera_vdddo_1v8: 1p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vdddo";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		regulator-always-on;
++	};
++
++	camera_vdda_2v8: 2p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vdda";
++		regulator-min-microvolt = <2800000>;
++		regulator-max-microvolt = <2800000>;
++		regulator-always-on;
++	};
++
++	camera_vddd_1v5: 1p5v {
++		compatible = "regulator-fixed";
++		regulator-name = "camera_vddd";
++		regulator-min-microvolt = <1500000>;
++		regulator-max-microvolt = <1500000>;
++		regulator-always-on;
++	};
++
++	camera_clk: camera_clk {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <24000000>;
++	};
++
++	pcm5102a: pcm5102a {
++		compatible = "ti,pcm5102a";
++		#sound-dai-cells = <0>;
++
++		port {
++			pcm5102a_endpoint: endpoint {
++				remote-endpoint = <&rsnd_endpoint1>;
++			};
++		};
++	};
++};
++
++&audio_clk_a {
++	clock-frequency = <22579200>;
++};
++
++&du {
++	status = "okay";
++};
++
++&ehci0 {
++	status = "okay";
++};
++
++&ehci1 {
++	status = "okay";
++};
++
++&extal_clk {
++	clock-frequency = <16666666>;
++};
++
++&extalr_clk {
++	clock-frequency = <32768>;
++};
++
++&gpio6 {
++	usb1-reset {
++		gpio-hog;
++		gpios = <10 GPIO_ACTIVE_LOW>;
++		output-low;
++		line-name = "usb1-reset";
++	};
++};
++
++&hdmi0 {
++	status = "okay";
++
++	ports {
++		port@1 {
++			reg = <1>;
++			rcar_dw_hdmi0_out: endpoint {
++				remote-endpoint = <&hdmi0_con>;
++			};
++		};
++		port@2 {
++			reg = <2>;
++			dw_hdmi0_snd_in: endpoint {
++				remote-endpoint = <&rsnd_endpoint>;
++			};
++		};
++	};
++};
++
++&hscif0 {
++	pinctrl-0 = <&hscif0_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++
++	bluetooth {
++		compatible = "ti,wl1837-st";
++		enable-gpios = <&gpio_expander 2 GPIO_ACTIVE_HIGH>;
++	};
++};
++
++&hscif1 {
++	pinctrl-0 = <&hscif1_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
++&scif0 {
++	pinctrl-0 = <&scif0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
++&hsusb {
++	dr_mode = "otg";
++	status = "okay";
++};
++
++&i2c4 {
++	clock-frequency = <400000>;
++	status = "okay";
++
++	gpio_expander: gpio@20 {
++		compatible = "onnn,pca9654";
++		reg = <0x20>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++
++	versaclock5: clock-generator@6a {
++		compatible = "idt,5p49v5923";
++		reg = <0x6a>;
++		#clock-cells = <1>;
++		clocks = <&x304_clk>;
++		clock-names = "xin";
++	};
++};
++
++&ohci0 {
++	status = "okay";
++};
++
++&ohci1 {
++	status = "okay";
++};
++
++&pcie_bus_clk {
++	clock-frequency = <100000000>;
++};
++
++&pfc {
++	pinctrl-0 = <&scif_clk_pins>;
++	pinctrl-names = "default";
++
++	hscif0_pins: hscif0 {
++		groups = "hscif0_data", "hscif0_ctrl";
++		function = "hscif0";
++	};
++
++	scif2_pins: scif2 {
++		groups = "scif2_data_a";
++		function = "scif2";
++	};
++
++	scif_clk_pins: scif_clk {
++		groups = "scif_clk_a";
++		function = "scif_clk";
++	};
++
++	hscif1_pins: hscif1 {
++		groups = "hscif1_data_a", "hscif1_ctrl_a";
++		function = "hscif1";
++	};
++
++	scif0_pins: scif0 {
++		groups = "scif0_data";
++		function = "scif0";
++	};
++
++	sdhi0_pins: sd0 {
++		groups = "sdhi0_data4", "sdhi0_ctrl";
++		function = "sdhi0";
++		power-source = <3300>;
++	};
++
++	sdhi0_pins_uhs: sd0_uhs {
++		groups = "sdhi0_data4", "sdhi0_ctrl";
++		function = "sdhi0";
++		power-source = <1800>;
++	};
++
++	sdhi2_pins: sd2 {
++		groups = "sdhi2_data4", "sdhi2_ctrl";
++		function = "sdhi2";
++		power-source = <1800>;
++	};
++
++	sdhi3_pins: sd3 {
++		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
++		function = "sdhi3";
++		power-source = <1800>;
++	};
++
++	sound_pins: sound {
++		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
++		function = "ssi";
++	};
++
++	sound_clk_pins: sound_clk {
++		groups = "audio_clk_a_a";
++		function = "audio_clk";
++	};
++
++	usb0_pins: usb0 {
++		groups = "usb0";
++		function = "usb0";
++	};
++
++	usb1_pins: usb1 {
++		mux {
++			groups = "usb1";
++			function = "usb1";
++		};
++
++		ovc {
++			pins = "GP_6_27";
++			bias-pull-up;
++		};
++
++		pwen {
++			pins = "GP_6_26";
++		};
++	};
++
++	usb30_pins: usb30 {
++		groups = "usb30";
++		function = "usb30";
++	};
++
++	i2c2_pins: i2c2 {
++		groups = "i2c2_a";
++		function = "i2c2";
++	};
++
++	msiof0_pins: spi0 {
++		groups = "msiof0_clk", "msiof0_sync",
++		"msiof0_rxd", "msiof0_txd";
++		function = "msiof0";
++	};
++};
++
++&rcar_sound {
++	pinctrl-0 = <&sound_pins &sound_clk_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++
++	/* Single DAI */
++	#sound-dai-cells = <0>;
++
++	ports {
++		rsnd_port0: port@0 {
++			rsnd_endpoint: endpoint {
++				remote-endpoint = <&dw_hdmi0_snd_in>;
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint>;
++				frame-master = <&rsnd_endpoint>;
++
++				playback = <&ssi2>;
++			};
++		};
++
++		rsnd_port1: port@1 {
++			rsnd_endpoint1: endpoint {
++				remote-endpoint = <&pcm5102a_endpoint>;
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint1>;
++				frame-master = <&rsnd_endpoint1>;
++
++				playback = <&ssi1 &src1 &dvc0>;
++			};
++		};
++	};
++};
++
++&ssi1 {
++	shared-pin;
++};
++
++&rwdt {
++	timeout-sec = <60>;
++	status = "okay";
++};
++
++&scif2 {
++	pinctrl-0 = <&scif2_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
++&scif_clk {
++	clock-frequency = <14745600>;
++};
++
++&sdhi0 {
++	pinctrl-0 = <&sdhi0_pins>;
++	pinctrl-1 = <&sdhi0_pins_uhs>;
++	pinctrl-names = "default", "state_uhs";
++
++	vmmc-supply = <&reg_3p3v>;
++	vqmmc-supply = <&vccq_sdhi0>;
++	cd-gpios = <&gpio3 12 GPIO_ACTIVE_LOW>;
++	bus-width = <4>;
++	sd-uhs-sdr50;
++	sd-uhs-sdr104;
++	status = "okay";
++};
++
++&sdhi2 {
++	status = "okay";
++	pinctrl-0 = <&sdhi2_pins>;
++	pinctrl-names = "default";
++
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	non-removable;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@2 {
++		compatible = "ti,wl1837";
++		reg = <2>;
++		interrupt-parent = <&gpio2>;
++		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
++	};
++};
++
++&sdhi3 {
++	pinctrl-0 = <&sdhi3_pins>;
++	pinctrl-1 = <&sdhi3_pins>;
++	pinctrl-names = "default", "state_uhs";
++
++	vmmc-supply = <&reg_3p3v>;
++	vqmmc-supply = <&reg_1p8v>;
++	bus-width = <8>;
++	mmc-hs200-1_8v;
++	mmc-hs400-1_8v;
++	non-removable;
++	fixed-emmc-driver-type = <1>;
++	status = "okay";
++};
++
++&usb_extal_clk {
++	clock-frequency = <50000000>;
++};
++
++&usb2_phy0 {
++	pinctrl-0 = <&usb0_pins>;
++	pinctrl-names = "default";
++
++	vbus-supply = <&vbus0_usb2>;
++	status = "okay";
++};
++
++&usb2_phy1 {
++	pinctrl-0 = <&usb1_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
++&usb3_peri0 {
++	phys = <&usb3_phy0>;
++	phy-names = "usb";
++
++	companion = <&xhci0>;
++
++	status = "okay";
++};
++
++&usb3_phy0 {
++	status = "okay";
++};
++
++&usb3s0_clk {
++	clock-frequency = <100000000>;
++};
++
++&xhci0 {
++	pinctrl-0 = <&usb30_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
++&cmt0 {
++	status = "okay";
++};
++
++&cmt1 {
++	status = "okay";
++};
++
++&tmu0 {
++	status = "okay";
++};
++
++&tmu1 {
++	status = "okay";
++};
++
++&tmu2 {
++	status = "okay";
++};
++
++&tmu3 {
++	status = "okay";
++};
++
++&tmu4 {
++	status = "okay";
++};
++
++&vin0 {
++	status = "okay";
++};
++
++&vin1 {
++	status = "okay";
++};
++
++&vin2 {
++	status = "okay";
++};
++
++&vin3 {
++	status = "okay";
++};
++
++&vin4 {
++	status = "okay";
++};
++
++&vin5 {
++	status = "okay";
++};
++
++&vin6 {
++	status = "okay";
++};
++
++&vin7 {
++	status = "okay";
++};
++
++&csi20 {
++	status = "okay";
++
++	ports {
++		port@0 {
++			reg = <0>;
++
++			csi20_in: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&ov5645_csi20>;
++			};
++		};
++	};
++};
++
++&i2c2 {
++	pinctrl-0 = <&i2c2_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	ov5645: ov5645@3c {
++		compatible = "ovti,ov5645";
++		reg = <0x3c>;
++
++		enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
++
++		clocks = <&camera_clk>;
++		clock-names = "xclk";
++		clock-frequency = <24000000>;
++
++		vdddo-supply = <&camera_vdddo_1v8>;
++		vdda-supply = <&camera_vdda_2v8>;
++		vddd-supply = <&camera_vddd_1v5>;
++
++		virtual-channel = /bits/ 8 <0>;
++
++		port {
++			ov5645_csi20: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&csi20_in>;
++			};
++		};
++	};
++};
++
++&msiof0 {
++	pinctrl-0 = <&msiof0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-rev2.dts
+new file mode 100644
+index 0000000..d90447f
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-rev2.dts
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2M Rev 2 sub board
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++
++#include "r8a774a1-hihope-rzg2m-rev2.dts"
++#include "hihope-rzg2-ex.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2M Rev 2 with sub board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m",
++		     "renesas,r8a774a1";
++};
++
++&pciec1 {
++	status = "okay";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "pcie-en-gpio";
++	};
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+new file mode 100644
+index 0000000..ead1cf7
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+@@ -0,0 +1,101 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2M Rev 2 main board
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++/dts-v1/;
++#include "r8a774a1.dtsi"
++#include "hihope-common-rev2.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2M Rev 2 main board based on r8a774a1";
++	compatible = "hoperun,hihope-rzg2m", "renesas,r8a774a1";
++
++	memory@48000000 {
++		device_type = "memory";
++		/* first 128MB is reserved for secure area. */
++		reg = <0x0 0x48000000 0x0 0x78000000>;
++	};
++
++	memory@600000000 {
++		device_type = "memory";
++		reg = <0x6 0x00000000 0x0 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		/* device specific region for Lossy Decompression */
++		lossy_decompress: linux,lossy_decompress@54000000 {
++			no-map;
++			reg = <0x00000000 0x54000000 0x0 0x03000000>;
++		};
++
++		/* global autoconfigured region for contiguous allocations */
++		global_cma: linux,cma@58000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x58000000 0x0 0x20000000>;
++			linux,cma-default;
++		};
++
++		/* device specific region for contiguous allocations */
++		mmp_reserved: linux,multimedia@70000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x78000000 0x0 0x10000000>;
++		};
++	};
++
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>, <&lossy_decompress>;
++	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
++	};
++};
++
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
++&du {
++	clocks = <&cpg CPG_MOD 724>,
++		 <&cpg CPG_MOD 723>,
++		 <&cpg CPG_MOD 722>,
++		 <&versaclock5 1>,
++		 <&x302_clk>,
++		 <&versaclock5 2>;
++	clock-names = "du.0", "du.1", "du.2",
++		      "dclkin.0", "dclkin.1", "dclkin.2";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-rev2.dts
+new file mode 100644
+index 0000000..a3df2a3
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-rev2.dts
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2N Rev 2 sub board
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++
++#include "r8a774b1-hihope-rzg2n-rev2.dts"
++#include "hihope-rzg2-ex.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2N Rev 2 with sub board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2n",
++		     "renesas,r8a774b1";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		input;
++		line-name = "pcie-en-gpio";
++	};
++};
++
++&pciec1 {
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+new file mode 100644
+index 0000000..98fd863
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+@@ -0,0 +1,105 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2N Rev 2 main board
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++/dts-v1/;
++#include "r8a774b1.dtsi"
++#include "hihope-common-rev2.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2N Rev 2 main board based on r8a774b1";
++	compatible = "hoperun,hihope-rzg2n", "renesas,r8a774b1";
++
++	memory@48000000 {
++		device_type = "memory";
++		/* first 128MB is reserved for secure area. */
++		reg = <0x0 0x48000000 0x0 0x78000000>;
++	};
++
++	memory@480000000 {
++		device_type = "memory";
++		reg = <0x4 0x80000000 0x0 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		/* device specific region for Lossy Decompression */
++		lossy_decompress: linux,lossy_decompress@54000000 {
++			no-map;
++			reg = <0x00000000 0x54000000 0x0 0x03000000>;
++		};
++
++		/* global autoconfigured region for contiguous allocations */
++		global_cma: linux,cma@58000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x58000000 0x0 0x20000000>;
++			linux,cma-default;
++		};
++
++		/* device specific region for contiguous allocations */
++		mmp_reserved: linux,multimedia@70000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x78000000 0x0 0x10000000>;
++		};
++	};
++
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>, <&lossy_decompress>;
++	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
++	};
++};
++
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
++&du {
++	clocks = <&cpg CPG_MOD 724>,
++		 <&cpg CPG_MOD 723>,
++		 <&cpg CPG_MOD 721>,
++		 <&versaclock5 1>,
++		 <&x302_clk>,
++		 <&versaclock5 2>;
++	clock-names = "du.0", "du.1", "du.3",
++		      "dclkin.0", "dclkin.1", "dclkin.3";
++};
++
++&sdhi3 {
++	mmc-hs400-1_8v;
++};
+-- 
+2.7.4
+
