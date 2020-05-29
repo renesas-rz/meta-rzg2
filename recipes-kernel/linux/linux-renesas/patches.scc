@@ -336,3 +336,7 @@ patch patches/v1.0.4_patch/0335-arm64-dts-renesas-r8a774e1-hihope-rzg2h-ex-enabl
 patch patches/v1.0.4_patch/0336-mm-rzg2_mfis_ecc-Add-compatible-support-for-r8a774e1.patch
 patch patches/v1.0.4_patch/0337-arm64-dts-renesas-r8a774e1-add-device-node-for-MFIS.patch
 patch patches/v1.0.4_patch/0338-arm64-dts-renesas-r8a774e1-Add-QoS-device-node.patch
+patch patches/v1.0.4_patch/0339-arm64-dts-renesas-add-support-Rev2-Board-for-HiHope-.patch
+patch patches/v1.0.4_patch/0340-ASoC-rsnd-fixup-SSI-clock-during-suspend-resume-mode.patch
+patch patches/v1.0.4_patch/0341-arm64-dma_mapping-allow-PCI-host-driver-to-limit-DMA.patch
+patch patches/v1.0.4_patch/0342-PCI-pcie-rcar-set-host-bridge-s-DMA-mask.patch
