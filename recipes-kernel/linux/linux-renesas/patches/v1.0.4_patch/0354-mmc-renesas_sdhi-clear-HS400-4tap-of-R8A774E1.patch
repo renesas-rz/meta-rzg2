@@ -1,0 +1,30 @@
+From 4dd5a48cb20a6f42661d3e2238175cc4ceadd24e Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Thu, 11 Jun 2020 15:02:01 +0700
+Subject: [PATCH 354/354] mmc: renesas_sdhi: clear HS400 4tap of R8A774E1
+
+RZG2H (R8A774E1) can run mode HS400 of eMMC normally without 4tap.
+Use HS400-4tap on RZG2H could cause low performance for eMMC.
+So, we clear it.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_core.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_core.c b/drivers/mmc/host/renesas_sdhi_core.c
+index fe503fb..038127c 100644
+--- a/drivers/mmc/host/renesas_sdhi_core.c
++++ b/drivers/mmc/host/renesas_sdhi_core.c
+@@ -821,8 +821,6 @@ static const struct soc_device_attribute sdhi_quirks_match[]  = {
+ 	  .data = &sdhi_quirks_r8a77965, },
+ 	{ .soc_id = "r8a774c0",
+ 	  .data = &sdhi_quirks_r8a77990, },
+-	{ .soc_id = "r8a774e1",
+-	  .data = &sdhi_quirks_4tap, },
+ 	{ .soc_id = "r8a7795", .revision = "ES1.*",
+ 	  .data = &sdhi_quirks_4tap_nohs400_bit17, },
+ 	{ .soc_id = "r8a7795", .revision = "ES2.0",
+-- 
+2.7.4
+

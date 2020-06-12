@@ -1,0 +1,86 @@
+From 2e6ae9d34b4e4607cc24ba0318d14908dc9822d1 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Thu, 11 Jun 2020 14:46:01 +0700
+Subject: [PATCH 344/354] mmc: tmio: Add adjust HS400 offset by manual
+ calibration mode
+
+Since Gen3/RZG2 SDHI has an internal DS signal AC-spec violation in HS400,
+CRC-error may occur in read command. It is only HS400 mode.
+This phoenomenon occurs at low/High temperature.
+(R-Car Gen3 HW restriction No.109)
+To fix this, after completion of HS400 tuning, enable manual calibration.
+
+[Flow of Manual Calibration mode]
+1) Complete tuning in HS400 mode.
+2) Switch card to HS400
+3) Set HS400 timing (SDHI transitions to HS400)
+4) Send command (CMD13)
+5) Enable manual calibration
+
+Before enabling manual calibration mode, CMD13 command must be issued.
+In card initialization processing, CMD13 is executed at the end of
+select HS400.
+So, when CMD13 request completes, enables manual mode.
+
+Reference path:
+- Repository: https://github.com/renesas-rcar/linux-bsp
+- Branch: v4.14.75-ltsi/rcar-3.9.8
+- Commit: <a27609e63e9c4915706022b367d1d005833fe547>
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/tmio_mmc.h      | 12 ++++++++++++
+ drivers/mmc/host/tmio_mmc_core.c |  5 +++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/drivers/mmc/host/tmio_mmc.h b/drivers/mmc/host/tmio_mmc.h
+index 35654aa..e2aef31 100644
+--- a/drivers/mmc/host/tmio_mmc.h
++++ b/drivers/mmc/host/tmio_mmc.h
+@@ -112,6 +112,13 @@
+ 
+ #define TMIO_MAX_BLK_SIZE 512
+ 
++/* Check LSI revisions and set specific quirk value */
++#define FORCE_HS200		BIT(2)
++#define HS400_USE_MANUAL_CALIB  BIT(3)
++/* bit[31:16] reserved for HS400 manual calibration */
++#define HS400_CALIB_MASK	GENMASK_ULL(23, 16)
++#define HS400_OFFSET_MASK	GENMASK_ULL(31, 24)
++
+ struct tmio_mmc_data;
+ struct tmio_mmc_host;
+ 
+@@ -188,8 +195,13 @@ struct tmio_mmc_host {
+ 	int (*write16_hook)(struct tmio_mmc_host *host, int addr);
+ 	void (*hw_reset)(struct tmio_mmc_host *host);
+ 	void (*prepare_tuning)(struct tmio_mmc_host *host, unsigned long tap);
++	void (*adjust_hs400_mode_enable)(struct mmc_host *mmc);
++	void (*adjust_hs400_mode_disable)(struct mmc_host *mmc);
+ 	bool (*check_scc_error)(struct tmio_mmc_host *host);
+ 
++	/* Manual caribration for HS400 mode */
++	bool			needs_adjust_hs400;
++
+ 	/*
+ 	 * Mandatory callback for tuning to occur which is optional for SDR50
+ 	 * and mandatory for SDR104.
+diff --git a/drivers/mmc/host/tmio_mmc_core.c b/drivers/mmc/host/tmio_mmc_core.c
+index bf7be85..89ceac2 100644
+--- a/drivers/mmc/host/tmio_mmc_core.c
++++ b/drivers/mmc/host/tmio_mmc_core.c
+@@ -997,6 +997,11 @@ static void tmio_mmc_finish_request(struct tmio_mmc_host *host)
+ 		return;
+ 	}
+ 
++	/* Enabled adjust HS400 mode after CMD13 */
++	if (host->adjust_hs400_mode_enable && host->needs_adjust_hs400 &&
++	    mrq->cmd->opcode == MMC_SEND_STATUS)
++		host->adjust_hs400_mode_enable(host->mmc);
++
+ 	mmc_request_done(host->mmc, mrq);
+ }
+ 
+-- 
+2.7.4
+

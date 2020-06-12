@@ -340,3 +340,15 @@ patch patches/v1.0.4_patch/0339-arm64-dts-renesas-add-support-Rev2-Board-for-HiH
 patch patches/v1.0.4_patch/0340-ASoC-rsnd-fixup-SSI-clock-during-suspend-resume-mode.patch
 patch patches/v1.0.4_patch/0341-arm64-dma_mapping-allow-PCI-host-driver-to-limit-DMA.patch
 patch patches/v1.0.4_patch/0342-PCI-pcie-rcar-set-host-bridge-s-DMA-mask.patch
+patch patches/v1.0.4_patch/0343-usb-host-ehci-platform-add-a-quirk-to-avoid-stuck.patch
+patch patches/v1.0.4_patch/0344-mmc-tmio-Add-adjust-HS400-offset-by-manual-calibrati.patch
+patch patches/v1.0.4_patch/0345-mmc-renesas_sdhi_core-Add-adjust-HS400-offset-by-man.patch
+patch patches/v1.0.4_patch/0346-mmc-renesas_sdhi-Change-HS400-manual-calibration-met.patch
+patch patches/v1.0.4_patch/0347-mmc-renesas_sdhi-Add-manual-calibration-parameters-b.patch
+patch patches/v1.0.4_patch/0348-Revert-mmc-renesas_sdhi-Add-manual-calibration-param.patch
+patch patches/v1.0.4_patch/0349-Revert-mmc-renesas_sdhi-Change-HS400-manual-calibrat.patch
+patch patches/v1.0.4_patch/0350-mmc-renesas_sdhi-Change-HS400-manual-calibration-met.patch
+patch patches/v1.0.4_patch/0351-mmc-renesas_sdhi-Add-manual-correction.patch
+patch patches/v1.0.4_patch/0352-mmc-renesas_sdhi-only-check-CMD-status-for-HS400-man.patch
+patch patches/v1.0.4_patch/0353-mmc-renesas_sdhi-enforce-manual-correction-for-Gen3.patch
+patch patches/v1.0.4_patch/0354-mmc-renesas_sdhi-clear-HS400-4tap-of-R8A774E1.patch
