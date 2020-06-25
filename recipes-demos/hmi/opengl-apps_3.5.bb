@@ -7,9 +7,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 DEPENDS = "gles-user-module weston"
 
-SRCREV = "77e545ef6749ce51b16d87145591d274f5222907"
+#Repository TAG: R15.1-v3.5
+SRCREV = "d042dd42d9cd205b621402a99a636da6d00b8c79"
 SRC_URI = " \
-    git://github.com/powervr-graphics/Native_SDK;branch=3.5;protocol=git \
+    git://github.com/powervr-graphics/Native_SDK;branch=master;protocol=git \
     file://build_64_wl.patch \
     file://0003-Wayland-patch-setting-position.patch \
     file://0002-prevent-error-convert-bool-to-void.patch \
