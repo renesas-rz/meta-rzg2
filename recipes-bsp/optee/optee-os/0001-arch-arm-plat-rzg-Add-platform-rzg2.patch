@@ -1,0 +1,293 @@
+From ccc2d464ad3e9d7d1f30074ec6a1a8844cc04fad Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 1 Jul 2020 10:13:04 +0700
+Subject: [PATCH 1/3] arch: arm: plat-rzg: Add platform rzg2
+
+This patch will add support tee for platform rzg2.
+
+Reference: https://github.com/renesas-rz/meta-rzg2-security
+Commit ID: 8b8d38d50d5eb4a9431148b2c06e25fcb2575c62
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ core/arch/arm/plat-rzg/conf.mk           | 50 +++++++++++++++
+ core/arch/arm/plat-rzg/link.mk           | 14 +++++
+ core/arch/arm/plat-rzg/main.c            | 77 +++++++++++++++++++++++
+ core/arch/arm/plat-rzg/platform_config.h | 79 ++++++++++++++++++++++++
+ core/arch/arm/plat-rzg/sub.mk            |  2 +
+ core/tee/tadb.c                          |  2 +-
+ 6 files changed, 223 insertions(+), 1 deletion(-)
+ create mode 100644 core/arch/arm/plat-rzg/conf.mk
+ create mode 100644 core/arch/arm/plat-rzg/link.mk
+ create mode 100644 core/arch/arm/plat-rzg/main.c
+ create mode 100644 core/arch/arm/plat-rzg/platform_config.h
+ create mode 100644 core/arch/arm/plat-rzg/sub.mk
+
+diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
+new file mode 100644
+index 00000000..a9621ffa
+--- /dev/null
++++ b/core/arch/arm/plat-rzg/conf.mk
+@@ -0,0 +1,50 @@
++PLATFORM_FLAVOR ?= ek874
++
++include core/arch/arm/cpu/cortex-armv8-0.mk
++
++$(call force,CFG_GENERIC_BOOT,y)
++$(call force,CFG_PM_STUBS,y)
++$(call force,CFG_SECURE_TIME_SOURCE_CNTPCT,y)
++$(call force,CFG_WITH_ARM_TRUSTED_FW,y)
++$(call force,CFG_SCIF,y)
++$(call force,CFG_CORE_LARGE_PHYS_ADDR,y)
++$(call force,CFG_CORE_ARM64_PA_BITS,36)
++
++# Disable core ASLR for two reasons:
++# 1. There is no source for ALSR seed, as RZG platform
++#    does not provide DTB to OP-TEE. Also, there is no
++#    publically available documentation on integrated
++#    hardware RNG, so we can't use it either.
++# 2. OP-TEE crashes during boot with enabled CFG_CORE_ASLR.
++$(call force,CFG_CORE_ASLR,n)
++
++ifeq ($(PLATFORM_FLAVOR),ek874)
++$(call force,CFG_TEE_CORE_NB_CORE,2)
++endif
++ifeq ($(PLATFORM_FLAVOR),hihope_rzg2m)
++$(call force,CFG_TEE_CORE_NB_CORE,6)
++
++# RZ/G2M have 6 cores for 2 clusters, but the number isn't contigous.
++# One cluster has ids 0, 1, other has ids 3, 4, 5, 6.
++# CFG_CORE_CLUSTER_SHIFT will process to make the right numbering.
++$(call force,CFG_CORE_CLUSTER_SHIFT,1)
++endif
++ifeq ($(PLATFORM_FLAVOR),hihope_rzg2n)
++$(call force,CFG_TEE_CORE_NB_CORE,2)
++endif
++ifeq ($(PLATFORM_FLAVOR),hihope_rzg2h)
++$(call force,CFG_TEE_CORE_NB_CORE,8)
++endif
++
++CFG_TZDRAM_START ?= 0x44100000
++CFG_TZDRAM_SIZE ?= 0x03D00000
++CFG_TEE_RAM_VA_SIZE ?= 0x100000
++ifeq ($(CFG_ARM64_core),y)
++$(call force,CFG_WITH_LPAE,y)
++supported-ta-targets = ta_arm64
++else
++$(call force,CFG_ARM32_core,y)
++endif
++
++CFG_WITH_STACK_CANARIES ?= y
++CFG_CORE_HEAP_SIZE ?= 0x20000
+diff --git a/core/arch/arm/plat-rzg/link.mk b/core/arch/arm/plat-rzg/link.mk
+new file mode 100644
+index 00000000..24af140a
+--- /dev/null
++++ b/core/arch/arm/plat-rzg/link.mk
+@@ -0,0 +1,14 @@
++include core/arch/arm/kernel/link.mk
++
++all: $(link-out-dir)/tee.srec
++cleanfiles += $(link-out-dir)/tee.srec
++
++cleanfiles += $(link-out-dir)/tee-raw.bin
++$(link-out-dir)/tee-raw.bin: $(link-out-dir)/tee.elf scripts/gen_tee_bin.py
++	@$(cmd-echo-silent) '  GEN     $@'
++	$(q)scripts/gen_tee_bin.py --input $< --out_tee_raw_bin $@
++
++cleanfiles += $(link-out-dir)/tee.srec
++$(link-out-dir)/tee.srec: $(link-out-dir)/tee-raw.bin
++	@$(cmd-echo-silent) '  SREC    $@'
++	$(q)$(OBJCOPYcore) -I binary -O srec $< $@
+diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
+new file mode 100644
+index 00000000..a407c852
+--- /dev/null
++++ b/core/arch/arm/plat-rzg/main.c
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: BSD-2-Clause
++/*
++ * Copyright (c) 2016, GlobalLogic
++ * Copyright (c) 2019-2020, Renesas Electronics Corporation
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright notice,
++ * this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright notice,
++ * this list of conditions and the following disclaimer in the documentation
++ * and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
++ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include <console.h>
++#include <kernel/generic_boot.h>
++#include <kernel/panic.h>
++#include <kernel/pm_stubs.h>
++#include <mm/core_memprot.h>
++#include <platform_config.h>
++#include <stdint.h>
++#include <tee/entry_std.h>
++#include <tee/entry_fast.h>
++#include <drivers/scif.h>
++#include <drivers/gic.h>
++
++register_phys_mem_pgdir(MEM_AREA_IO_SEC, CONSOLE_UART_BASE, SCIF_REG_SIZE);
++register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICD_BASE, GIC_DIST_REG_SIZE);
++register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICC_BASE, GIC_DIST_REG_SIZE);
++
++register_dynamic_shm(NSEC_DDR_0_BASE, NSEC_DDR_0_SIZE);
++#ifdef NSEC_DDR_1_BASE
++register_dynamic_shm(NSEC_DDR_1_BASE, NSEC_DDR_1_SIZE);
++#endif
++#ifdef NSEC_DDR_2_BASE
++register_dynamic_shm(NSEC_DDR_2_BASE, NSEC_DDR_2_SIZE);
++#endif
++#ifdef NSEC_DDR_3_BASE
++register_dynamic_shm(NSEC_DDR_3_BASE, NSEC_DDR_3_SIZE);
++#endif
++
++static const struct thread_handlers handlers __nex_data = {
++    .cpu_on = cpu_on_handler,
++    .cpu_off = pm_do_nothing,
++    .cpu_suspend = pm_do_nothing,
++    .cpu_resume = pm_do_nothing,
++    .system_off = pm_do_nothing,
++    .system_reset = pm_do_nothing,
++};
++
++static struct scif_uart_data console_data __nex_bss;
++
++const struct thread_handlers *generic_boot_get_handlers(void)
++{
++    return &handlers;
++}
++
++void console_init(void)
++{
++    scif_uart_init(&console_data, CONSOLE_UART_BASE);
++    register_serial_console(&console_data.chip);
++}
+diff --git a/core/arch/arm/plat-rzg/platform_config.h b/core/arch/arm/plat-rzg/platform_config.h
+new file mode 100644
+index 00000000..344cc3f4
+--- /dev/null
++++ b/core/arch/arm/plat-rzg/platform_config.h
+@@ -0,0 +1,79 @@
++/* SPDX-License-Identifier: BSD-2-Clause */
++/*
++ * Copyright (c) 2016, GlobalLogic
++ * Copyright (c) 2019-2020, Renesas Electronics Corporation
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright notice,
++ * this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright notice,
++ * this list of conditions and the following disclaimer in the documentation
++ * and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
++ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef PLATFORM_CONFIG_H
++#define PLATFORM_CONFIG_H
++
++#include <mm/generic_ram_layout.h>
++
++/* Make stacks aligned to data cache line length */
++#define STACK_ALIGNMENT     64
++
++#define GIC_BASE            0xF1000000
++#define GICC_BASE           0xF1020000
++#define GICD_BASE           0xF1010000
++
++#define CONSOLE_UART_BASE   0xE6E88000
++
++#if defined(PLATFORM_FLAVOR_ek874)
++#define NSEC_DDR_0_BASE     0x47E00000U
++#define NSEC_DDR_0_SIZE     0x78200000
++#endif
++#if defined(PLATFORM_FLAVOR_hihope_rzg2m)
++#define NSEC_DDR_0_BASE     0x47E00000U
++#define NSEC_DDR_0_SIZE     0x78200000
++#define NSEC_DDR_1_BASE     0x600000000U
++#define NSEC_DDR_1_SIZE     0x80000000
++#endif
++#if defined(PLATFORM_FLAVOR_hihope_rzg2n)
++#define NSEC_DDR_0_BASE     0x47E00000U
++#define NSEC_DDR_0_SIZE     0x78200000
++#define NSEC_DDR_1_BASE     0x480000000U
++#define NSEC_DDR_1_SIZE     0x80000000
++#endif
++#if defined(PLATFORM_FLAVOR_hihope_rzg2h)
++#define NSEC_DDR_0_BASE     0x47E00000U
++#define NSEC_DDR_0_SIZE     0x78200000
++#define NSEC_DDR_1_BASE     0x500000000U
++#define NSEC_DDR_1_SIZE     0x80000000
++#endif
++
++/* Full GlobalPlatform test suite requires TEE_SHMEM_SIZE to be at least 2MB */
++#define TEE_SHMEM_START     (TZDRAM_BASE + TZDRAM_SIZE)
++#define TEE_SHMEM_SIZE      0x200000
++
++#ifndef CFG_TEE_LOAD_ADDR
++#define CFG_TEE_LOAD_ADDR      CFG_TEE_RAM_START
++#endif
++
++#define CFG_TEE_RAM_START      (0x44100000)    /* TEE RAM address      */
++
++#define OPTEE_LIMIT             (CFG_TEE_RAM_START + 0x00100000)
++
++#endif /*PLATFORM_CONFIG_H*/
+diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
+new file mode 100644
+index 00000000..8ddc2fd4
+--- /dev/null
++++ b/core/arch/arm/plat-rzg/sub.mk
+@@ -0,0 +1,2 @@
++global-incdirs-y += .
++srcs-y += main.c
+diff --git a/core/tee/tadb.c b/core/tee/tadb.c
+index 01f00234..49692c16 100644
+--- a/core/tee/tadb.c
++++ b/core/tee/tadb.c
+@@ -209,7 +209,7 @@ static TEE_Result tadb_open(struct tee_tadb_dir **db_ret)
+ 	if (!db)
+ 		return TEE_ERROR_OUT_OF_MEMORY;
+ 
+-	db->ops = tee_svc_storage_file_ops(TEE_STORAGE_PRIVATE);
++	db->ops = tee_svc_storage_file_ops(TEE_STORAGE_PRIVATE_REE);
+ 
+ 	res = db->ops->open(&po, NULL, &db->fh);
+ 	if (res == TEE_ERROR_ITEM_NOT_FOUND)
+-- 
+2.17.1
+
