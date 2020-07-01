@@ -2,33 +2,27 @@ DESCRIPTION = "OP-TEE OS"
 
 LICENSE = "BSD-2-Clause & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
-    file://LICENSE;md5=69663ab153298557a59c67a60a743e5b \
-    file://${WORKDIR}/git_official/LICENSE;md5=69663ab153298557a59c67a60a743e5b \
+    file://LICENSE;md5=c1f21c4f72f372ef38a5a4aee55ec173 \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+inherit deploy python3native
 
-inherit deploy pythonnative
-
-PV = "3.1.0+renesas+git${SRCPV}"
-
-BRANCH = "rcar_gen3"
-SRCREV_renesas = "19fb6dcbf42631f23afed406e893310eb30cd548"
-SRCREV_officialgit = "e77020396508fc086d7a4d6137388b116e4a662f"
-SRCREV_FORMAT = "renesas_officialgit"
+PV = "3.9.0+renesas+git${SRCPV}"
+BRANCH = "master"
+#TAG: 3.9.0
+SRCREV = "af141c61fe7a2430f3b4bb89661d8414117013b3"
 
 SRC_URI = " \
-    git://github.com/renesas-rcar/optee_os.git;branch=${BRANCH};name=renesas \
-    git://github.com/OP-TEE/optee_os.git;branch=master;name=officialgit;destsuffix=git_official \
-    file://0001-plat-rcar-Change-check-of-load-address-and-size-of-T.patch \
-    file://0002-plat-rcar-Update-optee_os-Rev2.0.6.patch \
+    git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
+    file://0001-arch-arm-plat-rzg-Add-platform-rzg2.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
-PLATFORM = "rcar"
+PLATFORM = "rzg"
+PLATFORM_FLAVOR = "${@d.getVar("MACHINE", False).replace("-", "_")}"
 
-DEPENDS = "python-pycrypto-native"
-
+DEPENDS = "python3-pyelftools-native python3-pycryptodome-native python3-pycryptodomex-native"
 export CROSS_COMPILE64="${TARGET_PREFIX}"
 
 # Let the Makefile handle setting up the flags as it is a standalone application
@@ -39,16 +33,12 @@ export LDcore="${LD}"
 libdir[unexport] = "1"
 
 S = "${WORKDIR}/git"
-EXTRA_OEMAKE = "-e MAKEFLAGS="
-
-do_configure() {
-    (cd ${WORKDIR}/git_official && git checkout -B official 3.1.0)
-    (cd ${WORKDIR}/git_official && git cherry-pick ${SRCREV_officialgit})
-    cp -rn ${WORKDIR}/git_official/core/lib/libtomcrypt ${B}/core/lib/.
-}
+EXTRA_OEMAKE = "-e MAKEFLAGS= \
+		LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
+		"
 
 do_compile() {
-    oe_runmake PLATFORM=${PLATFORM} CFG_ARM64_core=y
+    oe_runmake PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n
 }
 
 # do_install() nothing
@@ -61,6 +51,9 @@ do_deploy() {
     # Copy TEE OS to deploy folder
     install -m 0644 ${S}/out/arm-plat-${PLATFORM}/core/tee.elf ${DEPLOYDIR}/tee-${MACHINE}.elf
     install -m 0644 ${S}/out/arm-plat-${PLATFORM}/core/tee.bin ${DEPLOYDIR}/tee-${MACHINE}.bin
-    install -m 0644 ${S}/out/arm-plat-${PLATFORM}/core/tee.srec ${DEPLOYDIR}/tee-${MACHINE}.srec
+    # SREC file is generated from RAW bin and it has start address at 0x0,
+    # so we must adjust it to our address for our platform before using it.
+    objcopy --adjust-vma=0x44100000 -I srec -O srec \
+	${S}/out/arm-plat-${PLATFORM}/core/tee.srec ${DEPLOYDIR}/tee-${MACHINE}.srec
 }
 addtask deploy before do_build after do_compile
