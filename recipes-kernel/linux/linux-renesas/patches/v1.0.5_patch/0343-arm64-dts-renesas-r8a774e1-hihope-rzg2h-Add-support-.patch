@@ -1,0 +1,127 @@
+From fb336c58645021e4442c6aa5ac5866d2215c4038 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 30 Jun 2020 15:22:56 +0700
+Subject: [PATCH 343/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
+ support for AISTARVISION MIPI Adapter V2.1
+
+This patch adds support for AISTARVISION MIPI Adapter V2.1 board
+connected to G2H board.
+
+Currently, G2H Board just supports 1 CSI2-IF is CSI20.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |  1 +
+ .../renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts  | 88 ++++++++++++++++++++++
+ 2 files changed, 89 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 0cd8a649..36d2cdf 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -16,6 +16,7 @@ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-es10-ek874-mipi-2.1.dtb
+ dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h.dtb
+ dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h-ex-idk-1110wr.dtb
++dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h-ex-mipi-2.1.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-x.dtb r8a7795-h3ulcb.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-h3ulcb-kf.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-xs.dtb
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+new file mode 100644
+index 0000000..5fae729
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+@@ -0,0 +1,88 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HopeRun HiHope RZ/G2H Platform
++ * connected with aistarvision-mipi-v2-adapter board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++/dts-v1/;
++#include "r8a774e1-hihope-rzg2h-ex.dts"
++#define MIPI_PARENT_I2C_CSI20 i2c2
++#include "aistarvision-mipi-adapter-2.1.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2H with sub board with aistarvision-mipi-v2-adapter board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2h",
++		     "renesas,r8a774e1";
++};
++
++&pfc {
++	i2c2_pins: i2c2 {
++		groups = "i2c2_a";
++		function = "i2c2";
++	};
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&vin0 {
++	status = "okay";
++};
++
++&vin1 {
++	status = "okay";
++};
++
++&vin2 {
++	status = "okay";
++};
++
++&vin3 {
++	status = "okay";
++};
++
++&vin4 {
++	status = "okay";
++};
++
++&vin5 {
++	status = "okay";
++};
++
++&vin6 {
++	status = "okay";
++};
++
++&vin7 {
++	status = "okay";
++};
++
++&csi20 {
++	status = "okay";
++
++	ports {
++		port {
++			csi20_in: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&ov5645_csi20_ep>;
++			};
++		};
++	};
++};
++
++&ov5645_csi20 {
++	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
++	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
++
++	port {
++		ov5645_csi20_ep: endpoint {
++			clock-lanes = <0>;
++			data-lanes = <1 2>;
++			remote-endpoint = <&csi20_in>;
++		};
++	};
++};
+-- 
+2.7.4
+

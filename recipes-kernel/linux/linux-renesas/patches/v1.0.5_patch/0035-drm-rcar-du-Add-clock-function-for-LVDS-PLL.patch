@@ -1,0 +1,266 @@
+From 1dcb99a9aea07d1493b44192aa43943286948a7f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 27 Mar 2020 16:49:01 +0700
+Subject: [PATCH 035/351] drm: rcar-du: Add clock function for LVDS PLL
+
+Since it is necessary to set PLL initialization of LVDS before DU,
+register the clock function and this patch adds its processing.
+
+Signed-off-by: Koji Matsuoka <koji.matsuoka.xm@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c | 12 +++++++
+ drivers/gpu/drm/rcar-du/rcar_du_drv.c  |  3 +-
+ drivers/gpu/drm/rcar-du/rcar_du_drv.h  |  1 +
+ drivers/gpu/drm/rcar-du/rcar_lvds.c    | 65 ++++++++++++++++++++++++++++++----
+ drivers/gpu/drm/rcar-du/rcar_lvds.h    |  6 ++++
+ 5 files changed, 80 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+index cec4b5c..04157f3 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+@@ -12,7 +12,9 @@
+  */
+ 
+ #include <linux/clk.h>
++#include <linux/clk-provider.h>
+ #include <linux/mutex.h>
++#include <linux/of_platform.h>
+ #include <linux/sys_soc.h>
+ 
+ #include <drm/drmP.h>
+@@ -485,6 +487,13 @@ static void rcar_du_crtc_wait_page_flip(struct rcar_du_crtc *rcrtc)
+ 
+ static void rcar_du_crtc_setup(struct rcar_du_crtc *rcrtc)
+ {
++	const struct drm_display_mode *mode = &rcrtc->crtc.state->adjusted_mode;
++	struct rcar_du_device *rcdu = rcrtc->group->dev;
++	unsigned long mode_clock = mode->clock * 1000;
++
++	if (rcar_du_has(rcdu, RCAR_DU_FEATURE_R8A7799X))
++		rcar_lvds_pll_round_rate(rcrtc->index, mode_clock);
++
+ 	/* Set display off and background to black */
+ 	rcar_du_crtc_write(rcrtc, DOOR, DOOR_RGB(0, 0, 0));
+ 	rcar_du_crtc_write(rcrtc, BPOR, BPOR_RGB(0, 0, 0));
+@@ -597,6 +606,7 @@ static void rcar_du_crtc_disable_planes(struct rcar_du_crtc *rcrtc)
+ 
+ static void rcar_du_crtc_stop(struct rcar_du_crtc *rcrtc)
+ {
++	struct rcar_du_device *rcdu = rcrtc->group->dev;
+ 	struct drm_crtc *crtc = &rcrtc->crtc;
+ 
+ 	/*
+@@ -636,6 +646,8 @@ static void rcar_du_crtc_stop(struct rcar_du_crtc *rcrtc)
+ 					   DSYSR_TVM_SWITCH);
+ 
+ 	rcar_du_group_start_stop(rcrtc->group, false);
++	if (rcar_du_has(rcdu, RCAR_DU_FEATURE_R8A7799X))
++		rcar_lvds_pll_round_rate(rcrtc->index, 0);
+ }
+ 
+ /* -----------------------------------------------------------------------------
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.c b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+index d881a27..1429aff 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+@@ -141,7 +141,8 @@ static const struct rcar_du_device_info rcar_du_r8a774b1_info = {
+ static const struct rcar_du_device_info rcar_du_r8a774c0_info = {
+ 	.gen = 3,
+ 	.features = RCAR_DU_FEATURE_CRTC_IRQ_CLOCK
+-		  | RCAR_DU_FEATURE_VSP1_SOURCE,
++		  | RCAR_DU_FEATURE_VSP1_SOURCE
++		  | RCAR_DU_FEATURE_R8A7799X,
+ 	.channels_mask = BIT(1) | BIT(0),
+ 	.routes = {
+ 		/*
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.h b/drivers/gpu/drm/rcar-du/rcar_du_drv.h
+index f16cd26..10f5187 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.h
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.h
+@@ -32,6 +32,7 @@ struct rcar_du_encoder;
+ #define RCAR_DU_FEATURE_INTERLACED	BIT(2)	/* HW supports interlaced */
+ #define RCAR_DU_FEATURE_TVM_SYNC	BIT(3)	/* Has TV switch/sync modes */
+ 
++#define RCAR_DU_FEATURE_R8A7799X	BIT(9)	/* Use R8A7799X */
+ #define RCAR_DU_QUIRK_ALIGN_128B	BIT(0)	/* Align pitches to 128 bytes */
+ 
+ /*
+diff --git a/drivers/gpu/drm/rcar-du/rcar_lvds.c b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+index ad1ab98..32b54a8 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_lvds.c
++++ b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+@@ -26,6 +26,7 @@
+ #include "rcar_lvds_regs.h"
+ 
+ struct rcar_lvds;
++static struct rcar_lvds *g_lvds[RCAR_LVDS_MAX_NUM];
+ 
+ /* Keep in sync with the LVDCR0.LVMD hardware register values. */
+ enum rcar_lvds_mode {
+@@ -66,6 +67,7 @@ struct rcar_lvds {
+ 
+ 	struct drm_display_mode display_mode;
+ 	enum rcar_lvds_mode mode;
++	u32 id;
+ };
+ 
+ #define bridge_to_rcar_lvds(b) \
+@@ -423,9 +425,11 @@ static void rcar_lvds_enable(struct drm_bridge *bridge)
+ 
+ 	WARN_ON(lvds->enabled);
+ 
+-	ret = clk_prepare_enable(lvds->clocks.mod);
+-	if (ret < 0)
+-		return;
++	if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)) {
++		ret = clk_prepare_enable(lvds->clocks.mod);
++		if (ret < 0)
++			return;
++	}
+ 
+ 	/*
+ 	 * Hardcode the channels and control signals routing for now.
+@@ -454,7 +458,8 @@ static void rcar_lvds_enable(struct drm_bridge *bridge)
+ 	}
+ 
+ 	/* PLL clock configuration. */
+-	lvds->info->pll_setup(lvds, mode->clock * 1000);
++	if (lvds->info->pll_setup)
++		lvds->info->pll_setup(lvds, mode->clock * 1000);
+ 
+ 	/* Set the LVDS mode and select the input. */
+ 	lvdcr0 = lvds->mode << LVDCR0_LVMD_SHIFT;
+@@ -511,7 +516,7 @@ static void rcar_lvds_enable(struct drm_bridge *bridge)
+ 	lvds->enabled = true;
+ }
+ 
+-static void rcar_lvds_disable(struct drm_bridge *bridge)
++static void __rcar_lvds_disable(struct drm_bridge *bridge)
+ {
+ 	struct rcar_lvds *lvds = bridge_to_rcar_lvds(bridge);
+ 	u32 lvdcr0 = 0;
+@@ -549,6 +554,17 @@ static void rcar_lvds_disable(struct drm_bridge *bridge)
+ 	lvds->enabled = false;
+ }
+ 
++static void rcar_lvds_disable(struct drm_bridge *bridge)
++{
++	struct rcar_lvds *lvds = bridge_to_rcar_lvds(bridge);
++
++	if (lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)
++		return;
++
++	__rcar_lvds_disable(bridge);
++}
++
++
+ static bool rcar_lvds_mode_fixup(struct drm_bridge *bridge,
+ 				 const struct drm_display_mode *mode,
+ 				 struct drm_display_mode *adjusted_mode)
+@@ -676,6 +692,7 @@ static int rcar_lvds_parse_dt(struct rcar_lvds *lvds)
+ 	struct device_node *node;
+ 	bool is_bridge = false;
+ 	int ret = 0;
++	u32 id;
+ 
+ 	local_output = of_graph_get_endpoint_by_regs(lvds->dev->of_node, 1, 0);
+ 	if (!local_output) {
+@@ -726,6 +743,12 @@ static int rcar_lvds_parse_dt(struct rcar_lvds *lvds)
+ 			ret = PTR_ERR(lvds->panel);
+ 	}
+ 
++	/* Make sure LVDS id is present and sane */
++	if (!of_property_read_u32(lvds->dev->of_node, "renesas,id", &id))
++		lvds->id = id;
++	else
++		lvds->id = 0;
++
+ done:
+ 	of_node_put(local_output);
+ 	of_node_put(remote_input);
+@@ -743,6 +766,32 @@ static int rcar_lvds_parse_dt(struct rcar_lvds *lvds)
+ 	return ret;
+ }
+ 
++int rcar_lvds_pll_round_rate(u32 index, unsigned long rate)
++{
++	struct rcar_lvds *lvds;
++	int ret;
++
++	if (index >= RCAR_LVDS_MAX_NUM)
++		return 0;
++
++	lvds = g_lvds[index];
++
++	if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL))
++		return 0;
++
++	if (rate == 0) {
++		__rcar_lvds_disable(&lvds->bridge);
++	} else {
++		ret = clk_prepare_enable(lvds->clocks.mod);
++		if (ret < 0)
++			return ret;
++		rcar_lvds_pll_setup_d3_e3(lvds, rate);
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(rcar_lvds_pll_round_rate);
++
+ static struct clk *rcar_lvds_get_clock(struct rcar_lvds *lvds, const char *name,
+ 				       bool optional)
+ {
+@@ -832,6 +881,11 @@ static int rcar_lvds_probe(struct platform_device *pdev)
+ 
+ 	drm_bridge_add(&lvds->bridge);
+ 
++	if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL))
++		return 0;
++
++	g_lvds[lvds->id] = lvds;
++
+ 	return 0;
+ }
+ 
+@@ -871,7 +925,6 @@ static const struct rcar_lvds_device_info rcar_lvds_r8a77990_info = {
+ 	.gen = 3,
+ 	.quirks = RCAR_LVDS_QUIRK_GEN3_LVEN | RCAR_LVDS_QUIRK_EXT_PLL
+ 		| RCAR_LVDS_QUIRK_DUAL_LINK,
+-	.pll_setup = rcar_lvds_pll_setup_d3_e3,
+ };
+ 
+ static const struct rcar_lvds_device_info rcar_lvds_r8a77995_info = {
+diff --git a/drivers/gpu/drm/rcar-du/rcar_lvds.h b/drivers/gpu/drm/rcar-du/rcar_lvds.h
+index a709cae..91e972e 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_lvds.h
++++ b/drivers/gpu/drm/rcar-du/rcar_lvds.h
+@@ -11,10 +11,12 @@
+ #define __RCAR_LVDS_H__
+ 
+ struct drm_bridge;
++#define RCAR_LVDS_MAX_NUM	2
+ 
+ #if IS_ENABLED(CONFIG_DRM_RCAR_LVDS)
+ int rcar_lvds_clk_enable(struct drm_bridge *bridge, unsigned long freq);
+ void rcar_lvds_clk_disable(struct drm_bridge *bridge);
++int rcar_lvds_pll_round_rate(u32 index, unsigned long rate);
+ #else
+ static inline int rcar_lvds_clk_enable(struct drm_bridge *bridge,
+ 				       unsigned long freq)
+@@ -22,6 +24,10 @@ static inline int rcar_lvds_clk_enable(struct drm_bridge *bridge,
+ 	return -ENOSYS;
+ }
+ static inline void rcar_lvds_clk_disable(struct drm_bridge *bridge) { }
++static inline int rcar_lvds_pll_round_rate(u32 index, unsigned long rate)
++{
++	return 0;
++};
+ #endif /* CONFIG_DRM_RCAR_LVDS */
+ 
+ #endif /* __RCAR_LVDS_H__ */
+-- 
+2.7.4
+

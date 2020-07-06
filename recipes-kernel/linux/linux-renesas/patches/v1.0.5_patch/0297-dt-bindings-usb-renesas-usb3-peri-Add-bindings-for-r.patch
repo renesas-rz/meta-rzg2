@@ -1,0 +1,28 @@
+From ff0544e4ad111c7bd571ddede5a9535910c699d7 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Fri, 10 Apr 2020 21:14:46 +0700
+Subject: [PATCH 297/351] dt-bindings: usb: renesas,usb3-peri: Add bindings for
+ r8a774e1
+
+Add Document for R8A774E1 (RZ/G2H)
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt b/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt
+index 9e463b0..231747a 100644
+--- a/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt
++++ b/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt
+@@ -5,6 +5,7 @@ Required properties:
+ 	- "renesas,r8a774a1-usb3-peri"
+ 	- "renesas,r8a774b1-usb3-peri"
+ 	- "renesas,r8a774c0-usb3-peri"
++	- "renesas,r8a774e1-usb3-peri"
+ 	- "renesas,r8a7795-usb3-peri"
+ 	- "renesas,r8a7796-usb3-peri"
+ 	- "renesas,r8a77965-usb3-peri"
+-- 
+2.7.4
+

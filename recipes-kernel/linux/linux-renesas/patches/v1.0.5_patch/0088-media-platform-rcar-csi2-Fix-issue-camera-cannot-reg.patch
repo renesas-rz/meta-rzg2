@@ -1,0 +1,33 @@
+From b349d82ada20405350aed70b8fc4079423594c3d Mon Sep 17 00:00:00 2001
+From: Tri Luong <tri.luong.te@renesas.com>
+Date: Fri, 21 Jun 2019 13:17:26 +0700
+Subject: [PATCH 088/351] media: platform: rcar-csi2: Fix issue camera cannot
+ register to VIN.
+
+Reason is fwnodes path is different between CSI2 and Camera sensor:
+- CSI2 registers Camera/Sensor as v4l2 async sub device with fwnode is
+  remote endpoint.
+- Camera/Sensor register itself as v4l2 sub device with fwnode is remote
+  device.
+
+Signed-off-by: Tri Luong <tri.luong.te@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-csi2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-csi2.c b/drivers/media/platform/rcar-vin/rcar-csi2.c
+index 007e238..8d02b44 100644
+--- a/drivers/media/platform/rcar-vin/rcar-csi2.c
++++ b/drivers/media/platform/rcar-vin/rcar-csi2.c
+@@ -769,7 +769,7 @@ static int rcsi2_parse_dt(struct rcar_csi2 *priv)
+ 	}
+ 
+ 	priv->asd.match.fwnode =
+-		fwnode_graph_get_remote_endpoint(of_fwnode_handle(ep));
++		fwnode_graph_get_remote_port_parent(of_fwnode_handle(ep));
+ 	priv->asd.match_type = V4L2_ASYNC_MATCH_FWNODE;
+ 
+ 	of_node_put(ep);
+-- 
+2.7.4
+

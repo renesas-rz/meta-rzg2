@@ -1,0 +1,26 @@
+From cbe61cdf88b9d8c790b3a472e88a446007ea837c Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 29 Apr 2019 10:44:16 +0700
+Subject: [PATCH 097/351] arch: arm64: defconfig: configs for USB TypeC
+
+This patch will configs USB TypeC and HD3SS3220 TypeC chip.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 2dd9529..f60d3e2 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -775,3 +775,6 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+ 
+ # Enable Camera Sensor
+ CONFIG_VIDEO_OV5645=y
++
++CONFIG_TYPEC=y
++CONFIG_TYPEC_HD3SS3220=y
+-- 
+2.7.4
+

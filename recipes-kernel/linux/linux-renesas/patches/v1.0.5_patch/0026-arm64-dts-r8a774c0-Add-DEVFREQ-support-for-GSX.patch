@@ -1,0 +1,48 @@
+From ccde506cc4b49089a1404ff3e7afcba15b90d44f Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Mon, 1 Jul 2019 17:28:23 +0700
+Subject: [PATCH 026/351] arm64: dts: r8a774c0: Add DEVFREQ support for GSX
+
+This commit add opp table for gsx to use devfreq.
+Note that voltage scaling is not supported
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index ebe92c1..52304cf 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -139,6 +139,19 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	gsx_opp_table: gsx_opp_table {
++		compatible = "operating-points-v2";
++
++		opp-300000000 {
++			opp-hz = /bits/ 64 <300000000>;
++			opp-microvolt = <820000>;
++		};
++		opp-600000000 {
++			opp-hz = /bits/ 64 <600000000>;
++			opp-microvolt = <820000>;
++		};
++	};
++
+ 	/* External PCIe clock - can be overridden by the board */
+ 	pcie_bus_clk: pcie_bus {
+ 		compatible = "fixed-clock";
+@@ -1739,6 +1752,7 @@
+ 			reg = <0 0xfd000000 0 0x40000>;
+ 			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&cpg CPG_MOD 112>;
++			operating-points-v2 = <&gsx_opp_table>;
+ 			power-domains = <&sysc R8A774C0_PD_3DG_A>;
+ 			resets = <&cpg 112>;
+ 		};
+-- 
+2.7.4
+

@@ -1,0 +1,87 @@
+From d066517b2dae324bd69ee4fbe80e93c4418312b4 Mon Sep 17 00:00:00 2001
+From: Dat Nguyen <dat.nguyen.ra@rensas.com>
+Date: Mon, 13 Apr 2020 15:43:46 +0700
+Subject: [PATCH 259/351] arm64: dts: r8a774e1: Thermal support for RZ/G2H
+
+This patch enables thermal support for R8A774E1 SoC
+
+Signed-off-by: Dat Nguyen <dat.nguyen.ra@rensas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 56 +++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 34d976a..abcbba2a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -981,6 +981,20 @@
+ 			/* placeholder */
+ 		};
+ 
++		tsc: thermal@e6198000 {
++			compatible = "renesas,r8a774e1-thermal";
++			reg = <0 0xe6198000 0 0x100>,
++				<0 0xe61a0000 0 0x100>,
++				<0 0xe61a8000 0 0x100>;
++			interrupts = <GIC_SPI 67 IRQ_TYPE_LEVEL_HIGH>,
++						<GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>,
++						<GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 522>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 522>;
++			#thermal-sensor-cells = <1>;
++		};
++
+ 		avb: ethernet@e6800000 {
+ 			compatible = "renesas,etheravb-r8a774e1",
+ 				"renesas,etheravb-rcar-gen3";
+@@ -2168,4 +2182,46 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <0>;
+ 	};
++	thermal-zones {
++		sensor_thermal1: sensor-thermal1 {
++			polling-delay-passive = <250>;
++			polling-delay = <0>;
++			thermal-sensors = <&tsc 0>;
++
++			trips {
++				sensor1_crit: sensor1-crit {
++				temperature = <120000>;
++				hysteresis = <2000>;
++				type = "critical";
++				};
++			};
++		};
++		sensor_thermal2: sensor-thermal2 {
++			polling-delay-passive = <250>;
++			polling-delay = <0>;
++			thermal-sensors = <&tsc 1>;
++
++			trips {
++				sensor2_crit: sensor2-crit {
++					temperature = <120000>;
++					hysteresis = <2000>;
++					type = "critical";
++				};
++			};
++		};
++
++		sensor_thermal3: sensor-thermal3 {
++			polling-delay-passive = <250>;
++			polling-delay = <0>;
++			thermal-sensors = <&tsc 2>;
++
++			trips {
++				sensor3_crit: sensor3-crit {
++					temperature = <120000>;
++					hysteresis = <2000>;
++					type = "critical";
++				};
++			};
++		};
++	};
+ };
+-- 
+2.7.4
+

@@ -1,0 +1,28 @@
+From c567176f4a6f32ea36e73a4ce4a99593cfc139e6 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Wed, 8 Apr 2020 14:00:03 +0700
+Subject: [PATCH 254/351] dt-bindings: pwm: renesas,pwm-rcar: Document r8a774e1
+ PWM support
+
+Document SoC specific bindings for RZ/G2H (r8a774e1) SoC.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+index 2905db4..691cae7 100644
+--- a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
++++ b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+@@ -7,6 +7,7 @@ Required Properties:
+  - "renesas,pwm-r8a774a1": for RZ/G2M
+  - "renesas,pwm-r8a774b1": for RZ/G2N
+  - "renesas,pwm-r8a774c0": for RZ/G2E
++ - "renesas,pwm-r8a774e1": for RZ/G2H
+  - "renesas,pwm-r8a7778": for R-Car M1A
+  - "renesas,pwm-r8a7779": for R-Car H1
+  - "renesas,pwm-r8a7790": for R-Car H2
+-- 
+2.7.4
+

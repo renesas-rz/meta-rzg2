@@ -1,0 +1,43 @@
+From 5b567171bcc4c381438bf44d3c2f7e7652d88ea0 Mon Sep 17 00:00:00 2001
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Date: Thu, 11 Jun 2020 15:00:30 +0700
+Subject: [PATCH 339/351] mmc: renesas_sdhi: enforce manual correction for Gen3
+
+HW engineers say that automatic tap correction cannot be used for HS400
+in all R-Car Gen3 and RZG2 SoCs. So, check for that SDHI variant and
+disable it when HS400 is about to be enabled.
+
+Reference path:
+- Repository: https://github.com/torvalds/linux
+- Tag: v5.7-rc7
+- Commit: <a86bf70b7021c93119f81454ad81293c526f3cb8>
+
+Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Link: https://lore.kernel.org/r/20191217114034.13290-5-wsa+renesas@sang-engineering.com
+Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_core.c b/drivers/mmc/host/renesas_sdhi_core.c
+index 228418f..fe503fb 100644
+--- a/drivers/mmc/host/renesas_sdhi_core.c
++++ b/drivers/mmc/host/renesas_sdhi_core.c
+@@ -358,6 +358,12 @@ static void renesas_sdhi_hs400_complete(struct tmio_mmc_host *host)
+ 	sd_scc_write32(host, priv, SH_MOBILE_SDHI_SCC_DT2FF,
+ 		       priv->scc_tappos_hs400);
+ 
++	/* Gen3 can't do automatic tap correction with HS400, so disable it */
++	if (sd_ctrl_read16(host, CTL_VERSION) == SDHI_VER_GEN3_SDMMC)
++		sd_scc_write32(host, priv, SH_MOBILE_SDHI_SCC_RVSCNTL,
++			       ~SH_MOBILE_SDHI_SCC_RVSCNTL_RVSEN &
++			       sd_scc_read32(host, priv, SH_MOBILE_SDHI_SCC_RVSCNTL));
++
+ 	sd_scc_write32(host, priv, SH_MOBILE_SDHI_SCC_TMPPORT2,
+ 		       (SH_MOBILE_SDHI_SCC_TMPPORT2_HS400EN |
+ 			SH_MOBILE_SDHI_SCC_TMPPORT2_HS400OSEL) |
+-- 
+2.7.4
+

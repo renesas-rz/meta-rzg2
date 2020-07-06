@@ -1,0 +1,116 @@
+From 75edf039f60c3bafa9f7d2e86c543885067c21c6 Mon Sep 17 00:00:00 2001
+From: Duy Bao Dang <duy.dang.yb@renesas.com>
+Date: Tue, 5 May 2020 14:01:58 +0700
+Subject: [PATCH 316/351] pinctrl: sh-pfc: r8a7795: Add-TPU-pinctrl.
+
+This patch add definition for pins functions/groups for common
+structure.
+
+Signed-off-by: Duy Bao Dang <duy.dang.yb@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/pfc-r8a7795.c | 50 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 46 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a7795.c b/drivers/pinctrl/sh-pfc/pfc-r8a7795.c
+index 5abf291..23f185e 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a7795.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a7795.c
+@@ -3310,6 +3310,36 @@ static const unsigned int pwm6_b_mux[] = {
+ 	PWM6_B_MARK,
+ };
+ 
++/* - TPU -------------------------------------------------------------------- */
++static const unsigned int tpu0_to0_pins[] = {
++	/* TPU0TO0 */
++	RCAR_GP_PIN(6, 28),
++};
++static const unsigned int tpu0_to0_mux[] = {
++	TPU0TO0_MARK,
++};
++static const unsigned int tpu0_to1_pins[] = {
++	/* TPU0TO1 */
++	RCAR_GP_PIN(6, 29),
++};
++static const unsigned int tpu0_to1_mux[] = {
++	TPU0TO1_MARK,
++};
++static const unsigned int tpu0_to2_pins[] = {
++	/* TPU0TO2 */
++	RCAR_GP_PIN(6, 30),
++};
++static const unsigned int tpu0_to2_mux[] = {
++	TPU0TO2_MARK,
++};
++static const unsigned int tpu0_to3_pins[] = {
++	/* TPU0TO3 */
++	RCAR_GP_PIN(6, 31),
++};
++static const unsigned int tpu0_to3_mux[] = {
++	TPU0TO3_MARK,
++};
++
+ /* - SATA --------------------------------------------------------------------*/
+ static const unsigned int sata0_devslp_a_pins[] = {
+ 	/* DEVSLP */
+@@ -4228,10 +4258,10 @@ static const unsigned int vin5_clk_mux[] = {
+ 
+ static const struct {
+ #ifdef CONFIG_PINCTRL_PFC_R8A7795
+-	struct sh_pfc_pin_group common[316];
++	struct sh_pfc_pin_group common[320];
+ #endif
+ #ifdef CONFIG_PINCTRL_PFC_R8A774E1
+-	struct sh_pfc_pin_group common[315];
++	struct sh_pfc_pin_group common[319];
+ #endif
+ 	struct sh_pfc_pin_group automotive[30];
+ } pinmux_groups = {
+@@ -4435,6 +4465,10 @@ static const struct {
+ 		SH_PFC_PIN_GROUP(pwm5_b),
+ 		SH_PFC_PIN_GROUP(pwm6_a),
+ 		SH_PFC_PIN_GROUP(pwm6_b),
++		SH_PFC_PIN_GROUP(tpu0_to0),
++		SH_PFC_PIN_GROUP(tpu0_to1),
++		SH_PFC_PIN_GROUP(tpu0_to2),
++		SH_PFC_PIN_GROUP(tpu0_to3),
+ 		SH_PFC_PIN_GROUP(sata0_devslp_a),
+ 		SH_PFC_PIN_GROUP(sata0_devslp_b),
+ 		SH_PFC_PIN_GROUP(scif0_data),
+@@ -4923,6 +4957,13 @@ static const char * const pwm6_groups[] = {
+ 	"pwm6_b",
+ };
+ 
++static const char * const tpu0_groups[] = {
++	"tpu0_to0",
++	"tpu0_to1",
++	"tpu0_to2",
++	"tpu0_to3",
++};
++
+ static const char * const sata0_groups[] = {
+ 	"sata0_devslp_a",
+ 	"sata0_devslp_b",
+@@ -5105,10 +5146,10 @@ static const char * const vin5_groups[] = {
+ 
+ static const struct {
+ #ifdef CONFIG_PINCTRL_PFC_R8A7795
+-	struct sh_pfc_function common[52];
++	struct sh_pfc_function common[53];
+ #endif
+ #ifdef CONFIG_PINCTRL_PFC_R8A774E1
+-	struct sh_pfc_function common[51];
++	struct sh_pfc_function common[52];
+ #endif
+ 	struct sh_pfc_function automotive[5];
+ } pinmux_functions = {
+@@ -5144,6 +5185,7 @@ static const struct {
+ 		SH_PFC_FUNCTION(pwm4),
+ 		SH_PFC_FUNCTION(pwm5),
+ 		SH_PFC_FUNCTION(pwm6),
++		SH_PFC_FUNCTION(tpu0),
+ 		SH_PFC_FUNCTION(sata0),
+ 		SH_PFC_FUNCTION(scif0),
+ 		SH_PFC_FUNCTION(scif1),
+-- 
+2.7.4
+

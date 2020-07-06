@@ -1,0 +1,47 @@
+From 4f5a89f870df34f6386913215b72cf82377a2638 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 Apr 2020 11:07:36 +0700
+Subject: [PATCH 231/351] soc: renesas: rcar-topology: Add RZ/G2H in supporting
+ capacity awareness
+
+RZ/G2H have 8 cores with 4 cores for each type (CA57 and CA57) same as
+R-Car H3. Therefore, add RZ/G2H (R8A774E1) SoC to support Capacity
+Awareness Scheduler as default.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig         | 3 ++-
+ drivers/soc/renesas/rcar-topology.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 8ca0620..4b0f70f 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -28,7 +28,8 @@ config SOC_RENESAS
+ 	select SYSC_R8A77995 if ARCH_R8A77995
+ 
+ config RCAR_CPU_TOPOLOGY
+-	depends on (ARCH_R8A7795 || ARCH_R8A7796 || ARCH_R8A774A1)
++	depends on (ARCH_R8A7795 || ARCH_R8A7796 || \
++		    ARCH_R8A774A1 || ARCH_R8A774E1)
+ 	bool "R-Car CPU Topology"
+ 	default y
+ 	help
+diff --git a/drivers/soc/renesas/rcar-topology.c b/drivers/soc/renesas/rcar-topology.c
+index 5bed7ee..e1f247b 100644
+--- a/drivers/soc/renesas/rcar-topology.c
++++ b/drivers/soc/renesas/rcar-topology.c
+@@ -28,7 +28,8 @@ static int __init rcar_topology_init(void)
+ {
+ 	if (of_machine_is_compatible("renesas,r8a7795") ||
+ 		of_machine_is_compatible("renesas,r8a7796") ||
+-		of_machine_is_compatible("renesas,r8a774a1")) {
++		of_machine_is_compatible("renesas,r8a774a1") ||
++		of_machine_is_compatible("renesas,r8a774e1")) {
+ 		set_sched_topology(rcar_topology);
+ 	}
+ 
+-- 
+2.7.4
+

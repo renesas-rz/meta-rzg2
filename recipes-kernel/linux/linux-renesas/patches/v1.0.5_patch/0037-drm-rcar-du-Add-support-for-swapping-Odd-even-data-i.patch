@@ -1,0 +1,61 @@
+From 6cddb8f4f38f1900c71a070ccd620ec8abefebce Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 27 Mar 2020 16:54:11 +0700
+Subject: [PATCH 037/351] drm: rcar-du: Add support for swapping Odd/even data
+ in dual-link mode
+
+Based on Hardware Manual, bit 1st of LVDSTRIPE register support for
+swapping odd/even data for LVDS port in dual-link mode.
+This patch enables it for swapping requirement from DT side.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_lvds.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_lvds.c b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+index 41b7376..ea7b2f9 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_lvds.c
++++ b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+@@ -76,6 +76,7 @@ struct rcar_lvds {
+ 	enum rcar_lvds_mode mode;
+ 	enum rcar_lvds_link_mode link_mode;
+ 	u32 id;
++	bool st_swap;	/*Odd/even Data swap mode in Dual-link LVDS */
+ };
+ 
+ #define bridge_to_rcar_lvds(b) \
+@@ -390,13 +391,16 @@ static void rcar_lvds_dual_mode(struct rcar_lvds *lvds0,
+ 			LVDCTRCR_CTR2SEL_DISP | LVDCTRCR_CTR1SEL_VSYNC |
+ 			LVDCTRCR_CTR0SEL_HSYNC);
+ 	rcar_lvds_write(lvds0, LVDCHCR, lvdhcr);
+-	rcar_lvds_write(lvds0, LVDSTRIPE, LVDSTRIPE_ST_ON);
++	rcar_lvds_write(lvds0, LVDSTRIPE, LVDSTRIPE_ST_ON
++				| (lvds0->st_swap ? LVDSTRIPE_ST_SWAP : 0));
++
+ 
+ 	rcar_lvds_write(lvds1, LVDCTRCR, LVDCTRCR_CTR3SEL_ZERO |
+ 			LVDCTRCR_CTR2SEL_DISP | LVDCTRCR_CTR1SEL_VSYNC |
+ 			LVDCTRCR_CTR0SEL_HSYNC);
+ 	rcar_lvds_write(lvds1, LVDCHCR, lvdhcr);
+-	rcar_lvds_write(lvds1, LVDSTRIPE, LVDSTRIPE_ST_ON);
++	rcar_lvds_write(lvds1, LVDSTRIPE, LVDSTRIPE_ST_ON
++				| (lvds1->st_swap ? LVDSTRIPE_ST_SWAP : 0));
+ 
+ 	/* Set the LVDS mode and select the input. */
+ 	lvdcr0 = lvds0->mode << LVDCR0_LVMD_SHIFT;
+@@ -903,6 +907,11 @@ static int rcar_lvds_parse_dt(struct rcar_lvds *lvds)
+ 		lvds->link_mode = RCAR_LVDS_SINGLE;
+ 	}
+ 
++	if ((lvds->info->quirks & RCAR_LVDS_QUIRK_DUAL_LINK) &&
++					lvds->link_mode == RCAR_LVDS_DUAL)
++		lvds->st_swap = of_property_read_bool(lvds->dev->of_node,
++								"swap");
++
+ done:
+ 	of_node_put(local_output);
+ 	of_node_put(remote_input);
+-- 
+2.7.4
+

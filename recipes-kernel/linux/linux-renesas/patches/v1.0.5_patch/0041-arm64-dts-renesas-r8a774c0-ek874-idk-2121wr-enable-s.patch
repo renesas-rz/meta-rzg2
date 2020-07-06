@@ -1,0 +1,46 @@
+From aa433fb2a71ae46fa52d30d9d4449da4ddefe890 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 30 Jun 2020 11:15:29 +0700
+Subject: [PATCH 041/351] arm64: dts: renesas: r8a774c0-ek874-idk-2121wr:
+ enable swapping odd/even data for dual channels LVDS
+
+In sub board, pin-outs of LVDS-IF to dual channels LVDS panel are
+described in Schematics:
+- LVDS0 : Even Data.
+- LVDS1 : Odd Data.
+
+Dual channels LVDS panel will use LVDS1 for 1st pixel and LVDS0 for 2nd
+pixel. It is reversed with default register.
+So that to support right channel, add "swap" property in LVDS nodes
+in devicetree.
+
+This patch does this thing.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts b/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts
+index 9d50061..55d9e96 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts
+@@ -94,6 +94,7 @@
+ 	clocks = <&cpg CPG_MOD 727>, <&x13_clk>;
+ 	clock-names = "fck", "dclkin.0";
+ 	mode = "dual-link";
++	swap = <1>;
+ 
+ 	ports {
+ 		port@1 {
+@@ -110,6 +111,7 @@
+ 	clocks = <&cpg CPG_MOD 727>, <&x13_clk>;
+ 	clock-names = "fck", "dclkin.0";
+ 	mode = "dual-link";
++	swap = <1>;
+ 
+ 	ports {
+ 		port@1 {
+-- 
+2.7.4
+

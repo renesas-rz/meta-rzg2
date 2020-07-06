@@ -1,0 +1,34 @@
+From 1e1f5db1bbfded98436ec3f95146965ccf2e2c1f Mon Sep 17 00:00:00 2001
+From: Duy Bao Dang <duy.dang.yb@renesas.com>
+Date: Mon, 6 Apr 2020 14:34:45 +0700
+Subject: [PATCH 230/351] arm64: dts: renesas: r8a774e1: Add watchdog node
+
+This patch adds watchdog node for RZ/G2H (R8A774E1) SoC.
+
+Signed-off-by: Duy Bao Dang <duy.dang.yb@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index e600de8..9caa19d 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -249,8 +249,13 @@
+ 		ranges;
+ 
+ 		rwdt: watchdog@e6020000 {
++			compatible = "renesas,r8a774e1-wdt",
++				"renesas,rcar-gen3-wdt";
+ 			reg = <0 0xe6020000 0 0x0c>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 402>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 402>;
++			status = "disabled";
+ 		};
+ 
+ 		gpio0: gpio@e6050000 {
+-- 
+2.7.4
+

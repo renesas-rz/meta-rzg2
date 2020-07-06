@@ -1,0 +1,36 @@
+From 139ef22a0f10a24de0d7caa2152353a8236eb0af Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Fri, 10 Apr 2020 11:05:24 +0700
+Subject: [PATCH 247/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable
+ HDMI audio by default
+
+This patch is to disable HDMI audio by default in HiHope G2H platform
+because we do not support HDMI in default environment. As a result,
+external PCM5102A will become default audio codec in this platform.
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index b0361f1..c34561c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -38,3 +38,13 @@
+ 		};
+ 	};
+ };
++
++&sound_card {
++	dais = <&rsnd_port1>;	/* PCM5102A */
++};
++
++&rcar_sound {
++	ports {
++		/delete-node/ rsnd_port0;
++	};
++};
+-- 
+2.7.4
+

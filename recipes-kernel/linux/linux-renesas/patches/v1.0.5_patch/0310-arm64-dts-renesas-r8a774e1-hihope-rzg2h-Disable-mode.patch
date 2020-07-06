@@ -1,0 +1,29 @@
+From 954e51bd258f07eeb9684c57200cf4553ad80722 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Wed, 8 Apr 2020 08:37:33 +0700
+Subject: [PATCH 310/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable
+ mode HS400
+
+This commit disables HS400 and use HS200 as default eMMC mode
+in HiHope G2H platform.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index ebbdb41..558bbd8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -97,3 +97,7 @@
+ 	clock-names = "du.0", "du.1", "du.3",
+ 		"dclkin.0", "dclkin.1", "dclkin.3";
+ };
++
++&sdhi3 {
++	/delete-property/ mmc-hs400-1_8v;
++};
+-- 
+2.7.4
+

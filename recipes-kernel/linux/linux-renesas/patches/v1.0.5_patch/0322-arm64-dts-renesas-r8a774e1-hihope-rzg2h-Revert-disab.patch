@@ -1,0 +1,29 @@
+From 42464288f24855f9d478826e10f36cde2bd8c6a3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 30 Jun 2020 15:10:37 +0700
+Subject: [PATCH 322/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Revert
+ disabling mode HS400 for r8a774e1
+
+This commit reverts to support mode HS400 for eMMC on Hihope RZ/G2H.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index b57d7c5..7d000c9 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -117,7 +117,3 @@
+ 	clock-names = "du.0", "du.1", "du.3",
+ 		"dclkin.0", "dclkin.1", "dclkin.3";
+ };
+-
+-&sdhi3 {
+-	/delete-property/ mmc-hs400-1_8v;
+-};
+-- 
+2.7.4
+
