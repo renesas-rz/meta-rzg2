@@ -1,0 +1,36 @@
+From ab4038baa5a12d355a6be96f125e526a510923ee Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 08:38:01 +0700
+Subject: [PATCH 2/2] Fix ld error unrecognized option with old binutils
+
+With older binutils version 2.25, below error will happen
+   aarch64-poky-linux-ld.bfd: unrecognized option '--fix-cortex-a53-843419'
+
+In this binutils version, the option name is "--fix-cortex-a53"
+(before change name to "--fix-cortex-a53-843419" in later version)
+
+Fix this by modifying the option name.
+
+Signed-off-by: Hung Tran <hung.tran.jy@renesas.com>
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
+---
+ plat/renesas/rzg/platform.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/plat/renesas/rzg/platform.mk b/plat/renesas/rzg/platform.mk
+index 5c081bb..5d22ccd 100644
+--- a/plat/renesas/rzg/platform.mk
++++ b/plat/renesas/rzg/platform.mk
+@@ -299,7 +299,8 @@ ERRATA_A53_835769  := 1
+ ifdef ERRATA_A53_843419
+ ERRATA_A53_843419  := 1
+ else
+-TF_LDFLAGS_aarch64	+= --fix-cortex-a53-843419
++# Fix-ld-error-unrecognized-option-with-old-binutils
++TF_LDFLAGS_aarch64	+= --fix-cortex-a53
+ endif
+ ERRATA_A53_855873  := 1
+ 
+-- 
+2.7.4
+
