@@ -1,8 +1,7 @@
-From fa3897196dac698311f4914419fa37e4211ce1c2 Mon Sep 17 00:00:00 2001
+From 62f1aecc6a5990ed7f57631beed5c4cd7464cc3a Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Thu, 28 Mar 2019 14:29:18 +0700
-Subject: [PATCH 1/7] ARM64: DTS: cat874: reduce mem to 960M when enable
- DRAM-ECC
+Subject: [PATCH] ARM64: DTS: cat874: reduce mem to 960M when enable DRAM-ECC
 
 When enable DRAM-ECC, a part of DRAM used to store ECC.
 This commit limit mem to prevent Linux to access to ECC area.
@@ -14,14 +13,28 @@ Currently, with 8bit data/5bit ECC, only 960M can be used.
 
 Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
 ---
- arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts      | 2 +-
+ arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
-index d1c0d68..ac83d79 100644
+index ac67b21..8baca5b 100644
 --- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
 +++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
-@@ -27,7 +27,7 @@
+@@ -65,7 +65,7 @@
+ 	memory@48000000 {
+ 		device_type = "memory";
+ 		/* first 128MB is reserved for secure area. */
+-		reg = <0x0 0x48000000 0x0 0x78000000>;
++		reg = <0x0 0x48000000 0x0 0x3C000000>;
+ 	};
+ 
+ 	reserved-memory {
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+index 56232e6..60cf129 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+@@ -65,7 +65,7 @@
  	memory@48000000 {
  		device_type = "memory";
  		/* first 128MB is reserved for secure area. */
@@ -31,5 +44,5 @@ index d1c0d68..ac83d79 100644
  
  	reserved-memory {
 -- 
-2.7.4
+1.9.1
 
