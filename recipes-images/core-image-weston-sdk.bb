@@ -16,7 +16,7 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL_append = " kernel-devsrc ltp"
 
 # Add some necessary tool
-TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex "
+TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex nativesdk-python3-pycryptodome nativesdk-python3-pycryptodomex"
 
 # Post process after installed sdk
 sdk_post_process () {
