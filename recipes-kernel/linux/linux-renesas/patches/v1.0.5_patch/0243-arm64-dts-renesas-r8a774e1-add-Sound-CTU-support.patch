@@ -1,0 +1,35 @@
+From 85c5550a365e0157a32c55b4d6cc9b15112b4623 Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Tue, 7 Apr 2020 16:50:55 +0700
+Subject: [PATCH 243/350] arm64: dts: renesas: r8a774e1: add Sound CTU support
+
+This patch adds CTU[0,1,2,3,4,5,6,7] support for R8A774E1 SoC.
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 12ee908..7768b56 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1152,6 +1152,7 @@
+ 				 <&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
+ 				 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
+ 				 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++				 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
+ 				 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
+ 				 <&audio_clk_a>, <&audio_clk_b>,
+ 				 <&audio_clk_c>,
+@@ -1163,6 +1164,7 @@
+ 					"src.9", "src.8", "src.7", "src.6",
+ 					"src.5", "src.4", "src.3", "src.2",
+ 					"src.1", "src.0",
++					"ctu.1", "ctu.0",
+ 					"dvc.0", "dvc.1",
+ 					"clk_a", "clk_b", "clk_c", "clk_i";
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,37 @@
+From 72a7de1cba4d1fa3ec10ebfd8de191d6718eb12e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 30 Mar 2020 11:42:33 +0700
+Subject: [PATCH 115/350] arm64: dts: renesas: r8a774b1: TPU support for RZ/G2N
+
+This patch adds TPU device node for R8A774B1 SoC.
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 3c729d6..f0b50ff 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -1120,6 +1120,16 @@
+ 			status = "disabled";
+ 		};
+ 
++		tpu: pwm@e6e80000 {
++			compatible = "renesas,tpu";
++			reg = <0 0xe6e80000 0 0x148>;
++			clocks = <&cpg CPG_MOD 304>;
++			power-domains = <&sysc R8A774B1_PD_ALWAYS_ON>;
++			resets = <&cpg 304>;
++			#pwm-cells = <3>;
++			status = "disabled";
++		};
++
+ 		scif0: serial@e6e60000 {
+ 			compatible = "renesas,scif-r8a774b1",
+ 				     "renesas,rcar-gen3-scif", "renesas,scif";
+-- 
+2.7.4
+

@@ -1,0 +1,34 @@
+From c4fa8125645bf835b0ea261d5b34dc56c82f6599 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 5 Mar 2019 14:35:40 +0700
+Subject: [PATCH 005/350] arm64: defconfig: Add Powersave and Conservative for
+ CPUFREQ
+
+This patch enables Powersave and Conservative functionalities for
+CPUFREQ framework governor.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 70b0f65..3b17500 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -108,10 +108,10 @@ CONFIG_WQ_POWER_EFFICIENT_DEFAULT=y
+ CONFIG_ARM_CPUIDLE=y
+ CONFIG_CPU_FREQ=y
+ CONFIG_CPU_FREQ_STAT=y
+-CONFIG_CPU_FREQ_GOV_POWERSAVE=m
++CONFIG_CPU_FREQ_GOV_POWERSAVE=y
+ CONFIG_CPU_FREQ_GOV_USERSPACE=y
+ CONFIG_CPU_FREQ_GOV_ONDEMAND=y
+-CONFIG_CPU_FREQ_GOV_CONSERVATIVE=m
++CONFIG_CPU_FREQ_GOV_CONSERVATIVE=y
+ CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
+ CONFIG_CPUFREQ_DT=y
+ CONFIG_ACPI_CPPC_CPUFREQ=m
+-- 
+2.7.4
+

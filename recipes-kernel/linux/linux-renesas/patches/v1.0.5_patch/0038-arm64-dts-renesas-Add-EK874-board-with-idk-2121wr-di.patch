@@ -1,0 +1,179 @@
+From 32964504fd97820fce595697e12e099f339c527b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 30 Jun 2020 11:12:27 +0700
+Subject: [PATCH 038/350] arm64: dts: renesas: Add EK874 board with idk-2121wr
+ display support
+
+Commit <ae56c940f188c1dde440c8456229adaad733908e> upstream.
+
+The EK874 is advertised as compatible with panel IDK-2121WR from
+Advantech, however the panel isn't sold alongside the board.
+A new dts, adding everything that's required to get the panel to
+to work with the EK874, is the most convenient way to support the
+EK874 when it's connected to the IDK-2121WR.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro@bp.renesas.com>
+Acked-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Link: https://lore.kernel.org/r/1576590361-28244-7-git-send-email-fabrizio.castro@bp.renesas.com
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |   1 +
+ .../boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts | 133 +++++++++++++++++++++
+ 2 files changed, 134 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index c05feec..cd303a1 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -5,6 +5,7 @@ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-ex-idk-1110wr.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb r8a774c0-ek874.dtb
++dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-ek874-idk-2121wr.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-x.dtb r8a7795-h3ulcb.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-h3ulcb-kf.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-xs.dtb
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts b/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts
+new file mode 100644
+index 0000000..9aa7ce9
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-ek874-idk-2121wr.dts
+@@ -0,0 +1,133 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the Silicon Linux RZ/G2E evaluation kit (EK874),
++ * connected to an Advantech IDK-2121WR 21.5" LVDS panel
++ *
++ * Copyright (C) 2019 Renesas Electronics Corp.
++ */
++
++#include "r8a774c0-ek874.dts"
++
++/ {
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&pwm5 0 50000>;
++
++		brightness-levels = <0 4 8 16 32 64 128 255>;
++		default-brightness-level = <6>;
++
++		power-supply = <&reg_12p0v>;
++		enable-gpios = <&gpio6 12 GPIO_ACTIVE_HIGH>;
++	};
++
++	panel@0 {
++		compatible = "advantech,idk-2121wr", "panel-lvds";
++
++		width-mm = <476>;
++		height-mm = <268>;
++
++		data-mapping = "vesa-24";
++
++		panel-timing {
++			clock-frequency = <148500000>;
++			hactive = <1920>;
++			vactive = <1080>;
++			hsync-len = <44>;
++			hfront-porch = <88>;
++			hback-porch = <148>;
++			vfront-porch = <4>;
++			vback-porch = <36>;
++			vsync-len = <5>;
++		};
++
++		port {
++			lvds0_panel_in: endpoint {
++				remote-endpoint = <&lvds0_out>;
++			};
++		};
++	};
++
++	panel@1 {
++		compatible = "advantech,idk-2121wr", "panel-lvds";
++
++		width-mm = <476>;
++		height-mm = <268>;
++
++		data-mapping = "vesa-24";
++
++		panel-timing {
++			clock-frequency = <148500000>;
++			hactive = <1920>;
++			vactive = <1080>;
++			hsync-len = <44>;
++			hfront-porch = <88>;
++			hback-porch = <148>;
++			vfront-porch = <4>;
++			vback-porch = <36>;
++			vsync-len = <5>;
++		};
++
++		port {
++			lvds1_panel_in: endpoint {
++				remote-endpoint = <&lvds1_out>;
++			};
++		};
++	};
++};
++
++&gpio0 {
++	/*
++	 * When GP0_17 is low LVDS[01] are connected to the LVDS connector
++	 * When GP0_17 is high LVDS[01] are connected to the LT8918L
++	 */
++	lvds-connector-en-gpio{
++		gpio-hog;
++		gpios = <17 GPIO_ACTIVE_HIGH>;
++		output-low;
++		line-name = "lvds-connector-en-gpio";
++	};
++};
++
++&lvds0 {
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 727>, <&x13_clk>;
++	clock-names = "fck", "dclkin.0";
++
++	ports {
++		port@1 {
++			lvds0_out: endpoint {
++				remote-endpoint = <&lvds0_panel_in>;
++			};
++		};
++	};
++};
++
++&lvds1 {
++	status = "okay";
++
++	clocks = <&cpg CPG_MOD 727>, <&x13_clk>;
++	clock-names = "fck", "dclkin.0";
++
++	ports {
++		port@1 {
++			lvds1_out: endpoint {
++				remote-endpoint = <&lvds1_panel_in>;
++			};
++		};
++	};
++};
++
++&pfc {
++	pwm5_pins: pwm5 {
++		groups = "pwm5_a";
++		function = "pwm5";
++	};
++};
++
++&pwm5 {
++	pinctrl-0 = <&pwm5_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

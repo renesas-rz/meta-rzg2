@@ -1,0 +1,42 @@
+From 31aa09a39cc96e8de079d36166a8415d13a8f05f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 10:22:16 +0700
+Subject: [PATCH 007/350] arm64: dts: renesas: r8a774c0: add threshold
+ temperature to enable IPA
+
+This patch adds threshold temperature to enable IPA in R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index e0b3c64..2b7b1128 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -81,6 +81,8 @@
+ 			clocks = <&cpg CPG_CORE R8A774C0_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
++			cooling-min-level = <0>;
++			cooling-max-level = <2>;
+ 		};
+ 
+ 		a53_1: cpu@1 {
+@@ -1940,6 +1942,12 @@
+ 					type = "critical";
+ 				};
+ 
++				threshold: trip-point0 {
++					temperature = <90000>;
++					hysteresis = <2000>;
++					type = "passive";
++				};
++
+ 				target: trip-point1 {
+ 					temperature = <100000>;
+ 					hysteresis = <2000>;
+-- 
+2.7.4
+

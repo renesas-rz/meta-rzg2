@@ -1,0 +1,37 @@
+From 1eb03858d80065c9e327158070a1b1fbe2ca164d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 11:16:04 +0700
+Subject: [PATCH 111/350] dt-bindings: display: renesas: du: Document the
+ r8a774b1 bindings
+
+Document the RZ/G2N (R8A774B1) SoC in the R-Car DU bindings.
+
+Signed-off-by: Toan Nguyen <toan.nguyen.yw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/display/renesas,du.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/display/renesas,du.txt b/Documentation/devicetree/bindings/display/renesas,du.txt
+index 8f9d65c..b690c35 100644
+--- a/Documentation/devicetree/bindings/display/renesas,du.txt
++++ b/Documentation/devicetree/bindings/display/renesas,du.txt
+@@ -6,6 +6,7 @@ Required Properties:
+     - "renesas,du-r8a7743" for R8A7743 (RZ/G1M) compatible DU
+     - "renesas,du-r8a7745" for R8A7745 (RZ/G1E) compatible DU
+     - "renesas,du-r8a774a1" for R8A774A1 (RZ/G2M) compatible DU
++    - "renesas,du-r8a774b1" for R8A774B1 (RZ/G2N) compatible DU
+     - "renesas,du-r8a774c0" for R8A774C0 (RZ/G2E) compatible DU
+     - "renesas,du-r8a7779" for R8A7779 (R-Car H1) compatible DU
+     - "renesas,du-r8a7790" for R8A7790 (R-Car H2) compatible DU
+@@ -54,6 +55,7 @@ corresponding to each DU output.
+  R8A7743 (RZ/G1M)       DPAD 0         LVDS 0         -              -
+  R8A7745 (RZ/G1E)       DPAD 0         DPAD 1         -              -
+  R8A774A1 (RZ/G2M)      DPAD 0         HDMI 0         LVDS 0         -
++ R8A774B1 (RZ/G2N)      DPAD 0         HDMI 0         LVDS 0         -
+  R8A774C0 (RZ/G2E)      DPAD 0         LVDS 0         LVDS 1         -
+  R8A7779 (R-Car H1)     DPAD 0         DPAD 1         -              -
+  R8A7790 (R-Car H2)     DPAD 0         LVDS 0         LVDS 1         -
+-- 
+2.7.4
+

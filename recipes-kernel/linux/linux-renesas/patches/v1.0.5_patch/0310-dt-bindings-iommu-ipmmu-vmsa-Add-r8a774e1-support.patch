@@ -1,0 +1,27 @@
+From fdb5ea464116e7667539ad456c9cd785812e81ad Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Thu, 9 Apr 2020 10:40:45 +0700
+Subject: [PATCH 310/350] dt-bindings: iommu: ipmmu-vmsa: Add r8a774e1 support
+
+Document RZ/G2H (R8A774E1) SoC bindings.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ Documentation/devicetree/bindings/iommu/renesas,ipmmu-vmsa.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/iommu/renesas,ipmmu-vmsa.txt b/Documentation/devicetree/bindings/iommu/renesas,ipmmu-vmsa.txt
+index 56faf8d..b55b117 100644
+--- a/Documentation/devicetree/bindings/iommu/renesas,ipmmu-vmsa.txt
++++ b/Documentation/devicetree/bindings/iommu/renesas,ipmmu-vmsa.txt
+@@ -13,6 +13,7 @@ Required Properties:
+     - "renesas,ipmmu-r8a73a4" for the R8A73A4 (R-Mobile APE6) IPMMU.
+     - "renesas,ipmmu-r8a7743" for the R8A7743 (RZ/G1M) IPMMU.
+     - "renesas,ipmmu-r8a7745" for the R8A7745 (RZ/G1E) IPMMU.
++    - "renesas,ipmmu-r8a774e1" for the R8A774E1 (RZ/G2H) IPMMU.
+     - "renesas,ipmmu-r8a774a1" for the R8A774A1 (RZ/G2M) IPMMU.
+     - "renesas,ipmmu-r8a774b1" for the R8A774B1 (RZ/G2N) IPMMU.
+     - "renesas,ipmmu-r8a774c0" for the R8A774C0 (RZ/G2E) IPMMU.
+-- 
+2.7.4
+

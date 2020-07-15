@@ -1,0 +1,73 @@
+From c153652061ae57b9266323cf983c6cba65f2f798 Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 Jul 2020 15:39:12 +0700
+Subject: [PATCH 350/350] rcar-du: workaround to display DPAD0 and LVDS-IF at
+ the same time in r8a774c0 SoC.
+
+Currently, there are 2 types of devicetree which support for RZ/G2E:
+1. Only DPAD0
+2. DPAD0 + Dual link LVDS (LVDS0 + LVDS1)
+
+There are total 3 encoders but only 2 DU outputs in G2E.
+To workaround using for all case, we hard fix:
+1. Only DPAD0: possible output is DU0.
+2. DPAD0 + Dual link LVDS: possible output for DPAD0 is DU1 and Dual
+link LVDS is DU0.
+
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_drv.c |  2 +-
+ drivers/gpu/drm/rcar-du/rcar_du_kms.c | 17 +++++++++++++++--
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.c b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+index cae5041..4df1021 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+@@ -150,7 +150,7 @@ static const struct rcar_du_device_info rcar_du_r8a774c0_info = {
+ 		 * R8A774C0 has one RGB output and two LVDS outputs
+ 		 */
+ 		[RCAR_DU_OUTPUT_DPAD0] = {
+-			.possible_crtcs = BIT(0) | BIT(1),
++			.possible_crtcs = BIT(1),
+ 			.port = 0,
+ 		},
+ 		[RCAR_DU_OUTPUT_LVDS0] = {
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_kms.c b/drivers/gpu/drm/rcar-du/rcar_du_kms.c
+index 3257aca..3f2266d 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_kms.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_kms.c
+@@ -663,7 +663,13 @@ int rcar_du_modeset_init(struct rcar_du_device *rcdu)
+ 		const struct rcar_du_output_routing *route =
+ 			&rcdu->info->routes[renc->output];
+ 
+-		encoder->possible_crtcs = route->possible_crtcs;
++		if (num_encoders < 3 && renc->output == RCAR_DU_OUTPUT_DPAD0 &&
++				rcar_du_has(rcdu, RCAR_DU_FEATURE_R8A7799X))
++			encoder->possible_crtcs = route->possible_crtcs
++						  | BIT(0);
++		else
++			encoder->possible_crtcs = route->possible_crtcs;
++
+ 		encoder->possible_clones = (1 << num_encoders) - 1;
+ 	}
+ 
+@@ -675,7 +681,14 @@ int rcar_du_modeset_init(struct rcar_du_device *rcdu)
+ 	 * hardware configuration on Gen3 where DU0 can't always be connected to
+ 	 * DPAD0.
+ 	 */
+-	dpad0_sources = rcdu->info->routes[RCAR_DU_OUTPUT_DPAD0].possible_crtcs;
++	if (num_encoders < 3 && rcar_du_has(rcdu, RCAR_DU_FEATURE_R8A7799X))
++		dpad0_sources =
++			rcdu->info->routes[RCAR_DU_OUTPUT_DPAD0].possible_crtcs
++			| BIT(0);
++	else
++		dpad0_sources =
++			rcdu->info->routes[RCAR_DU_OUTPUT_DPAD0].possible_crtcs;
++
+ 	rcdu->dpad0_source = ffs(dpad0_sources) - 1;
+ 
+ 	drm_mode_config_reset(dev);
+-- 
+2.7.4
+

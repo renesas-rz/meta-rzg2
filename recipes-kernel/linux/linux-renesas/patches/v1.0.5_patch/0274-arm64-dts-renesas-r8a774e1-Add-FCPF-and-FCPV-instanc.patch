@@ -1,0 +1,99 @@
+From de8e16a0675351cb9f840e1da77d976cbb59ae53 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Mon, 13 Apr 2020 14:54:16 +0700
+Subject: [PATCH 274/350] arm64: dts: renesas: r8a774e1: Add FCPF and FCPV
+ instances
+
+The FCPs handle the interface between various IP cores and memory.
+This patch adds the instances related to the FDPs and VSP2s.i.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 54 +++++++++++++++++++++++++------
+ 1 file changed, 44 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index ed9ab54..19082c4 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1853,33 +1853,67 @@
+ 		};
+ 
+ 		fcpf0: fcp@fe950000 {
++			compatible = "renesas,fcpf";
+ 			reg = <0 0xfe950000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 615>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 615>;
++		};
++
++		fcpf1: fcp@fe951000 {
++			compatible = "renesas,fcpf";
++			reg = <0 0xfe951000 0 0x200>;
++			clocks = <&cpg CPG_MOD 614>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 614>;
+ 		};
+ 
+ 		fcpvb0: fcp@fe96f000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfe96f000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 607>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 607>;
++		};
++
++		fcpvb1: fcp@fe92f000 {
++			compatible = "renesas,fcpv";
++			reg = <0 0xfe92f000 0 0x200>;
++			clocks = <&cpg CPG_MOD 606>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 606>;
+ 		};
+ 
+ 		fcpvd0: fcp@fea27000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 603>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 603>;
+ 		};
+ 
+ 		fcpvd1: fcp@fea2f000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea2f000 0 0x200>;
+-			/* placeholder */
+-		};
+-
+-		fcpvd2: fcp@fea37000 {
+-			reg = <0 0xfea37000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 602>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 602>;
+ 		};
+ 
+ 		fcpvi0: fcp@fe9af000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfe9af000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 611>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 611>;
++		};
++
++		fcpvi1: fcp@fe9bf000 {
++			compatible = "renesas,fcpv";
++			reg = <0 0xfe9bf000 0 0x200>;
++			clocks = <&cpg CPG_MOD 610>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++			resets = <&cpg 610>;
+ 		};
+ 
+ 		vsp@fe960000 {
+-- 
+2.7.4
+

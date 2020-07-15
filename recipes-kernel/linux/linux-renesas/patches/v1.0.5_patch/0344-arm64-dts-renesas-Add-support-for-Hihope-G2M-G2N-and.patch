@@ -1,0 +1,305 @@
+From de3d48c71c8cf4017d73a71d8f6da153cae00311 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 30 Jun 2020 15:55:20 +0700
+Subject: [PATCH 344/350] arm64: dts: renesas: Add support for Hihope G2M, G2N
+ and G2H rev4 platform
+
+This commit is created to support Hihope G2M, G2N and G2H revision 4:
+- Remove GPIO Expander PCA9654 because rev4 board uses built-in GPIO
+in SoC to control enabling/disabling Wifi/Bluetooth Chip.
+- Remove active LEDs for Bluetooth (GP7_0) and Wifi (GP7_1).
+- Support Audio sampling rate 48kHz which is generated from clock
+supplier CS2000.
+- Remove MSIOF0 due to pin conflict with Audio clock function.
+- Define audio internal clock macro for separated G2M, G2N and G2H to avoid
+mismatch error.
+- Define I2C2 node in common platform and remove i2c2 node in mipi dts.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi     | 88 ++++++++++++++--------
+ .../renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts  | 11 ---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi          |  2 +
+ .../renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts  | 11 ---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi          |  2 +
+ .../renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts  | 11 ---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi          |  2 +
+ 7 files changed, 62 insertions(+), 65 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index f086d56..c5c4cd1 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -13,7 +13,6 @@
+ 		serial1 = &hscif0;
+ 		serial2 = &hscif1;
+ 		serial3 = &scif0;
+-		spi0 = &msiof0;
+ 	};
+ 
+ 	chosen {
+@@ -35,13 +34,6 @@
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+-		bt_active_led {
+-			label = "blue:bt";
+-			gpios = <&gpio7  0 GPIO_ACTIVE_HIGH>;
+-			linux,default-trigger = "hci0-power";
+-			default-state = "off";
+-		};
+-
+ 		led0 {
+ 			gpios = <&gpio6 11 GPIO_ACTIVE_HIGH>;
+ 		};
+@@ -57,13 +49,6 @@
+ 		led3 {
+ 			gpios = <&gpio0  0 GPIO_ACTIVE_HIGH>;
+ 		};
+-
+-		wlan_active_led {
+-			label = "yellow:wlan";
+-			gpios = <&gpio7  1 GPIO_ACTIVE_HIGH>;
+-			linux,default-trigger = "phy0tx";
+-			default-state = "off";
+-		};
+ 	};
+ 
+ 	reg_1p8v: regulator0 {
+@@ -124,7 +109,7 @@
+ 		regulator-max-microvolt = <1800000>;
+ 		startup-delay-us = <70000>;
+ 
+-		gpio = <&gpio_expander 1 GPIO_ACTIVE_HIGH>;
++		gpio = <&gpio4 6 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 	};
+ 
+@@ -154,6 +139,18 @@
+ 			};
+ 		};
+ 	};
++
++	audio_clkout: audio-clkout {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <12288000>;
++	};
++
++	x1801_clk: x1801 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <24576000>;
++	};
+ };
+ 
+ &audio_clk_a {
+@@ -217,7 +214,7 @@
+ 
+ 	bluetooth {
+ 		compatible = "ti,wl1837-st";
+-		enable-gpios = <&gpio_expander 2 GPIO_ACTIVE_HIGH>;
++		enable-gpios = <&gpio3 13 GPIO_ACTIVE_HIGH>;
+ 	};
+ };
+ 
+@@ -245,13 +242,6 @@
+ 	clock-frequency = <400000>;
+ 	status = "okay";
+ 
+-	gpio_expander: gpio@20 {
+-		compatible = "onnn,pca9654";
+-		reg = <0x20>;
+-		gpio-controller;
+-		#gpio-cells = <2>;
+-	};
+-
+ 	versaclock5: clock-generator@6a {
+ 		compatible = "idt,5p49v5923";
+ 		reg = <0x6a>;
+@@ -327,7 +317,7 @@
+ 	};
+ 
+ 	sound_clk_pins: sound_clk {
+-		groups = "audio_clk_a_a";
++		groups = "audio_clk_a_a", "audio_clk_b_a", "audio_clkout_a";
+ 		function = "audio_clk";
+ 	};
+ 
+@@ -362,10 +352,9 @@
+ 		function = "usb30";
+ 	};
+ 
+-	msiof0_pins: spi0 {
+-		groups = "msiof0_clk", "msiof0_sync",
+-			 "msiof0_rxd", "msiof0_txd";
+-		function = "msiof0";
++	i2c2_pins: i2c2 {
++		groups = "i2c2_a";
++		function = "i2c2";
+ 	};
+ };
+ 
+@@ -378,6 +367,31 @@
+ 	/* Single DAI */
+ 	#sound-dai-cells = <0>;
+ 
++	/* audio_clkout0/1/2/3 */
++	#clock-cells = <1>;
++	clock-frequency = <12288000 11289600>;
++
++	status = "okay";
++
++	/* update <audio_clk_b> to <cs2000> */
++	clocks = <&cpg CPG_MOD 1005>,
++		 <&cpg CPG_MOD 1006>, <&cpg CPG_MOD 1007>,
++		 <&cpg CPG_MOD 1008>, <&cpg CPG_MOD 1009>,
++		 <&cpg CPG_MOD 1010>, <&cpg CPG_MOD 1011>,
++		 <&cpg CPG_MOD 1012>, <&cpg CPG_MOD 1013>,
++		 <&cpg CPG_MOD 1014>, <&cpg CPG_MOD 1015>,
++		 <&cpg CPG_MOD 1022>, <&cpg CPG_MOD 1023>,
++		 <&cpg CPG_MOD 1024>, <&cpg CPG_MOD 1025>,
++		 <&cpg CPG_MOD 1026>, <&cpg CPG_MOD 1027>,
++		 <&cpg CPG_MOD 1028>, <&cpg CPG_MOD 1029>,
++		 <&cpg CPG_MOD 1030>, <&cpg CPG_MOD 1031>,
++		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		 <&cpg CPG_MOD 1020>, <&cpg CPG_MOD 1021>,
++		 <&cpg CPG_MOD 1019>, <&cpg CPG_MOD 1018>,
++		 <&audio_clk_a>, <&cs2000>,
++		 <&audio_clk_c>,
++		 <&cpg CPG_CORE CPG_AUDIO_CLK_I>;
++
+ 	ports {
+ 		rsnd_port0: port@0 {
+ 			rsnd_endpoint: endpoint {
+@@ -547,9 +561,19 @@
+ 	status = "okay";
+ };
+ 
+-&msiof0 {
+-	pinctrl-0 = <&msiof0_pins>;
++&i2c2 {
++	pinctrl-0 = <&i2c2_pins>;
+ 	pinctrl-names = "default";
+-
+ 	status = "okay";
++
++	cs2000: clk_multiplier@4f {
++		#clock-cells = <0>;
++		compatible = "cirrus,cs2000-cp";
++		reg = <0x4f>;
++		clocks = <&audio_clkout>, <&x1801_clk>;
++		clock-names = "clk_in", "ref_clk";
++
++		assigned-clocks = <&cs2000>;
++		assigned-clock-rates = <24576000>; /* 1/1 divide */
++	};
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts
+index d06f486..3d9e649 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts
+@@ -17,17 +17,6 @@
+ 		     "renesas,r8a774a1";
+ };
+ 
+-&pfc {
+-	i2c2_pins: i2c2 {
+-		groups = "i2c2_a";
+-		function = "i2c2";
+-	};
+-};
+-
+-&i2c2 {
+-	status = "okay";
+-};
+-
+ &vin0 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 4c2b2a8..111e0af 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -10,6 +10,8 @@
+ #include <dt-bindings/clock/r8a774a1-cpg-mssr.h>
+ #include <dt-bindings/power/r8a774a1-sysc.h>
+ 
++#define CPG_AUDIO_CLK_I		R8A774A1_CLK_S0D4
++
+ / {
+ 	compatible = "renesas,r8a774a1";
+ 	#address-cells = <2>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts
+index 401d9f3..fcd0f75 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts
+@@ -17,17 +17,6 @@
+ 		     "renesas,r8a774b1";
+ };
+ 
+-&pfc {
+-	i2c2_pins: i2c2 {
+-		groups = "i2c2_a";
+-		function = "i2c2";
+-	};
+-};
+-
+-&i2c2 {
+-	status = "okay";
+-};
+-
+ &vin0 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 54c4636..d6f36e5 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -10,6 +10,8 @@
+ #include <dt-bindings/clock/r8a774b1-cpg-mssr.h>
+ #include <dt-bindings/power/r8a774b1-sysc.h>
+ 
++#define CPG_AUDIO_CLK_I		R8A774B1_CLK_S0D4
++
+ / {
+ 	compatible = "renesas,r8a774b1";
+ 	#address-cells = <2>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+index 30c6579..179b4fc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+@@ -17,17 +17,6 @@
+ 		     "renesas,r8a774e1";
+ };
+ 
+-&pfc {
+-	i2c2_pins: i2c2 {
+-		groups = "i2c2_a";
+-		function = "i2c2";
+-	};
+-};
+-
+-&i2c2 {
+-	status = "okay";
+-};
+-
+ &vin0 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index e5e09ff..a2709f1 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -10,6 +10,8 @@
+ #include <dt-bindings/clock/r8a774e1-cpg-mssr.h>
+ #include <dt-bindings/power/r8a774e1-sysc.h>
+ 
++#define CPG_AUDIO_CLK_I		R8A774E1_CLK_S0D4
++
+ / {
+ 	compatible = "renesas,r8a774e1";
+ 	#address-cells = <2>;
+-- 
+2.7.4
+

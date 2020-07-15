@@ -1,0 +1,36 @@
+From 167a2512d1aefdf6339645cb0f737eafa87f3701 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 25 Apr 2019 13:13:38 +0700
+Subject: [PATCH 040/350] arm64: dts: renesas: r8a774c0: add "renesas,id"
+ property for lvds nodes
+
+This patch add "renesas,id" support for lvds nodes in R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index ed8390e..b692dfb 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -2013,6 +2013,7 @@
+ 			clocks = <&cpg CPG_MOD 727>;
+ 			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
+ 			resets = <&cpg 727>;
++			renesas,id = <0>;
+ 			status = "disabled";
+ 
+ 			ports {
+@@ -2040,6 +2041,7 @@
+ 			clocks = <&cpg CPG_MOD 727>;
+ 			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
+ 			resets = <&cpg 726>;
++			renesas,id = <1>;
+ 			status = "disabled";
+ 
+ 			ports {
+-- 
+2.7.4
+

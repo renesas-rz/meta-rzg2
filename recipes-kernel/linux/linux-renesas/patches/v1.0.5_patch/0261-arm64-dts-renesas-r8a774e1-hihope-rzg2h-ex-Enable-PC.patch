@@ -1,0 +1,45 @@
+From 9efc233d1fe1f19340ed4ef1e0790c2e45cec6e2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 30 Jun 2020 15:03:44 +0700
+Subject: [PATCH 261/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h-ex: Enable
+ PCIE1 and set PCIe as a default instead of SATA
+
+This patch enables PCIE1 for the HiHope board
+
+In RZ/G2H, we can choose the output between PCIE1 and SATA by
+GP7_03 and SW43=OFF with following selections:
+
+GPIO7_03 = HIGH -> PCIE1
+GPIO7_03 = LOW -> SATA
+Currently, we enable PCIE1 as default environment.
+
+Signed-off-by: Dat Nguyen <dat.nguyen.ra@rensas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts
+index ce1c01b..0756761 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex.dts
+@@ -15,3 +15,16 @@
+ 	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2h",
+ 		     "renesas,r8a774e1";
+ };
++
++&pciec1 {
++	status = "okay";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "pcie-en-gpio";
++	};
++};
+-- 
+2.7.4
+

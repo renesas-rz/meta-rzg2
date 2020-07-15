@@ -1,0 +1,29 @@
+From c1781ae24fb653f07a9ffd99ada41aee68fdbd87 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 16:48:38 +0700
+Subject: [PATCH 106/350] sound: codec: Add PCM5102A codec support for RZ/G2
+ SoC series
+
+This patch add PCM5012A audio codec support for RZ/G2 SoC series.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ sound/soc/codecs/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
+index efb095d..7c8641b 100644
+--- a/sound/soc/codecs/Kconfig
++++ b/sound/soc/codecs/Kconfig
+@@ -748,7 +748,7 @@ config SND_SOC_PCM3168A_SPI
+ 	select REGMAP_SPI
+ 
+ config SND_SOC_PCM5102A
+-	tristate
++	tristate "Texas Instruments PCM5102A CODEC"
+ 
+ config SND_SOC_PCM512x
+ 	tristate
+-- 
+2.7.4
+

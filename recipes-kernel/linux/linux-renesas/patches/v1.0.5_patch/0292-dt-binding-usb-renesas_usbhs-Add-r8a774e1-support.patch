@@ -1,0 +1,27 @@
+From ee922af3d44ccc618013d23b81e37767bb802f07 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Fri, 10 Apr 2020 20:00:12 +0700
+Subject: [PATCH 292/350] dt-binding: usb: renesas_usbhs: Add r8a774e1 support
+
+Document RZ/G2H (R8A774E1) SoC bindings
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas,usbhs.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas,usbhs.txt b/Documentation/devicetree/bindings/usb/renesas,usbhs.txt
+index 33fc4b9..032bc67 100644
+--- a/Documentation/devicetree/bindings/usb/renesas,usbhs.txt
++++ b/Documentation/devicetree/bindings/usb/renesas,usbhs.txt
+@@ -8,6 +8,7 @@ Required properties:
+ 	- "renesas,usbhs-r8a774a1" for r8a774a1 (RZ/G2M) compatible device
+ 	- "renesas,usbhs-r8a774b1" for r8a774b1 (RZ/G2N) compatible device
+ 	- "renesas,usbhs-r8a774c0" for r8a774c0 (RZ/G2E) compatible device
++	- "renesas,usbhs-r8a774e1" for r8a774e1 (RZ/G2H) compatible device
+ 	- "renesas,usbhs-r8a7790" for r8a7790 (R-Car H2) compatible device
+ 	- "renesas,usbhs-r8a7791" for r8a7791 (R-Car M2-W) compatible device
+ 	- "renesas,usbhs-r8a7792" for r8a7792 (R-Car V2H) compatible device
+-- 
+2.7.4
+

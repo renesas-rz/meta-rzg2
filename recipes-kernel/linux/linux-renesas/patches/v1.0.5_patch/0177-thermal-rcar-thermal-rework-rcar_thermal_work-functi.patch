@@ -1,0 +1,80 @@
+From 840e5f92265a85effbf68a17f906e00bcfb2287b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 15:04:13 +0700
+Subject: [PATCH 177/350] thermal: rcar-thermal: rework rcar_thermal_work
+ function
+
+When the current temperature changes, interrupt will be generated
+and it calls rcar_thermal_work to get the current temperature
+then update (lower, upper) threshold interrupt temperature.
+
+To do these jobs, rcar_thermal_work will get 2 current temperature
+values called cctemp (current current temp) and nctemp (new current temp)
+then compare each other. If these current temp values are different,
+thermal driver will update thermal zone temperature.
+
+However, the time between 2 times getting current temp is quite short
+(maximum time to get stable temp is
+300(us)*128(iterations)*3(times to get temp)=115200(us)=0.11(s)).
+
+Therefore, it will be less to recognize the difference
+of these temperatures. cctemp is almost equal to nctemp
+so thermal_zone_device_update is not called.
+
+In order to update thermal zone when interrupts rise, this patch will
+rework rcar_thermal_work by removing getting these temperatures.
+Getting and updating temperatures (current, threshold) will be implemented
+in thermal_zone_device_update.
+
+Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/thermal/rcar_thermal.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/thermal/rcar_thermal.c b/drivers/thermal/rcar_thermal.c
+index 84baeb2..7e27a11 100644
+--- a/drivers/thermal/rcar_thermal.c
++++ b/drivers/thermal/rcar_thermal.c
+@@ -384,28 +384,11 @@ static void _rcar_thermal_irq_ctrl(struct rcar_thermal_priv *priv, int enable)
+ static void rcar_thermal_work(struct work_struct *work)
+ {
+ 	struct rcar_thermal_priv *priv;
+-	int cctemp, nctemp;
+-	int ret;
+ 
+ 	priv = container_of(work, struct rcar_thermal_priv, work.work);
+ 
+-	ret = rcar_thermal_get_current_temp(priv, &cctemp);
+-	if (ret < 0)
+-		return;
+-
+-	ret = rcar_thermal_update_temp(priv);
+-	if (ret < 0)
+-		return;
+-
+-	rcar_thermal_irq_enable(priv);
+-
+-	ret = rcar_thermal_get_current_temp(priv, &nctemp);
+-	if (ret < 0)
+-		return;
+-
+-	if (nctemp != cctemp)
+-		thermal_zone_device_update(priv->zone,
+-					   THERMAL_EVENT_UNSPECIFIED);
++	thermal_zone_device_update(priv->zone,
++					THERMAL_EVENT_UNSPECIFIED);
+ }
+ 
+ static u32 rcar_thermal_had_changed(struct rcar_thermal_priv *priv, u32 status)
+@@ -446,7 +429,6 @@ static irqreturn_t rcar_thermal_irq(int irq, void *data)
+ 	 */
+ 	rcar_thermal_for_each_priv(priv, common) {
+ 		if (rcar_thermal_had_changed(priv, status)) {
+-			rcar_thermal_irq_disable(priv);
+ 			queue_delayed_work(system_freezable_wq, &priv->work,
+ 					   msecs_to_jiffies(300));
+ 		}
+-- 
+2.7.4
+

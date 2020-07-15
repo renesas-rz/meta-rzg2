@@ -1,0 +1,77 @@
+From ff1852775820d4fea7bd4d17b2d4379111ef5662 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Tue, 14 Apr 2020 16:48:35 +0700
+Subject: [PATCH 277/350] arm64: dts: renesas: move vspb and vspi from common
+ part
+
+This patch moves vspb and vspi from common part to specific Hihope
+RZ/G2M and RZ/G2N because vsp modules of G2M and G2N are different
+from G2H.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi        | 8 --------
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts | 8 ++++++++
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts | 8 ++++++++
+ 3 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 04f9578..f086d56 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -547,14 +547,6 @@
+ 	status = "okay";
+ };
+ 
+-&vspb {
+-	status = "okay";
+-};
+-
+-&vspi0 {
+-	status = "okay";
+-};
+-
+ &msiof0 {
+ 	pinctrl-0 = <&msiof0_pins>;
+ 	pinctrl-names = "default";
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index 6d0a199..5705cc9 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -61,6 +61,14 @@
+ 	};
+ };
+ 
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
+ &du {
+ 	clocks = <&cpg CPG_MOD 724>,
+ 		 <&cpg CPG_MOD 723>,
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index 9bc8164..d2eab43 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -61,6 +61,14 @@
+ 	};
+ };
+ 
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
+ &du {
+ 	clocks = <&cpg CPG_MOD 724>,
+ 		 <&cpg CPG_MOD 723>,
+-- 
+2.7.4
+

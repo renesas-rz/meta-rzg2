@@ -1,0 +1,31 @@
+From b7638db7c854d48e3a5b072a98d59ed2aa806b7b Mon Sep 17 00:00:00 2001
+From: Dat Nguyen <dat.nguyen.ra@rensas.com>
+Date: Mon, 13 Apr 2020 15:42:08 +0700
+Subject: [PATCH 258/350] Thermal: rcar_gen3_thermal: Thermal support for
+ RZ/G2H
+
+This patch adds thermal compatible string for R8A774E1 SoC.
+
+Signed-off-by: Dat Nguyen <dat.nguyen.ra@rensas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index cf53bc2..012d324 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -346,6 +346,10 @@ static const struct of_device_id rcar_gen3_thermal_dt_ids[] = {
+ 		.compatible = "renesas,r8a77965-thermal",
+ 		.data = &rcar_gen3_ths_tj_1,
+ 	},
++	{
++		.compatible = "renesas,r8a774e1-thermal",
++		.data = &rcar_gen3_ths_tj_1,
++	},
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, rcar_gen3_thermal_dt_ids);
+-- 
+2.7.4
+

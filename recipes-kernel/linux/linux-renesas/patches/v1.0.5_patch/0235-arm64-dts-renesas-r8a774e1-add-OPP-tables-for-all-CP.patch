@@ -1,0 +1,137 @@
+From 39b88a10f3714b95ba97d792083eaf3bf7ee1d6c Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 24 Mar 2020 12:00:38 +0700
+Subject: [PATCH 235/350] arm64: dts: renesas: r8a774e1: add OPP tables for all
+ CPUs
+
+This patch adds OPP tables support for all CPUs of r8a774e1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 54 +++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 1c5c468..5020ab1 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -56,6 +56,48 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	cluster0_opp: opp_table0 {
++		compatible = "operating-points-v2";
++		opp-shared;
++
++		opp-500000000 {
++			opp-hz = /bits/ 64 <500000000>;
++			opp-microvolt = <820000>;
++			clock-latency-ns = <300000>;
++		};
++		opp-1000000000 {
++			opp-hz = /bits/ 64 <1000000000>;
++			opp-microvolt = <820000>;
++			clock-latency-ns = <300000>;
++		};
++		opp-1500000000 {
++			opp-hz = /bits/ 64 <1500000000>;
++			opp-microvolt = <820000>;
++			clock-latency-ns = <300000>;
++		};
++	};
++
++	cluster1_opp: opp_table1 {
++		compatible = "operating-points-v2";
++		opp-shared;
++
++		opp-800000000 {
++			opp-hz = /bits/ 64 <800000000>;
++			opp-microvolt = <820000>;
++			clock-latency-ns = <300000>;
++		};
++		opp-1000000000 {
++			opp-hz = /bits/ 64 <1000000000>;
++			opp-microvolt = <820000>;
++			clock-latency-ns = <300000>;
++		};
++		opp-1200000000 {
++			opp-hz = /bits/ 64 <1200000000>;
++			opp-microvolt = <820000>;
++			clock-latency-ns = <300000>;
++		};
++	};
++
+ 	cpus {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+@@ -100,6 +142,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
++			operating-points-v2 = <&cluster0_opp>;
+ 		};
+ 
+ 		a57_1: cpu@1 {
+@@ -110,6 +153,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
++			operating-points-v2 = <&cluster0_opp>;
+ 		};
+ 
+ 		a57_2: cpu@2 {
+@@ -120,6 +164,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
++			operating-points-v2 = <&cluster0_opp>;
+ 		};
+ 
+ 		a57_3: cpu@3 {
+@@ -130,6 +175,7 @@
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
++			operating-points-v2 = <&cluster0_opp>;
+ 		};
+ 
+ 		a53_0: cpu@100 {
+@@ -139,6 +185,8 @@
+ 			power-domains = <&sysc R8A774E1_PD_CA53_CPU0>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
++			operating-points-v2 = <&cluster1_opp>;
+ 		};
+ 
+ 		a53_1: cpu@101 {
+@@ -148,6 +196,8 @@
+ 			power-domains = <&sysc R8A774E1_PD_CA53_CPU1>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
++			operating-points-v2 = <&cluster1_opp>;
+ 		};
+ 
+ 		a53_2: cpu@102 {
+@@ -157,6 +207,8 @@
+ 			power-domains = <&sysc R8A774E1_PD_CA53_CPU2>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
++			operating-points-v2 = <&cluster1_opp>;
+ 		};
+ 
+ 		a53_3: cpu@103 {
+@@ -166,6 +218,8 @@
+ 			power-domains = <&sysc R8A774E1_PD_CA53_CPU3>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
++			operating-points-v2 = <&cluster1_opp>;
+ 		};
+ 
+ 		L2_CA57: cache-controller-0 {
+-- 
+2.7.4
+
