@@ -25,6 +25,9 @@ SRC_URI_append = " \
     file://add-symlink-vsp.rules \
 "
 
+#Fix build break with glibc 2.28
+SRC_URI += "${@'file://Fix-build-error-major-minor.patch' if 'Buster' in '${MACHINE_FEATURES}' else ' '}"
+
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG_append = " \
