@@ -16,6 +16,7 @@ SRCREV = "af141c61fe7a2430f3b4bb89661d8414117013b3"
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
     file://0001-arch-arm-plat-rzg-Add-platform-rzg2.patch \
+    file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
