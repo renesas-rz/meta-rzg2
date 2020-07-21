@@ -17,6 +17,7 @@ SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
     file://0001-arch-arm-plat-rzg-Add-platform-rzg2.patch \
     file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
+    file://0003-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
