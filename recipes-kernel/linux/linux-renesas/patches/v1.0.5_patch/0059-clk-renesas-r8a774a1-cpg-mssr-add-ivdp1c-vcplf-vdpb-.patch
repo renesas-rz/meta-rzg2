@@ -1,4 +1,4 @@
-From 988d88b728c13f9c3a7ec8a45cc7d7bf2ce564a5 Mon Sep 17 00:00:00 2001
+From e07629755b189612a917b5ced9bbff0ff4e1d10d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 14:57:26 +0700
 Subject: [PATCH 059/350] clk: renesas: r8a774a1-cpg-mssr: add ivdp1c, vcplf,

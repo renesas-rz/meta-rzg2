@@ -1,4 +1,4 @@
-From afd6660a67138d67bf6b131ce72cdb817427752b Mon Sep 17 00:00:00 2001
+From 7a6d57eb56dbc857be16a75b8abd1cbfa67851b3 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:26:55 +0700
 Subject: [PATCH 251/350] arm64: dts: renesas: r8a774e1: Add I2C nodes.

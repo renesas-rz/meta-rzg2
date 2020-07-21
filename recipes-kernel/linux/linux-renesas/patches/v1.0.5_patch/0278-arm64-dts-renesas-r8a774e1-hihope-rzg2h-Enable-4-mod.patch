@@ -1,4 +1,4 @@
-From da006b80ad2206e816018bcc32667bdaa5e3a2f4 Mon Sep 17 00:00:00 2001
+From 331461a6717e62df76d0bb26840110ec869e4d81 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 16:56:03 +0700
 Subject: [PATCH 278/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Enable 4

@@ -1,4 +1,4 @@
-From 47988bf6761825e4bbbbaa8f17c0c27f0e4a8569 Mon Sep 17 00:00:00 2001
+From feef8e445bcbcde47ae8e6455686fcd7a38f1bad Mon Sep 17 00:00:00 2001
 From: Duy Bao Dang <duy.dang.yb@renesas.com>
 Date: Mon, 6 Apr 2020 14:34:45 +0700
 Subject: [PATCH 228/350] arm64: dts: renesas: r8a774e1: Add watchdog node

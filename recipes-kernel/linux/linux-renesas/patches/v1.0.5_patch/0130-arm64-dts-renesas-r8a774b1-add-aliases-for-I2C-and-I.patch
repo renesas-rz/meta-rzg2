@@ -1,4 +1,4 @@
-From 6c759b3d9450cee5c259448efce51859c508c77e Mon Sep 17 00:00:00 2001
+From 7132dafdea7309058b9aba87da64ee0f6128b024 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 13:19:29 +0700
 Subject: [PATCH 130/350] arm64: dts: renesas: r8a774b1: add aliases for I2C

@@ -1,4 +1,4 @@
-From 37124b8045bf64e162fc0418d63c6086fb8a39df Mon Sep 17 00:00:00 2001
+From b17d6b14b45455a222820b859e4e0a86a1b7035e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 13:46:00 +0700
 Subject: [PATCH 143/350] arm64: dts: renesas: r8a774b1: Add CPUIdle support

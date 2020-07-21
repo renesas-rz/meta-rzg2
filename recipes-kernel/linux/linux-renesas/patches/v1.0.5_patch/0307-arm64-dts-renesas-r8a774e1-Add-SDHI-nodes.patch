@@ -1,4 +1,4 @@
-From ad14125df2d49830e5dbc773d7bb3764c98e460f Mon Sep 17 00:00:00 2001
+From 9f8ebeb8a5dff593fbba6ed335edfb2138d45eb2 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 3 Apr 2020 08:49:47 +0700
 Subject: [PATCH 307/350] arm64: dts: renesas: r8a774e1: Add SDHI nodes

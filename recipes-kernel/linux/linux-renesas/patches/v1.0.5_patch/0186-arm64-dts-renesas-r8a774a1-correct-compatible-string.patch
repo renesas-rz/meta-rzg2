@@ -1,4 +1,4 @@
-From 1f1b5d5cb8e095edb8b51496f954c4daf228bcc6 Mon Sep 17 00:00:00 2001
+From b2bea8aaeff592859393a4ffd970d5423778bce6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 6 Mar 2020 14:54:07 +0700
 Subject: [PATCH 186/350] arm64: dts: renesas: r8a774a1: correct compatible

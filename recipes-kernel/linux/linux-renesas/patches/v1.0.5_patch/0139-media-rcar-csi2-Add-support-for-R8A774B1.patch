@@ -1,4 +1,4 @@
-From 052db9c4d01c613cbbadcd970c4e4f6972ba4639 Mon Sep 17 00:00:00 2001
+From e49164a9fcb1372bdd64bcc320719fad0bbfea6c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 10 Sep 2019 11:54:32 +0700
 Subject: [PATCH 139/350] media: rcar-csi2: Add support for R8A774B1

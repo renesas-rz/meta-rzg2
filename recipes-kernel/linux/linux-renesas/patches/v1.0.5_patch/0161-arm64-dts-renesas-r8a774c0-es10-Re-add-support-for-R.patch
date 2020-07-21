@@ -1,4 +1,4 @@
-From 39134d37d37404a8064e151d50ee2550d5e77037 Mon Sep 17 00:00:00 2001
+From 431cac0b508442f67e228d2268511a1168a54dca Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 14:25:16 +0700
 Subject: [PATCH 161/350] arm64: dts: renesas: r8a774c0-es10-*: Re-add support

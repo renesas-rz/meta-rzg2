@@ -1,4 +1,4 @@
-From b53a50b265521f081a8513bb4433df47b72b5179 Mon Sep 17 00:00:00 2001
+From 3fe5386eb647d635823ad35b969688d87e055ffc Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 19 Nov 2019 17:29:30 +0700
 Subject: [PATCH 170/350] arm64: dts: renesas: r8a774b1-hihope-rzg2n: increase

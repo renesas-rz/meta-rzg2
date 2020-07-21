@@ -1,4 +1,4 @@
-From e55a2a4b9c80b494c0f68200bf1521cac085e079 Mon Sep 17 00:00:00 2001
+From f003cbd7efaf42ad82eb8e473106f49192f68a59 Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Fri, 20 Dec 2019 10:49:34 +0700
 Subject: [PATCH 181/350] arm64: dts: renesas: hihope-common: Enable HS400 mode

@@ -1,4 +1,4 @@
-From cf22986cd3990aeee589ba590e82f36e06c06643 Mon Sep 17 00:00:00 2001
+From fd695bd5be0c7f17495cffbb4a20e71663beeeeb Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 7 Apr 2020 18:52:24 +0700
 Subject: [PATCH 216/350] dt-bindings: net: renesas: ravb: Document r8a774e1

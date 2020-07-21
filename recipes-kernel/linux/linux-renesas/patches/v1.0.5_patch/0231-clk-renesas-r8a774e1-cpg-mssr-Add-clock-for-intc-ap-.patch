@@ -1,4 +1,4 @@
-From 12402fb4b0977c288eade07971e396cfb9184215 Mon Sep 17 00:00:00 2001
+From 1c0f1cf3fd81f9b8abd63d6518be6658236e2f0a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 11:29:17 +0700
 Subject: [PATCH 231/350] clk: renesas: r8a774e1-cpg-mssr: Add clock for

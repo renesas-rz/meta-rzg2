@@ -1,4 +1,4 @@
-From d06bf05a56634510af07e28f5e87284ae6a8935a Mon Sep 17 00:00:00 2001
+From 12b702ac9254bb5decc743b6bc81d8f80b13d20c Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Tue, 14 Apr 2020 16:43:44 +0700
 Subject: [PATCH 289/350] driver: pinctrl: sh-pfc: r8a7795: Add I2C{0,3,5}

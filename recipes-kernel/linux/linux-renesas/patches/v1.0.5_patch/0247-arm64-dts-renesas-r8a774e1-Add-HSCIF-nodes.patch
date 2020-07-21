@@ -1,4 +1,4 @@
-From fc89c39c33322250dcc3bd542aceb8a2ef8d8cb0 Mon Sep 17 00:00:00 2001
+From cc42e94aef86bbe2b8f3e58b4002007324e1693a Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:36:29 +0700
 Subject: [PATCH 247/350] arm64: dts: renesas: r8a774e1: Add HSCIF nodes

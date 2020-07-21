@@ -1,4 +1,4 @@
-From 3f6c3c248f095429d6b29c0be50f3823bd2a027a Mon Sep 17 00:00:00 2001
+From 5d53e6107868c2173e09ae3ff959b3d7e7f05e93 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:24:56 +0700
 Subject: [PATCH 008/350] arm64: dts:renesas: r8a774c0: Add the emergency node

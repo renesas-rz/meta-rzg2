@@ -1,4 +1,4 @@
-From 11e9ce63319a35382fbb0d7a8a2c8cd1b20b389b Mon Sep 17 00:00:00 2001
+From c64d28f12b10938300826f8d0fb07f5ac3c0a20c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 9 Apr 2020 11:27:48 +0700
 Subject: [PATCH 302/350] media: rcar-vin: Add support for R8A774E1

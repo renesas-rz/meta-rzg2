@@ -1,4 +1,4 @@
-From 73305c57d22956639c4343b27a3efb72fef29136 Mon Sep 17 00:00:00 2001
+From 915549ee9e11192d00f7fa16b1c2e340966e69ba Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 10:15:48 +0700
 Subject: [PATCH 234/350] clk: renesas: r8a774e1-cpg-mssr: correct definition

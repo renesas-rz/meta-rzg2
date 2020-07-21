@@ -1,4 +1,4 @@
-From 0931abf08f2747a346fde9af01d160108215a7ac Mon Sep 17 00:00:00 2001
+From 8f902c2c9329415cd4c5d232656b6566c27d613b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:50:32 +0700
 Subject: [PATCH 066/350] arm64: dts: renesas: hihope-common: enable vspm_if,

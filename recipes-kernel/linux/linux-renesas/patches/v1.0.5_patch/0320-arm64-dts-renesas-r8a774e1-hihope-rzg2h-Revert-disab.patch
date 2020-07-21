@@ -1,4 +1,4 @@
-From 8deb201d8201e50f34f316abb2887581c8249f5e Mon Sep 17 00:00:00 2001
+From 491ae7c9175eb43ce2161b6259da03195a24e1fa Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:10:37 +0700
 Subject: [PATCH 320/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Revert

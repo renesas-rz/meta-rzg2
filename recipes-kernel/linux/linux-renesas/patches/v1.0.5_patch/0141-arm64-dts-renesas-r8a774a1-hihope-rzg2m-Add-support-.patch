@@ -1,4 +1,4 @@
-From d59ffa9f48e6f22ebca57ace27ba589b9e4f44ec Mon Sep 17 00:00:00 2001
+From 144a6ed33fa870cb32e1f7c00be2373f275946ef Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 14:07:26 +0700
 Subject: [PATCH 141/350] arm64: dts: renesas: r8a774a1-hihope-rzg2m: Add

@@ -1,4 +1,4 @@
-From c4fa8125645bf835b0ea261d5b34dc56c82f6599 Mon Sep 17 00:00:00 2001
+From 8913cea9dcd09539e5956050a198433e201da9ed Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 5 Mar 2019 14:35:40 +0700
 Subject: [PATCH 005/350] arm64: defconfig: Add Powersave and Conservative for

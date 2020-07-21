@@ -1,4 +1,4 @@
-From d7e298c46a08048964f15888904bb3964f4a380d Mon Sep 17 00:00:00 2001
+From 0c4e3bd2739b8ab9152250a844c6338d62814fcd Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:09:47 +0700
 Subject: [PATCH 051/350] arm64: defconfig: enable config for versaclock5

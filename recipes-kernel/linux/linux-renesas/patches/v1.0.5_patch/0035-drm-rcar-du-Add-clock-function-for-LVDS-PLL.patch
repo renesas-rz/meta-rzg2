@@ -1,4 +1,4 @@
-From 8c873705032cce544e331861974fd9fbdfa43b6c Mon Sep 17 00:00:00 2001
+From 14f944bc20cf32623bed9e6eb82abdc33d6aed0b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:49:01 +0700
 Subject: [PATCH 035/350] drm: rcar-du: Add clock function for LVDS PLL

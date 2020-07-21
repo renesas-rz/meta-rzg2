@@ -1,4 +1,4 @@
-From fdea479d15d73339322e4233491ddaa1fcf97cf7 Mon Sep 17 00:00:00 2001
+From 638a9b852c8fa023f56d8c555ee657bb14a63897 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:28:23 +0700
 Subject: [PATCH 026/350] arm64: dts: r8a774c0: Add DEVFREQ support for GSX

@@ -1,4 +1,4 @@
-From 79b54d6273c66cc5efe10841100d73a252492174 Mon Sep 17 00:00:00 2001
+From 02adbbca10c3cc62238b99889b506b3f82502c15 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Mon, 6 Apr 2020 20:53:26 +0700
 Subject: [PATCH 264/350] bindings: usb-xhci: Add r8a774e1 support

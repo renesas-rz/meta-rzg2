@@ -1,4 +1,4 @@
-From 2099ea6bd65da65e287f19938dbcf52e56459a51 Mon Sep 17 00:00:00 2001
+From 331d0d00e4110724ea244edb9a5a4c616339cfe6 Mon Sep 17 00:00:00 2001
 From: Duy Bao Dang <duy.dang.yb@renesas.com>
 Date: Mon, 6 Apr 2020 14:23:35 +0700
 Subject: [PATCH 227/350] dt-bindings: watchdog: renesas-wdt: Document r8a774e1

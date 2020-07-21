@@ -1,4 +1,4 @@
-From fea1e316dbedcfb9fddeeee29b7866b224db53cd Mon Sep 17 00:00:00 2001
+From 7cf8a6f799af05567cd63b66b1ee312966539f84 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:55:19 +0700
 Subject: [PATCH 248/350] arm64: dts: renesas: r8a774e1: Add SCIF nodes

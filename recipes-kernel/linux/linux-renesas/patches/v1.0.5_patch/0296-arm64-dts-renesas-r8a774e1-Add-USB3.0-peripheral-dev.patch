@@ -1,4 +1,4 @@
-From 209cb1101539d227f0eb69f4de34118658f9d0f5 Mon Sep 17 00:00:00 2001
+From b6206fa226dd3de90e2ae51641f20c83da31a119 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 13:56:03 +0700
 Subject: [PATCH 296/350] arm64: dts: renesas: r8a774e1: Add USB3.0 peripheral

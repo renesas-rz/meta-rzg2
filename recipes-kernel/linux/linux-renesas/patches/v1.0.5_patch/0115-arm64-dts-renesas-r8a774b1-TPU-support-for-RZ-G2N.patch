@@ -1,4 +1,4 @@
-From 72a7de1cba4d1fa3ec10ebfd8de191d6718eb12e Mon Sep 17 00:00:00 2001
+From 655d6cd970f0b6c2ccbba4b31fb4629664a158ff Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:42:33 +0700
 Subject: [PATCH 115/350] arm64: dts: renesas: r8a774b1: TPU support for RZ/G2N

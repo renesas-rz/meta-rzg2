@@ -1,4 +1,4 @@
-From fed778c3bf799c860ccc7de4da4b87cdc1ec2719 Mon Sep 17 00:00:00 2001
+From 96585b1f1de18f458058df286cb8566f3fd265f0 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Fri, 6 Sep 2019 18:36:33 +0700
 Subject: [PATCH 124/350] arm64: dts: renesas: r8a774b1-hihope-rzg2n: Add

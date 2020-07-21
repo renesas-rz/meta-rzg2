@@ -1,4 +1,4 @@
-From 935c9a8e0ffc788febb2ad2d6c944f0bfcfb394f Mon Sep 17 00:00:00 2001
+From 3e7f4ffd82075a49e2a23407fdbb6cde8db3936f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:35:50 +0700
 Subject: [PATCH 071/350] sched/fair: Kick nohz balance if rq->misfit_task_load
@@ -41,7 +41,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 669e885..3100e1b 100644
+index 08b9ba9..d7c6885 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -9368,7 +9368,7 @@ static void nohz_balancer_kick(struct rq *rq)

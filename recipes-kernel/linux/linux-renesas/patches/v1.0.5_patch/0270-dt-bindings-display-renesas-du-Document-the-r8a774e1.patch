@@ -1,4 +1,4 @@
-From 2d96f64a17883d47558ead6eabaaf8c72f07a9de Mon Sep 17 00:00:00 2001
+From ba21887f99a24fea7918258ff3cc10c8ede28131 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:27:56 +0700
 Subject: [PATCH 270/350] dt-bindings: display: renesas: du: Document the

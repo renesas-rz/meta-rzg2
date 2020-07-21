@@ -1,4 +1,4 @@
-From 236fb717da950aa3ed54f2316a549f9665fc7e52 Mon Sep 17 00:00:00 2001
+From 81279a26a7a88b967a5c4f0bd934b00ca966e186 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 7 Nov 2019 09:53:48 +0700
 Subject: [PATCH 164/350] arm64: dts: renesas: r8a774c0: Add device node for

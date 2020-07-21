@@ -1,4 +1,4 @@
-From c80d34a38d982b9d3500b4518b187d4c6d7951a2 Mon Sep 17 00:00:00 2001
+From 51f21f2d467b12ef66b935e702b4e3970a83d73a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 15:02:21 +0700
 Subject: [PATCH 076/350] sched/fair: Don't move tasks to lower capacity cpus
@@ -27,7 +27,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 11 insertions(+)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index c627052..10152f9 100644
+index e01373c..09a0c8d 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -8644,6 +8644,17 @@ static struct rq *find_busiest_queue(struct lb_env *env,

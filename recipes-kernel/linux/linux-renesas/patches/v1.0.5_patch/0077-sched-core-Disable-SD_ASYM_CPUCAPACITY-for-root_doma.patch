@@ -1,4 +1,4 @@
-From c9f7d2643ef64329da92f1107ce22a4d2029334b Mon Sep 17 00:00:00 2001
+From 5a8bf84aaeee76a71c78f6cc0eb5774d8f3ccd45 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:11:12 +0700
 Subject: [PATCH 077/350] sched/core: Disable SD_ASYM_CPUCAPACITY for

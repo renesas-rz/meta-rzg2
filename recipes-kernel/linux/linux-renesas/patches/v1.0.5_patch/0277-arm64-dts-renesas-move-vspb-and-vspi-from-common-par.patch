@@ -1,4 +1,4 @@
-From ff1852775820d4fea7bd4d17b2d4379111ef5662 Mon Sep 17 00:00:00 2001
+From 1ed89d824dc0085bb1bbb351dfd36aa94b479b16 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 16:48:35 +0700
 Subject: [PATCH 277/350] arm64: dts: renesas: move vspb and vspi from common

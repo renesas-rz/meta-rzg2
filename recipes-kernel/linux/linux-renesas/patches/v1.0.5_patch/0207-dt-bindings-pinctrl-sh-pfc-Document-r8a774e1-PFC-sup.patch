@@ -1,4 +1,4 @@
-From 01f53fc9010c61bb77d21e007fc15b1d8733a028 Mon Sep 17 00:00:00 2001
+From be168bc1ec323dc18d1b1ceb7516b8af227ed93f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 13:37:18 +0700
 Subject: [PATCH 207/350] dt-bindings: pinctrl: sh-pfc: Document r8a774e1 PFC

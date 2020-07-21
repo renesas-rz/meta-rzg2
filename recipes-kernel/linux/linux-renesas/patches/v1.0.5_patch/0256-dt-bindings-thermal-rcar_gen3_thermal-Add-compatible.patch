@@ -1,4 +1,4 @@
-From 722e700e72b831ba5d9a41fa984bdca4725cb102 Mon Sep 17 00:00:00 2001
+From e8ccebad2b7ddd42006c50aa6fef724e1d756e8f Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Thu, 9 Apr 2020 16:19:13 +0700
 Subject: [PATCH 256/350] dt-bindings: thermal: rcar_gen3_thermal: Add

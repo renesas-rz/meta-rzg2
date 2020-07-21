@@ -1,4 +1,4 @@
-From 548555d66c51a937a10ad9102ee890e477017727 Mon Sep 17 00:00:00 2001
+From a895e6e61066d14fd7369d9ac7c047122df9c23b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:39:45 +0700
 Subject: [PATCH 237/350] arm64: dts: renesas: r8a774e1: Add CPU

@@ -1,4 +1,4 @@
-From 58f7a1cb0078781443a63b50127b74432aeaea8b Mon Sep 17 00:00:00 2001
+From 022ab4ae094f94173a55570dedfb2aa0304d20d5 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Mon, 29 Apr 2019 10:44:16 +0700
 Subject: [PATCH 097/350] arch: arm64: defconfig: configs for USB TypeC

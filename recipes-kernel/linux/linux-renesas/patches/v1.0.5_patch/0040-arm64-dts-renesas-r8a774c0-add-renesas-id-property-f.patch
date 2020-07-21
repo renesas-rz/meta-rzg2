@@ -1,4 +1,4 @@
-From 167a2512d1aefdf6339645cb0f737eafa87f3701 Mon Sep 17 00:00:00 2001
+From b7631d0e71806b05ce3721365f28bd9c69978ede Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 25 Apr 2019 13:13:38 +0700
 Subject: [PATCH 040/350] arm64: dts: renesas: r8a774c0: add "renesas,id"

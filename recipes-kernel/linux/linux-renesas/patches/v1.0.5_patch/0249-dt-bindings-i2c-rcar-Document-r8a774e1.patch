@@ -1,4 +1,4 @@
-From dd87eb2d962670e9b3fd708833e6f7715ab7f092 Mon Sep 17 00:00:00 2001
+From c80df7e10de90a5cf5ae391113096ff7f6355d80 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:21:22 +0700
 Subject: [PATCH 249/350] dt-bindings: i2c: rcar: Document r8a774e1

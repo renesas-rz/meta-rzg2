@@ -1,4 +1,4 @@
-From 88c2c3630b66b39b4d69b6eedb29987fbdd3bd7c Mon Sep 17 00:00:00 2001
+From cfc91f8056ca0664ab43318e6aa2a1763d22a84a Mon Sep 17 00:00:00 2001
 From: Dmytro Prokopchuk <dmytro.prokopchuk@globallogic.com>
 Date: Fri, 21 Sep 2018 04:59:59 +0000
 Subject: [PATCH 324/350] ASoC: rsnd: fixup SSI clock during suspend/resume

@@ -1,4 +1,4 @@
-From 63bc2d0305f83e9da002dca1b463c966acdaf9f1 Mon Sep 17 00:00:00 2001
+From a424228fb846283b9d88dc009e447a2f3576fa48 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 7 Apr 2020 18:56:24 +0700
 Subject: [PATCH 218/350] dt-bindings: timer: renesas, cmt: Document r8a774e1

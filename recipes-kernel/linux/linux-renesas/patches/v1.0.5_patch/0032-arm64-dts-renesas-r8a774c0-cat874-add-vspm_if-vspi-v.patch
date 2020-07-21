@@ -1,4 +1,4 @@
-From eae0f9d31030c13d2263871b80722bc51e56eb8a Mon Sep 17 00:00:00 2001
+From 50e6900a791b6101acf2aa3b438d8c4f0a699a93 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 11:32:34 +0700
 Subject: [PATCH 032/350] arm64: dts: renesas: r8a774c0-cat874: add vspm_if,

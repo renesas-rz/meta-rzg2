@@ -1,4 +1,4 @@
-From 923d75e0e5a5dd150b0a2f35661e386d73a0cd2f Mon Sep 17 00:00:00 2001
+From 85e8d7052d959bf49c3d679195b1fc448a140cfa Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:22:41 +0700
 Subject: [PATCH 009/350] arm64: dts: renesas: r8a774c0-cat874: enable CMT{0,1}

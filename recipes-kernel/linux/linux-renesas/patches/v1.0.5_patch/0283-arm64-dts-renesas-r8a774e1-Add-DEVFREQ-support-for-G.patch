@@ -1,4 +1,4 @@
-From 0e1292160de76a1b6407bd55def072f652af6e60 Mon Sep 17 00:00:00 2001
+From c8185d3a718c3936393dfdca19cdbaedbbfe6678 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Wed, 8 Apr 2020 10:14:45 +0700
 Subject: [PATCH 283/350] arm64: dts: renesas: r8a774e1: Add DEVFREQ support

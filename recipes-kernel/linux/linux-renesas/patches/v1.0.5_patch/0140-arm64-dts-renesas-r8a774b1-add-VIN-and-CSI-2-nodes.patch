@@ -1,4 +1,4 @@
-From 5a4e35b2f77371a49027e19457bc8013169a2762 Mon Sep 17 00:00:00 2001
+From 26227a9c641bc118d84979bed107e8045017e7a5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 13:39:19 +0700
 Subject: [PATCH 140/350] arm64: dts: renesas: r8a774b1: add VIN and CSI-2

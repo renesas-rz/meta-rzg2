@@ -1,4 +1,4 @@
-From 773a45823c8644cf9e3a0e9d7c79b4b80be177d1 Mon Sep 17 00:00:00 2001
+From 894a981ebc5ca69b6cdf93383db40fb689db2584 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:52:14 +0700
 Subject: [PATCH 074/350] sched: Wrap rq->rd->overload accesses with
@@ -24,7 +24,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 7c6cb57..a843c14 100644
+index 9ee043d..6af360e 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -8279,8 +8279,8 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd

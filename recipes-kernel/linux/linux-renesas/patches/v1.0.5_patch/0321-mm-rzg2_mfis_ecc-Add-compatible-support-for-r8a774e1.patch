@@ -1,4 +1,4 @@
-From dad207789322600f98104f959682397b4906c652 Mon Sep 17 00:00:00 2001
+From 80dfa13afb8e427b3ce1d7af1937b2c115755a6d Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 12 May 2020 15:34:07 +0700
 Subject: [PATCH 321/350] mm: rzg2_mfis_ecc : Add compatible support for

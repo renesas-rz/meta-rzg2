@@ -1,4 +1,4 @@
-From 2c5bc2b71bace077ac4d7cad173a539a15d4d85d Mon Sep 17 00:00:00 2001
+From 9486d662b5b51733998f03905baf0c0f061b73aa Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:23:04 +0700
 Subject: [PATCH 250/350] dt-bindings: i2c: sh_mobile: Document r8a774e1

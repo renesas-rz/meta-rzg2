@@ -1,4 +1,4 @@
-From c77c5b6ad80f991c219eefab80234c0d36a80c04 Mon Sep 17 00:00:00 2001
+From 604c55f9b832c761f0beb03d4d171d79ac10f165 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:49:43 +0700
 Subject: [PATCH 119/350] clk: renesas: r8a774b1-cpg-mssr: add vcplf, vdpb and

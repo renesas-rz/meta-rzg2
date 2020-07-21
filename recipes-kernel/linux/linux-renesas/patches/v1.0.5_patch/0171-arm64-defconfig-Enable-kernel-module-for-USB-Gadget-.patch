@@ -1,4 +1,4 @@
-From b46c30cc0f36e741f20699fae7e22b7179d4b8d9 Mon Sep 17 00:00:00 2001
+From 7214afad7150447327de23e73ce21af138a11e38 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Fri, 22 Nov 2019 09:39:32 +0700
 Subject: [PATCH 171/350] arm64: defconfig: Enable kernel module for USB Gadget

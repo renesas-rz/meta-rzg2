@@ -1,4 +1,4 @@
-From eddfbfb2c1d1e5c7972c92a794d9aa97c403dbfc Mon Sep 17 00:00:00 2001
+From afc5120aa6dfc22f7f48637a232cd12e47cd85a1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:02:38 +0700
 Subject: [PATCH 196/350] dt-bindings: arm: renesas: Add HopeRun RZ/G2H boards

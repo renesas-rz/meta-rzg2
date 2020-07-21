@@ -1,4 +1,4 @@
-From 4fc13ae191110a247312f1b6da0d01d7ff8b7fe1 Mon Sep 17 00:00:00 2001
+From 69a784ea5ba849d4b1e04643681b1be398731762 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 00:40:29 +0700
 Subject: [PATCH 263/350] arm64: dts: renesas: r8a774e1: add usb3_phy node

@@ -1,4 +1,4 @@
-From c53e32b4a034f73eb223bfb3c07a37bd81f0bea4 Mon Sep 17 00:00:00 2001
+From 06eaa0f3be50af8d1a03980e6faf20aed9b6603c Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 15:47:23 +0700
 Subject: [PATCH 275/350] arm64: dts: renesas: r8a774e1: Add VSP instances

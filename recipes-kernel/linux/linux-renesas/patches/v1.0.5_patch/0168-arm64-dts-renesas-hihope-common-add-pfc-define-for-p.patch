@@ -1,4 +1,4 @@
-From e3ec96dda1ca300ad29804a633dda9868a9ef394 Mon Sep 17 00:00:00 2001
+From 7a4e9a3fa1851f80a2cc35521518bcd7524d3483 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Mon, 18 Nov 2019 13:18:48 +0700
 Subject: [PATCH 168/350] arm64: dts: renesas: hihope-common: add pfc define

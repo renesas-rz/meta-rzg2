@@ -1,4 +1,4 @@
-From 6fdec13b0d3bcaa59e8ffe02e18e02e2fb2d78bb Mon Sep 17 00:00:00 2001
+From a4f73267f4e8d5e04b7a3fc7e168c59f4fe1c1be Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 31 Mar 2020 11:53:42 +0700
 Subject: [PATCH 315/350] media: usb: uvc: Add the "allocators" module

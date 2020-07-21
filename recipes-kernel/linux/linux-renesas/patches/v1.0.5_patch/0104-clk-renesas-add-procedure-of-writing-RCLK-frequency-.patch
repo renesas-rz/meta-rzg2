@@ -1,4 +1,4 @@
-From 640ae485266c8db8d101e035a06a16faddf52a05 Mon Sep 17 00:00:00 2001
+From 566d0879cc9e08f1091afaa53010e9041740500d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 1 Aug 2019 13:12:51 +0700
 Subject: [PATCH 104/350] clk: renesas: add procedure of writing RCLK frequency

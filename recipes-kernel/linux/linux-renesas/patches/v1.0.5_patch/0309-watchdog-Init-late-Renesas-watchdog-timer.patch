@@ -1,4 +1,4 @@
-From 970a858659901bded189002fb32e89b333f25cb0 Mon Sep 17 00:00:00 2001
+From b1377f51d10de0f17d5fb7db8642f03ba8e1372e Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Thu, 23 Apr 2020 16:20:57 +0700
 Subject: [PATCH 309/350] watchdog: Init late Renesas watchdog timer

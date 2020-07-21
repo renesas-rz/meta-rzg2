@@ -1,4 +1,4 @@
-From b2f8684954559e41032cc17ae6b3128ed01533fd Mon Sep 17 00:00:00 2001
+From 91e7c21570cf10d49d21466cb735f3f8f8ae8923 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 10:04:04 +0700
 Subject: [PATCH 203/350] soc: renesas: rcar-rst: Add support for RZ/G2H

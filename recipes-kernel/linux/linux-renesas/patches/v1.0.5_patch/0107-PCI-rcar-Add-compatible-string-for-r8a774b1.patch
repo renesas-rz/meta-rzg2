@@ -1,4 +1,4 @@
-From 104811152482cc5174436bc5d0d2d7043a374622 Mon Sep 17 00:00:00 2001
+From 449518794e2caf1c80e3e6e9c77a2c4b3456eb38 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Fri, 23 Aug 2019 13:26:07 +0700
 Subject: [PATCH 107/350] PCI: rcar: Add compatible string for r8a774b1

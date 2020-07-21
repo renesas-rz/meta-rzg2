@@ -1,4 +1,4 @@
-From 5f8e50929f1163e1785ed7bef938393d6d975eaf Mon Sep 17 00:00:00 2001
+From 527efe71f6e85f04ee52fec8b77da92f740c7b53 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:12:57 +0700
 Subject: [PATCH 197/350] soc: renesas: Add Renesas R8A774E1 config option

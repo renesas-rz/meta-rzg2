@@ -1,4 +1,4 @@
-From e546bc701a6e0d4c4185c8db066a1e2964233b67 Mon Sep 17 00:00:00 2001
+From 41e73c259681f4f77be6be29c910cf762b0cae75 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 11:17:17 +0700
 Subject: [PATCH 112/350] dt-bindings: display: renesas: lvds: Document

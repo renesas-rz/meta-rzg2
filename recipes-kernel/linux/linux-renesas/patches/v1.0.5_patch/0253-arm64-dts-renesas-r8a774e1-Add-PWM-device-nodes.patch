@@ -1,4 +1,4 @@
-From 8be635b84b18f3af2bc84fc1c1d63fbcd76f2cbf Mon Sep 17 00:00:00 2001
+From 448f9981998b1ebd8bff3fc45a8ff00f11dbe7d0 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Wed, 8 Apr 2020 15:53:26 +0700
 Subject: [PATCH 253/350] arm64: dts: renesas: r8a774e1: Add PWM device nodes

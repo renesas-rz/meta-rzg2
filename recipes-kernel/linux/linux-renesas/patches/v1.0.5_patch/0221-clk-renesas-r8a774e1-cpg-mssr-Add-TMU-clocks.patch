@@ -1,4 +1,4 @@
-From bafc777aa2cd89e029e6763e9e7f0d18164f3b6c Mon Sep 17 00:00:00 2001
+From 55d18964d65d261fe05c97827d89fb9e6e348da4 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 27 Mar 2020 13:06:39 +0700
 Subject: [PATCH 221/350] clk: renesas: r8a774e1-cpg-mssr: Add TMU clocks.

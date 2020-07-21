@@ -1,4 +1,4 @@
-From 26bda15a80bd5781f4863ff927978256002539a3 Mon Sep 17 00:00:00 2001
+From 20510002b77b39f0a88904d8b3493b6854d84aec Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Tue, 14 Apr 2020 15:39:29 +0700
 Subject: [PATCH 260/350] arm64: dts: renesas: r8a774e1: Add PCIe device nodes

@@ -1,4 +1,4 @@
-From e3db2c5980d789bf3f4be7392531e19c6b279128 Mon Sep 17 00:00:00 2001
+From 997b00016a9e56cbbe98d43efddb511d48d58f2e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:57:46 +0700
 Subject: [PATCH 122/350] arm64: dts: renesas: r8a774b1: change fdp to fdpm

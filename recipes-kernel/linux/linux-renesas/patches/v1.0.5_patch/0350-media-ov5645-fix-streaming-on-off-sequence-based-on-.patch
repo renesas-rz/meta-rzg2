@@ -1,8 +1,8 @@
-From 0b17571fe456e7e3f884d55fd817598cb227ca8c Mon Sep 17 00:00:00 2001
+From bfdd08fd673d81dedf88574249c1061f0bf960ee Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Fri, 17 Jul 2020 13:44:40 +0700
-Subject: [PATCH] media: ov5645: fix streaming on/off sequence based on OV5640
- driver
+Subject: [PATCH 350/350] media: ov5645: fix streaming on/off sequence based on
+ OV5640 driver
 
 This commit is created to fix streaming on/off sequence based on OV5640
 driver to ensure camera will coax into LP-11 State when powering up.

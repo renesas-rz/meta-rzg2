@@ -1,4 +1,4 @@
-From 21fff47d24c57dec3402431440097898f84cdba1 Mon Sep 17 00:00:00 2001
+From 44143815076b2203663bd7bc44dc527a433cc24b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 20 Mar 2020 09:12:18 +0700
 Subject: [PATCH 201/350] soc: renesas: rcar-sysc: Add r8a774e1 support

@@ -1,4 +1,4 @@
-From 1633f569fcc0ad4cef3edefd1dc2950a935a19f7 Mon Sep 17 00:00:00 2001
+From 104985dd6636a2495cc5cca449b96e64445b5dbc Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 6 Mar 2020 10:35:04 +0700
 Subject: [PATCH 185/350] arm64: dts: renesas: r8a774c0-{,es10}-cat874: Enable

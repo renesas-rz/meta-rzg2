@@ -1,4 +1,4 @@
-From 3b99fc24400be9f6f9af5f2d68568ff61126eb00 Mon Sep 17 00:00:00 2001
+From c1ffcc3e973b20ff2dbb77f5268143d3b55df61a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 13:20:06 +0700
 Subject: [PATCH 095/350] arm64: dts: renesas: r8a774c0-cat874: Enable TPU node

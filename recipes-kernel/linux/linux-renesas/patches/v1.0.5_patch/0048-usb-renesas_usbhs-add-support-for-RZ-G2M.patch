@@ -1,4 +1,4 @@
-From 0da2ebcd304375da6acc8bdbf8e3e4eeb84f073c Mon Sep 17 00:00:00 2001
+From ba3147da4bc4ef1de15425ef8c2378a03f77600f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 13:52:54 +0700
 Subject: [PATCH 048/350] usb: renesas_usbhs: add support for RZ/G2M

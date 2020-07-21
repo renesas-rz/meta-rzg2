@@ -1,4 +1,4 @@
-From 7ea3f1e7827f161e42d33e92f3c1609b975bd2d7 Mon Sep 17 00:00:00 2001
+From e8fb0a7287bdc753ba08b9730155e450526009de Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 23 Sep 2019 15:19:49 +0700
 Subject: [PATCH 157/350] media: rcar-vin: Fix FourCC of ARGB1555 format

@@ -1,4 +1,4 @@
-From 74625374a5c6c8f28ca213921632edde303687bf Mon Sep 17 00:00:00 2001
+From 4ab6d4968f7acc4ab17d34a1f8ae7b444b322383 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Wed, 8 Apr 2020 08:37:33 +0700
 Subject: [PATCH 308/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable

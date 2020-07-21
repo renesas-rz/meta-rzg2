@@ -1,4 +1,4 @@
-From 8d576ee6eb2774a12b5b5fa5102e54584b48f3d8 Mon Sep 17 00:00:00 2001
+From e770451d0196185dabe949bf79477971b86891b5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 18:50:28 +0700
 Subject: [PATCH 133/350] media: rcar-vin: Add support for R8A774A1

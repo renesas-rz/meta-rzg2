@@ -1,4 +1,4 @@
-From 9d1787d72f74782cd2738bb94dbb355c0d020e34 Mon Sep 17 00:00:00 2001
+From fe1a0f7721591f15bb363ca6b173e203cd77d572 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 11:27:45 +0700
 Subject: [PATCH 025/350] arm64: dts: renesaas: r8a774c0: Add GSX device node

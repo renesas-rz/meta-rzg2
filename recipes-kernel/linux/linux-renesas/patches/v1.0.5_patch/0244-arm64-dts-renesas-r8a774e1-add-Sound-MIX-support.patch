@@ -1,4 +1,4 @@
-From 1ec4de8a79b5742567b8ad0be2ec420fc5af7f8b Mon Sep 17 00:00:00 2001
+From 2a4f527ae1db264824d6285e28ebb31c1ce296ff Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 16:53:53 +0700
 Subject: [PATCH 244/350] arm64: dts: renesas: r8a774e1: add Sound MIX support

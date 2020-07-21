@@ -1,4 +1,4 @@
-From 2224c40f3b4c1c07523fc5152e8c02e1a7556a74 Mon Sep 17 00:00:00 2001
+From acb83ddc3b61f0db8cac8d7e7be297180335c060 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:23:31 +0700
 Subject: [PATCH 068/350] sched/fair: Add group_misfit_task load-balance type
@@ -39,7 +39,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  2 files changed, 53 insertions(+), 8 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 0046327..a9bc4c2 100644
+index e95eaa0..636256e 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -721,6 +721,7 @@ static u64 sched_vslice(struct cfs_rq *cfs_rq, struct sched_entity *se)

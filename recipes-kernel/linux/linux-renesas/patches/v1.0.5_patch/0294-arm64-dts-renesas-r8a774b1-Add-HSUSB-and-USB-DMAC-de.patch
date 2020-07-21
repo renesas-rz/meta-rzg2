@@ -1,4 +1,4 @@
-From d241d9f0086402f24dcb04befebb3aa03c664e60 Mon Sep 17 00:00:00 2001
+From c9502fe933f5275e90d911429155bbf8cbfe9234 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 13:44:43 +0700
 Subject: [PATCH 294/350] arm64: dts: renesas: r8a774b1: Add HSUSB and USB-DMAC

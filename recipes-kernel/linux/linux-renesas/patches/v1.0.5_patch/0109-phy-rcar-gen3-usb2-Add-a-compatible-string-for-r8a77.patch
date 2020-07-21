@@ -1,4 +1,4 @@
-From 40fa92abafacd9fcb2cef9d7e127a1d757873fc2 Mon Sep 17 00:00:00 2001
+From a8e3d13b7b98a6cad60f8198eb728975ce00805b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 16:55:15 +0700
 Subject: [PATCH 109/350] phy: rcar-gen3-usb2: Add a compatible string for

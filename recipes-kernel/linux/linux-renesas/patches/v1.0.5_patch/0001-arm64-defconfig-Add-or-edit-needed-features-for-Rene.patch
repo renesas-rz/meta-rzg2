@@ -1,4 +1,4 @@
-From f97cba737c8e0e07897e09b89c10c0f0425b6d3d Mon Sep 17 00:00:00 2001
+From 826da01de3a0f7e511d2ff168820b6da07f64c59 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 28 Feb 2020 17:04:42 +0700
 Subject: [PATCH 001/350] arm64: defconfig: Add or edit needed features for

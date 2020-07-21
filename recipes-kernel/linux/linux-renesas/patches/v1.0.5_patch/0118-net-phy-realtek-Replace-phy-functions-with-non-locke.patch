@@ -1,4 +1,4 @@
-From de950db8096e4d41ce6f6d6d671cdc9bd2af2674 Mon Sep 17 00:00:00 2001
+From 04c027429b590fac09fa94db6f385203847eefdf Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Fri, 6 Sep 2019 15:43:33 +0700
 Subject: [PATCH 118/350] net: phy: realtek: Replace phy functions with

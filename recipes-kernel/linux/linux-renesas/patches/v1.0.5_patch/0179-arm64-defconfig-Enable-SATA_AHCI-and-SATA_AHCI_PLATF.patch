@@ -1,4 +1,4 @@
-From 1b7c4ac226fce804ae9c2f32682cb64201da9d68 Mon Sep 17 00:00:00 2001
+From b97d32b05a221e16b53c116eee7e0da09172cb39 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 31 Dec 2019 13:21:25 +0700
 Subject: [PATCH 179/350] arm64: defconfig: Enable SATA_AHCI and

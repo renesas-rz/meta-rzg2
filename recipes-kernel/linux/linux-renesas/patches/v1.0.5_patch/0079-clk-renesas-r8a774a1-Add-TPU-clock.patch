@@ -1,4 +1,4 @@
-From 6faa862784133f6ceae2ddb73cb928e60fc89df4 Mon Sep 17 00:00:00 2001
+From 1145167f8eaa706746db76b6c673c89b1bfc1dcf Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:37:54 +0700
 Subject: [PATCH 079/350] clk: renesas: r8a774a1: Add TPU clock

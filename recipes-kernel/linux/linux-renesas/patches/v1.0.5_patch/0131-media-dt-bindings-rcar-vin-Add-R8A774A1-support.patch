@@ -1,4 +1,4 @@
-From 041f2323a333f1cf074161cd00f6900138c630d4 Mon Sep 17 00:00:00 2001
+From 8a16091fdc01b1358797b59483e002acf67422b6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 18:47:15 +0700
 Subject: [PATCH 131/350] media: dt-bindings: rcar-vin: Add R8A774A1 support

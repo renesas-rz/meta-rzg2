@@ -1,4 +1,4 @@
-From 0392e314db5fe716c76dca334617bfe770a1971f Mon Sep 17 00:00:00 2001
+From ae95ccddf06b41fb156d953e5f21b6cd29897e3f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 May 2019 18:16:31 +0700
 Subject: [PATCH 034/350] drm: rcar-du: Fix LVDS stop sequence

@@ -1,4 +1,4 @@
-From c7fb40abd2df00ea619d1b10c8ea38dcc626361c Mon Sep 17 00:00:00 2001
+From c1e4a2bea837297b0600da75291c17cbeee5ac49 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 11:26:20 +0700
 Subject: [PATCH 024/350] arm64: dts: renesas: r8a774c0: Change vspb and vspi

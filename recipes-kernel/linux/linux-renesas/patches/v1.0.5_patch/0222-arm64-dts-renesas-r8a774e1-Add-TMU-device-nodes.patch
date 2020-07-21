@@ -1,4 +1,4 @@
-From 498e783b7c8097b347f74237ae33ba5ade4903f6 Mon Sep 17 00:00:00 2001
+From 975dfb6ca80ea3523ce39831ab9e7ba041cff0ce Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 27 Mar 2020 13:43:50 +0700
 Subject: [PATCH 222/350] arm64: dts: renesas: r8a774e1: Add TMU device nodes

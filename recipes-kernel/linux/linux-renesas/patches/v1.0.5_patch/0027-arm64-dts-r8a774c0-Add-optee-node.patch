@@ -1,4 +1,4 @@
-From 0e10ed2304e99783e99ae567998819a23c782b1a Mon Sep 17 00:00:00 2001
+From 0d4ebd22e613450ad2eb4e8a7ba7c5837476079b Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:30:16 +0700
 Subject: [PATCH 027/350] arm64: dts: r8a774c0: Add optee node

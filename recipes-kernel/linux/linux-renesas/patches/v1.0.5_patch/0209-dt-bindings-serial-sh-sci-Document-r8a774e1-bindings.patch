@@ -1,4 +1,4 @@
-From c4c1c24b20e67381913cec9f567baba1f8b78232 Mon Sep 17 00:00:00 2001
+From 2fd408a13674f16941e80447ec8520bb3b0f0d5b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 16:39:31 +0700
 Subject: [PATCH 209/350] dt-bindings: serial: sh-sci: Document r8a774e1

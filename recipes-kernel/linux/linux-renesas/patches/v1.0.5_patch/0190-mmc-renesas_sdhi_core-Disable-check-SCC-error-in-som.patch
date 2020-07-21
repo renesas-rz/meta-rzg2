@@ -1,4 +1,4 @@
-From 9fb80323a02569efdc17d913fd624eb87ccb0b69 Mon Sep 17 00:00:00 2001
+From 684c9bfc09332cc0c50dece11c2e5425e7b6f52d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 10 Mar 2020 11:06:41 +0700
 Subject: [PATCH 190/350] mmc: renesas_sdhi_core: Disable check SCC error in

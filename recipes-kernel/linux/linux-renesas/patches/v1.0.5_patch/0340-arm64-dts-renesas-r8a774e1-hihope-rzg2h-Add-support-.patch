@@ -1,7 +1,7 @@
-From ee9628e31489acc34a66057e8b0ff1beb6ede301 Mon Sep 17 00:00:00 2001
+From 2ca148bd63d1e82978eae8360d09ec685ab2b93a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:22:56 +0700
-Subject: [PATCH 341/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
+Subject: [PATCH 340/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
  support for AISTARVISION MIPI Adapter V2.1
 
 This patch adds support for AISTARVISION MIPI Adapter V2.1 board

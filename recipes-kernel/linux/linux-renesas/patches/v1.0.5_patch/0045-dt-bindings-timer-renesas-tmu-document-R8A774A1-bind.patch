@@ -1,4 +1,4 @@
-From aaecaa27c786b95987d2ec55404c96e31b3e05ec Mon Sep 17 00:00:00 2001
+From 88edf35a2414fd333719087949aef82219913216 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:57:16 +0700
 Subject: [PATCH 045/350] dt-bindings: timer: renesas: tmu: document R8A774A1

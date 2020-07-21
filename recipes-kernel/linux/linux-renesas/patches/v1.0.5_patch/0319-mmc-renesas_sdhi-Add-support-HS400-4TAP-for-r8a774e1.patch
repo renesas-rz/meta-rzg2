@@ -1,4 +1,4 @@
-From 0c5990cb76101db6f1bbec61f4761005dadbcd8d Mon Sep 17 00:00:00 2001
+From fc960ce3c5d5a9a4978aab4541dfc9e796098923 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Mon, 11 May 2020 14:48:17 +0700
 Subject: [PATCH 319/350] mmc: renesas_sdhi: Add support HS400 4TAP for

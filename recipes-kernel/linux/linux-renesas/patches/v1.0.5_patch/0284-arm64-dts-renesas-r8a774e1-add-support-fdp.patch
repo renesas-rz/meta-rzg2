@@ -1,4 +1,4 @@
-From d8a90d2c50cba7c3bae7c3d8ec3ce2dee286a232 Mon Sep 17 00:00:00 2001
+From b252ef14f9267915d76e3ef7e243149f12aa59bd Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Wed, 8 Apr 2020 10:19:54 +0700
 Subject: [PATCH 284/350] arm64: dts: renesas: r8a774e1: add support fdp

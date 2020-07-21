@@ -1,7 +1,7 @@
-From e45b53374bd346e74c0663536b66ebf3fbd09066 Mon Sep 17 00:00:00 2001
+From 26ecdf0e3c3f4cd7985b59a13a37f33a66dc263b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 22 Apr 2020 17:26:46 +0700
-Subject: [PATCH 342/350] media: ov5645: change the way of setting virtual
+Subject: [PATCH 341/350] media: ov5645: change the way of setting virtual
  channel
 
 This commit is created to change the way of setting virtual channel

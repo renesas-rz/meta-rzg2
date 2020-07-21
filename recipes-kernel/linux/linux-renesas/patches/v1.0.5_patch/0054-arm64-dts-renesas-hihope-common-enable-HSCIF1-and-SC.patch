@@ -1,4 +1,4 @@
-From d1f159dcbaf1fa2f5b7f090923ed842b38cfdf84 Mon Sep 17 00:00:00 2001
+From 58d17fff799ab106280a10cc36047c7e3d5240c8 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:29:12 +0700
 Subject: [PATCH 054/350] arm64: dts: renesas: hihope-common: enable HSCIF1 and

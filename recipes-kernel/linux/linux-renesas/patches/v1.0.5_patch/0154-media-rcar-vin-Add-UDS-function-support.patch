@@ -1,4 +1,4 @@
-From 3fdb6b0a999dce2389016b1b7240023867d22ced Mon Sep 17 00:00:00 2001
+From f55b1829334a1624c414ca215c8ac4049f65f5f0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Sep 2019 11:30:43 +0700
 Subject: [PATCH 154/350] media: rcar-vin: Add UDS function support

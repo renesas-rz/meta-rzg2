@@ -1,4 +1,4 @@
-From 19bdeee198d60eed413c50f5aa8e191fb3ceeb2c Mon Sep 17 00:00:00 2001
+From a4446af904538837197fa9da08c25276f80b1a80 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 11:14:06 +0700
 Subject: [PATCH 039/350] arm64: dts: renesas: r8a774c0-ek874-idk-2121wr: Add

@@ -1,4 +1,4 @@
-From d582da411a9817a92204aea1fa9897e82a5e7136 Mon Sep 17 00:00:00 2001
+From cf3dc98067b1a7e255185d3c612384cac2552f03 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 6 Apr 2020 11:27:45 +0700
 Subject: [PATCH 224/350] arm64: dts: renesas: r8a774e1: add SYS-DMAC nodes

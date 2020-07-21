@@ -1,4 +1,4 @@
-From 39b88a10f3714b95ba97d792083eaf3bf7ee1d6c Mon Sep 17 00:00:00 2001
+From 76811d8813f52bfaa91124ae7d078342c70a5e33 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 24 Mar 2020 12:00:38 +0700
 Subject: [PATCH 235/350] arm64: dts: renesas: r8a774e1: add OPP tables for all

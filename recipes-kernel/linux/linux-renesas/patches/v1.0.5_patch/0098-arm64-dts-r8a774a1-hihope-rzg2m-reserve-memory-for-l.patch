@@ -1,4 +1,4 @@
-From 8cd3bb4ebe5ac21e598d6f79467044297cd0ad09 Mon Sep 17 00:00:00 2001
+From 28d24020f4fbea906f04de0e7d8d9eebdf24c53f Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Fri, 19 Jul 2019 13:29:05 +0700
 Subject: [PATCH 098/350] arm64: dts: r8a774a1-hihope-rzg2m: reserve memory for

@@ -1,4 +1,4 @@
-From 81c5aeb45ff1ab3eaa07d337ff1fbf84f432d78f Mon Sep 17 00:00:00 2001
+From 31c2afa030d7ceb6ea1779b1a39302111db9d8ec Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:31:14 +0700
 Subject: [PATCH 055/350] arm64: dts: renesas: r8a774a1: Add interrupt for

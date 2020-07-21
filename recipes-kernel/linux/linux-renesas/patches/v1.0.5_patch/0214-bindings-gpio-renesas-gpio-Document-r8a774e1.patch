@@ -1,4 +1,4 @@
-From d94d9352ed9b29d2304f421fa296950e3b770e8d Mon Sep 17 00:00:00 2001
+From f7da07d0ad69eb217851073753b56a8a75b386cd Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hieppham@renesas.com>
 Date: Wed, 25 Mar 2020 15:55:00 +0700
 Subject: [PATCH 214/350] bindings: gpio: renesas: gpio: Document r8a774e1

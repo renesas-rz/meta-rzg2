@@ -1,4 +1,4 @@
-From 0f4bb0477f9c79d331d4fdfea8aee96885e54c6e Mon Sep 17 00:00:00 2001
+From 753c68aa17dd6e2fd93ff8155eb0759ec4119ef2 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 10:14:11 +0700
 Subject: [PATCH 052/350] arm64: dts: renesas: r8a774a1-hihope-rzg2m-ex: Enable

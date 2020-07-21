@@ -1,4 +1,4 @@
-From 315fac9e2cddbf7e49ee234f45b3c423425488e3 Mon Sep 17 00:00:00 2001
+From 769ee1eed61a74e10ebee32f8ba834496716fba6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 1 Jul 2019 15:08:32 +0700
 Subject: [PATCH 016/350] clk: renesas: r8a774c0: Add ADG clocks

@@ -1,4 +1,4 @@
-From 6ff9582c1b6d594a0ec5f2a01635d9ad7b5c30d6 Mon Sep 17 00:00:00 2001
+From 14d30f89f7ebbab4e16afcf7dbcd00912a1295ea Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 10 Sep 2019 11:46:26 +0700
 Subject: [PATCH 137/350] media: dt-bindings: rcar-csi2: Add R8A774B1 support

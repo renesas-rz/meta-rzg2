@@ -1,4 +1,4 @@
-From 5d6cbc6dbe782093f442a5ad2f5e8049275cc639 Mon Sep 17 00:00:00 2001
+From c2ca940cc009eb93e732251b04e2ee1e68e1aee8 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:10:05 +0700
 Subject: [PATCH 067/350] sched: Add static_key for asymmetric cpu capacity
@@ -24,7 +24,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  3 files changed, 25 insertions(+)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 86ccaaf..0046327 100644
+index 92b1e71..e95eaa0 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -6405,6 +6405,9 @@ static int wake_cap(struct task_struct *p, int cpu, int prev_cpu)

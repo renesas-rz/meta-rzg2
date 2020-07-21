@@ -1,4 +1,4 @@
-From bd307e17e8af04f2a2a8dda2f8a40609ed3625bd Mon Sep 17 00:00:00 2001
+From 4a4669346bfe0f2bca67cefb185ff1f5cb2b33b6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:04:21 +0700
 Subject: [PATCH 070/350] sched/fair: Consider misfit tasks when load-balancing
@@ -41,7 +41,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 48 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index d3bac89..669e885 100644
+index 13bd404..08b9ba9 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -7111,6 +7111,7 @@ struct lb_env {

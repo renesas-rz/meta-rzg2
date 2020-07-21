@@ -1,4 +1,4 @@
-From e44044223a5acf10dd52cdb41a44b51a1c6842ad Mon Sep 17 00:00:00 2001
+From d79235e7c1705a92427bcaebebe3dddc61a03db3 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 1 Jul 2019 15:22:55 +0700
 Subject: [PATCH 017/350] arm64: defconfig: Enable Sound support for R8A774C0

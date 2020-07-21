@@ -1,4 +1,4 @@
-From b4a9afd279307476b774c981ff2013b772090f21 Mon Sep 17 00:00:00 2001
+From 899aa0dd56cc8de3380807b952f9d9991e0b8be2 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 14:16:07 +0700
 Subject: [PATCH 183/350] arm64: dts: renesas: r8a774b1: add missing msiof ref

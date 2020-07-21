@@ -1,4 +1,4 @@
-From f73383ccfb391cc0199cf8650ee9f1f2bb9a5c69 Mon Sep 17 00:00:00 2001
+From 49a50b907b0044ba71cfab33fd15bbf5651ecda6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 11:34:08 +0700
 Subject: [PATCH 232/350] arm64: dts: renesas: r8a774e1: Add INTC-EX device

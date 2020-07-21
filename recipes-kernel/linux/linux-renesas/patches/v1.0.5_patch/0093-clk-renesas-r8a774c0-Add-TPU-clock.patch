@@ -1,4 +1,4 @@
-From 43ee73d0648d2dc7e0c9cf43852fb64a0b1058b7 Mon Sep 17 00:00:00 2001
+From 09c5cc1f17ae10502f3c6c95c30bad9c7c1cc4f9 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@rvc.renesas.com>
 Date: Wed, 3 Jul 2019 10:27:28 +0700
 Subject: [PATCH 093/350] clk: renesas: r8a774c0: Add TPU clock

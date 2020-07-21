@@ -1,4 +1,4 @@
-From 6edf307ab34b37174635ba5027758ee49a18de7a Mon Sep 17 00:00:00 2001
+From 3a7c9cc6085b1c84b7405f30f78078f433133b6c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 15:30:01 +0700
 Subject: [PATCH 087/350] arm64: dts: renesas: r8a774a1: Add QoS device node

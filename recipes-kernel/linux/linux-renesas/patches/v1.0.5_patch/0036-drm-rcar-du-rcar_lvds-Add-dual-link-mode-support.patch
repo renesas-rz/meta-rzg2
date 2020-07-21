@@ -1,4 +1,4 @@
-From 0aa46b7df42e1803900c866d38b3723947960f70 Mon Sep 17 00:00:00 2001
+From 9adcc4fec8c7c05863d74ab14e224c250f7c50fc Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 13:31:00 +0700
 Subject: [PATCH 036/350] drm: rcar-du: rcar_lvds: Add dual-link mode support

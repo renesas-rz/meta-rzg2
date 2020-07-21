@@ -1,4 +1,4 @@
-From 92dd5e8bd09bd617b200cc7b8576635dd44b074c Mon Sep 17 00:00:00 2001
+From 7d857b9db2032c7e8c2a6b14245e052fdc294dfa Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:45:50 +0700
 Subject: [PATCH 063/350] arm64: dts: renesas: r8a774a1: Add VCP4 device nodes

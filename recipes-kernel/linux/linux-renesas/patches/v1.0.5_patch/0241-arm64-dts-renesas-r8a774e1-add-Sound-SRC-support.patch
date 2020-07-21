@@ -1,4 +1,4 @@
-From aa6a40dfc115f727ec51130ebd9159dd12d614ed Mon Sep 17 00:00:00 2001
+From 1e191ea11e9ee6709dea53f6e42b264267a615fe Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 16:31:59 +0700
 Subject: [PATCH 241/350] arm64: dts: renesas: r8a774e1: add Sound SRC support

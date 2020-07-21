@@ -1,4 +1,4 @@
-From 215a63314d26bc6fbbe3de51de94f23b7473d80c Mon Sep 17 00:00:00 2001
+From 2c8246115a84420155f8d452cf742cd8a68d4d1b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:24:55 +0700
 Subject: [PATCH 013/350] defconfig: config to enable DRM_TILCD and

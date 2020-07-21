@@ -1,4 +1,4 @@
-From 8d32af2e717726ef8d707f50b0707fea9736d560 Mon Sep 17 00:00:00 2001
+From 6d81618f76cccefc5849f39fd7a85c77805c512e Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
 Date: Tue, 30 Apr 2019 13:38:59 +0700
 Subject: [PATCH 053/350] PCI: pcie-rcar: Add bus notifier so we can limit the
@@ -13,10 +13,10 @@ Signed-off-by: Loc Phuoc Pham. Lam <loc.lam.px@renesas.com>
  1 file changed, 28 insertions(+)
 
 diff --git a/drivers/pci/controller/pcie-rcar.c b/drivers/pci/controller/pcie-rcar.c
-index daf4b4d..c37b995 100644
+index e632b7a..cad8d17 100644
 --- a/drivers/pci/controller/pcie-rcar.c
 +++ b/drivers/pci/controller/pcie-rcar.c
-@@ -1261,3 +1261,31 @@ static struct platform_driver rcar_pcie_driver = {
+@@ -1262,3 +1262,31 @@ static struct platform_driver rcar_pcie_driver = {
  	.probe = rcar_pcie_probe,
  };
  builtin_platform_driver(rcar_pcie_driver);

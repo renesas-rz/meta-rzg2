@@ -1,4 +1,4 @@
-From e2b3727f5af2e5af6298901fe9dc565e45b8222f Mon Sep 17 00:00:00 2001
+From 966dc4f89fd8d8548534bbfe6a7ef927e6adb16e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 15:39:26 +0700
 Subject: [PATCH 092/350] pinctrl: r8a77990: add pins, groups, function for TPU

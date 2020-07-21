@@ -1,4 +1,4 @@
-From f9757f690a8fbb9125854a95604cbecbe2ed08e9 Mon Sep 17 00:00:00 2001
+From 3ed977091685a4f35af78124174c7bb962a0b7f4 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Fri, 17 Apr 2020 11:46:09 +0700
 Subject: [PATCH 317/350] arm64: dts: renesas: r8a774{c0,c0-es10,a1,b1,e1}: Add

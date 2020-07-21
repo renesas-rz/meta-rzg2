@@ -1,4 +1,4 @@
-From ee922af3d44ccc618013d23b81e37767bb802f07 Mon Sep 17 00:00:00 2001
+From 58bb31ae5e7cfc946a264257ae30505fcd169c68 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Fri, 10 Apr 2020 20:00:12 +0700
 Subject: [PATCH 292/350] dt-binding: usb: renesas_usbhs: Add r8a774e1 support

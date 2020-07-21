@@ -1,4 +1,4 @@
-From c28f9ff053ad52f78dee3126558a3f789347dfcf Mon Sep 17 00:00:00 2001
+From cc0dbfc740f6e7e5812f745c95cfe41c68be5a06 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Mon, 13 Apr 2020 14:58:49 +0700
 Subject: [PATCH 279/350] arm64: dts: renesas: r8a774e1: Add DU device to DT

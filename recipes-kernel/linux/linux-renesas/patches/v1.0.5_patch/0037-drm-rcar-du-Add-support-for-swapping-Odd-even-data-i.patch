@@ -1,4 +1,4 @@
-From cb58c1bffa053cfeb3d5d3ef1e1984205a3f142d Mon Sep 17 00:00:00 2001
+From 7218e26a01ab8a252bf976aef5fb2bf09685efea Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:54:11 +0700
 Subject: [PATCH 037/350] drm: rcar-du: Add support for swapping Odd/even data

@@ -1,4 +1,4 @@
-From cae39853ee7cbfaa50d46321a453e4286335c6cb Mon Sep 17 00:00:00 2001
+From 2a8ea1ad2d75057f2a9074f99ccab82f3b9c900f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 15:14:13 +0700
 Subject: [PATCH 180/350] mmc: renesas_sdhi: add support HS400 4TAP for

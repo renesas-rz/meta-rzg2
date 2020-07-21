@@ -1,4 +1,4 @@
-From a81bd910063c011de1bb7d450914ca1e641d8ee8 Mon Sep 17 00:00:00 2001
+From cd1e6ed711e43fecd7c9b6c2515f2997cb7fabe6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 10:53:52 +0700
 Subject: [PATCH 144/350] thermal: renesas: Add emergency shutdown support in

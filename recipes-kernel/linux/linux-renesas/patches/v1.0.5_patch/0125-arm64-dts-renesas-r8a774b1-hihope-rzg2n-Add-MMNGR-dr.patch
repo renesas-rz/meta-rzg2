@@ -1,4 +1,4 @@
-From 72ab55d2ab996c6979e48048f9d0ec14be11d7d8 Mon Sep 17 00:00:00 2001
+From d340c39233f76a07d2ce9ff93be861b42a6e1aa4 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Fri, 6 Sep 2019 18:41:38 +0700
 Subject: [PATCH 125/350] arm64: dts: renesas: r8a774b1-hihope-rzg2n: Add MMNGR

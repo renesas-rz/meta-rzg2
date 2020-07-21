@@ -1,4 +1,4 @@
-From 2d63d8df4f52d40b5120b765d3ffcbd329fd770d Mon Sep 17 00:00:00 2001
+From 89972d5d44c34e907de5551105fa3cabc459bba7 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Mon, 6 Apr 2020 20:06:35 +0700
 Subject: [PATCH 226/350] arm64: dts: renesas: r8a774e1: Add MSIOF nodes

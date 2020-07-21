@@ -1,4 +1,4 @@
-From bf964b17a1ede97ea939b2a4c29af2ddc35f3b24 Mon Sep 17 00:00:00 2001
+From 28c65e9a97bb17dfff5b1d3fe5115eac906b7749 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Mon, 13 Apr 2020 15:00:01 +0700
 Subject: [PATCH 280/350] arm64: dts: renesas: r8a774e1: Add LVDS encoder to DT

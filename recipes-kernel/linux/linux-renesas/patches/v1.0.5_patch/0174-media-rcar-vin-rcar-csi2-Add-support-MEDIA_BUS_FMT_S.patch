@@ -1,4 +1,4 @@
-From dc2a28a1719108f4220ff983ef95cb07c6157f78 Mon Sep 17 00:00:00 2001
+From 1cbac80fa602a9e0b85f9c2048592d7fb4e52bab Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 7 Nov 2019 19:07:05 +0700
 Subject: [PATCH 174/350] media: rcar-vin: rcar-csi2: Add support

@@ -1,7 +1,7 @@
-From 28cad2a2158ad5240892529959b5ac73d5d2960f Mon Sep 17 00:00:00 2001
+From a88471f4962afb1f5f86a3a55f7670fbe0ad459d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 16:44:20 +0700
-Subject: [PATCH 349/350] arm64: dts: renesas: add support Rev2 Board for
+Subject: [PATCH 348/350] arm64: dts: renesas: add support Rev2 Board for
  HiHope RZ/G2M and RZ/G2N.
 
 This commit is created to support Rev2 Board for HiHope RZ/G2M and

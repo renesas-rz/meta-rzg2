@@ -1,4 +1,4 @@
-From 92ec96bd95d37c02a2fda3490253d6d6adecdaac Mon Sep 17 00:00:00 2001
+From 27120f92bd50fd6ebdc6c837d378ecaec7eeb153 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 27 May 2020 11:25:35 +0700
 Subject: [PATCH 325/350] arm64: dma_mapping: allow PCI host driver to limit

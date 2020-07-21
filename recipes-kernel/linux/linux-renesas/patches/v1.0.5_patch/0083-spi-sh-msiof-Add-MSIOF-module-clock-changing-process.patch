@@ -1,4 +1,4 @@
-From 1ee628128993bd06ea1777a4f4b7ca8f51641d58 Mon Sep 17 00:00:00 2001
+From 5168eb773339f71b25b47cfc18ac4862cf3a7245 Mon Sep 17 00:00:00 2001
 From: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
 Date: Fri, 30 Mar 2018 14:46:57 +0900
 Subject: [PATCH 083/350] spi: sh-msiof: Add MSIOF module clock changing

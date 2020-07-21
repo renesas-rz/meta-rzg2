@@ -1,4 +1,4 @@
-From 93222bbebc91eb24e64c3ea1d11d4bf1017a50a3 Mon Sep 17 00:00:00 2001
+From 6cc31862cef553e82bd211ed02950c819d58b8ea Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 15:06:00 +0700
 Subject: [PATCH 096/350] arm64: dts: renesas: r8a774c0-cat874: Add support to

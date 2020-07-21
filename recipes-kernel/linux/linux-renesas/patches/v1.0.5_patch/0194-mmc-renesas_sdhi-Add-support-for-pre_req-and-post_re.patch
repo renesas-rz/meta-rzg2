@@ -1,4 +1,4 @@
-From a74e6e9cd5a048f2e2098fee0adf4ffea131ed7c Mon Sep 17 00:00:00 2001
+From 82338cad7e8b8f1f40e3a803199483a6d18065a8 Mon Sep 17 00:00:00 2001
 From: Masaharu Hayakawa <masaharu.hayakawa.ry@renesas.com>
 Date: Wed, 22 Nov 2017 21:13:22 +0900
 Subject: [PATCH 194/350] mmc: renesas_sdhi: Add support for pre_req and

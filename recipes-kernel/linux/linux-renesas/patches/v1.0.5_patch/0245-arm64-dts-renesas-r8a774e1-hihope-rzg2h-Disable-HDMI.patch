@@ -1,4 +1,4 @@
-From b30abc6eadc72b8287442b2c849327be6210d288 Mon Sep 17 00:00:00 2001
+From 8be8bee106cdea9a0e44b1e3129c4c7c876126db Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Fri, 10 Apr 2020 11:05:24 +0700
 Subject: [PATCH 245/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable

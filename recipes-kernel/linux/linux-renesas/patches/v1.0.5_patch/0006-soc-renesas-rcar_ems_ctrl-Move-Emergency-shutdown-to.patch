@@ -1,4 +1,4 @@
-From 2e8e63c2b38065110884a7a134576300d636cdb7 Mon Sep 17 00:00:00 2001
+From e30cc23c77f322c36ea7d4fc9f20d094eb3fa9c5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:20:06 +0700
 Subject: [PATCH 006/350] soc: renesas: rcar_ems_ctrl: Move Emergency shutdown

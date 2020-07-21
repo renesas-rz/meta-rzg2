@@ -1,4 +1,4 @@
-From 11fbde752ee390c544f788ff58b1a23fbc15b24c Mon Sep 17 00:00:00 2001
+From 2aba8c184f24d3a4e513631a63a8b353d688bc56 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:40:27 +0700
 Subject: [PATCH 272/350] drm: rcar-du: Add R8A774E1 support

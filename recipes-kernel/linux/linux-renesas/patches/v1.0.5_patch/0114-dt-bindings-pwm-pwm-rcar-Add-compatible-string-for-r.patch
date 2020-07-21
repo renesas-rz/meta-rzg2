@@ -1,4 +1,4 @@
-From d83248adb85c53ef1eeff6f839a2b6009b3947dc Mon Sep 17 00:00:00 2001
+From 8a931908d6c59cb2734874ddaa81cc3054558100 Mon Sep 17 00:00:00 2001
 From: Ky Nguyen <ky.nguyen.uj@renesas.com>
 Date: Mon, 12 Aug 2019 13:26:56 +0700
 Subject: [PATCH 114/350] dt-bindings: pwm: pwm-rcar: Add compatible string for

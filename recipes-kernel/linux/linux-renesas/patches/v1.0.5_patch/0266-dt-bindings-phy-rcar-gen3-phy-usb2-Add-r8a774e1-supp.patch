@@ -1,4 +1,4 @@
-From 5783703332ba8f085e2e11536f16f0be2fda62d1 Mon Sep 17 00:00:00 2001
+From 8e706e47d75829d119fadf81ea745437d216ece5 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Thu, 9 Apr 2020 19:18:27 +0700
 Subject: [PATCH 266/350] dt: bindings: phy: rcar-gen3-phy-usb2: Add r8a774e1

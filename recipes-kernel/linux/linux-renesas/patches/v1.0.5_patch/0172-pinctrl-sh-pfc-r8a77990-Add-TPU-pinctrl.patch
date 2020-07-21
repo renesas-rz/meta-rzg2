@@ -1,4 +1,4 @@
-From 232545c91dbf28027d3cedf7433a9bbe22567051 Mon Sep 17 00:00:00 2001
+From b63eb8092f10326b4d7bff951055f83b2e25b07c Mon Sep 17 00:00:00 2001
 From: Duy Dang <duy.dang.yb@renesas.com>
 Date: Thu, 21 Nov 2019 18:41:12 +0700
 Subject: [PATCH 172/350] pinctrl: sh-pfc: r8a77990: Add-TPU-pinctrl.

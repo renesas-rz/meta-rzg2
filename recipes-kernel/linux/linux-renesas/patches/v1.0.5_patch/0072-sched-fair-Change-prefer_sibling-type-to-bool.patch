@@ -1,4 +1,4 @@
-From f3773164eadbb71cbc3c8916c683d737844aef46 Mon Sep 17 00:00:00 2001
+From 6879c67a6a0bce333a0f4a118d2de9b253c3090d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:47:41 +0700
 Subject: [PATCH 072/350] sched/fair: Change prefer_sibling type to bool
@@ -20,7 +20,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 3100e1b..7c6cb57 100644
+index d7c6885..9ee043d 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -8201,11 +8201,11 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd

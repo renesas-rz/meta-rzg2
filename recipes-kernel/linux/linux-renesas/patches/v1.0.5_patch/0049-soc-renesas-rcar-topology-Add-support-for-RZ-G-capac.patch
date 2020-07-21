@@ -1,4 +1,4 @@
-From 72c2210ec102dbf68f1ce3b53ed4a3cd576bbf66 Mon Sep 17 00:00:00 2001
+From 2366065af9eae612499e20cf2e59c4b851319a68 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 17:01:59 +0700
 Subject: [PATCH 049/350] soc: renesas: rcar-topology: Add support for RZ/G

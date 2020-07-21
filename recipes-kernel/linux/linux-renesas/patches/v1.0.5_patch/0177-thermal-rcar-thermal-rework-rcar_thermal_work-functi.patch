@@ -1,4 +1,4 @@
-From 840e5f92265a85effbf68a17f906e00bcfb2287b Mon Sep 17 00:00:00 2001
+From 5d3a636782da8ebee04a1ab82a24163695eff783 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 15:04:13 +0700
 Subject: [PATCH 177/350] thermal: rcar-thermal: rework rcar_thermal_work

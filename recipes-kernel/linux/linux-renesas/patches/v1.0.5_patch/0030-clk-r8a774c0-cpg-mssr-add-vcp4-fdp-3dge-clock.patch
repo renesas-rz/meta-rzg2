@@ -1,4 +1,4 @@
-From b4dd2f2117acaa2899e3c4a6af7b04deb341b7ed Mon Sep 17 00:00:00 2001
+From 8255072334d9fb40ee8b56afbc63c4305d0179d3 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:38:10 +0700
 Subject: [PATCH 030/350] clk: r8a774c0-cpg-mssr: add vcp4, fdp, 3dge clock

@@ -1,4 +1,4 @@
-From 1eb03858d80065c9e327158070a1b1fbe2ca164d Mon Sep 17 00:00:00 2001
+From 82de4fc23f1fbfbea1e950f3a6f77797eeba5e8d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 11:16:04 +0700
 Subject: [PATCH 111/350] dt-bindings: display: renesas: du: Document the

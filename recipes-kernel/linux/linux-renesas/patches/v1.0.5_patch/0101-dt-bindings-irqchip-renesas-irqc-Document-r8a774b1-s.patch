@@ -1,4 +1,4 @@
-From f634cc4768468a88eeb39edea2030d4735875f25 Mon Sep 17 00:00:00 2001
+From 96947b1baf3e78c88a4fa5268d42dae069f1a1e8 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 25 Jul 2019 13:05:03 +0700
 Subject: [PATCH 101/350] dt-bindings: irqchip: renesas-irqc: Document r8a774b1
