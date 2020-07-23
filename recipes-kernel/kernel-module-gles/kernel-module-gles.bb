@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = " \
 "
 inherit module
 require include/rzg2-modules-common.inc
+require include/ecc-control.inc
 PN = "kernel-module-gles"
 PR = "r0"
 
@@ -20,6 +21,13 @@ SRC_URI_r8a774c0 = 'file://GSX_KM_E3.tar.bz2'
 SRC_URI_append = "\
 	file://0001-supporting-kernel-version-4.19-and-later.patch \
 	file://0002-common-linux-dma_support-replace-__get_order-to-get_.patch \
+"
+
+SRC_URI_append_r8a774a1 = "\
+	${@base_ifelse("${ECC_FULL}" == "1", " file://0001-r8a7796-Makefile-support-fixed-device-memory-for-PVR.patch ", "")} \
+"
+SRC_URI_append_r8a774e1 = "\
+	${@base_ifelse("${ECC_FULL}" == "1", " file://0001-r8a7795-Makefile-support-fixed-device-memory-for-PVR.patch ", "")} \
 "
 
 S = "${WORKDIR}/rogue_km"
