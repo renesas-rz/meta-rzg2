@@ -1,7 +1,7 @@
-From 6cddb8f4f38f1900c71a070ccd620ec8abefebce Mon Sep 17 00:00:00 2001
+From d2e200365a19634bee7472a06cbf351ca88ca566 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:54:11 +0700
-Subject: [PATCH 037/351] drm: rcar-du: Add support for swapping Odd/even data
+Subject: [PATCH 037/353] drm: rcar-du: Add support for swapping Odd/even data
  in dual-link mode
 
 Based on Hardware Manual, bit 1st of LVDSTRIPE register support for

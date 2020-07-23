@@ -1,7 +1,7 @@
-From 875f90b2f883f0b1cd03a578e3a5e95134910b37 Mon Sep 17 00:00:00 2001
+From c6d883e8c8cefab7d5ee093a76ce5148ec3893f3 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Tue, 5 May 2020 15:54:26 +0700
-Subject: [PATCH 315/351] arm64: dts: r8a774e1: add device node for optee
+Subject: [PATCH 315/353] arm64: dts: r8a774e1: add device node for optee
 
 Add optee support for r8a774e1
 

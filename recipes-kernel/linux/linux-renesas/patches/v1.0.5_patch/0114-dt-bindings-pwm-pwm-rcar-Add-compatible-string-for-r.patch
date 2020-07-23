@@ -1,7 +1,7 @@
-From cb402ce4f0242eb5c84d9bafaa20a9865e67c6af Mon Sep 17 00:00:00 2001
+From 658da2acfd34397a896f98e3cba517ced4b85d32 Mon Sep 17 00:00:00 2001
 From: Ky Nguyen <ky.nguyen.uj@renesas.com>
 Date: Mon, 12 Aug 2019 13:26:56 +0700
-Subject: [PATCH 114/351] dt-bindings: pwm: pwm-rcar: Add compatible string for
+Subject: [PATCH 114/353] dt-bindings: pwm: pwm-rcar: Add compatible string for
  r8a774b1
 
 This patch adds compatible string for R8A774B1 SoC

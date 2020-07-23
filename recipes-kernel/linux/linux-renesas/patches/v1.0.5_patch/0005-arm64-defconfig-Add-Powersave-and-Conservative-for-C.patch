@@ -1,7 +1,7 @@
-From e484bba861f3b0243d7240a20b3d67c3647c6bcf Mon Sep 17 00:00:00 2001
+From c77efdae766604aad9e5476560402732085dc578 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 5 Mar 2019 14:35:40 +0700
-Subject: [PATCH 005/351] arm64: defconfig: Add Powersave and Conservative for
+Subject: [PATCH 005/353] arm64: defconfig: Add Powersave and Conservative for
  CPUFREQ
 
 This patch enables Powersave and Conservative functionalities for

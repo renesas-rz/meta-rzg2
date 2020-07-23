@@ -1,7 +1,7 @@
-From ebfcf048bac2bd9e74c8d79cc4c9c13dcae8ae0e Mon Sep 17 00:00:00 2001
+From a811720203bcf6b5670cd5898f39b9b4204b46b0 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Fri, 10 Apr 2020 20:00:12 +0700
-Subject: [PATCH 294/351] dt-binding: usb: renesas_usbhs: Add r8a774e1 support
+Subject: [PATCH 294/353] dt-binding: usb: renesas_usbhs: Add r8a774e1 support
 
 Document RZ/G2H (R8A774E1) SoC bindings
 

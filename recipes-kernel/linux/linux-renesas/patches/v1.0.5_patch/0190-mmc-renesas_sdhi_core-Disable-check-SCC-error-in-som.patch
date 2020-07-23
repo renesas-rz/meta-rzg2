@@ -1,7 +1,7 @@
-From 730377e3876217e0f8563c5685aab322a4a47d3f Mon Sep 17 00:00:00 2001
+From 910d81d80187d2fbe721bd65c3b8e2a2f1c354e3 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 10 Mar 2020 11:06:41 +0700
-Subject: [PATCH 190/351] mmc: renesas_sdhi_core: Disable check SCC error in
+Subject: [PATCH 190/353] mmc: renesas_sdhi_core: Disable check SCC error in
  some modes
 
 There is no need to check SCC error in some modes which excludes:

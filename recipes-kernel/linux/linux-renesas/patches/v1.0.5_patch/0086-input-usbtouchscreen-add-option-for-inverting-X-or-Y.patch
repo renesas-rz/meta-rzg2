@@ -1,7 +1,7 @@
-From 749e04c924e3655144689f58e7639d4758f533d5 Mon Sep 17 00:00:00 2001
+From 479c6636908b53e456164155faec84212509e8aa Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 5 Jun 2019 14:12:41 +0700
-Subject: [PATCH 086/351] input: usbtouchscreen: add option for inverting X or
+Subject: [PATCH 086/353] input: usbtouchscreen: add option for inverting X or
  Y axis
 
 Some touchscreen type eGalax need invert X or Y (maybe together with
@@ -14,7 +14,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 13 insertions(+)
 
 diff --git a/drivers/input/touchscreen/usbtouchscreen.c b/drivers/input/touchscreen/usbtouchscreen.c
-index e74f813..3980d50 100644
+index 5d1d463..bfc0b88 100644
 --- a/drivers/input/touchscreen/usbtouchscreen.c
 +++ b/drivers/input/touchscreen/usbtouchscreen.c
 @@ -64,6 +64,14 @@ static bool hwcalib_xy;
@@ -32,7 +32,7 @@ index e74f813..3980d50 100644
  /* device specifc data/functions */
  struct usbtouch_usb;
  struct usbtouch_device_info {
-@@ -1404,6 +1412,11 @@ static void usbtouch_process_pkt(struct usbtouch_usb *usbtouch,
+@@ -1405,6 +1413,11 @@ static void usbtouch_process_pkt(struct usbtouch_usb *usbtouch,
  			return;
  
  	input_report_key(usbtouch->input, BTN_TOUCH, usbtouch->touch);

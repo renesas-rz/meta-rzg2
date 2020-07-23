@@ -1,7 +1,7 @@
-From 1dcb99a9aea07d1493b44192aa43943286948a7f Mon Sep 17 00:00:00 2001
+From d7558c21c9e07dfef774a145456c4f88948986c2 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:49:01 +0700
-Subject: [PATCH 035/351] drm: rcar-du: Add clock function for LVDS PLL
+Subject: [PATCH 035/353] drm: rcar-du: Add clock function for LVDS PLL
 
 Since it is necessary to set PLL initialization of LVDS before DU,
 register the clock function and this patch adds its processing.

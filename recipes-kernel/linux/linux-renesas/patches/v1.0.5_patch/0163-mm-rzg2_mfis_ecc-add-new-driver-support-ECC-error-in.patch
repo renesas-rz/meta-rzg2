@@ -1,7 +1,7 @@
-From d2b6b41fea053d26ae5d1e54c12967f82483ecc9 Mon Sep 17 00:00:00 2001
+From 2efa2c9740c1ecdc8e1eb288134d53a18d2f14ac Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Wed, 11 Sep 2019 17:01:48 +0700
-Subject: [PATCH 163/351] mm: rzg2_mfis_ecc: add new driver support ECC error
+Subject: [PATCH 163/353] mm: rzg2_mfis_ecc: add new driver support ECC error
  interrupt
 
 Add new driver to support DRAM ECC error interrupt

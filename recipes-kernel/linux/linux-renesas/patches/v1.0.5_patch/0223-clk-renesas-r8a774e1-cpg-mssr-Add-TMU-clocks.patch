@@ -1,7 +1,7 @@
-From f96bca7bb7e65aff75768e14ab9c42a1746612a4 Mon Sep 17 00:00:00 2001
+From 5528db5238d2833170548731859d2694f06f6bdf Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 27 Mar 2020 13:06:39 +0700
-Subject: [PATCH 223/351] clk: renesas: r8a774e1-cpg-mssr: Add TMU clocks.
+Subject: [PATCH 223/353] clk: renesas: r8a774e1-cpg-mssr: Add TMU clocks.
 
 Add TMU clocks to R8A774E1 SoC.
 

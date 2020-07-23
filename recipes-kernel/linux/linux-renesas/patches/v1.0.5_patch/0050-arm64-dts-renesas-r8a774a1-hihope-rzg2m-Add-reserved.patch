@@ -1,7 +1,7 @@
-From 1a7d9454b8c588df49e17fd3faffd6172b19e70f Mon Sep 17 00:00:00 2001
+From f8190a49df0269e5481e52636fb4b09ee9b1d1cb Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 22 May 2019 11:24:31 +0700
-Subject: [PATCH 050/351] arm64: dts: renesas: r8a774a1-hihope-rzg2m: Add
+Subject: [PATCH 050/353] arm64: dts: renesas: r8a774a1-hihope-rzg2m: Add
  reserved memory region
 
 This patch adds reserved memory region for default CMA area:

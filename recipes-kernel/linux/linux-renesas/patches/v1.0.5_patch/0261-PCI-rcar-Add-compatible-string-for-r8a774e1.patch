@@ -1,7 +1,7 @@
-From 222e4e13a19c63af18c3d3343c5636ad4066aaab Mon Sep 17 00:00:00 2001
+From c8622bec6fe696db8453599e2cf003ad7368e045 Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Tue, 14 Apr 2020 15:28:29 +0700
-Subject: [PATCH 261/351] PCI: rcar: Add compatible string for r8a774e1
+Subject: [PATCH 261/353] PCI: rcar: Add compatible string for r8a774e1
 
 Add support for r8a774e1.
 

@@ -1,7 +1,7 @@
-From 08aca0f8df69b3bc9d3efd811556d1b94dadcc91 Mon Sep 17 00:00:00 2001
+From 8cc5cac1f736c4828f57aa7002017e20db600fc4 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:47:41 +0700
-Subject: [PATCH 072/351] sched/fair: Change prefer_sibling type to bool
+Subject: [PATCH 072/353] sched/fair: Change prefer_sibling type to bool
 
 This variable is entirely local to update_sd_lb_stats, so we can
 safely change its type and slightly clean up its initialisation.
@@ -20,7 +20,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 7fbb867..520c11a 100644
+index 5967b08..d6b7fd0 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -8203,11 +8203,11 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd

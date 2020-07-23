@@ -1,7 +1,7 @@
-From b95425a98fe421a74754c9ad7f5d2d79369854c0 Mon Sep 17 00:00:00 2001
+From 6a4236ac108712f9044f5066ae65d8beff770b82 Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Tue, 14 Apr 2020 19:02:21 +0700
-Subject: [PATCH 293/351] arm64: dts: renesas: r8a774e1: Add SATA controller
+Subject: [PATCH 293/353] arm64: dts: renesas: r8a774e1: Add SATA controller
  node
 
 This patch adds SATA controller node for the R8A774E1 SoC.

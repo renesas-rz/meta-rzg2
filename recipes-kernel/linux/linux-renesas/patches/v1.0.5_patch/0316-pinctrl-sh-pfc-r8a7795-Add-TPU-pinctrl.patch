@@ -1,7 +1,7 @@
-From 75edf039f60c3bafa9f7d2e86c543885067c21c6 Mon Sep 17 00:00:00 2001
+From 92ca30a1038e45e662f2c30461e23c454b1c9047 Mon Sep 17 00:00:00 2001
 From: Duy Bao Dang <duy.dang.yb@renesas.com>
 Date: Tue, 5 May 2020 14:01:58 +0700
-Subject: [PATCH 316/351] pinctrl: sh-pfc: r8a7795: Add-TPU-pinctrl.
+Subject: [PATCH 316/353] pinctrl: sh-pfc: r8a7795: Add-TPU-pinctrl.
 
 This patch add definition for pins functions/groups for common
 structure.

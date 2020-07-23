@@ -1,7 +1,7 @@
-From d44a88663b7c8ec69fcea0440bf098a99f05d435 Mon Sep 17 00:00:00 2001
+From 57a8a4b373937972f43c1e647815b9d3c3951f41 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 6 Mar 2020 10:35:04 +0700
-Subject: [PATCH 185/351] arm64: dts: renesas: r8a774c0-{,es10}-cat874: Enable
+Subject: [PATCH 185/353] arm64: dts: renesas: r8a774c0-{,es10}-cat874: Enable
  Audio support in Low speed connector
 
 This patch enable sound support in Low speed connector

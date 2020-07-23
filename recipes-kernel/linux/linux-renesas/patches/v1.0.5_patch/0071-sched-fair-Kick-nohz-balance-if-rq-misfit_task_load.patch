@@ -1,7 +1,7 @@
-From 90a0b867077db861a05e5bf548a9f2cd15c9c446 Mon Sep 17 00:00:00 2001
+From 768b3cc0452deccb361cc6e3635d5a29fe642329 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:35:50 +0700
-Subject: [PATCH 071/351] sched/fair: Kick nohz balance if rq->misfit_task_load
+Subject: [PATCH 071/353] sched/fair: Kick nohz balance if rq->misfit_task_load
 
 There already are a few conditions in nohz_kick_needed() to ensure
 a nohz kick is triggered, but they are not enough for some misfit
@@ -41,7 +41,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 5ea7172..7fbb867 100644
+index 32cbffc..5967b08 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -9370,7 +9370,7 @@ static void nohz_balancer_kick(struct rq *rq)

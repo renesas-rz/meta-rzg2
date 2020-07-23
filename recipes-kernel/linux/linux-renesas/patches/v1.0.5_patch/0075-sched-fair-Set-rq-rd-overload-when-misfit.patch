@@ -1,7 +1,7 @@
-From c907d23b0f09381bcd79ffe93be38ecc7e0a1747 Mon Sep 17 00:00:00 2001
+From 7b99fd1435e71c1bff65dc1a5483f8ba5206a941 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:07:12 +0700
-Subject: [PATCH 075/351] sched/fair: Set rq->rd->overload when misfit
+Subject: [PATCH 075/353] sched/fair: Set rq->rd->overload when misfit
 
 Idle balance is a great opportunity to pull a misfit task. However,
 there are scenarios where misfit tasks are present but idle balance
@@ -57,7 +57,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index c511415..03cdf1d 100644
+index ad8a864..e0e17cd 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -8015,7 +8015,7 @@ static bool update_nohz_stats(struct rq *rq, bool force)

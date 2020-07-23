@@ -1,7 +1,7 @@
-From e25e1e9b4107054bae9654fcf508d656bf7887e2 Mon Sep 17 00:00:00 2001
+From 27c86bfa73c48d460f32236f408ffd3bc0786b77 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:23:04 +0700
-Subject: [PATCH 252/351] dt-bindings: i2c: sh_mobile: Document r8a774e1
+Subject: [PATCH 252/353] dt-bindings: i2c: sh_mobile: Document r8a774e1
 
 This patch adds compatible string for iic driver.
 

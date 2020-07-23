@@ -1,7 +1,7 @@
-From 87231c9f576f2dd456c1d66100b65e520157aecb Mon Sep 17 00:00:00 2001
+From 6be3ad15622a8559150f95cc2b77c795fbdc26a0 Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 16:31:59 +0700
-Subject: [PATCH 243/351] arm64: dts: renesas: r8a774e1: add Sound SRC support
+Subject: [PATCH 243/353] arm64: dts: renesas: r8a774e1: add Sound SRC support
 
 This patch adds SRC[0,1,2,3,4,5,6,7,8,9] support for R8A774E1 SoC.
 

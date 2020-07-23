@@ -1,7 +1,7 @@
-From 877da00030879d9f1d3903dd1f9da6321966f460 Mon Sep 17 00:00:00 2001
+From f3bd389cb321a15aedbe61490cdeff481841d90b Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 13:21:59 +0700
-Subject: [PATCH 240/351] ASoC: rsnd: Document r8a774e1 audio support
+Subject: [PATCH 240/353] ASoC: rsnd: Document r8a774e1 audio support
 
 Document audio support for R8A774E1 (RZ/G2H) SoC.
 

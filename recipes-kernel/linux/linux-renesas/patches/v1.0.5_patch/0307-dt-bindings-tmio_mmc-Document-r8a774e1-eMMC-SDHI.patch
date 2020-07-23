@@ -1,7 +1,7 @@
-From a8f0d01ee5d0d63e8459c5569a530a0442de8641 Mon Sep 17 00:00:00 2001
+From c624d2dc3cec40823f66611c2eb2a112654b73e3 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Wed, 1 Apr 2020 09:04:04 +0700
-Subject: [PATCH 307/351] dt-bindings: tmio_mmc: Document r8a774e1 eMMC/SDHI
+Subject: [PATCH 307/353] dt-bindings: tmio_mmc: Document r8a774e1 eMMC/SDHI
 
 Document RZ/G2H (R8A774E1) SoC bindings
 for eMMC/SDHI.

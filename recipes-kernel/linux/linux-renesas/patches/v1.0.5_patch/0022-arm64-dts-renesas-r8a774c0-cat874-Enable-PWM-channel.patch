@@ -1,7 +1,7 @@
-From 8d77fc32fab26df4f18e07a65a0ebc8399f8b1b5 Mon Sep 17 00:00:00 2001
+From 426e37022a4aeca36a29f112b3d412e751db9837 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:28:27 +0700
-Subject: [PATCH 022/351] arm64: dts: renesas: r8a774c0-cat874: Enable PWM
+Subject: [PATCH 022/353] arm64: dts: renesas: r8a774c0-cat874: Enable PWM
  channel 6
 
 This patch enables PWM6 for RZ/G2E boards.

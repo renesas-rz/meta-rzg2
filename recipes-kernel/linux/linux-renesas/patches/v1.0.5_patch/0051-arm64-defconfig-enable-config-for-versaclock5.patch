@@ -1,7 +1,7 @@
-From 5f56747c114b2fe5cea1a6e06d73cff2d3f02138 Mon Sep 17 00:00:00 2001
+From 77761206f7db744ae00d44488b111def7d8d4f5e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:09:47 +0700
-Subject: [PATCH 051/351] arm64: defconfig: enable config for versaclock5
+Subject: [PATCH 051/353] arm64: defconfig: enable config for versaclock5
 
 This patch enables config for versaclock5 to use it for produce
 display dot clock in RZ/G2M.

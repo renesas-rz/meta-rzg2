@@ -1,7 +1,7 @@
-From c0c7a431ff66c370418f92b9f5613413f7990e90 Mon Sep 17 00:00:00 2001
+From 2d42a520bfd3e723241255a0d4101468b00cb8f2 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Fri, 19 Jul 2019 14:15:43 +0700
-Subject: [PATCH 100/351] arm64: dts: r8a774a1-hihope-rzg2m: pass
+Subject: [PATCH 100/353] arm64: dts: r8a774a1-hihope-rzg2m: pass
  lossy_decompress to mmngr
 
 Add lossy_decompress to mmngr memory-region

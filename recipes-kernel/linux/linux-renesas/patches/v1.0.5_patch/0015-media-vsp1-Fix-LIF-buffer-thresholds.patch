@@ -1,7 +1,7 @@
-From 46ac955a2621a71929ecfdd3f7664c77fd0658b9 Mon Sep 17 00:00:00 2001
+From a2920aa8548f74a3533187aa13f3cc3dedc1da94 Mon Sep 17 00:00:00 2001
 From: Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
 Date: Wed, 21 Nov 2018 22:38:07 -0500
-Subject: [PATCH 015/351] media: vsp1: Fix LIF buffer thresholds
+Subject: [PATCH 015/353] media: vsp1: Fix LIF buffer thresholds
 
 Commit de2bc45c84f7 ("media: vsp1: Update LIF buffer thresholds")
 updated the LIF buffer thresholds based on the VSP version, but used the

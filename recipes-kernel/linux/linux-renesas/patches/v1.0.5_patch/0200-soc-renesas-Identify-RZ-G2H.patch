@@ -1,7 +1,7 @@
-From 8d44fa5fec2457bcb3091d0ea5156a7a317c96af Mon Sep 17 00:00:00 2001
+From c4cb172d7ced9b2d6531cf6a01af3949a6d31a51 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:16:34 +0700
-Subject: [PATCH 200/351] soc: renesas: Identify RZ/G2H
+Subject: [PATCH 200/353] soc: renesas: Identify RZ/G2H
 
 This patch adds support for identifying the RZ/G2H (r8a774e1) SoC.
 

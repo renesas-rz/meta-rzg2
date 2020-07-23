@@ -1,7 +1,7 @@
-From 62b8d8e6b62e36259d5b49637666831c41edcc75 Mon Sep 17 00:00:00 2001
+From 8b6276381e8c7daa4cfff1b8dc734f54623681d0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 13:31:00 +0700
-Subject: [PATCH 036/351] drm: rcar-du: rcar_lvds: Add dual-link mode support
+Subject: [PATCH 036/353] drm: rcar-du: rcar_lvds: Add dual-link mode support
 
 This patch add dual-link mode support for dual channels LVDS.
 

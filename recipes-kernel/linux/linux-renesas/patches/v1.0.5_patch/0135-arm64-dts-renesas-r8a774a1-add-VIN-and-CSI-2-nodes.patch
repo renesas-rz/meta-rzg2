@@ -1,7 +1,7 @@
-From 784d1dc248dc1784c259b9c5d1b815c86edf7b99 Mon Sep 17 00:00:00 2001
+From 88ade4cb6c7d100d37460d8d84d9fe0ce2252ab0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 14:10:04 +0700
-Subject: [PATCH 135/351] arm64: dts: renesas: r8a774a1: add VIN and CSI-2
+Subject: [PATCH 135/353] arm64: dts: renesas: r8a774a1: add VIN and CSI-2
  nodes
 
 This patch adds VIN{0,1,2,3,4,5,6,7} and CSI{CSI40, CSI20} device nodes

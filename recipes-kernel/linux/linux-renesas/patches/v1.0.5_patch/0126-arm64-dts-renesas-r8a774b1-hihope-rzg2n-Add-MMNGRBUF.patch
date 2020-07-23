@@ -1,7 +1,7 @@
-From a022b175ca57bc20c6f7ab40e12e7209a1ea5058 Mon Sep 17 00:00:00 2001
+From 59ef0d629320fac15e6558521b62ebc669e8381b Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Fri, 6 Sep 2019 18:44:26 +0700
-Subject: [PATCH 126/351] arm64: dts: renesas: r8a774b1-hihope-rzg2n: Add
+Subject: [PATCH 126/353] arm64: dts: renesas: r8a774b1-hihope-rzg2n: Add
  MMNGRBUF driver support
 
 This patch adds MMNGRBUF driver support for the R8A774B1 SoC

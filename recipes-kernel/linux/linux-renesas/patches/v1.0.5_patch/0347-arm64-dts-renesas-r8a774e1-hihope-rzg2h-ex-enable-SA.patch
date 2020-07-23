@@ -1,7 +1,7 @@
-From 341cb68680718a88e51576b7114077d19fee3a93 Mon Sep 17 00:00:00 2001
+From c0bf6a5fc3d1f00d26c1c42641cf92a7f61b35a6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:58:21 +0700
-Subject: [PATCH 348/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h-ex: enable
+Subject: [PATCH 347/353] arm64: dts: renesas: r8a774e1-hihope-rzg2h-ex: enable
  SATA
 
 In RZ/G2H, we can choose the output between PCIE1 and SATA by:

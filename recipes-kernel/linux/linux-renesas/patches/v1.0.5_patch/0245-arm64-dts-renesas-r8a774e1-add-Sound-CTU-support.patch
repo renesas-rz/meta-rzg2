@@ -1,7 +1,7 @@
-From 8a2064ebd848cd42f49170a4492a703e83836cfc Mon Sep 17 00:00:00 2001
+From d8ebcef39bd3926687264bb7d1089e5ed9c7fb35 Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 16:50:55 +0700
-Subject: [PATCH 245/351] arm64: dts: renesas: r8a774e1: add Sound CTU support
+Subject: [PATCH 245/353] arm64: dts: renesas: r8a774e1: add Sound CTU support
 
 This patch adds CTU[0,1,2,3,4,5,6,7] support for R8A774E1 SoC.
 

@@ -1,7 +1,7 @@
-From f737c40ec042c516eb6bd146404de22789b71230 Mon Sep 17 00:00:00 2001
+From a8b9a7e8f678c912019d1ab29527b1dc04e37b0c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 14 Jul 2020 20:24:18 +0700
-Subject: [PATCH 353/353] signal: Prevent double-free of user struct
+Subject: [PATCH 352/353] signal: Prevent double-free of user struct
 
 While running sigwaittest: sigwaittest -t -a -p90 -l1000000,
 a warning is triggered:

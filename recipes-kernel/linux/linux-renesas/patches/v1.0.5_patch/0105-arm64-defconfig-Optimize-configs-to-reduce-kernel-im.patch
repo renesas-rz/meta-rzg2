@@ -1,7 +1,7 @@
-From 008b05f1db1989bb80d9bdcbe61773d62a8dabb7 Mon Sep 17 00:00:00 2001
+From 4bdf0643a85c603aca01adc81bc2dc5249e6e20e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 17:24:08 +0700
-Subject: [PATCH 105/351] arm64: defconfig: Optimize configs to reduce kernel
+Subject: [PATCH 105/353] arm64: defconfig: Optimize configs to reduce kernel
  image size
 
 This patch optimizes configs needed for RZ/G2 SoC to reduce kernel

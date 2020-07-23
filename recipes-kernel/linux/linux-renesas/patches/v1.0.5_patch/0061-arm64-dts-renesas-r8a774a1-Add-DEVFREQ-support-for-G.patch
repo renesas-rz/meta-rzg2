@@ -1,7 +1,7 @@
-From eba4b784475687bea08dabff92c760421cfb81a0 Mon Sep 17 00:00:00 2001
+From 2885ccca0230b47d3667322fb1118a820577f32e Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Thu, 30 May 2019 16:11:33 +0700
-Subject: [PATCH 061/351] arm64: dts: renesas: r8a774a1: Add DEVFREQ support
+Subject: [PATCH 061/353] arm64: dts: renesas: r8a774a1: Add DEVFREQ support
  for GSX
 
 This commit add opp table for gsx to use devfreq.

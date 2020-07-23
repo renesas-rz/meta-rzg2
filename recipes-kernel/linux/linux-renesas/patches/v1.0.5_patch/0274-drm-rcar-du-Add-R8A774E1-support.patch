@@ -1,7 +1,7 @@
-From eb996122376c9b04739c30c5a5f3c7fbe5a10031 Mon Sep 17 00:00:00 2001
+From 71e261819901430976e9b97d5b9def08e5ac1d4c Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:40:27 +0700
-Subject: [PATCH 274/351] drm: rcar-du: Add R8A774E1 support
+Subject: [PATCH 274/353] drm: rcar-du: Add R8A774E1 support
 
 Add support for the R8A774E1 DU.
 It has one DRGB output, one LVDS output and one HDMI output.

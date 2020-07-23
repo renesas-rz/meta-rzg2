@@ -1,7 +1,7 @@
-From bbf03f65c33f55ff4b736426ab4f4c68d39097b9 Mon Sep 17 00:00:00 2001
+From 60dbe2f01e02a4817975562e2f6171594737a5f5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:49:43 +0700
-Subject: [PATCH 119/351] clk: renesas: r8a774b1-cpg-mssr: add vcplf, vdpb and
+Subject: [PATCH 119/353] clk: renesas: r8a774b1-cpg-mssr: add vcplf, vdpb and
  3dge clock
 
 This commit adds:

@@ -1,7 +1,7 @@
-From 954e51bd258f07eeb9684c57200cf4553ad80722 Mon Sep 17 00:00:00 2001
+From 731b0245a6eb4fddf4be3e7a3636e7f207a9d4f0 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Wed, 8 Apr 2020 08:37:33 +0700
-Subject: [PATCH 310/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable
+Subject: [PATCH 310/353] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable
  mode HS400
 
 This commit disables HS400 and use HS200 as default eMMC mode

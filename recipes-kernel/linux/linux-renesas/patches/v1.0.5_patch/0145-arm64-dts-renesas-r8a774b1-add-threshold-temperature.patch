@@ -1,7 +1,7 @@
-From 4cd213c9f6b864a74b83c48581da783e80f8a2ed Mon Sep 17 00:00:00 2001
+From 617c0a64b678e97024649d4d22a2d53c488cd02e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 13:50:10 +0700
-Subject: [PATCH 145/351] arm64: dts: renesas: r8a774b1: add threshold
+Subject: [PATCH 145/353] arm64: dts: renesas: r8a774b1: add threshold
  temperature to enable IPA
 
 This patch adds threshold temperature to enable IPA function.

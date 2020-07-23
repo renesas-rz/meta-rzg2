@@ -1,7 +1,7 @@
-From f112d0e03e6008f06a535908d18551a7e2b1b4e2 Mon Sep 17 00:00:00 2001
+From 7c152a43c7430ae77acf53bbbe8ca4f98743b30f Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 27 Mar 2020 13:43:50 +0700
-Subject: [PATCH 224/351] arm64: dts: renesas: r8a774e1: Add TMU device nodes
+Subject: [PATCH 224/353] arm64: dts: renesas: r8a774e1: Add TMU device nodes
 
 Add TMU device nodes to support on RZG2H (r8a774e1).
 

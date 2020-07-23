@@ -1,7 +1,7 @@
-From ccde506cc4b49089a1404ff3e7afcba15b90d44f Mon Sep 17 00:00:00 2001
+From 33eb19d7b1ca0b76bf4c987d608a0a9b20cc068d Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:28:23 +0700
-Subject: [PATCH 026/351] arm64: dts: r8a774c0: Add DEVFREQ support for GSX
+Subject: [PATCH 026/353] arm64: dts: r8a774c0: Add DEVFREQ support for GSX
 
 This commit add opp table for gsx to use devfreq.
 Note that voltage scaling is not supported

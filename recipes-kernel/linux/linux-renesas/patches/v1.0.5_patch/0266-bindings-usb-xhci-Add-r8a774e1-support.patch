@@ -1,7 +1,7 @@
-From 034bcdc54f22e26756cd1470c1854c0efb17ab9c Mon Sep 17 00:00:00 2001
+From 8f85a9bca01d459dd3d29e87b64c451b21d634c3 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Mon, 6 Apr 2020 20:53:26 +0700
-Subject: [PATCH 266/351] bindings: usb-xhci: Add r8a774e1 support
+Subject: [PATCH 266/353] bindings: usb-xhci: Add r8a774e1 support
 
 Document RZ/G2H (R8A774E1) SoC bindings.
 

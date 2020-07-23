@@ -1,7 +1,7 @@
-From 41ca3791d1089ee7c8309868641aed04c64ad0e7 Mon Sep 17 00:00:00 2001
+From aa1212c1633696dd6af634fbb611263a32a0cef8 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Wed, 8 Apr 2020 10:19:54 +0700
-Subject: [PATCH 286/351] arm64: dts: renesas: r8a774e1: add support fdp
+Subject: [PATCH 286/353] arm64: dts: renesas: r8a774e1: add support fdp
 
 This commit adds device node for fdp used by fdpm.
 

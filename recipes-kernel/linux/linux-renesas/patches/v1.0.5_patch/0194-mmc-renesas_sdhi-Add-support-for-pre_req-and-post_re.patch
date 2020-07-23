@@ -1,7 +1,7 @@
-From 861a083f99831aea4334bf43b843a5c6329d3833 Mon Sep 17 00:00:00 2001
+From ee71f8189fbd59ae4d0c7a602ab162ef2022481f Mon Sep 17 00:00:00 2001
 From: Masaharu Hayakawa <masaharu.hayakawa.ry@renesas.com>
 Date: Wed, 22 Nov 2017 21:13:22 +0900
-Subject: [PATCH 194/351] mmc: renesas_sdhi: Add support for pre_req and
+Subject: [PATCH 194/353] mmc: renesas_sdhi: Add support for pre_req and
  post_req
 
 This patch implements pre_req and post_req to support

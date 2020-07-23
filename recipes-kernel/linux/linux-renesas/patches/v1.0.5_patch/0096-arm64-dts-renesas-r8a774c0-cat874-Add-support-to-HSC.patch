@@ -1,7 +1,7 @@
-From 0df27c94b8ea7128c21c7cef6cd611e055bee91a Mon Sep 17 00:00:00 2001
+From 315a7de272008831345d84d529a8e60750849bbc Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 15:06:00 +0700
-Subject: [PATCH 096/351] arm64: dts: renesas: r8a774c0-cat874: Add support to
+Subject: [PATCH 096/353] arm64: dts: renesas: r8a774c0-cat874: Add support to
  HSCIF4
 
 This patch adds pincontrol support to HSCIF4

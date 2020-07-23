@@ -1,7 +1,7 @@
-From 93f7a8608f1e53a1ee4dd5ea88d48d0cc3f81c6e Mon Sep 17 00:00:00 2001
+From b8553e3805141a18dc5e4ca8d539d1a96531e5b3 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:31:26 +0700
-Subject: [PATCH 113/351] arm64: dts: renesas: r8a774b1: Change vspb and vspi
+Subject: [PATCH 113/353] arm64: dts: renesas: r8a774b1: Change vspb and vspi
  node for vspm
 
 Change vspb and vspi setting to use vspm driver.

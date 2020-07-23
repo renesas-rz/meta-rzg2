@@ -1,7 +1,7 @@
-From d3aaf159da5c134dc3d3799d22c740b0acef6050 Mon Sep 17 00:00:00 2001
+From d472ea87f4101f276ddfb17d7dcf68b3f2b4a5e1 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Thu, 9 Apr 2020 19:56:11 +0700
-Subject: [PATCH 269/351] phy: rcar-gen3-usb2: Add a compatible string for
+Subject: [PATCH 269/353] phy: rcar-gen3-usb2: Add a compatible string for
  r8a774e1
 
 This patch adds a compatible string for r8a774e1.

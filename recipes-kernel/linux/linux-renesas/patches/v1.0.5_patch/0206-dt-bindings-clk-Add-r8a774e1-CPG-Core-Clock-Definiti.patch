@@ -1,7 +1,7 @@
-From e596b358d86363048bf8be49d49b00cfed102da3 Mon Sep 17 00:00:00 2001
+From 003138fb9dc573415fa199647050922616ee0ab0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 10:19:43 +0700
-Subject: [PATCH 206/351] dt-bindings: clk: Add r8a774e1 CPG Core Clock
+Subject: [PATCH 206/353] dt-bindings: clk: Add r8a774e1 CPG Core Clock
  Definitions
 
 Add all RZ/G2H Clock Pulse Generator Core Clock Outputs, as listed in

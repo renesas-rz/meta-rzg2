@@ -1,7 +1,7 @@
-From f5b7a55ef2074a2276f6d9d39b160ec2dfeb9bbe Mon Sep 17 00:00:00 2001
+From a09bc53ff4eb688e211717b20c2b94db396c91b0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 1 Aug 2019 13:12:51 +0700
-Subject: [PATCH 104/351] clk: renesas: add procedure of writing RCLK frequency
+Subject: [PATCH 104/353] clk: renesas: add procedure of writing RCLK frequency
  control register divider
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

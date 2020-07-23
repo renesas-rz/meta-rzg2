@@ -1,7 +1,7 @@
-From 2a1d3edbf2c57a1fba63afae162235ea3788da9c Mon Sep 17 00:00:00 2001
+From a978f4d44ce8b11bf087ea00c3ff42cd127c1bd8 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 16:56:03 +0700
-Subject: [PATCH 280/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Enable 4
+Subject: [PATCH 280/353] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Enable 4
  modules vsp.
 
 This patch enables 4 modules: vspbc, vspbd, vspi0 and vspi1.

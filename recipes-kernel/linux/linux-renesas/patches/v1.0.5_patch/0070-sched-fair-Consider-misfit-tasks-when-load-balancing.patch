@@ -1,7 +1,7 @@
-From e8a29e2192d70049e2135d154cd4a534d06506cb Mon Sep 17 00:00:00 2001
+From 44e13fcc5858d7d0c68c2edb9b5c9af338d63ac4 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:04:21 +0700
-Subject: [PATCH 070/351] sched/fair: Consider misfit tasks when load-balancing
+Subject: [PATCH 070/353] sched/fair: Consider misfit tasks when load-balancing
 
 On asymmetric cpu capacity systems load intensive tasks can end up
 on cpus that don't suit their compute demand.  In this scenarios
@@ -41,7 +41,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  1 file changed, 48 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 2875cb3..5ea7172 100644
+index d1e5f3e..32cbffc 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -7113,6 +7113,7 @@ struct lb_env {

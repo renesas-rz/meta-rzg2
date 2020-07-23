@@ -1,7 +1,7 @@
-From eadc4f796efa9310fd737117a8df193bf64081d2 Mon Sep 17 00:00:00 2001
+From 03bd0b548b33e519b0a60025cae407f636a9fa21 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:45:14 +0700
-Subject: [PATCH 275/351] drm: rcar-du: lvds: Add r8a774e1 support
+Subject: [PATCH 275/353] drm: rcar-du: lvds: Add r8a774e1 support
 
 The LVDS encoders on RZ/G2H SoC is similar to R-Car H3
 Add support for RZ/G2H (R8A774E1) SoC to the LVDS encoder driver.

@@ -1,7 +1,7 @@
-From f1eb4536ce6a91c98afbad74967c0642e0b55b50 Mon Sep 17 00:00:00 2001
+From fff4a5f54f54eee60a36967aadfaf19fec616c27 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:23:31 +0700
-Subject: [PATCH 068/351] sched/fair: Add group_misfit_task load-balance type
+Subject: [PATCH 068/353] sched/fair: Add group_misfit_task load-balance type
 
 To maximize throughput in systems with asymmetric cpu capacities
 (e.g. ARM big.LITTLE) load-balancing has to consider task and cpu
@@ -39,7 +39,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  2 files changed, 53 insertions(+), 8 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index dc91703..7ecedae 100644
+index 4fe3680..9e20997 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -721,6 +721,7 @@ static u64 sched_vslice(struct cfs_rq *cfs_rq, struct sched_entity *se)

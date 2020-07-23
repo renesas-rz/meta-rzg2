@@ -1,7 +1,7 @@
-From 261aca06d52537f7758009b89a91d60d2b693910 Mon Sep 17 00:00:00 2001
+From 1bb6cbf12aa76550d416a2ceba375f57a0ba7b55 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 27 May 2020 11:25:35 +0700
-Subject: [PATCH 327/351] arm64: dma_mapping: allow PCI host driver to limit
+Subject: [PATCH 327/353] arm64: dma_mapping: allow PCI host driver to limit
  DMA mask
 
 It is possible that PCI device supports 64-bit DMA addressing, and thus

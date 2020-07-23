@@ -1,7 +1,7 @@
-From 2a5bb06ed480f7b91f7d7e9156abbf19f4cac742 Mon Sep 17 00:00:00 2001
+From 902b051b673178b3bb5e93a8dfc2889ec5497343 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:31:37 +0700
-Subject: [PATCH 069/351] sched: Add sched_group per-cpu max capacity
+Subject: [PATCH 069/353] sched: Add sched_group per-cpu max capacity
 
 The current sg->min_capacity tracks the lowest per-cpu compute
 capacity available in the sched_group when rt/irq pressure is taken into
@@ -30,7 +30,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  3 files changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 7ecedae..2875cb3 100644
+index 9e20997..d1e5f3e 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -7779,13 +7779,14 @@ static void update_cpu_capacity(struct sched_domain *sd, int cpu)

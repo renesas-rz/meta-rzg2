@@ -1,7 +1,7 @@
-From 4cf60367c8e3229c9bddcac10748f3cd8bdd8b59 Mon Sep 17 00:00:00 2001
+From 48e9f100894a4535faeec5de349ac7ffc5787a22 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
 Date: Tue, 8 Oct 2019 01:08:42 +0700
-Subject: [PATCH 167/351] drivers: thermal: rcar_gen3_thermal: Support hardware
+Subject: [PATCH 167/353] drivers: thermal: rcar_gen3_thermal: Support hardware
  parameters
 
 1. Based on R-CAR patch:

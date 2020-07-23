@@ -1,7 +1,7 @@
-From 26f83ea167e561198aa52948bddf0c12aaeb84f9 Mon Sep 17 00:00:00 2001
+From fc4c14752840a0f741ff1bb330a645583d5c5be9 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:15:42 +0700
-Subject: [PATCH 341/351] arm64: dts: renesas: Add HiHope RZ/G2N board with
+Subject: [PATCH 340/353] arm64: dts: renesas: Add HiHope RZ/G2N board with
  idk-1110wr display
 
 The HiHope RZ/G2N is advertised as compatible with panel idk-1110wr

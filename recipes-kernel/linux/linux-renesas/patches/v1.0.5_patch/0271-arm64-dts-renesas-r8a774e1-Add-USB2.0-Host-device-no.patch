@@ -1,7 +1,7 @@
-From 144fd91b36cfbf36b20e92699649c52c070d7e94 Mon Sep 17 00:00:00 2001
+From 3b7341a2fd1f096a231ce8f04d9c116140d27536 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 01:18:22 +0700
-Subject: [PATCH 271/351] arm64: dts: renesas: r8a774e1: Add USB2.0 Host device
+Subject: [PATCH 271/353] arm64: dts: renesas: r8a774e1: Add USB2.0 Host device
  nodes
 
 This patch adds USB2.0 host (EHCI/OHCI) device nodes for R8A774E1 SoC.

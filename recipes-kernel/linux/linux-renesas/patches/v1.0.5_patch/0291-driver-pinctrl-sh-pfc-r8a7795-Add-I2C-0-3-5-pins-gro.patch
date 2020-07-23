@@ -1,7 +1,7 @@
-From e168511b3829f73e2d4711d1dc2f078ab7c9d52c Mon Sep 17 00:00:00 2001
+From 2e7d1afc97697296c76b5f50a8dc57562064635b Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Tue, 14 Apr 2020 16:43:44 +0700
-Subject: [PATCH 291/351] driver: pinctrl: sh-pfc: r8a7795: Add I2C{0,3,5}
+Subject: [PATCH 291/353] driver: pinctrl: sh-pfc: r8a7795: Add I2C{0,3,5}
  pins, groups and functions
 
 This patch adds I2C{0,3,5} pins, groups and functions to the

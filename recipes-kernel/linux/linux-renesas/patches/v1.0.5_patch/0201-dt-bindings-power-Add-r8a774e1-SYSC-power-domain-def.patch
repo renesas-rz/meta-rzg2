@@ -1,7 +1,7 @@
-From c1c106d91b2e2bbe85d0fd4577bc0e3da827980c Mon Sep 17 00:00:00 2001
+From d6ef92e531b54f1e421944517f3e55af1956f8a5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:30:20 +0700
-Subject: [PATCH 201/351] dt-bindings: power: Add r8a774e1 SYSC power domain
+Subject: [PATCH 201/353] dt-bindings: power: Add r8a774e1 SYSC power domain
  definitions
 
 This patch adds power domain indices for the RZ/G2H (a.k.a r8a774e1)

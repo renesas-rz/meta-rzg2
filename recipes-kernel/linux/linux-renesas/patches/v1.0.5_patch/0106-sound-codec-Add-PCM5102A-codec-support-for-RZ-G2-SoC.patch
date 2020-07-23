@@ -1,7 +1,7 @@
-From fc6830b0385d0d12b88d1032a8a5fb614e5c5951 Mon Sep 17 00:00:00 2001
+From 70656997631910e0692dc5267009cf068c29097f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 16:48:38 +0700
-Subject: [PATCH 106/351] sound: codec: Add PCM5102A codec support for RZ/G2
+Subject: [PATCH 106/353] sound: codec: Add PCM5102A codec support for RZ/G2
  SoC series
 
 This patch add PCM5012A audio codec support for RZ/G2 SoC series.

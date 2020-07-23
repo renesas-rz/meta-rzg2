@@ -1,7 +1,7 @@
-From b106b72b11d8f91389291a9419de649fe6731187 Mon Sep 17 00:00:00 2001
+From 80d7adc1159c4faf14641b6261025ab8d4884a66 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:02:38 +0700
-Subject: [PATCH 198/351] dt-bindings: arm: renesas: Add HopeRun RZ/G2H boards
+Subject: [PATCH 198/353] dt-bindings: arm: renesas: Add HopeRun RZ/G2H boards
 
 This patch adds board HiHope RZ/G2H (the main board, powered by
 the R8A774E1) and board HiHope RZ/G2 EX (the expansion board

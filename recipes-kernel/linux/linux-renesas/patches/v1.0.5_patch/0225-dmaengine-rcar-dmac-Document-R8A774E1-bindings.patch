@@ -1,7 +1,7 @@
-From 1bfa2edb1541f6b7f83b553b88696784bc098819 Mon Sep 17 00:00:00 2001
+From df563553ce91c447d7759749d0b2fa1b63e55d0d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 24 Mar 2020 09:38:19 +0700
-Subject: [PATCH 225/351] dmaengine: rcar-dmac: Document R8A774E1 bindings
+Subject: [PATCH 225/353] dmaengine: rcar-dmac: Document R8A774E1 bindings
 
 Renesas RZ/G2H (R8A774E1) SoC has DMA controllers compatible
 with this driver, therefore document RZ/G2H specific bindings.

@@ -1,7 +1,7 @@
-From 48ef93860368fbc070759712a1a76cef127abc30 Mon Sep 17 00:00:00 2001
+From 6cc22d5cab5e6c861320a915aa893a5d011b8155 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 7 Apr 2020 18:56:24 +0700
-Subject: [PATCH 220/351] dt-bindings: timer: renesas, cmt: Document r8a774e1
+Subject: [PATCH 220/353] dt-bindings: timer: renesas, cmt: Document r8a774e1
  CMT
 
 Document CMT module bindings for RZ/G2H (r8a774e1) SoC

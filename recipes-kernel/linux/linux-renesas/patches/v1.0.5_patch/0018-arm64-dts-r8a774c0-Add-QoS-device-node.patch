@@ -1,7 +1,7 @@
-From a488ec5a28f1c05af38a2b0ae2374c3a1e81c24f Mon Sep 17 00:00:00 2001
+From dc1fe3350d8c499ee8e0bc295fd058143e03d7d6 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
 Date: Mon, 1 Jul 2019 16:13:44 +0700
-Subject: [PATCH 018/351] arm64: dts: r8a774c0: Add QoS device node.
+Subject: [PATCH 018/353] arm64: dts: r8a774c0: Add QoS device node.
 
 This patch adds QoS device node for the R8A774C0 SoC.
 

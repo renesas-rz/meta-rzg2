@@ -1,7 +1,7 @@
-From 447b26dbe2691706c15fc03b06bb24379adf2e65 Mon Sep 17 00:00:00 2001
+From 5061a1907d4f5f49a6d742836b5024212311bdc3 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 May 2019 18:16:31 +0700
-Subject: [PATCH 034/351] drm: rcar-du: Fix LVDS stop sequence
+Subject: [PATCH 034/353] drm: rcar-du: Fix LVDS stop sequence
 
 According to H/W manual, LVDCR0 register must be cleared per bits.
 This patch fixes it.

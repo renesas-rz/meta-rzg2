@@ -1,7 +1,7 @@
-From a47db9b66a5c7587bbb876d76ba96350c6f25eaa Mon Sep 17 00:00:00 2001
+From 40409e076cf6df79d692c4b1bd79da38866b21d7 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 10:53:52 +0700
-Subject: [PATCH 144/351] thermal: renesas: Add emergency shutdown support in
+Subject: [PATCH 144/353] thermal: renesas: Add emergency shutdown support in
  DT documentation
 
 This patch adds description about emergency shutdown support

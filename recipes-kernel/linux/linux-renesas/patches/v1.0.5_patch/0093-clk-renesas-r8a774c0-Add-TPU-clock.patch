@@ -1,7 +1,7 @@
-From 5372d983ad1eeaf54c1f96f475bea352a0828863 Mon Sep 17 00:00:00 2001
+From 5b94903b1647ca72bd14bbcd605011704a425570 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@rvc.renesas.com>
 Date: Wed, 3 Jul 2019 10:27:28 +0700
-Subject: [PATCH 093/351] clk: renesas: r8a774c0: Add TPU clock
+Subject: [PATCH 093/353] clk: renesas: r8a774c0: Add TPU clock
 
 This patch adds the TPU clocks to the R8A774C0 SoC.
 

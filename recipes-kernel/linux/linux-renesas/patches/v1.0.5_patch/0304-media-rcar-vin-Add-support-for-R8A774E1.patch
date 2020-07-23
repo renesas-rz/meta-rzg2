@@ -1,7 +1,7 @@
-From 2125b9d402a0c12abc1cbd2ecfa716c4459030f3 Mon Sep 17 00:00:00 2001
+From 993ab3dea3cf354d7c6c9ad23686d75b3b0ca088 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 9 Apr 2020 11:27:48 +0700
-Subject: [PATCH 304/351] media: rcar-vin: Add support for R8A774E1
+Subject: [PATCH 304/353] media: rcar-vin: Add support for R8A774E1
 
 This patch adds support VIN for r8a774e1 SoC.
 Also add routing between CSI2(CSI20, CSI40) and VIN based on

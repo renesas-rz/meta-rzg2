@@ -1,7 +1,7 @@
-From e16357a8e3185d1de85ca3a489e4b949783a2dea Mon Sep 17 00:00:00 2001
+From b363b17829f1fb51d3b27a9da9f38320a6e6d6c9 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:50:32 +0700
-Subject: [PATCH 066/351] arm64: dts: renesas: hihope-common: enable vspm_if,
+Subject: [PATCH 066/353] arm64: dts: renesas: hihope-common: enable vspm_if,
  vspi, vspb
 
 This commit enables vspb, vspi, vspm_if support

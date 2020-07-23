@@ -1,7 +1,7 @@
-From 2778c806e94540c542064e35d47d2650cff4e283 Mon Sep 17 00:00:00 2001
+From 72f01f8e0e16dc2622516e24da5ea6dd7ca0cf92 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Thu, 9 Apr 2020 10:42:24 +0700
-Subject: [PATCH 313/351] iommu/ipmmu-vmsa: Hook up r8a774e1 DT matching code
+Subject: [PATCH 313/353] iommu/ipmmu-vmsa: Hook up r8a774e1 DT matching code
 
 Support RZ/G2H (R8A774E1) IPMMU.
 

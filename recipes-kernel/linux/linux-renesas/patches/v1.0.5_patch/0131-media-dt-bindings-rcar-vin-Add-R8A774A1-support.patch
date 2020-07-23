@@ -1,7 +1,7 @@
-From 82d6a8c43704d0477114b7e11ff86fa074faa177 Mon Sep 17 00:00:00 2001
+From 62043866b33effe35131040ce8a9ecdf5351a5f7 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 18:47:15 +0700
-Subject: [PATCH 131/351] media: dt-bindings: rcar-vin: Add R8A774A1 support
+Subject: [PATCH 131/353] media: dt-bindings: rcar-vin: Add R8A774A1 support
 
 This patch adds documentation for VIN of RZ/G2M
 

@@ -1,7 +1,7 @@
-From 233876d2a9617d85db1a084969991d14792d6253 Mon Sep 17 00:00:00 2001
+From 6f9007169adfcd88a9719279c4ee0a732ae34bf1 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Thu, 11 Jun 2020 14:48:05 +0700
-Subject: [PATCH 331/351] mmc: renesas_sdhi_core: Add adjust HS400 offset by
+Subject: [PATCH 330/353] mmc: renesas_sdhi_core: Add adjust HS400 offset by
  manual calibration mode
 
 Since Gen3 SDHI/RZG2 has an internal DS signal AC-spec violation in HS400,

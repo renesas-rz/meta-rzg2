@@ -1,7 +1,7 @@
-From 403dc7a4c67449e1cee26f6472abfcb139ab209e Mon Sep 17 00:00:00 2001
+From e6815914b24a40cba01399b28f140f3da85147ce Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 15:39:26 +0700
-Subject: [PATCH 092/351] pinctrl: r8a77990: add pins, groups, function for TPU
+Subject: [PATCH 092/353] pinctrl: r8a77990: add pins, groups, function for TPU
 
 This patch add pins, groups, function for TPU0{T0,T1} for
 SoC R8A77990 and SoC R8A774C0.

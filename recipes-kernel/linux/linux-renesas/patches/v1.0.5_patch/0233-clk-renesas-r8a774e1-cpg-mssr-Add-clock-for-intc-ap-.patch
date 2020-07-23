@@ -1,7 +1,7 @@
-From 1502f65d8d8b482b949cac30ccdc383217b6a075 Mon Sep 17 00:00:00 2001
+From c6e5e3aa2e694af23190c4a7ff2ad1834730b7b5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 11:29:17 +0700
-Subject: [PATCH 233/351] clk: renesas: r8a774e1-cpg-mssr: Add clock for
+Subject: [PATCH 233/353] clk: renesas: r8a774e1-cpg-mssr: Add clock for
  intc-ap and intc-ex
 
 This commit adds clock input support for intc-ap and intc-ex module:

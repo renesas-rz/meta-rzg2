@@ -1,7 +1,7 @@
-From fee172441869cf92bb995c2f619a89518121be49 Mon Sep 17 00:00:00 2001
+From 90d38aefb880d9f5b539f433575e2144c018330a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 9 Apr 2020 14:25:00 +0700
-Subject: [PATCH 306/351] arm64: dts: renesas: r8a774e1: add VIN and CSI-2
+Subject: [PATCH 306/353] arm64: dts: renesas: r8a774e1: add VIN and CSI-2
  nodes
 
 This commit adds VIN{0,1,2,3,4,5,6,7} and CSI{40,20} device nodes

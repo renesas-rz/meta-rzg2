@@ -1,7 +1,7 @@
-From 221aeddd893b23223c677d1ccb0d588dc131a207 Mon Sep 17 00:00:00 2001
+From b23b81390104ca546f793891e1153195c8677252 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 17:01:59 +0700
-Subject: [PATCH 049/351] soc: renesas: rcar-topology: Add support for RZ/G
+Subject: [PATCH 049/353] soc: renesas: rcar-topology: Add support for RZ/G
  capacity awareness
 
 Base on commit "soc: renesas: rcar-topology: Add support for R-Car

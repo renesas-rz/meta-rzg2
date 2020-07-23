@@ -1,7 +1,7 @@
-From 0c2286f18a0de6c822b954b20e443757b4b3d05b Mon Sep 17 00:00:00 2001
+From d50c890cad50a4ab4c1ace9f8cbc6e3a629628a3 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 14:56:26 +0700
-Subject: [PATCH 213/351] arm64: dts: renesas: Add HiHope RZ/G2H main board
+Subject: [PATCH 213/353] arm64: dts: renesas: Add HiHope RZ/G2H main board
  support
 
 Basic support for the HiHope RZ/G2H main board:

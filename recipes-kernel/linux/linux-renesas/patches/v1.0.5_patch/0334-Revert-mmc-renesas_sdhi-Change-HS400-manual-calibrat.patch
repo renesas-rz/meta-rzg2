@@ -1,7 +1,7 @@
-From 17a5f5eb2a1c1b88fd0b24101b4cea92ac73b8b2 Mon Sep 17 00:00:00 2001
+From a62e0da09b1cc46baa349e17f3fe7382da8d58f6 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Thu, 11 Jun 2020 15:12:45 +0700
-Subject: [PATCH 335/351] Revert "mmc: renesas_sdhi: Change HS400 manual
+Subject: [PATCH 334/353] Revert "mmc: renesas_sdhi: Change HS400 manual
  calibration method"
 
 This reverts commit 76996ec2cf3888647623bdc07f2a23cdafb174b0

@@ -1,7 +1,7 @@
-From 4897655dec14eac90c86dc29a93d209398b93937 Mon Sep 17 00:00:00 2001
+From 12bae7e0331c396005056ebd69f744e3b7e0e22e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 14:16:07 +0700
-Subject: [PATCH 183/351] arm64: dts: renesas: r8a774b1: add missing msiof ref
+Subject: [PATCH 183/353] arm64: dts: renesas: r8a774b1: add missing msiof ref
  clock
 
 This patch adds missing misof reference clock for r8a774b1 SoC.

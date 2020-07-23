@@ -1,7 +1,7 @@
-From 084f88b03813f5404bdc47fb3aefc70236b3dd3e Mon Sep 17 00:00:00 2001
+From cd8f2afcf509d1f160d90199f2e3693ddaf8547c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:03:44 +0700
-Subject: [PATCH 263/351] arm64: dts: renesas: r8a774e1-hihope-rzg2h-ex: Enable
+Subject: [PATCH 263/353] arm64: dts: renesas: r8a774e1-hihope-rzg2h-ex: Enable
  PCIE1 and set PCIe as a default instead of SATA
 
 This patch enables PCIE1 for the HiHope board

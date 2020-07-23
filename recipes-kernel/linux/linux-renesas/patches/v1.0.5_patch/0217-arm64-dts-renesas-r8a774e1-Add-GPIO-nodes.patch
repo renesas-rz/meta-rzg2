@@ -1,7 +1,7 @@
-From 5f7e3d88f82f509afb3f52fd7e3236057454509a Mon Sep 17 00:00:00 2001
+From 62d92c718a97db3cbae520485c0d520afdb2e538 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hieppham@renesas.com>
 Date: Wed, 25 Mar 2020 16:25:16 +0700
-Subject: [PATCH 217/351] arm64: dts: renesas r8a774e1: Add GPIO nodes
+Subject: [PATCH 217/353] arm64: dts: renesas r8a774e1: Add GPIO nodes
 
 This patch adds GPIO nodes for (RZ/G2H) R8A774E1 SoC
 

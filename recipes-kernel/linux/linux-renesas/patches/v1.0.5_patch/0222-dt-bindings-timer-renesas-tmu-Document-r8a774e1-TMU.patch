@@ -1,7 +1,7 @@
-From 464692199c12e9e76c5008f8f98507ddde90b5ed Mon Sep 17 00:00:00 2001
+From 0bd70a55126be007ba9e4ab2deb51d78d49ee151 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 7 Apr 2020 18:58:06 +0700
-Subject: [PATCH 222/351] dt-bindings: timer: renesas: tmu: Document r8a774e1
+Subject: [PATCH 222/353] dt-bindings: timer: renesas: tmu: Document r8a774e1
  TMU
 
 Document TMU module bindings for RZ/G2H (r8a774e1) SoC

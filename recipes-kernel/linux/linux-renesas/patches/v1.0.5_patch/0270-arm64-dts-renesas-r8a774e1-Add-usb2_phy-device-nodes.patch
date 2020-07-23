@@ -1,7 +1,7 @@
-From 2d2c9667f96c46b938286ec7ad49600659aa9bc9 Mon Sep 17 00:00:00 2001
+From bffb6c9d9a5a5b9666054dc4b0396592184024a9 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 01:11:46 +0700
-Subject: [PATCH 270/351] arm64: dts: renesas: r8a774e1: Add usb2_phy device
+Subject: [PATCH 270/353] arm64: dts: renesas: r8a774e1: Add usb2_phy device
  nodes
 
 This patch adds usb2_phy device nodes for SoC R8A774E1.

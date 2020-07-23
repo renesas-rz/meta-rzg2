@@ -1,7 +1,7 @@
-From 62d301c46443bfa4494ef024a6e9e90138b7a8e5 Mon Sep 17 00:00:00 2001
+From 827c769b2a665e71f463bb3fc09680331cf2110a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 25 Apr 2019 13:13:38 +0700
-Subject: [PATCH 040/351] arm64: dts: renesas: r8a774c0: add "renesas,id"
+Subject: [PATCH 040/353] arm64: dts: renesas: r8a774c0: add "renesas,id"
  property for lvds nodes
 
 This patch add "renesas,id" support for lvds nodes in R8A774C0 SoC.

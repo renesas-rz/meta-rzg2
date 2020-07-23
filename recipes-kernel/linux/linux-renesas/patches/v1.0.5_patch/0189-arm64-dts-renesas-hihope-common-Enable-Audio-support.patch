@@ -1,7 +1,7 @@
-From eda60e370dedce2277283bb3246da1e97fde0784 Mon Sep 17 00:00:00 2001
+From df5a548fcd64c2b98ed79adbbf17d876548f15ee Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 14:39:35 +0700
-Subject: [PATCH 189/351] arm64: dts: renesas: hihope-common: Enable Audio
+Subject: [PATCH 189/353] arm64: dts: renesas: hihope-common: Enable Audio
  support in Low speed connector
 
 This patch enables sound support in Low speed connector

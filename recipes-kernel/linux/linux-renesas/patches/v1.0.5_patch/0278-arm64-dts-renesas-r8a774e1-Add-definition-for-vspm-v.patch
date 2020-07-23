@@ -1,7 +1,7 @@
-From 55b32982ef90757bf9db200c7eb654e703f05bb2 Mon Sep 17 00:00:00 2001
+From 68bf0298928a5bd8a927ba7751e623519d479f75 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 15 Apr 2020 08:50:25 +0700
-Subject: [PATCH 278/351] arm64: dts: renesas: r8a774e1: Add definition for
+Subject: [PATCH 278/353] arm64: dts: renesas: r8a774e1: Add definition for
  vspm/vsp2driver
 
 This patch replace the definition for vsp1 for vspm/vsp2driver

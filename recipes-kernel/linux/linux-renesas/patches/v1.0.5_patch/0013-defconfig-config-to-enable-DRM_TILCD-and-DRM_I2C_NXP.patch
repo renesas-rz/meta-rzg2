@@ -1,7 +1,7 @@
-From e57b8def4f6ea744c4bbaef3f8c6d38a4a060a4e Mon Sep 17 00:00:00 2001
+From 12c03f034acce0847bb2f9c7f0c2f9f2b1c2b045 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:24:55 +0700
-Subject: [PATCH 013/351] defconfig: config to enable DRM_TILCD and
+Subject: [PATCH 013/353] defconfig: config to enable DRM_TILCD and
  DRM_I2C_NXP_TDA998x
 
 Enable: CONFIG_DRM_TILCDC=y, CONFIG_DRM_I2C_NXP_TDA998X=y

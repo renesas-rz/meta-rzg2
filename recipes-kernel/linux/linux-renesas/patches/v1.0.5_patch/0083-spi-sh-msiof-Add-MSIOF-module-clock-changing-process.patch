@@ -1,7 +1,7 @@
-From fa57702bb5d1769177e73a42fd30414c423c12cd Mon Sep 17 00:00:00 2001
+From f262c23baed009a7c88148ae8719718e8627f279 Mon Sep 17 00:00:00 2001
 From: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
 Date: Fri, 30 Mar 2018 14:46:57 +0900
-Subject: [PATCH 083/351] spi: sh-msiof: Add MSIOF module clock changing
+Subject: [PATCH 083/353] spi: sh-msiof: Add MSIOF module clock changing
  processing for R-Car Gen3
 
 This patch adds processing to set MSIOF module clock.

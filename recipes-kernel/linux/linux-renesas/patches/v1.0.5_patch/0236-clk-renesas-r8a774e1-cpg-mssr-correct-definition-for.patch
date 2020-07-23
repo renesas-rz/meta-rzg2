@@ -1,7 +1,7 @@
-From b00509302200e80d0c1f35064de8eac79d3ff541 Mon Sep 17 00:00:00 2001
+From 0e760d2d441581759d5a98ca7314b9ee2c5a3c70 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 10:15:48 +0700
-Subject: [PATCH 236/351] clk: renesas: r8a774e1-cpg-mssr: correct definition
+Subject: [PATCH 236/353] clk: renesas: r8a774e1-cpg-mssr: correct definition
  for osc clock
 
 Correct right definition for OSC clock in RZ/G2H (r8a774e1) because:

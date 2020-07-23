@@ -1,7 +1,7 @@
-From 6458eeca76810fb6f8f868c30065a4946c7160ea Mon Sep 17 00:00:00 2001
+From d3e00e7d74d6fea0998fe5507154863ac3db768a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 15 May 2020 16:26:06 +0700
-Subject: [PATCH 325/351] arm64: dts: renesas: r8a774e1: Add QoS device node
+Subject: [PATCH 325/353] arm64: dts: renesas: r8a774e1: Add QoS device node
 
 This patch adds QoS device node for the r8a774e1 SoC.
 

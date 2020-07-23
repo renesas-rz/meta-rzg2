@@ -1,7 +1,7 @@
-From e8496adb0930558d42dd4f85a71417d48a2746d8 Mon Sep 17 00:00:00 2001
+From 310a590664cc3ed88305a5b117cdc0f569daf50d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:52:14 +0700
-Subject: [PATCH 074/351] sched: Wrap rq->rd->overload accesses with
+Subject: [PATCH 074/353] sched: Wrap rq->rd->overload accesses with
  READ/WRITE_ONCE
 
 This variable can be read and set locklessly within
@@ -24,7 +24,7 @@ Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 520c11a..c511415 100644
+index d6b7fd0..ad8a864 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -8281,8 +8281,8 @@ static inline void update_sd_lb_stats(struct lb_env *env, struct sd_lb_stats *sd

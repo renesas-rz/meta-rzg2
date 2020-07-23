@@ -1,7 +1,7 @@
-From 4a96c876537fedabd9728c7080752fdabd28f93e Mon Sep 17 00:00:00 2001
+From 2191ce55d593b5aec7a40ec435214c44e11395e1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 24 Mar 2020 12:00:38 +0700
-Subject: [PATCH 237/351] arm64: dts: renesas: r8a774e1: add OPP tables for all
+Subject: [PATCH 237/353] arm64: dts: renesas: r8a774e1: add OPP tables for all
  CPUs
 
 This patch adds OPP tables support for all CPUs of r8a774e1 SoC.

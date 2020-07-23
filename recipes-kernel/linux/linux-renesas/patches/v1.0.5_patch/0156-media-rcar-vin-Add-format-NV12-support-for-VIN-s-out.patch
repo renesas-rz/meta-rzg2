@@ -1,7 +1,7 @@
-From 3ce5cffb4d2300d426ed03d49f774f48f7f56e00 Mon Sep 17 00:00:00 2001
+From ca38a85590e4975fa8c5bd7f316aabb67128e983 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 23 Sep 2019 15:08:50 +0700
-Subject: [PATCH 156/351] media: rcar-vin: Add format NV12 support for VIN's
+Subject: [PATCH 156/353] media: rcar-vin: Add format NV12 support for VIN's
  output
 
 This patch adds format NV12 support for VIN's output  in RZ/G2 SoC.
