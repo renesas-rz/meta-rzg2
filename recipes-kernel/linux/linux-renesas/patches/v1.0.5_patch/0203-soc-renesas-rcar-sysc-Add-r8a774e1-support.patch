@@ -1,7 +1,7 @@
 From d659daa6a8df60806cf20237c85345d5071c1a25 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 20 Mar 2020 09:12:18 +0700
-Subject: [PATCH 203/353] soc: renesas: rcar-sysc: Add r8a774e1 support
+Subject: [PATCH 203/458] soc: renesas: rcar-sysc: Add r8a774e1 support
 
 Add support for RZ/G2H (R8A774E1) SoC power areas to the R-Car SYSC
 driver.

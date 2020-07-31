@@ -1,7 +1,7 @@
 From 3d57c9b09414190aa0d80f6426698f59635c5788 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 21 Oct 2019 11:36:53 +0700
-Subject: [PATCH 162/353] ravb: Fix inconsistent lock state at enabling tx
+Subject: [PATCH 162/458] ravb: Fix inconsistent lock state at enabling tx
  timestamp
 
 [   58.490829] =================================

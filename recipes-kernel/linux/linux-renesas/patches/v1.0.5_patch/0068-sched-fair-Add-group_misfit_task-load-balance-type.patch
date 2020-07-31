@@ -1,7 +1,7 @@
 From fff4a5f54f54eee60a36967aadfaf19fec616c27 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:23:31 +0700
-Subject: [PATCH 068/353] sched/fair: Add group_misfit_task load-balance type
+Subject: [PATCH 068/458] sched/fair: Add group_misfit_task load-balance type
 
 To maximize throughput in systems with asymmetric cpu capacities
 (e.g. ARM big.LITTLE) load-balancing has to consider task and cpu

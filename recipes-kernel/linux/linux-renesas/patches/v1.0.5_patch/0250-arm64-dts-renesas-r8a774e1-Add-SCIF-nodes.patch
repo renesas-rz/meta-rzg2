@@ -1,7 +1,7 @@
 From 9d038714fd30bdbf35d03ba2e5d569b1b1430d7c Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:55:19 +0700
-Subject: [PATCH 250/353] arm64: dts: renesas: r8a774e1: Add SCIF nodes
+Subject: [PATCH 250/458] arm64: dts: renesas: r8a774e1: Add SCIF nodes
 
 This commit adds the device nodes for all RZ/G2H SCIF serial port,
 incl. Clock, power-domains and DMAs.

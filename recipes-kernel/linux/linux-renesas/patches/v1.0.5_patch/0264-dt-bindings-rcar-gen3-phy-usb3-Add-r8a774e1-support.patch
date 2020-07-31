@@ -1,7 +1,7 @@
 From 5d2c05c9aecebfd247d8e00e12c2cafb5cb4bd34 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Mon, 6 Apr 2020 20:37:43 +0700
-Subject: [PATCH 264/353] dt-bindings: rcar-gen3-phy-usb3: Add r8a774e1 support
+Subject: [PATCH 264/458] dt-bindings: rcar-gen3-phy-usb3: Add r8a774e1 support
 
 This patch adds bindings for R8A774E1 SoC.
 

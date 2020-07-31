@@ -1,7 +1,7 @@
 From cc28a91ac2f837bb0d99db487a1c2efc3dafe4fd Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 16:58:47 +0700
-Subject: [PATCH 110/353] usb: renesas_usbhs: add support for RZ/G2N
+Subject: [PATCH 110/458] usb: renesas_usbhs: add support for RZ/G2N
 
 This patch adds support for r8a774b1 SoC (RZ/G2N)
 

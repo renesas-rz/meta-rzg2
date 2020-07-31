@@ -1,7 +1,7 @@
 From 07a564c38e0099e0ba4582c02b46133c3afdc0c1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 18:05:08 +0700
-Subject: [PATCH 215/353] arm64: defconfig: Enable R8A774E1 SoC
+Subject: [PATCH 215/458] arm64: defconfig: Enable R8A774E1 SoC
 
 Enable the Renesas RZ/G2H (R8A774E1) SoC in the ARM64 defconfig.
 

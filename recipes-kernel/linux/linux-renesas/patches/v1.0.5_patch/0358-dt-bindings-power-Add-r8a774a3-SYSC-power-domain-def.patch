@@ -1,0 +1,54 @@
+From 4f0d9d3b78fe74d4e1b3a8a96874fc0fa338a69f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 15:02:38 +0700
+Subject: [PATCH 358/458] dt-bindings: power: Add r8a774a3 SYSC power domain
+ definitions
+
+This patch adds power domain indices for the RZ/G2M v3.0
+(a.k.a r8a774a3) SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ include/dt-bindings/power/r8a774a3-sysc.h | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+ create mode 100644 include/dt-bindings/power/r8a774a3-sysc.h
+
+diff --git a/include/dt-bindings/power/r8a774a3-sysc.h b/include/dt-bindings/power/r8a774a3-sysc.h
+new file mode 100644
+index 0000000..a246273
+--- /dev/null
++++ b/include/dt-bindings/power/r8a774a3-sysc.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2019-2020 Renesas Electronics Corp.
++ */
++#ifndef __DT_BINDINGS_POWER_R8A774A3_SYSC_H__
++#define __DT_BINDINGS_POWER_R8A774A3_SYSC_H__
++
++/*
++ * These power domain indices match the numbers of the interrupt bits
++ * representing the power areas in the various Interrupt Registers
++ * (e.g. SYSCISR, Interrupt Status Register)
++ */
++
++#define R8A774A3_PD_CA57_CPU0		 0
++#define R8A774A3_PD_CA57_CPU1		 1
++#define R8A774A3_PD_CA53_CPU0		 5
++#define R8A774A3_PD_CA53_CPU1		 6
++#define R8A774A3_PD_CA53_CPU2		 7
++#define R8A774A3_PD_CA53_CPU3		 8
++#define R8A774A3_PD_CA57_SCU		12
++#define R8A774A3_PD_A3VC		14
++#define R8A774A3_PD_3DG_A		17
++#define R8A774A3_PD_3DG_B		18
++#define R8A774A3_PD_CA53_SCU		21
++#define R8A774A3_PD_A2VC1		26
++
++/* Always-on power area */
++#define R8A774A3_PD_ALWAYS_ON		32
++
++#endif /* __DT_BINDINGS_POWER_R8A774A3_SYSC_H__ */
+-- 
+2.7.4
+

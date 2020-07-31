@@ -1,7 +1,7 @@
 From 09795e049a2c6d504fccc5ba079d3b6d408c0b60 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 11:32:34 +0700
-Subject: [PATCH 032/353] arm64: dts: renesas: r8a774c0-cat874: add vspm_if,
+Subject: [PATCH 032/458] arm64: dts: renesas: r8a774c0-cat874: add vspm_if,
  vspi, vspb
 
 This commit enables vspb, vspi, vspmif for RZ/G2E CAT874.

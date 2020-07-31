@@ -1,7 +1,7 @@
 From a590b7246624d1469d88090be35186dc462f87f2 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Fri, 17 Apr 2020 11:46:09 +0700
-Subject: [PATCH 319/353] arm64: dts: renesas: r8a774{c0,c0-es10,a1,b1,e1}: Add
+Subject: [PATCH 319/458] arm64: dts: renesas: r8a774{c0,c0-es10,a1,b1,e1}: Add
  default cma memory for usb controller
 
 Usb media device need reserved memory to allocate dma-contig memory, so

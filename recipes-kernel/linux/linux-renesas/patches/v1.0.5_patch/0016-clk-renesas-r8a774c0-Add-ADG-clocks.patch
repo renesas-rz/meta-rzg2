@@ -1,7 +1,7 @@
 From c006cf5d8207e6caca26d0dd1f218f1af0e1ccfb Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 1 Jul 2019 15:08:32 +0700
-Subject: [PATCH 016/353] clk: renesas: r8a774c0: Add ADG clocks
+Subject: [PATCH 016/458] clk: renesas: r8a774c0: Add ADG clocks
 
 This patch adds ADG clock to the R8A774C0 SoC.
 

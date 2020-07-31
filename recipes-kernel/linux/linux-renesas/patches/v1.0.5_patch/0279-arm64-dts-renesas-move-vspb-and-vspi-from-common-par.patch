@@ -1,7 +1,7 @@
 From 205fe401dafdcdd1dddf30fc3c26cae886bd8563 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 16:48:35 +0700
-Subject: [PATCH 279/353] arm64: dts: renesas: move vspb and vspi from common
+Subject: [PATCH 279/458] arm64: dts: renesas: move vspb and vspi from common
  part
 
 This patch moves vspb and vspi from common part to specific Hihope

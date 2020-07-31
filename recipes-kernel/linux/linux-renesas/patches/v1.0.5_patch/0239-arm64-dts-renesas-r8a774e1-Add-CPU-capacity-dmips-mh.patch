@@ -1,7 +1,7 @@
 From 84c2f5e2a6f7f252628b733b92bc606dc79a93c2 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:39:45 +0700
-Subject: [PATCH 239/353] arm64: dts: renesas: r8a774e1: Add CPU
+Subject: [PATCH 239/458] arm64: dts: renesas: r8a774e1: Add CPU
  capacity-dmips-mhz
 
 Based on commit <2250d856b279d992c392170860a78c2482b1859c> upstream

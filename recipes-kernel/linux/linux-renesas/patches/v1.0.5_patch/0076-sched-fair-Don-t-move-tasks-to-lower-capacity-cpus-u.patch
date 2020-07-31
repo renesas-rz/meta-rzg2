@@ -1,7 +1,7 @@
 From 28bbf0f62f74792c8ef3762ba8a904ba5d780d52 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 15:02:21 +0700
-Subject: [PATCH 076/353] sched/fair: Don't move tasks to lower capacity cpus
+Subject: [PATCH 076/458] sched/fair: Don't move tasks to lower capacity cpus
  unless necessary
 
 When lower capacity CPUs are load balancing and considering to pull

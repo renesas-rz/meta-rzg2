@@ -1,7 +1,7 @@
 From 44ae55fa1ea291122e6a79ed64d9c42c64b94d8e Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
 Date: Tue, 30 Apr 2019 13:38:59 +0700
-Subject: [PATCH 053/353] PCI: pcie-rcar: Add bus notifier so we can limit the
+Subject: [PATCH 053/458] PCI: pcie-rcar: Add bus notifier so we can limit the
  dma range
 
 The PCIe DMA controller on R-Car Gen2 and earlier is on 32bit bus,

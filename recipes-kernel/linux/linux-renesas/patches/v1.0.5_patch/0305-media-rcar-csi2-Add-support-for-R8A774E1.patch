@@ -1,7 +1,7 @@
 From 99c3665aedad6637bfaf3fbee23b1d931b83d4be Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 9 Apr 2020 12:02:07 +0700
-Subject: [PATCH 305/353] media: rcar-csi2: Add support for R8A774E1
+Subject: [PATCH 305/458] media: rcar-csi2: Add support for R8A774E1
 
 This patch adds support CSI2 for r8a774e1 SoC.
 RZ/G2H has similar setting with R-Car H3 Rev3.

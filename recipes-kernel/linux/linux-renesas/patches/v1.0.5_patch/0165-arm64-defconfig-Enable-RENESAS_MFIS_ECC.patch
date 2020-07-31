@@ -1,7 +1,7 @@
 From d7ae09497c8a2b5d6dbcc761a36abee1a82cada7 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 7 Nov 2019 09:55:12 +0700
-Subject: [PATCH 165/353] arm64: defconfig: Enable RENESAS_MFIS_ECC
+Subject: [PATCH 165/458] arm64: defconfig: Enable RENESAS_MFIS_ECC
 
 Enable RENESAS_MFIS_ECC to support DRAM ECC error interrupt.
 

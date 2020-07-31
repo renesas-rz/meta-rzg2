@@ -1,7 +1,7 @@
 From 2d692524373cbbd4f2363e2e71880061754a8ecb Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Fri, 22 Nov 2019 09:39:32 +0700
-Subject: [PATCH 171/353] arm64: defconfig: Enable kernel module for USB Gadget
+Subject: [PATCH 171/458] arm64: defconfig: Enable kernel module for USB Gadget
  Function
 
 This patch add default build kernel module for USB Gadget Function.

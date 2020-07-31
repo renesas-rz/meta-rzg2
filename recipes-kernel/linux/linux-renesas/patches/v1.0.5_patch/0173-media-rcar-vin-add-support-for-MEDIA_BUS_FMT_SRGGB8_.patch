@@ -1,7 +1,7 @@
 From 0b5024e69e40fdc06a39b21005e2137da3ed0ebd Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 7 Nov 2019 19:06:20 +0700
-Subject: [PATCH 173/353] media: rcar-vin: add support for
+Subject: [PATCH 173/458] media: rcar-vin: add support for
  MEDIA_BUS_FMT_SRGGB8_1X8
 
 By setting VNMC, rcar-vin can support input video in

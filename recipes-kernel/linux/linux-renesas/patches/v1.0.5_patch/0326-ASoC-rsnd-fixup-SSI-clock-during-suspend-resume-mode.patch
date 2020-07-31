@@ -1,7 +1,7 @@
 From ad92a4ff5aa8271e83e0eb4e7e39f1abae571b03 Mon Sep 17 00:00:00 2001
 From: Dmytro Prokopchuk <dmytro.prokopchuk@globallogic.com>
 Date: Fri, 21 Sep 2018 04:59:59 +0000
-Subject: [PATCH 326/353] ASoC: rsnd: fixup SSI clock during suspend/resume
+Subject: [PATCH 326/458] ASoC: rsnd: fixup SSI clock during suspend/resume
  modes
 
 Prepare <-> Cleanup functions pair has balanced calls.

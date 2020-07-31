@@ -1,7 +1,7 @@
 From 1b22e29006a1a3c63d78a98d8ecb87e728ccd20b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:32:17 +0700
-Subject: [PATCH 344/353] arm64: dts: renesas: add property to set virtual
+Subject: [PATCH 344/458] arm64: dts: renesas: add property to set virtual
  channel for OV5645 camera for all RZ/G2 platforms
 
 This commit is created to add property "virtual-channel" to set virtual

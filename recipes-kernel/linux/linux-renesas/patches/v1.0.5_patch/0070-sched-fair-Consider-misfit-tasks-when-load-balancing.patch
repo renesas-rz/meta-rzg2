@@ -1,7 +1,7 @@
 From 44e13fcc5858d7d0c68c2edb9b5c9af338d63ac4 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:04:21 +0700
-Subject: [PATCH 070/353] sched/fair: Consider misfit tasks when load-balancing
+Subject: [PATCH 070/458] sched/fair: Consider misfit tasks when load-balancing
 
 On asymmetric cpu capacity systems load intensive tasks can end up
 on cpus that don't suit their compute demand.  In this scenarios

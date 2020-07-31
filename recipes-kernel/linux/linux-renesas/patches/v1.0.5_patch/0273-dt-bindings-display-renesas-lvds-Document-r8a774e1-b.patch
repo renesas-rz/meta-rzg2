@@ -1,7 +1,7 @@
 From 40cc70812fa2b23b357cb58aa3c9d4d7765770bc Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:31:29 +0700
-Subject: [PATCH 273/353] dt-bindings: display: renesas: lvds: Document
+Subject: [PATCH 273/458] dt-bindings: display: renesas: lvds: Document
  r8a774e1 bindings
 
 Document the RZ/G2H (R8A774E1) LVDS bindings.

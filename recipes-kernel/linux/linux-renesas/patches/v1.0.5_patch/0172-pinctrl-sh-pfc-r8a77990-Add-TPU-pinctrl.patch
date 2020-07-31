@@ -1,7 +1,7 @@
 From 373cda2057518c640458a7389c3b77935a892d61 Mon Sep 17 00:00:00 2001
 From: Duy Dang <duy.dang.yb@renesas.com>
 Date: Thu, 21 Nov 2019 18:41:12 +0700
-Subject: [PATCH 172/353] pinctrl: sh-pfc: r8a77990: Add-TPU-pinctrl.
+Subject: [PATCH 172/458] pinctrl: sh-pfc: r8a77990: Add-TPU-pinctrl.
 
 This patch adds support TPU pins, pin functions and pin groups
 for the R8A77990 and R8A774C0 SoC.

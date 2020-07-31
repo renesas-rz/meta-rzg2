@@ -1,7 +1,7 @@
 From fa3605766f844a0ce4d1d28829b3ca6cf11bfc7a Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Wed, 8 Apr 2020 11:23:57 +0700
-Subject: [PATCH 318/353] media: usb: uvc: Init reserved memory region for each
+Subject: [PATCH 318/458] media: usb: uvc: Init reserved memory region for each
  usb media device
 
 We must have reserved memory region to allocate dma-contig memory.

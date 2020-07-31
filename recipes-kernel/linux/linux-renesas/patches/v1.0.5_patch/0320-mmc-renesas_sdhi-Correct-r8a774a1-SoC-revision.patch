@@ -1,7 +1,7 @@
 From 22a8a0901b7da3c0e9f573f645e74b2bbefa0c3f Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Mon, 11 May 2020 14:42:36 +0700
-Subject: [PATCH 320/353] mmc: renesas_sdhi: Correct r8a774a1 SoC revision
+Subject: [PATCH 320/458] mmc: renesas_sdhi: Correct r8a774a1 SoC revision
 
 This patch correct revision of r8a774a1 to support
 mode HS400 for LSI v1.x.

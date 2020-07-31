@@ -1,7 +1,7 @@
 From ab4a2451112acb9fafbc97af87c14f36ae6f9e14 Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Tue, 14 Apr 2020 15:39:29 +0700
-Subject: [PATCH 262/353] arm64: dts: renesas: r8a774e1: Add PCIe device nodes
+Subject: [PATCH 262/458] arm64: dts: renesas: r8a774e1: Add PCIe device nodes
 
 This patch adds PCIe{0,1} device nodes for R8A774E1 SoC.
 

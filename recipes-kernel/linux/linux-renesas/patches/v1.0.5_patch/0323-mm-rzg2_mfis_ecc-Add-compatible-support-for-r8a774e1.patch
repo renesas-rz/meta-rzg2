@@ -1,7 +1,7 @@
 From b50da45c92402f74bb8d3f343462abc836b2e269 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 12 May 2020 15:34:07 +0700
-Subject: [PATCH 323/353] mm: rzg2_mfis_ecc : Add compatible support for
+Subject: [PATCH 323/458] mm: rzg2_mfis_ecc : Add compatible support for
  r8a774e1
 
 Add support for RZ/G2H (r8a774e1)

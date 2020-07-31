@@ -1,7 +1,7 @@
 From f6ca8e97e066c665531722c823182f8550942b44 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Mon, 13 Apr 2020 14:54:16 +0700
-Subject: [PATCH 276/353] arm64: dts: renesas: r8a774e1: Add FCPF and FCPV
+Subject: [PATCH 276/458] arm64: dts: renesas: r8a774e1: Add FCPF and FCPV
  instances
 
 The FCPs handle the interface between various IP cores and memory.

@@ -1,7 +1,7 @@
 From c34a900384348395e39f2034f069d39d8a50f97b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 15:05:57 +0700
-Subject: [PATCH 178/353] arm64: dts: renesas: r8a774a1: add missing enabled
+Subject: [PATCH 178/458] arm64: dts: renesas: r8a774a1: add missing enabled
  temperature for IPA
 
 This patch adds missing enabled temperature for IPA.

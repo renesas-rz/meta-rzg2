@@ -1,7 +1,7 @@
 From f4935fb85ecb98a7f7da8a5372f20fbd6b00cd90 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Tue, 1 Oct 2019 09:18:42 +0700
-Subject: [PATCH 160/353] arm64: dts: renesas: r8a774c0-es10: Re-add support
+Subject: [PATCH 160/458] arm64: dts: renesas: r8a774c0-es10: Re-add support
  for RZ/G2E ES1.0
 
 Re-add RZ/G2E ES 1.0, r8a774c0-es10.dtsi includes r8a774c0.dtsi,

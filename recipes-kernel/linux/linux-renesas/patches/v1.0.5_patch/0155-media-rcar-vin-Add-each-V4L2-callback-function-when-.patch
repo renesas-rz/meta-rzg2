@@ -1,7 +1,7 @@
 From e20c12cfcfe80e652a44dee41d574aaaadb7d1d4 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 14:48:05 +0700
-Subject: [PATCH 155/353] media: rcar-vin: Add each V4L2 callback function when
+Subject: [PATCH 155/458] media: rcar-vin: Add each V4L2 callback function when
  using csi2
 
 Supports cropcap, rvin_g_selection and rvin_s_selection even when

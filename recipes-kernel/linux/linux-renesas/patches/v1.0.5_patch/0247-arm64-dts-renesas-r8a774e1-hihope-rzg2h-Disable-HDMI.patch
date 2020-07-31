@@ -1,7 +1,7 @@
 From e3f7e7d7eab49df6e7aef6d2a3de1a035e2f53e5 Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Fri, 10 Apr 2020 11:05:24 +0700
-Subject: [PATCH 247/353] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable
+Subject: [PATCH 247/458] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Disable
  HDMI audio by default
 
 This patch is to disable HDMI audio by default in HiHope G2H platform

@@ -1,7 +1,7 @@
 From e9b191755903aadbcf86a2059b04cba25f606468 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 14:59:53 +0700
-Subject: [PATCH 214/353] arm64: dts: renesas: Add HiHope RZ/G2H extension
+Subject: [PATCH 214/458] arm64: dts: renesas: Add HiHope RZ/G2H extension
  board support
 
 The HiHope RZ/G2H extension board is made of HiHope RZ/G2H platform

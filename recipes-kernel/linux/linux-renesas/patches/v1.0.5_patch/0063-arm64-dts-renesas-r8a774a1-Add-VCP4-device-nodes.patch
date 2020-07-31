@@ -1,7 +1,7 @@
 From 91693fa3317190fc34c01a5b3a8bcbd74416c7fc Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:45:50 +0700
-Subject: [PATCH 063/353] arm64: dts: renesas: r8a774a1: Add VCP4 device nodes
+Subject: [PATCH 063/458] arm64: dts: renesas: r8a774a1: Add VCP4 device nodes
 
 Adds VCP4 device nodes (fcpci, fcpcs, ivdp1c, vcplf, vdpb)
 used by UVCS driver

@@ -1,7 +1,7 @@
 From 9ad1b1a6e24e98471ca905c868501f7b52beed53 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 28 Feb 2020 17:04:42 +0700
-Subject: [PATCH 001/353] arm64: defconfig: Add or edit needed features for
+Subject: [PATCH 001/458] arm64: defconfig: Add or edit needed features for
  Renesas SOC
 
 1. Add:

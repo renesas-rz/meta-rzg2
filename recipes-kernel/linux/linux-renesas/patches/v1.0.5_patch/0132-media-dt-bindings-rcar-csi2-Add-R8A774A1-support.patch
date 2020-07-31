@@ -1,7 +1,7 @@
 From a7366e31953f4eb08f3b1e581ad15e03a49bcdc9 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 18:48:53 +0700
-Subject: [PATCH 132/353] media: dt-bindings: rcar-csi2: Add R8A774A1 support
+Subject: [PATCH 132/458] media: dt-bindings: rcar-csi2: Add R8A774A1 support
 
 This patch adds documentation for CSI2 of RZ/G2M
 

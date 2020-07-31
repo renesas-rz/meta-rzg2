@@ -1,7 +1,7 @@
 From 21b24f50370a05897c0ddccf8d2d08a59647f04b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 11:34:08 +0700
-Subject: [PATCH 234/353] arm64: dts: renesas: r8a774e1: Add INTC-EX device
+Subject: [PATCH 234/458] arm64: dts: renesas: r8a774e1: Add INTC-EX device
  node
 
 Add a device node for the Interrupt Controller for External Devices

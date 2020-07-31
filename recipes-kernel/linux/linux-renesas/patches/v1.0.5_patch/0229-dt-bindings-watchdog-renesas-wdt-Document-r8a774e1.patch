@@ -1,7 +1,7 @@
 From 5cf6938d7b7dbb8ca9e88b62300334450c193793 Mon Sep 17 00:00:00 2001
 From: Duy Bao Dang <duy.dang.yb@renesas.com>
 Date: Mon, 6 Apr 2020 14:23:35 +0700
-Subject: [PATCH 229/353] dt-bindings: watchdog: renesas-wdt: Document r8a774e1
+Subject: [PATCH 229/458] dt-bindings: watchdog: renesas-wdt: Document r8a774e1
 
 This patch adds compatible for watchdog driver on RZ/G2H.
 

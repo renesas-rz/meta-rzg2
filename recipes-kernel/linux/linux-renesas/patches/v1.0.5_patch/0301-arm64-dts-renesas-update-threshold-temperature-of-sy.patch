@@ -1,7 +1,7 @@
 From 9f5f0d0d3d1994951c2ac86f0ff492c58cf394e8 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 14 Apr 2020 15:05:56 +0700
-Subject: [PATCH 301/353] arm64: dts: renesas: update threshold temperature of
+Subject: [PATCH 301/458] arm64: dts: renesas: update threshold temperature of
  system shutdown
 
 Base on HW Manual of RZ/G Series, 2nd Generation, maximum temperature

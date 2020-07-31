@@ -1,7 +1,7 @@
 From 93db4598f7efc75eb5c58d934671c8d8c50b10f0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:12:57 +0700
-Subject: [PATCH 199/353] soc: renesas: Add Renesas R8A774E1 config option
+Subject: [PATCH 199/458] soc: renesas: Add Renesas R8A774E1 config option
 
 Add configuration option for the RZ/G2H (R8A774E1) SoC.
 

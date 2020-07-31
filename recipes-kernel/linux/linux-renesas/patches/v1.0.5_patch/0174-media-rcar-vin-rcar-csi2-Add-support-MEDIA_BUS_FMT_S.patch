@@ -1,7 +1,7 @@
 From 91d5d6ddc34ce4077a9069bd8adb87a73ba0b53c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 7 Nov 2019 19:07:05 +0700
-Subject: [PATCH 174/353] media: rcar-vin: rcar-csi2: Add support
+Subject: [PATCH 174/458] media: rcar-vin: rcar-csi2: Add support
  MEDIA_BUS_FMT_SRGGB8_1X8 format
 
 This patch adds support MEDIA_BUS_FMT_SRGGB8_1X8 format for CSI2 input.

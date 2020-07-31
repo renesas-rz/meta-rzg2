@@ -1,7 +1,7 @@
 From 02faf91c673a0190e2ff1bb8365934750083655a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 27 Mar 2020 16:20:06 +0700
-Subject: [PATCH 006/353] soc: renesas: rcar_ems_ctrl: Move Emergency shutdown
+Subject: [PATCH 006/458] soc: renesas: rcar_ems_ctrl: Move Emergency shutdown
  to platform driver
 
 Emergency shutdown is a specific driver for R-Car Gen3 platform.

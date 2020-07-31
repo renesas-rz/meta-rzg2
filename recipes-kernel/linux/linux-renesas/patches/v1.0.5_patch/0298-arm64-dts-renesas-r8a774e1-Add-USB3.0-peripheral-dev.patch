@@ -1,7 +1,7 @@
 From 33635f66d4d0991bc2187fcd5bfa3fea5227d9d9 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 13:56:03 +0700
-Subject: [PATCH 298/353] arm64: dts: renesas: r8a774e1: Add USB3.0 peripheral
+Subject: [PATCH 298/458] arm64: dts: renesas: r8a774e1: Add USB3.0 peripheral
  device node
 
 This patch adds USB3.0 peripheral channel 0 device node

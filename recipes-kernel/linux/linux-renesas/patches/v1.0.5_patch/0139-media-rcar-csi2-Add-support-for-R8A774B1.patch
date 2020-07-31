@@ -1,7 +1,7 @@
 From 6cbde6a1d6788ed63a10db47c6be0d9390722e56 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 10 Sep 2019 11:54:32 +0700
-Subject: [PATCH 139/353] media: rcar-csi2: Add support for R8A774B1
+Subject: [PATCH 139/458] media: rcar-csi2: Add support for R8A774B1
 
 This patch adds support for r8a774b1 SoC.
 This is similar with RCar M3N SoC.

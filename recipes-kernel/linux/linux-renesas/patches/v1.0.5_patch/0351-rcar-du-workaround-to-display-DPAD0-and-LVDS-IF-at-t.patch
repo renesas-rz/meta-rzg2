@@ -1,7 +1,7 @@
 From 633ebe2e90987618c8b1bccfc00e1fb822ca144b Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Jul 2020 15:39:12 +0700
-Subject: [PATCH 351/353] rcar-du: workaround to display DPAD0 and LVDS-IF at
+Subject: [PATCH 351/458] rcar-du: workaround to display DPAD0 and LVDS-IF at
  the same time in r8a774c0 SoC.
 
 Currently, there are 2 types of devicetree which support for RZ/G2E:

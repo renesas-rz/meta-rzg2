@@ -1,7 +1,7 @@
 From 84df6c0cfe36a53896507549e5e29e964be5641c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 11:31:08 +0700
-Subject: [PATCH 031/353] arm64: dts: renesas: r8a774c0-cat874: add mmngr,
+Subject: [PATCH 031/458] arm64: dts: renesas: r8a774c0-cat874: add mmngr,
  mmngrbuf
 
 Add device node for mmngr, mmngrbuf. Reserve 128M for MMP CMA.

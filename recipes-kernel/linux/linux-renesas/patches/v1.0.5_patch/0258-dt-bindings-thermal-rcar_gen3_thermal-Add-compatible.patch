@@ -1,7 +1,7 @@
 From afbae0819a117280243ef139a466c6c95aaa21fc Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Thu, 9 Apr 2020 16:19:13 +0700
-Subject: [PATCH 258/353] dt-bindings: thermal: rcar_gen3_thermal: Add
+Subject: [PATCH 258/458] dt-bindings: thermal: rcar_gen3_thermal: Add
  compatible string for r8a774e1
 
 This patch adds compatible string for R8A774E1.

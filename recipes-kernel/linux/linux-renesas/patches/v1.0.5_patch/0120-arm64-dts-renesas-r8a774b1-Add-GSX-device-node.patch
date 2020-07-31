@@ -1,7 +1,7 @@
 From 818e8739408f5e2a242a6554e861acfcd6e9eca8 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:54:47 +0700
-Subject: [PATCH 120/353] arm64: dts: renesas: r8a774b1: Add GSX device node
+Subject: [PATCH 120/458] arm64: dts: renesas: r8a774b1: Add GSX device node
 
 This commit adds GSX device nodes for the R8A774B1 SoC.
 

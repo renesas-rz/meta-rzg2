@@ -1,7 +1,7 @@
 From f94c7f049f5be0177645cfa95a352855841a67b2 Mon Sep 17 00:00:00 2001
 From: Wolfram Sang <wsa+renesas@sang-engineering.com>
 Date: Thu, 11 Jun 2020 15:00:30 +0700
-Subject: [PATCH 338/353] mmc: renesas_sdhi: enforce manual correction for Gen3
+Subject: [PATCH 338/458] mmc: renesas_sdhi: enforce manual correction for Gen3
 
 HW engineers say that automatic tap correction cannot be used for HS400
 in all R-Car Gen3 and RZG2 SoCs. So, check for that SDHI variant and

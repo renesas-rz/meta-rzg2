@@ -1,7 +1,7 @@
 From 4fe6a39010b01a23c36b5ecbceadbb47efd1cdfd Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Tue, 14 Apr 2020 18:58:30 +0700
-Subject: [PATCH 292/353] ata: sata_rcar: Add r8a774e1 support
+Subject: [PATCH 292/458] ata: sata_rcar: Add r8a774e1 support
 
 Update the binding docs for Renesas RZ/G2H.
 

@@ -1,7 +1,7 @@
 From 0abcad150eb1deac67458170514e071a96076bf9 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Fri, 19 Jul 2019 13:29:05 +0700
-Subject: [PATCH 098/353] arm64: dts: r8a774a1-hihope-rzg2m: reserve memory for
+Subject: [PATCH 098/458] arm64: dts: r8a774a1-hihope-rzg2m: reserve memory for
  lossy_decompress
 
 lossy_decompress is supported at fixed address defined in IPL and mmngr.

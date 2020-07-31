@@ -1,7 +1,7 @@
 From 131c70c713dd468965de9dd833eae1480b163ea0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 13:52:54 +0700
-Subject: [PATCH 048/353] usb: renesas_usbhs: add support for RZ/G2M
+Subject: [PATCH 048/458] usb: renesas_usbhs: add support for RZ/G2M
 
 This patch adds support for r8a774a1 (RZ/G2M).
 

@@ -1,7 +1,7 @@
 From 5fa68746c7c06ffdb29bc8c203376cdd6a6b498b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 13 Apr 2020 12:03:59 +0700
-Subject: [PATCH 248/353] arm64: dts: renesas: r8a774b1-hihope-rzg2n-ex: enable
+Subject: [PATCH 248/458] arm64: dts: renesas: r8a774b1-hihope-rzg2n-ex: enable
  pcie1
 
 This commit enables PCIE1 in HiHope G2N Platform.

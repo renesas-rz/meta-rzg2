@@ -1,7 +1,7 @@
 From 08f5453b1f8a8030b29abefb859414d9a36d7166 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Mon, 6 Apr 2020 20:06:35 +0700
-Subject: [PATCH 228/353] arm64: dts: renesas: r8a774e1: Add MSIOF nodes
+Subject: [PATCH 228/458] arm64: dts: renesas: r8a774e1: Add MSIOF nodes
 
 This patch adds MSIOF nodes for RZ/G2H board.
 

@@ -1,7 +1,7 @@
 From d91effbe116b0f10966328cc1da7be3bcbd39f95 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 15:04:13 +0700
-Subject: [PATCH 177/353] thermal: rcar-thermal: rework rcar_thermal_work
+Subject: [PATCH 177/458] thermal: rcar-thermal: rework rcar_thermal_work
  function
 
 When the current temperature changes, interrupt will be generated

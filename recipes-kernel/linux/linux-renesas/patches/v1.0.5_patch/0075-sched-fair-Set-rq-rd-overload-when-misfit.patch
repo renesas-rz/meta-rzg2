@@ -1,7 +1,7 @@
 From 7b99fd1435e71c1bff65dc1a5483f8ba5206a941 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:07:12 +0700
-Subject: [PATCH 075/353] sched/fair: Set rq->rd->overload when misfit
+Subject: [PATCH 075/458] sched/fair: Set rq->rd->overload when misfit
 
 Idle balance is a great opportunity to pull a misfit task. However,
 there are scenarios where misfit tasks are present but idle balance

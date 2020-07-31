@@ -1,7 +1,7 @@
 From 310a590664cc3ed88305a5b117cdc0f569daf50d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:52:14 +0700
-Subject: [PATCH 074/353] sched: Wrap rq->rd->overload accesses with
+Subject: [PATCH 074/458] sched: Wrap rq->rd->overload accesses with
  READ/WRITE_ONCE
 
 This variable can be read and set locklessly within

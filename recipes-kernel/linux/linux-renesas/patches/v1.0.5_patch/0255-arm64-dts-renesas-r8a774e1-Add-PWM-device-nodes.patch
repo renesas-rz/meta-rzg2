@@ -1,7 +1,7 @@
 From f1569c3b1cad901dc4d873e396cdef84b5e4f5a6 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Wed, 8 Apr 2020 15:53:26 +0700
-Subject: [PATCH 255/353] arm64: dts: renesas: r8a774e1: Add PWM device nodes
+Subject: [PATCH 255/458] arm64: dts: renesas: r8a774e1: Add PWM device nodes
 
 This commit adds the device nodes for RZ/G2H PWM channels.
 

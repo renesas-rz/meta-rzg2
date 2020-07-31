@@ -1,7 +1,7 @@
 From 25234a96cf0ec0a51f1d6fa0130ea805754d6670 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Wed, 11 Sep 2019 09:24:26 +0700
-Subject: [PATCH 150/353] arm64: dts: renesas: r8a774b1: Add optee node
+Subject: [PATCH 150/458] arm64: dts: renesas: r8a774b1: Add optee node
 
 Add optee support for RZ/G2N (R8A774B1)
 

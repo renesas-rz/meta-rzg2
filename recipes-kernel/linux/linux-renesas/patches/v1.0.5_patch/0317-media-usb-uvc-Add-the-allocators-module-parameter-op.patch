@@ -1,7 +1,7 @@
 From d75794698182c40c84b13a251b09480f7ae90922 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 31 Mar 2020 11:53:42 +0700
-Subject: [PATCH 317/353] media: usb: uvc: Add the "allocators" module
+Subject: [PATCH 317/458] media: usb: uvc: Add the "allocators" module
  parameter option to let uvcvideo use the dma-contig instead of vmalloc.
 
 Some user-space application need contiguos memory in dmabuf mode. We will

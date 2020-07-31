@@ -1,7 +1,7 @@
 From b5089f5e517b0d35ae2b88f4d35250218a87580e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 16:18:44 +0700
-Subject: [PATCH 349/353] arm64: dts: renesas: disable CSI40 in HiHope RZ/G2H
+Subject: [PATCH 349/458] arm64: dts: renesas: disable CSI40 in HiHope RZ/G2H
  and G2N as default
 
 This commit is created to disable CSI40 in default environment to

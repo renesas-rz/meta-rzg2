@@ -1,7 +1,7 @@
 From 66d66941bf2186547387768f36cab2b101ef1539 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 14:25:16 +0700
-Subject: [PATCH 161/353] arm64: dts: renesas: r8a774c0-es10-*: Re-add support
+Subject: [PATCH 161/458] arm64: dts: renesas: r8a774c0-es10-*: Re-add support
  for RZ/G2E ES1.0
 
 Re-add CAT874/EK874 Platform with the ES1.0 revision of the RZ/G2E SoC.

@@ -1,7 +1,7 @@
 From 26f44dfce54fcf68098688d08879ece383f3826f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:29:12 +0700
-Subject: [PATCH 054/353] arm64: dts: renesas: hihope-common: enable HSCIF1 and
+Subject: [PATCH 054/458] arm64: dts: renesas: hihope-common: enable HSCIF1 and
  SCIF0
 
 This patch enables HSCIF1 and SCIF0 support.

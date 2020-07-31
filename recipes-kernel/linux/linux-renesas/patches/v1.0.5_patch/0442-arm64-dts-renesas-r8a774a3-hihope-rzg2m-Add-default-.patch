@@ -1,0 +1,46 @@
+From 583cdc115667f9d6265fc17f15d07bc18ceb066f Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Thu, 30 Jul 2020 18:29:32 +0700
+Subject: [PATCH 442/458] arm64: dts: renesas: r8a774a3-hihope-rzg2m: Add
+ default cma memory for usb controller
+
+Usb media device need reserved memory to allocate dma-contig memory,
+so we will use the default cma memory for this reserved memory.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ .../arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+index 76f3109..4cc5b14 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+@@ -70,3 +70,23 @@
+ 		/delete-node/ rsnd_port0;
+ 	};
+ };
++
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
+-- 
+2.7.4
+

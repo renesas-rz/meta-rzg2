@@ -1,7 +1,7 @@
 From d69e78e9e9d488670419732f93074d41242887af Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:38:10 +0700
-Subject: [PATCH 030/353] clk: r8a774c0-cpg-mssr: add vcp4, fdp, 3dge clock
+Subject: [PATCH 030/458] clk: r8a774c0-cpg-mssr: add vcp4, fdp, 3dge clock
 
 This commit adds:
 - VCP4(VCPLF), VCP4(VDPB) clocks

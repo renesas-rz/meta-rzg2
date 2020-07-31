@@ -1,7 +1,7 @@
 From 514e6d84647f88194c27df10bb3010ff5d34be95 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Mon, 18 Nov 2019 13:18:48 +0700
-Subject: [PATCH 168/353] arm64: dts: renesas: hihope-common: add pfc define
+Subject: [PATCH 168/458] arm64: dts: renesas: hihope-common: add pfc define
  for pwen on usb2.0 channel 1
 
 This patch add defination of USB2.0 Channel 1 PWEN to PFC, to avoid

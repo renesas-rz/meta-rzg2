@@ -1,7 +1,7 @@
 From c09bcf15e45aa2a8d381a7a075e911e9cf683013 Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Thu, 23 Apr 2020 16:20:57 +0700
-Subject: [PATCH 311/353] watchdog: Init late Renesas watchdog timer
+Subject: [PATCH 311/458] watchdog: Init late Renesas watchdog timer
 
 This patch lets watchdog timer init later than other
  drivers, to ensure that if any hang up occurs while

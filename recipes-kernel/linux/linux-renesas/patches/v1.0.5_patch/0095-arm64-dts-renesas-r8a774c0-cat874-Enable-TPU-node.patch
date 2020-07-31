@@ -1,7 +1,7 @@
 From 5b88befb3851eb8e2a81cfcb5b5dffc4f13b915f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 13:20:06 +0700
-Subject: [PATCH 095/353] arm64: dts: renesas: r8a774c0-cat874: Enable TPU node
+Subject: [PATCH 095/458] arm64: dts: renesas: r8a774c0-cat874: Enable TPU node
 
 This patch enables TPU node on CAT874 board.
 

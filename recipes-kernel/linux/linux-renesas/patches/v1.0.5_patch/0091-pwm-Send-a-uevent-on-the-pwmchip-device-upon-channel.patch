@@ -1,7 +1,7 @@
 From 04b7daa44019fa0a9fa7e8c832b4e32a82241787 Mon Sep 17 00:00:00 2001
 From: Fabrice Gasnier <fabrice.gasnier@st.com>
 Date: Mon, 1 Oct 2018 15:23:57 +0200
-Subject: [PATCH 091/353] pwm: Send a uevent on the pwmchip device upon channel
+Subject: [PATCH 091/458] pwm: Send a uevent on the pwmchip device upon channel
  sysfs (un)export
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

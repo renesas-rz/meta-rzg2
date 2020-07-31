@@ -1,7 +1,7 @@
 From 6efc1255c5d9887dd1804576e51f7cda85574570 Mon Sep 17 00:00:00 2001
 From: Duy Bao Dang <duy.dang.yb@renesas.com>
 Date: Mon, 6 Apr 2020 14:34:45 +0700
-Subject: [PATCH 230/353] arm64: dts: renesas: r8a774e1: Add watchdog node
+Subject: [PATCH 230/458] arm64: dts: renesas: r8a774e1: Add watchdog node
 
 This patch adds watchdog node for RZ/G2H (R8A774E1) SoC.
 

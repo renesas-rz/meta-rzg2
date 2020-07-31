@@ -1,7 +1,7 @@
 From eecdeaa757a0780ce7d4d46902921ec9c2d100d7 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 14:57:26 +0700
-Subject: [PATCH 059/353] clk: renesas: r8a774a1-cpg-mssr: add ivdp1c, vcplf,
+Subject: [PATCH 059/458] clk: renesas: r8a774a1-cpg-mssr: add ivdp1c, vcplf,
  vdpb and 3dge clock
 
 This commit adds:

@@ -1,7 +1,7 @@
 From 76d5621d4a4d34999b12b957afaeaa93024e3fff Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Thu, 9 Apr 2020 10:55:10 +0700
-Subject: [PATCH 314/353] arm64: dts: renesas: r8a774E1: Add IPMMU device nodes
+Subject: [PATCH 314/458] arm64: dts: renesas: r8a774E1: Add IPMMU device nodes
 
 This commit adds IPMMU device nodes for R8A774E1 SoC.
 ipmmu-vc[0/1] and ipmmu-vp[0/1] have different compat string since

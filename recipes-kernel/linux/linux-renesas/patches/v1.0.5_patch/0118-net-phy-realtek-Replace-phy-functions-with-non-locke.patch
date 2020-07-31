@@ -1,7 +1,7 @@
 From 3f68204447f2ac8e41cba97fbc4ffa099d13a3ad Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Fri, 6 Sep 2019 15:43:33 +0700
-Subject: [PATCH 118/353] net: phy: realtek: Replace phy functions with
+Subject: [PATCH 118/458] net: phy: realtek: Replace phy functions with
  non-locked version in rtl8211e_config_init()
 
 After calling phy_select_page() and until calling phy_restore_page(),

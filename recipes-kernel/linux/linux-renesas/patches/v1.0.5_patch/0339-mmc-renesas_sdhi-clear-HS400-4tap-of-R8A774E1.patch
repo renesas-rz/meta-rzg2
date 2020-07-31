@@ -1,7 +1,7 @@
 From 603007ebe9ed69fa547c9dbfa447087e151cdb6c Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Thu, 11 Jun 2020 15:02:01 +0700
-Subject: [PATCH 339/353] mmc: renesas_sdhi: clear HS400 4tap of R8A774E1
+Subject: [PATCH 339/458] mmc: renesas_sdhi: clear HS400 4tap of R8A774E1
 
 RZG2H (R8A774E1) can run mode HS400 of eMMC normally without 4tap.
 Use HS400-4tap on RZG2H could cause low performance for eMMC.

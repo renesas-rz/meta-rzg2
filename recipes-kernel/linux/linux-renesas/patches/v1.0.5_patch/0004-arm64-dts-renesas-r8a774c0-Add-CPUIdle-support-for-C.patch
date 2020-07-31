@@ -1,7 +1,7 @@
 From 5f167d8ca58730c80cf6ddc3c1e1dcab89d4f786 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:03:24 +0700
-Subject: [PATCH 004/353] arm64: dts: renesas: r8a774c0: Add CPUIdle support
+Subject: [PATCH 004/458] arm64: dts: renesas: r8a774c0: Add CPUIdle support
  for CA53
 
 This patch adds CPUIdle (Core shutdown) support for r8a774c0 SoC.

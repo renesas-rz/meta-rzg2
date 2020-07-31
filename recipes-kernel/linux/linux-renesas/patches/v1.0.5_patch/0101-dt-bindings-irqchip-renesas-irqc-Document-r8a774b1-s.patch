@@ -1,7 +1,7 @@
 From 89db834997af7a6753e3dcc8a155dfb58968247f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 25 Jul 2019 13:05:03 +0700
-Subject: [PATCH 101/353] dt-bindings: irqchip: renesas-irqc: Document r8a774b1
+Subject: [PATCH 101/458] dt-bindings: irqchip: renesas-irqc: Document r8a774b1
  support
 
 Document RZ/G2N (R8A774B1) SoC bindings.

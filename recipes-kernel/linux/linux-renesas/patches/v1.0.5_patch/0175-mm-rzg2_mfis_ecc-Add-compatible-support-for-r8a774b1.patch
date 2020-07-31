@@ -1,7 +1,7 @@
 From 2e10ab7c4a0630611d09f0c329727f4b33fe47ae Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Mon, 25 Nov 2019 14:36:56 +0700
-Subject: [PATCH 175/353] mm: rzg2_mfis_ecc : Add compatible support for
+Subject: [PATCH 175/458] mm: rzg2_mfis_ecc : Add compatible support for
  r8a774b1
 
 Add support for RZ/G2N (r8a774b1)

@@ -1,7 +1,7 @@
 From b4e0da85dfe6b503110d17fbeb1b160f4734cdbd Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Fri, 20 Dec 2019 10:49:34 +0700
-Subject: [PATCH 181/353] arm64: dts: renesas: hihope-common: Enable HS400 mode
+Subject: [PATCH 181/458] arm64: dts: renesas: hihope-common: Enable HS400 mode
  in eMMC node
 
 This patch enables HS400 mode for eMMC for both HiHope G2M and

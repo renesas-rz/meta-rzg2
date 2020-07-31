@@ -1,7 +1,7 @@
 From 0a9489464c3e281f2c0a04b8ff24bd8620e1e2e5 Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Thu, 26 Mar 2020 15:07:15 +0700
-Subject: [PATCH 219/353] arm64: dts: renesas: r8a774e1: Add Ethernet AVB node
+Subject: [PATCH 219/458] arm64: dts: renesas: r8a774e1: Add Ethernet AVB node
 
 This patch adds Ethernet AVB node for R8A774E1 SoC
 

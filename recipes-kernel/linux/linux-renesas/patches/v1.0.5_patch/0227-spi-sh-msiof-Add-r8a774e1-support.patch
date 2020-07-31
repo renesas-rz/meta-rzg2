@@ -1,7 +1,7 @@
 From ab4e92f8ae229fcc58c6ba0d76dc5a4c926a410f Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Mon, 6 Apr 2020 20:00:59 +0700
-Subject: [PATCH 227/353] spi: sh-msiof: Add r8a774e1 support
+Subject: [PATCH 227/458] spi: sh-msiof: Add r8a774e1 support
 
 Document RZ/G2H (R8A774E1) SoC bindings
 

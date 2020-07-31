@@ -1,7 +1,7 @@
 From d1ba67425edb0717b9090ab8d7a463cd719ad9e6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 11:15:29 +0700
-Subject: [PATCH 041/353] arm64: dts: renesas: r8a774c0-ek874-idk-2121wr:
+Subject: [PATCH 041/458] arm64: dts: renesas: r8a774c0-ek874-idk-2121wr:
  enable swapping odd/even data for dual channels LVDS
 
 In sub board, pin-outs of LVDS-IF to dual channels LVDS panel are

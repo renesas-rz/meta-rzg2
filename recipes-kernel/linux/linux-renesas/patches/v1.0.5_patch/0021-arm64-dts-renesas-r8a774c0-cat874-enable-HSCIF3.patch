@@ -1,7 +1,7 @@
 From e94385a6f06b5fdc9a69dc9f498609dd78dc0b3e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:48:45 +0700
-Subject: [PATCH 021/353] arm64: dts: renesas: r8a774c0-cat874: enable HSCIF3
+Subject: [PATCH 021/458] arm64: dts: renesas: r8a774c0-cat874: enable HSCIF3
 
 This patch enables HSCIF3 support
 

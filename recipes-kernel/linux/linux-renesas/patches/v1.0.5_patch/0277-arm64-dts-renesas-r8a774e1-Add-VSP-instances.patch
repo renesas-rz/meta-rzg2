@@ -1,7 +1,7 @@
 From 74f741552e94fd115a4268235a075f508467e564 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 15:47:23 +0700
-Subject: [PATCH 277/353] arm64: dts: renesas: r8a774e1: Add VSP instances
+Subject: [PATCH 277/458] arm64: dts: renesas: r8a774e1: Add VSP instances
 
 The r8a774e1 has 6 VSP instances.
 

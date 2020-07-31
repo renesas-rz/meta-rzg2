@@ -1,7 +1,7 @@
 From 4b728d5fab4725c23dd1900db9d868f4f002993c Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Mon, 11 May 2020 14:48:17 +0700
-Subject: [PATCH 321/353] mmc: renesas_sdhi: Add support HS400 4TAP for
+Subject: [PATCH 321/458] mmc: renesas_sdhi: Add support HS400 4TAP for
  r8a774e1 SoC
 
 This patch adds support mode HS400 for r8a774e1 SoC.

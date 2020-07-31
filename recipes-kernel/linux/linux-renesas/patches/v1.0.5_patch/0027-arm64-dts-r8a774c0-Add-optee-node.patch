@@ -1,7 +1,7 @@
 From 66f106f81312cc8339e61f828c17659e2be0f559 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:30:16 +0700
-Subject: [PATCH 027/353] arm64: dts: r8a774c0: Add optee node
+Subject: [PATCH 027/458] arm64: dts: r8a774c0: Add optee node
 
 This commit adds op-tee node for the R8A774c0 SoC.
 

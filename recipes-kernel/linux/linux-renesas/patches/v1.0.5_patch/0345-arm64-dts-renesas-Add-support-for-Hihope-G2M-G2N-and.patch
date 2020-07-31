@@ -1,7 +1,7 @@
 From f3cb5e78fa12fbc60a514b047c48efd05b5fdb8d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 15:55:20 +0700
-Subject: [PATCH 345/353] arm64: dts: renesas: Add support for Hihope G2M, G2N
+Subject: [PATCH 345/458] arm64: dts: renesas: Add support for Hihope G2M, G2N
  and G2H rev4 platform
 
 This commit is created to support Hihope G2M, G2N and G2H revision 4:

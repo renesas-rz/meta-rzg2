@@ -1,7 +1,7 @@
 From ea7b42c2ade50ba4540706a5b589e7b0038483e1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 18:50:28 +0700
-Subject: [PATCH 133/353] media: rcar-vin: Add support for R8A774A1
+Subject: [PATCH 133/458] media: rcar-vin: Add support for R8A774A1
 
 This patch adds support for r8a774a1 SoC. This is similar with RCar M3-W.
 

@@ -1,7 +1,7 @@
 From ebbf4d4bdb20a7bfe0c0233a4e7ccb4f77e2e7c0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 6 Apr 2020 11:27:45 +0700
-Subject: [PATCH 226/353] arm64: dts: renesas: r8a774e1: add SYS-DMAC nodes
+Subject: [PATCH 226/458] arm64: dts: renesas: r8a774e1: add SYS-DMAC nodes
 
 This patch adds SYS-DMAC{0,1,2} nodes for RZ/G2H (r8a774e1) SoC with
 16 channels for each node.

@@ -1,0 +1,31 @@
+From 86b13ae9ee2ae0ab4e545154b61ebdf6c5814c5f Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Wed, 22 Jul 2020 17:52:05 +0700
+Subject: [PATCH 394/458] ASoC: rsnd: Document r8a774a3 (RZ/G2M v3.0) audio
+ support
+
+Document audio support for R8A774A3 (RZ/G2M v3.0) SoC.
+Also update description of previous RZ/G2M v1.3 SoC (R8A774A1).
+
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ Documentation/devicetree/bindings/sound/renesas,rsnd.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/sound/renesas,rsnd.txt b/Documentation/devicetree/bindings/sound/renesas,rsnd.txt
+index 438e6c1..bb82d39 100644
+--- a/Documentation/devicetree/bindings/sound/renesas,rsnd.txt
++++ b/Documentation/devicetree/bindings/sound/renesas,rsnd.txt
+@@ -344,7 +344,8 @@ Required properties:
+ 				  Examples with soctypes are:
+ 				    - "renesas,rcar_sound-r8a7743" (RZ/G1M)
+ 				    - "renesas,rcar_sound-r8a7745" (RZ/G1E)
+-				    - "renesas,rcar_sound-r8a774a1" (RZ/G2M)
++				    - "renesas,rcar_sound-r8a774a1" (RZ/G2M v1.3)
++				    - "renesas,rcar_sound-r8a774a3" (RZ/G2M v3.0)
+ 				    - "renesas,rcar_sound-r8a774b1" (RZ/G2N)
+ 				    - "renesas,rcar_sound-r8a774c0" (RZ/G2E)
+ 				    - "renesas,rcar_sound-r8a774e1" (RZ/G2H)
+-- 
+2.7.4
+

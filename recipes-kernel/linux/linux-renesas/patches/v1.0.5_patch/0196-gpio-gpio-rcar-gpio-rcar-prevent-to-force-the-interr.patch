@@ -1,7 +1,7 @@
 From 4c30d6cf46f26b89751421a2451857a62d3171f5 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 8 Oct 2019 14:58:07 +0700
-Subject: [PATCH 196/353] gpio: gpio-rcar: gpio-rcar: prevent to force the
+Subject: [PATCH 196/458] gpio: gpio-rcar: gpio-rcar: prevent to force the
  interrupt handler as thread
 
 On RT system, when kernel is booting with CONFIG_IRQ_FORCED_THREADING

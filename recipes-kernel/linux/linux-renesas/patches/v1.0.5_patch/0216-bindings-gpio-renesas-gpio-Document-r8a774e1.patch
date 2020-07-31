@@ -1,7 +1,7 @@
 From be6308e6fe3e9316219524b39366bec438b39c15 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hieppham@renesas.com>
 Date: Wed, 25 Mar 2020 15:55:00 +0700
-Subject: [PATCH 216/353] bindings: gpio: renesas: gpio: Document r8a774e1
+Subject: [PATCH 216/458] bindings: gpio: renesas: gpio: Document r8a774e1
 
 This patch documents RG/G2H (R8A774E1) bindings for GPIO driver.
 

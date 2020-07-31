@@ -1,7 +1,7 @@
 From 60e01eda5bf164fbefb42be401dfb2fbf0fd9890 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 15:19:54 +0700
-Subject: [PATCH 080/353] arm64: dts: renesas: r8a774a1: Add TPU nodes
+Subject: [PATCH 080/458] arm64: dts: renesas: r8a774a1: Add TPU nodes
 
 This patch adds TPU node for SoC R8A774A1.
 

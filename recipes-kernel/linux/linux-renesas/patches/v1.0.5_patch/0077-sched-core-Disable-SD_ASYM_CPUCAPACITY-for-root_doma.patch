@@ -1,7 +1,7 @@
 From ce3ea63201005954a57b05c36757012403d71520 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 3 Jun 2019 13:11:12 +0700
-Subject: [PATCH 077/353] sched/core: Disable SD_ASYM_CPUCAPACITY for
+Subject: [PATCH 077/458] sched/core: Disable SD_ASYM_CPUCAPACITY for
  root_domains without asymmetry
 
 When hotplugging cpus out or creating exclusive cpusets (disabling

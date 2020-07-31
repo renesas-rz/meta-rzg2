@@ -1,7 +1,7 @@
 From a53baf90ceb67b6dd5e7fb2011c9113a28a29ed3 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 10:14:11 +0700
-Subject: [PATCH 052/353] arm64: dts: renesas: r8a774a1-hihope-rzg2m-ex: Enable
+Subject: [PATCH 052/458] arm64: dts: renesas: r8a774a1-hihope-rzg2m-ex: Enable
  PCIE1 as default
 
 In RZ/G2M, we can choose the output between PCIE1 and SATA
