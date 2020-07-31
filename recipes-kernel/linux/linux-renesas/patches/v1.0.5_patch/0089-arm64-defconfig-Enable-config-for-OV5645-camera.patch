@@ -1,7 +1,7 @@
 From 054db75850c3d75fae0a72e77af93c573abf8367 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:49:03 +0700
-Subject: [PATCH 089/350] arm64: defconfig: Enable config for OV5645 camera.
+Subject: [PATCH 089/455] arm64: defconfig: Enable config for OV5645 camera.
 
 This patch enables config for ov5645 camera.
 

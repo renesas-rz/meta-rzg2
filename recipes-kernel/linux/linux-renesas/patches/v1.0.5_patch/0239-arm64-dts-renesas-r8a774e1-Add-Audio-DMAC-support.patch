@@ -1,7 +1,7 @@
 From 96c0909f0ab436d3129702401b6df5ecdb350081 Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 14:12:07 +0700
-Subject: [PATCH 239/350] arm64: dts: renesas: r8a774e1: Add Audio-DMAC support
+Subject: [PATCH 239/455] arm64: dts: renesas: r8a774e1: Add Audio-DMAC support
 
 This patch adds Audio-DMAC[0,1] support for the R8A774E1 (RZ/G2H) SoC.
 

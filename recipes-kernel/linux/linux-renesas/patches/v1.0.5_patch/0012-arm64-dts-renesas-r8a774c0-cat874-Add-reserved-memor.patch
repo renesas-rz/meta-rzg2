@@ -1,7 +1,7 @@
 From 63f183aedd602c44e14fb4487ac38d90d9968c7a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:28:06 +0700
-Subject: [PATCH 012/350] arm64: dts: renesas: r8a774c0-cat874: Add reserved
+Subject: [PATCH 012/455] arm64: dts: renesas: r8a774c0-cat874: Add reserved
  memory region
 
 This patch adds reserved memory region for default CMA area:

@@ -1,7 +1,7 @@
 From 45c6689512fb267b73ddbc2113325309d8d5761f Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 27 May 2020 11:27:29 +0700
-Subject: [PATCH 326/350] PCI: pcie-rcar: set host bridge's DMA mask
+Subject: [PATCH 326/455] PCI: pcie-rcar: set host bridge's DMA mask
 
 This gives platform DMA mapping code a chance to disallow setting device
 DMA mask to something that host bridge can't support.

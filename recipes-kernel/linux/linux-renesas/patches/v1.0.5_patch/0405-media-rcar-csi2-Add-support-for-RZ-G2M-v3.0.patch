@@ -1,0 +1,32 @@
+From 324eb31937ea33bc1155be7997b14f7a93c66c3c Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 28 Jul 2020 14:06:00 +0700
+Subject: [PATCH 405/455] media: rcar-csi2: Add support for RZ/G2M v3.0
+
+According to the RZ/G2 User's manual, RZ/G2M v3.0 and RZ/G2M v1.3
+CSI-2 blocks are identical, therefore use RZ/G2M v1.3 (a.k.a R8A774A1)
+definitions to add RZ/G2M v3.0 (a.k.a R8A774A3) support.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-csi2.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-csi2.c b/drivers/media/platform/rcar-vin/rcar-csi2.c
+index 7a5a35c..91537ec 100644
+--- a/drivers/media/platform/rcar-vin/rcar-csi2.c
++++ b/drivers/media/platform/rcar-vin/rcar-csi2.c
+@@ -980,6 +980,10 @@ static const struct of_device_id rcar_csi2_of_table[] = {
+ 		.data = &rcar_csi2_info_r8a7796,
+ 	},
+ 	{
++		.compatible = "renesas,r8a774a3-csi2",
++		.data = &rcar_csi2_info_r8a7796,
++	},
++	{
+ 		.compatible = "renesas,r8a774b1-csi2",
+ 		.data = &rcar_csi2_info_r8a77965,
+ 	},
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
 From 5530ec191212278c5a73d8b7b74d0c0ae5ddc93d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:00:32 +0700
-Subject: [PATCH 195/350] dt-bindings: arm: renesas: Document RZ/G2H SoC DT
+Subject: [PATCH 195/455] dt-bindings: arm: renesas: Document RZ/G2H SoC DT
  bindings
 
 Add device tree bindings documentation for the Renesas RZ/G2H (r8a774e1)

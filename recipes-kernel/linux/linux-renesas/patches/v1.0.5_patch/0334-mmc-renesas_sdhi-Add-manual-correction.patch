@@ -1,7 +1,7 @@
 From 870d2579f837774e0313c503d1699f2fd1d3dada Mon Sep 17 00:00:00 2001
 From: Takeshi Saito <takeshi.saito.xv@renesas.com>
 Date: Thu, 11 Jun 2020 14:58:38 +0700
-Subject: [PATCH 334/350] mmc: renesas_sdhi: Add manual correction
+Subject: [PATCH 334/455] mmc: renesas_sdhi: Add manual correction
 
 This patch adds a manual correction mechanism for SDHI. Currently, SDHI
 uses automatic TAP position correction. However, TAP position can also

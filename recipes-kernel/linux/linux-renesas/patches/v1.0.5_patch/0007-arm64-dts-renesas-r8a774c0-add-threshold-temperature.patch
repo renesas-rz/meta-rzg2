@@ -1,7 +1,7 @@
 From b88e8974540ae0eae1827ff7fdeeae95703d073b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:22:16 +0700
-Subject: [PATCH 007/350] arm64: dts: renesas: r8a774c0: add threshold
+Subject: [PATCH 007/455] arm64: dts: renesas: r8a774c0: add threshold
  temperature to enable IPA
 
 This patch adds threshold temperature to enable IPA in R8A774C0 SoC.

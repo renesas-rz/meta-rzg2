@@ -1,0 +1,80 @@
+From b84b6f3ef663281d7220da10c896283e259ab1c0 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 30 Jul 2020 13:25:45 +0700
+Subject: [PATCH 446/455] arm64: dts: renesas: r8a774a3: Add FCPV instances
+
+The FCPs handle the interface between various IP cores and memory. Add
+ the instances related to the FDPs and VSP2s.
+
+The FCPF0 was removed because FCP is controlled by VSP2/VSPM driver.
+ If originally define FCPF0, the upstream code will be used
+ ( drivers/media/platform/rcar-fcp.c ), but we do not use this code.
+ So, it is not necessary to add in device tree.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 0f9ae8e..930d405 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -2217,34 +2217,44 @@
+ 			renesas,#ch = <0>;
+ 		};
+ 
+-		fcpf0: fcp@fe950000 {
+-			reg = <0 0xfe950000 0 0x200>;
+-			/* placeholder */
+-		};
+-
+ 		fcpvb0: fcp@fe96f000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfe96f000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 607>;
++			power-domains = <&sysc R8A774A3_PD_A3VC>;
++			resets = <&cpg 607>;
+ 		};
+ 
+ 		fcpvd0: fcp@fea27000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 603>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 603>;
+ 		};
+ 
+ 		fcpvd1: fcp@fea2f000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea2f000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 602>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 602>;
+ 		};
+ 
+ 		fcpvd2: fcp@fea37000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea37000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 601>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 601>;
+ 		};
+ 
+ 		fcpvi0: fcp@fe9af000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfe9af000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 611>;
++			power-domains = <&sysc R8A774A3_PD_A3VC>;
++			resets = <&cpg 611>;
+ 		};
+ 
+ 		vsp@fe960000 {
+-- 
+2.7.4
+

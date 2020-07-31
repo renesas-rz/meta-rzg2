@@ -1,0 +1,172 @@
+From a1137a0d4580dc5adab6fd65d7399df72e4d59e3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 28 Jul 2020 15:14:49 +0700
+Subject: [PATCH 407/455] arm64: dts: renesas: r8a774a3-hihope-rzg2m: Add
+ support for AISTARVISION MIPI Adapter V2.1
+
+This patch adds support for AISTARVISION MIPI Adapter V2.1 board
+connected to G2M v3.0 board.
+G2M v3.0 can support 2 CSI2-IFs:
+- CSI20
+- CSI40
+
+Currently, G2M v3.0 Board just supports 1 CSI2-IF is CSI20 and disable
+CSI40 by default with reasons:
+- VIN/CSI2 can work normally when connect 2 cameras in 2 CSI2-IFs
+(CSI20, CSI40) at the same time.
+- VIN/CSI2 can not work when disconnect 1 camera in CSI20 or CSI40.
+
+Therefore, please delete the commenting out at status property of CSI40
+if you want to use 2 cameras at the same time.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |   1 +
+ .../renesas/r8a774a3-hihope-rzg2m-ex-mipi-2.1.dts  | 123 +++++++++++++++++++++
+ 2 files changed, 124 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex-mipi-2.1.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 3a752f4..97192ca 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -9,6 +9,7 @@ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-ex-rev2-idk-1110wr.dtb
+ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-ex-rev2-mipi-2.1.dtb
+ dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m.dtb
+ dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m-ex.dtb
++dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m-ex-mipi-2.1.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-ex-idk-1110wr.dtb
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex-mipi-2.1.dts
+new file mode 100644
+index 0000000..0ca8819
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex-mipi-2.1.dts
+@@ -0,0 +1,123 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HopeRun HiHope RZ/G2M v3.0 Platform
++ * connected with aistarvision-mipi-v2-adapter board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++/dts-v1/;
++#include "r8a774a3-hihope-rzg2m-ex.dts"
++#define MIPI_PARENT_I2C_CSI20 i2c2
++#define MIPI_PARENT_I2C_CSI40 i2c3
++#include "aistarvision-mipi-adapter-2.1.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2M v3.0 with sub board with aistarvision-mipi-v2-adapter board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m",
++		     "renesas,r8a774a3";
++};
++
++&vin0 {
++	status = "okay";
++};
++
++&vin1 {
++	status = "okay";
++};
++
++&vin2 {
++	status = "okay";
++};
++
++&vin3 {
++	status = "okay";
++};
++
++&vin4 {
++	status = "okay";
++};
++
++&vin5 {
++	status = "okay";
++};
++
++&vin6 {
++	status = "okay";
++};
++
++&vin7 {
++	status = "okay";
++};
++
++&csi20 {
++	status = "okay";
++
++	ports {
++		port {
++			csi20_in: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&ov5645_csi20_ep>;
++			};
++		};
++	};
++};
++
++&ov5645_csi20 {
++	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
++	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
++
++	virtual-channel = /bits/ 8 <0>;
++
++	port {
++		ov5645_csi20_ep: endpoint {
++			clock-lanes = <0>;
++			data-lanes = <1 2>;
++			remote-endpoint = <&csi20_in>;
++		};
++	};
++};
++
++&pfc {
++	i2c3_pins: i2c3 {
++		groups = "i2c3";
++		function = "i2c3";
++	};
++};
++
++&i2c3 {
++	pinctrl-0 = <&i2c3_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++};
++
++&csi40 {
++	/* Remove below commenting out if want to use 2 cameras */
++	/* status = "okay"; */
++
++	ports {
++		port {
++			csi40_in: endpoint {
++				clock-lanes = <0>;
++				data-lanes = <1 2>;
++				remote-endpoint = <&ov5645_csi40_ep>;
++			};
++		};
++	};
++};
++
++&ov5645_csi40 {
++	enable-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
++	reset-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
++
++	virtual-channel = /bits/ 8 <0>;
++
++	port {
++		ov5645_csi40_ep: endpoint {
++			clock-lanes = <0>;
++			data-lanes = <1 2>;
++			remote-endpoint = <&csi40_in>;
++		};
++	};
++};
+-- 
+2.7.4
+

@@ -1,7 +1,7 @@
 From 5c5731633eaceae17d88c5ca134ba54ba6f32366 Mon Sep 17 00:00:00 2001
 From: Takeshi Saito <takeshi.saito.xv@renesas.com>
 Date: Thu, 11 Jun 2020 15:11:47 +0700
-Subject: [PATCH 330/350] mmc: renesas_sdhi: Add manual calibration parameters
+Subject: [PATCH 330/455] mmc: renesas_sdhi: Add manual calibration parameters
  by devicetree
 
 The manual calibration parameters can be customized by devicetree.

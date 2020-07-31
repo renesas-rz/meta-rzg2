@@ -1,7 +1,7 @@
 From 6f3695ef3f9cb78ecaf3420e91443442161975be Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 14 Apr 2020 14:55:04 +0700
-Subject: [PATCH 297/350] arm64: dts: renesas: r8a774e1: Create thermal zone to
+Subject: [PATCH 297/455] arm64: dts: renesas: r8a774e1: Create thermal zone to
  support IPA
 
 Based on commit <bcd5ff89708e8e888a2433e7a2605ee860bbf79b> from

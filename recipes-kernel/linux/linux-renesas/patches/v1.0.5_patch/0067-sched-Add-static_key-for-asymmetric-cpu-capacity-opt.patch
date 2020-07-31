@@ -1,7 +1,7 @@
 From c2ca940cc009eb93e732251b04e2ee1e68e1aee8 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:10:05 +0700
-Subject: [PATCH 067/350] sched: Add static_key for asymmetric cpu capacity
+Subject: [PATCH 067/455] sched: Add static_key for asymmetric cpu capacity
  optimizations
 
 The existing asymmetric cpu capacity code should cause minimal

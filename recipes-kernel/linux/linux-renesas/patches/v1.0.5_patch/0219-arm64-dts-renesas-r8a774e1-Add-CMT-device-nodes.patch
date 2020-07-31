@@ -1,7 +1,7 @@
 From c443ba703048c76e75e8aa2e11e486cd9258f1e8 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 27 Mar 2020 13:34:36 +0700
-Subject: [PATCH 219/350] arm64: dts: renesas: r8a774e1: Add CMT device nodes
+Subject: [PATCH 219/455] arm64: dts: renesas: r8a774e1: Add CMT device nodes
 
 Add CMT device nodes to support on RZG2H (r8a774e1).
 

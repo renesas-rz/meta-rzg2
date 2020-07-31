@@ -1,7 +1,7 @@
 From 70243af2a74856405551da91c10ffd0a624b7f3f Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Mon, 13 Apr 2020 15:42:08 +0700
-Subject: [PATCH 258/350] Thermal: rcar_gen3_thermal: Thermal support for
+Subject: [PATCH 258/455] Thermal: rcar_gen3_thermal: Thermal support for
  RZ/G2H
 
 This patch adds thermal compatible string for R8A774E1 SoC.

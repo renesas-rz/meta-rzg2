@@ -1,7 +1,7 @@
 From 8562c073dae4c465058f34e9d7440e389c818cd7 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Fri, 19 Jul 2019 13:52:17 +0700
-Subject: [PATCH 099/350] arm64: dts: r8a774a1: add optee node
+Subject: [PATCH 099/455] arm64: dts: r8a774a1: add optee node
 
 Add optee support for r8a774a1
 

@@ -1,7 +1,7 @@
 From 4d664e2c9c7f2fc7da5e862da67918915fdd2f63 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 25 Apr 2019 14:40:51 +0700
-Subject: [PATCH 043/350] arm64: defconfig: enable PWM based Backlight in RZ/G2
+Subject: [PATCH 043/455] arm64: defconfig: enable PWM based Backlight in RZ/G2
  SoC
 
 This patch enables config for support PWM based Backlight

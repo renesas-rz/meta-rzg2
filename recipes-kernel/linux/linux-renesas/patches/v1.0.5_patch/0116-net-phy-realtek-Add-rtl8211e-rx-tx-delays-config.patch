@@ -1,7 +1,7 @@
 From f6cb29535fc637fdb1e97c88b16f0b82405c9c81 Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Thu, 5 Sep 2019 17:04:06 +0700
-Subject: [PATCH 116/350] net: phy: realtek: Add rtl8211e rx/tx delays config
+Subject: [PATCH 116/455] net: phy: realtek: Add rtl8211e rx/tx delays config
 
 There are two chip pins named TXDLY and RXDLY which actually adds the 2ns
 delays to TXC and RXC for TXD/RXD latching. Alas this is the only

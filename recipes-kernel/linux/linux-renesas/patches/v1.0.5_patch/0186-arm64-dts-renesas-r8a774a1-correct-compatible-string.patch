@@ -1,7 +1,7 @@
 From b2bea8aaeff592859393a4ffd970d5423778bce6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 6 Mar 2020 14:54:07 +0700
-Subject: [PATCH 186/350] arm64: dts: renesas: r8a774a1: correct compatible
+Subject: [PATCH 186/455] arm64: dts: renesas: r8a774a1: correct compatible
  string for ipmmu-vc0
 
 This commit correct compatible string for ipmmu-vc0, which is

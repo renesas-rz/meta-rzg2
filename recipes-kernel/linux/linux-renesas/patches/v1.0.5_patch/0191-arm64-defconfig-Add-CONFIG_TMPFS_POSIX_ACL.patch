@@ -1,7 +1,7 @@
 From cd6237827bd6893b1dd6be3042791651ab3cfc82 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 10 Mar 2020 15:12:32 +0700
-Subject: [PATCH 191/350] arm64: defconfig: Add CONFIG_TMPFS_POSIX_ACL
+Subject: [PATCH 191/455] arm64: defconfig: Add CONFIG_TMPFS_POSIX_ACL
 
 This patch enables config CONFIG_TMPFS_POSIX_ACL in defconfig to
 support addtional access rights for users and groups for ACLs

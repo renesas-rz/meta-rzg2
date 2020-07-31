@@ -1,7 +1,7 @@
 From 91e7c21570cf10d49d21466cb735f3f8f8ae8923 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 10:04:04 +0700
-Subject: [PATCH 203/350] soc: renesas: rcar-rst: Add support for RZ/G2H
+Subject: [PATCH 203/455] soc: renesas: rcar-rst: Add support for RZ/G2H
 
 Add support for RZ/G2H (R8A774E1) to the R-Car RST driver.
 

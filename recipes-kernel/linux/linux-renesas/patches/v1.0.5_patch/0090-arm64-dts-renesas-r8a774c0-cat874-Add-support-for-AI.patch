@@ -1,7 +1,7 @@
 From ca82ee75370f970337371fc54c9f569a13cc9835 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 13:14:44 +0700
-Subject: [PATCH 090/350] arm64: dts: renesas: r8a774c0-cat874: Add support for
+Subject: [PATCH 090/455] arm64: dts: renesas: r8a774c0-cat874: Add support for
  AISTARVISION MIPI Adapter V2.1
 
 Commit <0e36587c0832af5df894f5e5fcc45fb5a05cea5b> upstream.

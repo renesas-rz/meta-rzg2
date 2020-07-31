@@ -1,7 +1,7 @@
 From cef2ccfa29a1c9e2cd688129e63835690b382610 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 12 May 2020 15:32:09 +0700
-Subject: [PATCH 322/350] arm64: dts: renesas: r8a774e1: add device node for
+Subject: [PATCH 322/455] arm64: dts: renesas: r8a774e1: add device node for
  MFIS
 
 Add support MFIS for r8a774e1.

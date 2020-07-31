@@ -1,7 +1,7 @@
 From 7196d2f78e76567045387dea765e9390ffed977c Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:36:43 +0700
-Subject: [PATCH 062/350] arm64: dts: renesas: r8a774a1: change to use fdpm as
+Subject: [PATCH 062/455] arm64: dts: renesas: r8a774a1: change to use fdpm as
  fdp
 
 This patch changes device node fdp to use by fdpm.

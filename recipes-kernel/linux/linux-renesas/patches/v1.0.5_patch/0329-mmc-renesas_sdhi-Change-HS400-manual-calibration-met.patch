@@ -1,7 +1,7 @@
 From d587fb8ed909a24cbedd2e943bde98dac0c9e5c8 Mon Sep 17 00:00:00 2001
 From: Takeshi Saito <takeshi.saito.xv@renesas.com>
 Date: Thu, 11 Jun 2020 15:11:37 +0700
-Subject: [PATCH 329/350] mmc: renesas_sdhi: Change HS400 manual calibration
+Subject: [PATCH 329/455] mmc: renesas_sdhi: Change HS400 manual calibration
  method
 
 The manual calibration value is changed from a fixed value

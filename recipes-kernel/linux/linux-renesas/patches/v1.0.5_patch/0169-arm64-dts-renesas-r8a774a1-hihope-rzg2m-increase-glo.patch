@@ -1,7 +1,7 @@
 From 0e8be720c8157b6556cb9b7f38bb2f4d648d7eb3 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Tue, 19 Nov 2019 17:25:43 +0700
-Subject: [PATCH 169/350] arm64: dts: renesas: r8a774a1-hihope-rzg2m: increase
+Subject: [PATCH 169/455] arm64: dts: renesas: r8a774a1-hihope-rzg2m: increase
  global CMA to 512MB
 
 For ensure that hihope rz/g2m can handle Fullscreen of Qt Multimedia

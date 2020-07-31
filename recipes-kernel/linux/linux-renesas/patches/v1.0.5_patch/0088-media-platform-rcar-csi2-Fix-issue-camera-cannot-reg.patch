@@ -1,7 +1,7 @@
 From faca58abf0f7c211f08ea4c6681b898feb4c16b1 Mon Sep 17 00:00:00 2001
 From: Tri Luong <tri.luong.te@renesas.com>
 Date: Fri, 21 Jun 2019 13:17:26 +0700
-Subject: [PATCH 088/350] media: platform: rcar-csi2: Fix issue camera cannot
+Subject: [PATCH 088/455] media: platform: rcar-csi2: Fix issue camera cannot
  register to VIN.
 
 Reason is fwnodes path is different between CSI2 and Camera sensor:

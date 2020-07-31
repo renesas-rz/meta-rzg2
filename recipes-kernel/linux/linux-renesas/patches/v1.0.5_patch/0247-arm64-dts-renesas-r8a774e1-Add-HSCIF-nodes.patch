@@ -1,7 +1,7 @@
 From cc42e94aef86bbe2b8f3e58b4002007324e1693a Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:36:29 +0700
-Subject: [PATCH 247/350] arm64: dts: renesas: r8a774e1: Add HSCIF nodes
+Subject: [PATCH 247/455] arm64: dts: renesas: r8a774e1: Add HSCIF nodes
 
 This commit adds the device nodes for all RZ/G2H HSCIF serial ports,
 incl. Clock, power-domains and DMAs.

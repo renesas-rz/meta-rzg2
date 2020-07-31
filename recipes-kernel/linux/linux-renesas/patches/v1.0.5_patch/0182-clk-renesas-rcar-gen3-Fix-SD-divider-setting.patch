@@ -1,7 +1,7 @@
 From 1db43689c229e56fc73b7ff8f6f50ca77085c1cd Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 11 Dec 2019 10:26:28 +0700
-Subject: [PATCH 182/350] clk: renesas: rcar-gen3: Fix SD divider setting
+Subject: [PATCH 182/455] clk: renesas: rcar-gen3: Fix SD divider setting
 
 This patch is based on commit:
 <2de4f963524d2f6f0c0373f684fb7f0af997d4a7>

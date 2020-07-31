@@ -1,7 +1,7 @@
 From c215e30b75b38e3efe9c895c677512358269e499 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:48:54 +0700
-Subject: [PATCH 073/350] sched: Change root_domain->overload type to int
+Subject: [PATCH 073/455] sched: Change root_domain->overload type to int
 
 sizeof(_Bool) is implementation defined, so let's just go with 'int' as
 is done for other structures e.g. sched_domain_shared->has_idle_cores.

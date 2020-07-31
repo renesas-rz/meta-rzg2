@@ -1,7 +1,7 @@
 From 997b00016a9e56cbbe98d43efddb511d48d58f2e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 11:57:46 +0700
-Subject: [PATCH 122/350] arm64: dts: renesas: r8a774b1: change fdp to fdpm
+Subject: [PATCH 122/455] arm64: dts: renesas: r8a774b1: change fdp to fdpm
 
 This commit changes device node for fdp used by fdpm.
 

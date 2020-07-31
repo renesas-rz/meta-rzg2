@@ -1,7 +1,7 @@
 From a3915e22973c745932213acdfe04180e63666a34 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 11:21:21 +0700
-Subject: [PATCH 230/350] dt-bindings: irqchip: renesas-irqc: Document r8a774e1
+Subject: [PATCH 230/455] dt-bindings: irqchip: renesas-irqc: Document r8a774e1
  support
 
 Document RZ/G2H (R8A774E1) SoC bindings.

@@ -1,0 +1,27 @@
+From d53f4e5f4f02d880b4ae32c28cec2e8d82c4a3ef Mon Sep 17 00:00:00 2001
+From: Quynh Nguyen <quynh.nguyen.xb@renesas.com>
+Date: Thu, 23 Jul 2020 15:09:40 +0700
+Subject: [PATCH 374/455] dt-bindings: can: rcar_can: document r8a774a3 support
+
+This patch adds document for RZ/G2M v3.0 R8A774A3 SoC.
+
+Signed-off-by: Quynh Nguyen <quynh.nguyen.xb@renesas.com>
+---
+ Documentation/devicetree/bindings/net/can/rcar_can.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/can/rcar_can.txt b/Documentation/devicetree/bindings/net/can/rcar_can.txt
+index b825bb0..70b55ec 100644
+--- a/Documentation/devicetree/bindings/net/can/rcar_can.txt
++++ b/Documentation/devicetree/bindings/net/can/rcar_can.txt
+@@ -5,6 +5,7 @@ Required properties:
+ - compatible: "renesas,can-r8a7743" if CAN controller is a part of R8A7743 SoC.
+ 	      "renesas,can-r8a7745" if CAN controller is a part of R8A7745 SoC.
+ 	      "renesas,can-r8a774a1" if CAN controller is a part of R8A774A1 SoC.
++	      "renesas,can-r8a774a3" if CAN controller is a part of R8A774A3 SoC.
+ 	      "renesas,can-r8a774b1" if CAN controller is a part of R8A774B1 SoC.
+ 	      "renesas,can-r8a774c0" if CAN controller is a part of R8A774C0 SoC.
+ 	      "renesas,can-r8a774e1" if CAN controller is a part of R8A774E1 SoC.
+-- 
+2.7.4
+

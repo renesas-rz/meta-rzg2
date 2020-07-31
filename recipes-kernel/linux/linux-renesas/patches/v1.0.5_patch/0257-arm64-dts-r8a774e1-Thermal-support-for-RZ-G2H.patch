@@ -1,7 +1,7 @@
 From c8a1f5be3c12d57530ada3b5ad1cb6522b8b5b4c Mon Sep 17 00:00:00 2001
 From: Dat Nguyen <dat.nguyen.ra@rensas.com>
 Date: Mon, 13 Apr 2020 15:43:46 +0700
-Subject: [PATCH 257/350] arm64: dts: r8a774e1: Thermal support for RZ/G2H
+Subject: [PATCH 257/455] arm64: dts: r8a774e1: Thermal support for RZ/G2H
 
 This patch enables thermal support for R8A774E1 SoC
 

@@ -1,7 +1,7 @@
 From e8e676e4179b917df1ce41e816dcef09aeeae92c Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Thu, 11 Jun 2020 14:46:01 +0700
-Subject: [PATCH 327/350] mmc: tmio: Add adjust HS400 offset by manual
+Subject: [PATCH 327/455] mmc: tmio: Add adjust HS400 offset by manual
  calibration mode
 
 Since Gen3/RZG2 SDHI has an internal DS signal AC-spec violation in HS400,

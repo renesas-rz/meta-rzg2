@@ -1,7 +1,7 @@
 From d208eeff30b801ad84596e731a4f7201e8bc560e Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 14:53:08 +0700
-Subject: [PATCH 081/350] arm64: dts: renesas: hihope-common: enable msiof0
+Subject: [PATCH 081/455] arm64: dts: renesas: hihope-common: enable msiof0
  node
 
 This patch enable MSIOF0 on the common part for HiHope Board.

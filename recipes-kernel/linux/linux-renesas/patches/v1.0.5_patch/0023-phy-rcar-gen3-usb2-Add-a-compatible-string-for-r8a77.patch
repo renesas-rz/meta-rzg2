@@ -1,7 +1,7 @@
 From 29c4a5bfbe4a2ca477895740ad41223b304752bc Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 10:52:56 +0700
-Subject: [PATCH 023/350] phy: rcar-gen3-usb2: Add a compatible string for
+Subject: [PATCH 023/455] phy: rcar-gen3-usb2: Add a compatible string for
  r8a774c0
 
 This patch adds a compatible string for r8a774c0.

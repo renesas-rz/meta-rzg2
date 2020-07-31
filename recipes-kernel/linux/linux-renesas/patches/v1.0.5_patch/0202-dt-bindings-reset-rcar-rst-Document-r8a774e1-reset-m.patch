@@ -1,7 +1,7 @@
 From ddb00a37bb9f888d857e36579c20846859961026 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 10:00:51 +0700
-Subject: [PATCH 202/350] dt-bindings: reset: rcar-rst: Document r8a774e1 reset
+Subject: [PATCH 202/455] dt-bindings: reset: rcar-rst: Document r8a774e1 reset
  module
 
 Document bindings for the RZ/G2H (R8A774E1) reset module.

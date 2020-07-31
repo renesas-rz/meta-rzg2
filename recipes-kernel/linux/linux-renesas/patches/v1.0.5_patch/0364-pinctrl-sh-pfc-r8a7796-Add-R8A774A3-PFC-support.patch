@@ -1,0 +1,134 @@
+From df1fb7d3a314b3f65ace9bb6559d4916cc883a4d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 15:59:35 +0700
+Subject: [PATCH 364/455] pinctrl: sh-pfc: r8a7796: Add R8A774A3 PFC support
+
+Add support for the Pin Function Controller in the RZ/G2M v3.0
+(R8A774A3) SoC.
+
+RZ/G2M v3.0 is pin compatible with RZ/G2M v1.3 (R8A774A1), which allows
+for both SoCs to share a driver.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/pinctrl/sh-pfc/Kconfig       |  5 +++++
+ drivers/pinctrl/sh-pfc/Makefile      |  1 +
+ drivers/pinctrl/sh-pfc/core.c        |  7 +++++++
+ drivers/pinctrl/sh-pfc/pfc-r8a7796.c | 29 +++++++++++++++++++++++++++--
+ drivers/pinctrl/sh-pfc/sh_pfc.h      |  1 +
+ 5 files changed, 41 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pinctrl/sh-pfc/Kconfig b/drivers/pinctrl/sh-pfc/Kconfig
+index bcbb532..9dec384 100644
+--- a/drivers/pinctrl/sh-pfc/Kconfig
++++ b/drivers/pinctrl/sh-pfc/Kconfig
+@@ -54,6 +54,11 @@ config PINCTRL_PFC_R8A774A1
+         depends on ARCH_R8A774A1
+         select PINCTRL_SH_PFC
+ 
++config PINCTRL_PFC_R8A774A3
++        def_bool y
++        depends on ARCH_R8A774A3
++        select PINCTRL_SH_PFC
++
+ config PINCTRL_PFC_R8A774B1
+         def_bool y
+         depends on ARCH_R8A774B1
+diff --git a/drivers/pinctrl/sh-pfc/Makefile b/drivers/pinctrl/sh-pfc/Makefile
+index 5cd1027..2d4b7e9 100644
+--- a/drivers/pinctrl/sh-pfc/Makefile
++++ b/drivers/pinctrl/sh-pfc/Makefile
+@@ -8,6 +8,7 @@ obj-$(CONFIG_PINCTRL_PFC_R8A7743)	+= pfc-r8a7791.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A7745)	+= pfc-r8a7794.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A77470)	+= pfc-r8a77470.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A774A1)	+= pfc-r8a7796.o
++obj-$(CONFIG_PINCTRL_PFC_R8A774A3)	+= pfc-r8a7796.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A774B1)	+= pfc-r8a77965.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A774C0)	+= pfc-r8a77990.o
+ obj-$(CONFIG_PINCTRL_PFC_R8A774E1)	+= pfc-r8a7795.o
+diff --git a/drivers/pinctrl/sh-pfc/core.c b/drivers/pinctrl/sh-pfc/core.c
+index 6396d43..7fde675 100644
+--- a/drivers/pinctrl/sh-pfc/core.c
++++ b/drivers/pinctrl/sh-pfc/core.c
+@@ -5,6 +5,7 @@
+  *
+  * Copyright (C) 2008 Magnus Damm
+  * Copyright (C) 2009 - 2012 Paul Mundt
++ * Copyright (C) 2019-2020 Renesas Electronics Corp.
+  *
+  * This file is subject to the terms and conditions of the GNU General Public
+  * License.  See the file "COPYING" in the main directory of this archive
+@@ -515,6 +516,12 @@ static const struct of_device_id sh_pfc_of_table[] = {
+ 		.data = &r8a774a1_pinmux_info,
+ 	},
+ #endif
++#ifdef CONFIG_PINCTRL_PFC_R8A774A3
++	{
++		.compatible = "renesas,pfc-r8a774a3",
++		.data = &r8a774a3_pinmux_info,
++	},
++#endif
+ #ifdef CONFIG_PINCTRL_PFC_R8A774B1
+ 	{
+ 		.compatible = "renesas,pfc-r8a774b1",
+diff --git a/drivers/pinctrl/sh-pfc/pfc-r8a7796.c b/drivers/pinctrl/sh-pfc/pfc-r8a7796.c
+index 9d2c963..a8f6aa0 100644
+--- a/drivers/pinctrl/sh-pfc/pfc-r8a7796.c
++++ b/drivers/pinctrl/sh-pfc/pfc-r8a7796.c
+@@ -1,7 +1,7 @@
+ /*
+- * R8A7796 processor support - PFC hardware block.
++ * R8A7796 (R-Car M3-W/W+) processor support - PFC hardware block.
+  *
+- * Copyright (C) 2016-2019 Renesas Electronics Corp.
++ * Copyright (C) 2016-2020 Renesas Electronics Corp.
+  *
+  * This file is based on the drivers/pinctrl/sh-pfc/pfc-r8a7795.c
+  *
+@@ -6213,6 +6213,31 @@ const struct sh_pfc_soc_info r8a774a1_pinmux_info = {
+ };
+ #endif
+ 
++#ifdef CONFIG_PINCTRL_PFC_R8A774A3
++const struct sh_pfc_soc_info r8a774a3_pinmux_info = {
++	.name = "r8a774a3_pfc",
++	.ops = &r8a7796_pinmux_ops,
++	.unlock_reg = 0xe6060000, /* PMMR */
++
++	.function = { PINMUX_FUNCTION_BEGIN, PINMUX_FUNCTION_END },
++
++	.pins = pinmux_pins,
++	.nr_pins = ARRAY_SIZE(pinmux_pins),
++	.groups = pinmux_groups.common,
++	.nr_groups = ARRAY_SIZE(pinmux_groups.common),
++	.functions = pinmux_functions.common,
++	.nr_functions = ARRAY_SIZE(pinmux_functions.common),
++
++	.cfg_regs = pinmux_config_regs,
++	.drive_regs = pinmux_drive_regs,
++	.bias_regs = pinmux_bias_regs,
++	.ioctrl_regs = pinmux_ioctrl_regs,
++
++	.pinmux_data = pinmux_data,
++	.pinmux_data_size = ARRAY_SIZE(pinmux_data),
++};
++#endif
++
+ #ifdef CONFIG_PINCTRL_PFC_R8A7796
+ const struct sh_pfc_soc_info r8a7796_pinmux_info = {
+ 	.name = "r8a77960_pfc",
+diff --git a/drivers/pinctrl/sh-pfc/sh_pfc.h b/drivers/pinctrl/sh-pfc/sh_pfc.h
+index d86c1d6..3712640 100644
+--- a/drivers/pinctrl/sh-pfc/sh_pfc.h
++++ b/drivers/pinctrl/sh-pfc/sh_pfc.h
+@@ -311,6 +311,7 @@ extern const struct sh_pfc_soc_info r8a7743_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a7745_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a77470_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a774a1_pinmux_info;
++extern const struct sh_pfc_soc_info r8a774a3_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a774b1_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a774c0_pinmux_info;
+ extern const struct sh_pfc_soc_info r8a774e1_pinmux_info;
+-- 
+2.7.4
+

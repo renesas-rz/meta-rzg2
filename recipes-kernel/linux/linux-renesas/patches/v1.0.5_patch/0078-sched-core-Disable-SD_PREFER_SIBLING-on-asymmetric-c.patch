@@ -1,7 +1,7 @@
 From eea4b4979bec775c8e85aea293eb39e684d55eff Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 15:08:14 +0700
-Subject: [PATCH 078/350] sched/core: Disable SD_PREFER_SIBLING on asymmetric
+Subject: [PATCH 078/455] sched/core: Disable SD_PREFER_SIBLING on asymmetric
  cpu capacity domains
 
 The 'prefer sibling' sched_domain flag is intended to encourage

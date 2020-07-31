@@ -1,7 +1,7 @@
 From 24b1f0a212cadb98deeed449d5c74bb89287237f Mon Sep 17 00:00:00 2001
 From: Hiromitsu Yamasaki <hiromitsu.yamasaki.ym@renesas.com>
 Date: Thu, 16 Mar 2017 15:12:06 +0900
-Subject: [PATCH 082/350] spi: sh-msiof: Add reset of registers before starting
+Subject: [PATCH 082/455] spi: sh-msiof: Add reset of registers before starting
  transfer
 
 In accordance with hardware specification Ver 1.0, reset register

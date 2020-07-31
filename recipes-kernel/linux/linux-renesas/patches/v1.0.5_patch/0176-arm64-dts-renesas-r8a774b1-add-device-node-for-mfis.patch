@@ -1,7 +1,7 @@
 From 8e8a50b51ab3df1e17343b7e4c01f29a8a769526 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 14:08:37 +0700
-Subject: [PATCH 176/350] arm64: dts: renesas: r8a774b1: add device node for
+Subject: [PATCH 176/455] arm64: dts: renesas: r8a774b1: add device node for
  mfis
 
 Add support mfis for RZ/G2N (r8a774b1)

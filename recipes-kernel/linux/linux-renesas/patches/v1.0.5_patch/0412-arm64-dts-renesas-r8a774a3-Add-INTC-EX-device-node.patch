@@ -1,0 +1,43 @@
+From 537c374979d53aef34d4261e15cdbc0971bfc736 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 29 Jul 2020 16:16:07 +0700
+Subject: [PATCH 412/455] arm64: dts: renesas: r8a774a3: Add INTC-EX device
+ node
+
+Add a device node for the Interrupt Controller for External Devices
+(INTC-EX) on RZ/G2M v3.0 (a.k.a R8A774A3), which serves external
+IRQ pins IRQ[0-5].
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index b4d009a..a7f4354 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -534,10 +534,19 @@
+ 		};
+ 
+ 		intc_ex: interrupt-controller@e61c0000 {
++			compatible = "renesas,intc-ex-r8a774a3", "renesas,irqc";
+ 			#interrupt-cells = <2>;
+ 			interrupt-controller;
+ 			reg = <0 0xe61c0000 0 0x200>;
+-			/* placeholder */
++			interrupts =	<GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH
++					 GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH
++					 GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH
++					 GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH
++					 GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH
++					 GIC_SPI 161 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 407>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 407>;
+ 		};
+ 
+ 		tmu0: timer@e61e0000 {
+-- 
+2.7.4
+

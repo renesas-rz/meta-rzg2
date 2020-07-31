@@ -1,7 +1,7 @@
 From a23dc46954dff9a5baa0b23d33d00901e9d15b97 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 16:23:26 +0700
-Subject: [PATCH 184/350] arm64: defconfig: Fix cannot create virtual mouse
+Subject: [PATCH 184/455] arm64: defconfig: Fix cannot create virtual mouse
 
 This patch is created to make loadable modules of UINPUT
 and MOUSEDEV for creating virtual mouse.

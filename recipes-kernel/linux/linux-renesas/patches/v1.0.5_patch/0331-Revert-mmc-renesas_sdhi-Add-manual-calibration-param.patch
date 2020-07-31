@@ -1,7 +1,7 @@
 From a43631da418cdbbb1452fd48430fde861f9312ba Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Thu, 11 Jun 2020 15:11:56 +0700
-Subject: [PATCH 331/350] Revert "mmc: renesas_sdhi: Add manual calibration
+Subject: [PATCH 331/455] Revert "mmc: renesas_sdhi: Add manual calibration
  parameters by devicetree"
 
 This reverts commit 0eb2b6c1d3117bc4300b7ea7ff56811a0cb6942c

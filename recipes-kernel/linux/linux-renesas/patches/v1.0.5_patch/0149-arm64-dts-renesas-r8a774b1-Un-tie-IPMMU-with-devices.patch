@@ -1,7 +1,7 @@
 From e0384ff4f459dc15f6b8898bdfef32748e5233a1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 13:58:52 +0700
-Subject: [PATCH 149/350] arm64: dts: renesas: r8a774b1: Un-tie IPMMU with
+Subject: [PATCH 149/455] arm64: dts: renesas: r8a774b1: Un-tie IPMMU with
  devices
 
 This commit un-tie devices with IPMMU, also disable some of IPMMUs

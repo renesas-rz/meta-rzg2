@@ -1,7 +1,7 @@
 From 9f8ebeb8a5dff593fbba6ed335edfb2138d45eb2 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Fri, 3 Apr 2020 08:49:47 +0700
-Subject: [PATCH 307/350] arm64: dts: renesas: r8a774e1: Add SDHI nodes
+Subject: [PATCH 307/455] arm64: dts: renesas: r8a774e1: Add SDHI nodes
 
 Add SHDI nodes to devicetree of R8A774E1(RZ/G2H).
 

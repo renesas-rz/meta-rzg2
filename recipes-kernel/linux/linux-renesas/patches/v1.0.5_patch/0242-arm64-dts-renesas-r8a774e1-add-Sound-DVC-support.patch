@@ -1,7 +1,7 @@
 From c01758494511bd4ecd46f56d54b1ae8d1e754ee9 Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 16:47:00 +0700
-Subject: [PATCH 242/350] arm64: dts: renesas: r8a774e1: add Sound DVC support
+Subject: [PATCH 242/455] arm64: dts: renesas: r8a774e1: add Sound DVC support
 
 This patch adds DVC[0.1] support for R8A774E1 SoC.
 

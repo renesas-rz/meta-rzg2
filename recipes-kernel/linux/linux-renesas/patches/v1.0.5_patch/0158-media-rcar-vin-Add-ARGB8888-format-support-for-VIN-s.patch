@@ -1,7 +1,7 @@
 From c11f648d82a37aeb350e6f25f44131e05c98b4c1 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 23 Sep 2019 15:23:10 +0700
-Subject: [PATCH 158/350] media: rcar-vin: Add ARGB8888 format support for
+Subject: [PATCH 158/455] media: rcar-vin: Add ARGB8888 format support for
  VIN's output
 
 Based on repo horms/renesas-bsp with commit id:

@@ -1,7 +1,7 @@
 From f5d114befa5f968981f54a5d7d848ce9985e9d55 Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Fri, 6 Sep 2019 10:49:41 +0700
-Subject: [PATCH 117/350] net: phy: realtek: add missing page operations
+Subject: [PATCH 117/455] net: phy: realtek: add missing page operations
 
 Add missing page operation callbacks to few Realtek drivers.
 This also fixes a NPE after the referenced commit which added code to the

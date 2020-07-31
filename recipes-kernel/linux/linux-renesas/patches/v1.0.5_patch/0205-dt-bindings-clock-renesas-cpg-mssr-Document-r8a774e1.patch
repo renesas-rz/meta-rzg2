@@ -1,7 +1,7 @@
 From 70ef6dbd6a616c53538ab5ce781d68c5aa09cdac Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 10:23:07 +0700
-Subject: [PATCH 205/350] dt-bindings: clock: renesas: cpg-mssr: Document
+Subject: [PATCH 205/455] dt-bindings: clock: renesas: cpg-mssr: Document
  r8a774e1 binding
 
 Add binding documentation for the RZ/G2H (R8A774e1) Clock Pulse

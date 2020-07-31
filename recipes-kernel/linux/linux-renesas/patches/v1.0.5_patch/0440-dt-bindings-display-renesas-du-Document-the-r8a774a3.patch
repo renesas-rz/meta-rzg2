@@ -1,0 +1,41 @@
+From bdd8b550095dd1cdea8728eb8600cb2fb18ad05b Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Tue, 28 Jul 2020 14:55:19 +0700
+Subject: [PATCH 440/455] dt-bindings: display: renesas: du: Document the
+ r8a774a3 bindings
+
+Document the RZ/G2M v3.0 (R8A774A3) SoC and update name for RZ/G2M v1.3
+ (R8A774A1) in the R-Car DU bindings.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ Documentation/devicetree/bindings/display/renesas,du.txt | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/display/renesas,du.txt b/Documentation/devicetree/bindings/display/renesas,du.txt
+index 78f7bfe..fe0f6a8 100644
+--- a/Documentation/devicetree/bindings/display/renesas,du.txt
++++ b/Documentation/devicetree/bindings/display/renesas,du.txt
+@@ -5,7 +5,8 @@ Required Properties:
+   - compatible: must be one of the following.
+     - "renesas,du-r8a7743" for R8A7743 (RZ/G1M) compatible DU
+     - "renesas,du-r8a7745" for R8A7745 (RZ/G1E) compatible DU
+-    - "renesas,du-r8a774a1" for R8A774A1 (RZ/G2M) compatible DU
++    - "renesas,du-r8a774a1" for R8A774A1 (RZ/G2M v1.3) compatible DU
++    - "renesas,du-r8a774a3" for R8A774A3 (RZ/G2M v3.0) compatible DU
+     - "renesas,du-r8a774b1" for R8A774B1 (RZ/G2N) compatible DU
+     - "renesas,du-r8a774c0" for R8A774C0 (RZ/G2E) compatible DU
+     - "renesas,du-r8a774e1" for R8A774E1 (RZ/G2H) compatible DU
+@@ -55,7 +56,8 @@ corresponding to each DU output.
+ -----------------------------------------------------------------------------
+  R8A7743 (RZ/G1M)       DPAD 0         LVDS 0         -              -
+  R8A7745 (RZ/G1E)       DPAD 0         DPAD 1         -              -
+- R8A774A1 (RZ/G2M)      DPAD 0         HDMI 0         LVDS 0         -
++ R8A774A1 (RZ/G2M v1.3) DPAD 0         HDMI 0         LVDS 0         -
++ R8A774A3 (RZ/G2M v3.0) DPAD 0         HDMI 0         LVDS 0         -
+  R8A774B1 (RZ/G2N)      DPAD 0         HDMI 0         LVDS 0         -
+  R8A774C0 (RZ/G2E)      DPAD 0         LVDS 0         LVDS 1         -
+  R8A774E1 (RZ/G2H)      DPAD 0         HDMI 0         LVDS 0         -
+-- 
+2.7.4
+

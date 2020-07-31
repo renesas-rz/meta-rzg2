@@ -1,0 +1,27 @@
+From 0a1cbe466846c31d953d59e739491dc5c414ab8f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 10 Jul 2020 19:18:51 +0700
+Subject: [PATCH 369/455] arm64: defconfig: Enable R8A774A3 SoC
+
+Enable the Renesas RZ/G2M v3.0 (R8A774A3) SoC in the ARM64 defconfig.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 5f5e0bf..ce19a44 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -32,6 +32,7 @@ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+ CONFIG_ARCH_RENESAS=y
+ CONFIG_ARCH_R8A774A1=y
++CONFIG_ARCH_R8A774A3=y
+ CONFIG_ARCH_R8A774B1=y
+ CONFIG_ARCH_R8A774C0=y
+ CONFIG_ARCH_R8A774E1=y
+-- 
+2.7.4
+

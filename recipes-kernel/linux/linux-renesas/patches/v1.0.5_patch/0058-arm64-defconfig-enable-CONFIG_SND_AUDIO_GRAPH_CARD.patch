@@ -1,7 +1,7 @@
 From 39faadc85beda262a480af6a5c4be243838d9842 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 4 Nov 2019 13:29:32 +0700
-Subject: [PATCH 058/350] arm64: defconfig: enable CONFIG_SND_AUDIO_GRAPH_CARD
+Subject: [PATCH 058/455] arm64: defconfig: enable CONFIG_SND_AUDIO_GRAPH_CARD
 
 This patch enables CONFIG_SND_AUDIO_GRAPH_CARD to support sound
 for RZ/G2 SoC platform.

@@ -1,7 +1,7 @@
 From 7a6d57eb56dbc857be16a75b8abd1cbfa67851b3 Mon Sep 17 00:00:00 2001
 From: Hiep Pham <hiep.pham.zy@renesas.com>
 Date: Fri, 10 Apr 2020 16:26:55 +0700
-Subject: [PATCH 251/350] arm64: dts: renesas: r8a774e1: Add I2C nodes.
+Subject: [PATCH 251/455] arm64: dts: renesas: r8a774e1: Add I2C nodes.
 
 This patch adds device nodes for all RZ/G2H I2C/IIC, clock,
 power-domains, DMA and i2c-scl-internal-delay.

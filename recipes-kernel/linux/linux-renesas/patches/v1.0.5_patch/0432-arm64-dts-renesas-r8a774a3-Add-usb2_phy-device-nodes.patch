@@ -1,0 +1,51 @@
+From 3aa3b8579ee2c9249143dbda72cbfa5b5be47a48 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Tue, 28 Jul 2020 17:59:15 +0700
+Subject: [PATCH 432/455] arm64: dts: renesas: r8a774a3: Add usb2_phy device
+ nodes
+
+This patch adds usb2_phy channel 0, 1 device nodes for RZ/G2M v3.0
+(R8A774A3) SoC.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 1c6b8aa..1261906 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -1941,15 +1941,27 @@
+ 		};
+ 
+ 		usb2_phy0: usb-phy@ee080200 {
++			compatible = "renesas,usb2-phy-r8a774a3",
++				     "renesas,rcar-gen3-usb2-phy";
+ 			reg = <0 0xee080200 0 0x700>;
++			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 703>, <&cpg CPG_MOD 704>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 703>, <&cpg 704>;
+ 			#phy-cells = <0>;
+-			/* placeholder */
++			status = "disabled";
+ 		};
+ 
+ 		usb2_phy1: usb-phy@ee0a0200 {
++			compatible = "renesas,usb2-phy-r8a774a3",
++				     "renesas,rcar-gen3-usb2-phy";
+ 			reg = <0 0xee0a0200 0 0x700>;
++			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 702>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 702>;
+ 			#phy-cells = <0>;
+-			/* placeholder */
++			status = "disabled";
+ 		};
+ 
+ 		sdhi0: sd@ee100000 {
+-- 
+2.7.4
+

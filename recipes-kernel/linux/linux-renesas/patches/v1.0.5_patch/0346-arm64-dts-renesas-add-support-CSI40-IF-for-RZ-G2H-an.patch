@@ -1,7 +1,7 @@
 From e3095966338cc7274ea08e934ccfb9cb74e05958 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 16:13:11 +0700
-Subject: [PATCH 346/350] arm64: dts: renesas: add support CSI40 IF for RZ/G2H
+Subject: [PATCH 346/455] arm64: dts: renesas: add support CSI40 IF for RZ/G2H
  and RZ/G2N
 
 This commit is created to support CSI40 IF in HiHope RZ/G2H and

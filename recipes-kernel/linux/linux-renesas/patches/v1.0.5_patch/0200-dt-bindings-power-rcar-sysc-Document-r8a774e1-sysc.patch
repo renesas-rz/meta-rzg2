@@ -1,7 +1,7 @@
 From 6aecb70bcc34af8b42fd63f0f8a615405852e857 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 09:34:26 +0700
-Subject: [PATCH 200/350] dt-bindings: power: rcar-sysc: Document r8a774e1 sysc
+Subject: [PATCH 200/455] dt-bindings: power: rcar-sysc: Document r8a774e1 sysc
 
 Document bindings for the RZ/G2H (a.k.a. R8A774E1) system controller.
 

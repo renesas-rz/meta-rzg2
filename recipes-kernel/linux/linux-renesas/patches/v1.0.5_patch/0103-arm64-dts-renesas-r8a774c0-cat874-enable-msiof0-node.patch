@@ -1,7 +1,7 @@
 From 1bf1b9dc7ae3b8b5587aac1812a5604e7be89cd4 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 10:45:46 +0700
-Subject: [PATCH 103/350] arm64: dts: renesas: r8a774c0-cat874: enable msiof0
+Subject: [PATCH 103/455] arm64: dts: renesas: r8a774c0-cat874: enable msiof0
  node
 
 This patch enable MSIOF0 on SoC R8A774C0 for CAT874 Board.

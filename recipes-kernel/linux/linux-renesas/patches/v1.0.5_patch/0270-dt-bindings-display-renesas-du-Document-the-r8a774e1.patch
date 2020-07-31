@@ -1,7 +1,7 @@
 From ba21887f99a24fea7918258ff3cc10c8ede28131 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Wed, 8 Apr 2020 13:27:56 +0700
-Subject: [PATCH 270/350] dt-bindings: display: renesas: du: Document the
+Subject: [PATCH 270/455] dt-bindings: display: renesas: du: Document the
  r8a774e1 bindings
 
 Document the RZ/G2H (R8A774E1) SoC in the R-Car DU bindings.

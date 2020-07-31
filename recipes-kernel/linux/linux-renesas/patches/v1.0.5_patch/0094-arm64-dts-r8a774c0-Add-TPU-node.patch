@@ -1,7 +1,7 @@
 From 1add642ff06c32a9cb2b0ac7745b6274c1a58d15 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@rvc.renesas.com>
 Date: Wed, 3 Jul 2019 10:33:22 +0700
-Subject: [PATCH 094/350] arm64: dts: r8a774c0: Add TPU node
+Subject: [PATCH 094/455] arm64: dts: r8a774c0: Add TPU node
 
 This patch add TPU node for SoC R8A774C0.
 

@@ -1,0 +1,72 @@
+From 1102a4bad6ea0a0d728f663416059c2629e8573e Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Thu, 30 Jul 2020 13:33:11 +0700
+Subject: [PATCH 436/455] arm64: dts: renesas: r8a774a3: Add HSUSB and USB-DMAC
+ device nodes
+
+This patch adds hsusb and usb dmac{0,1} device nodes for R8A774A3 SoC.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 36 ++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 3f2aeca..fefcdb8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -884,18 +884,48 @@
+ 		};
+ 
+ 		hsusb: usb@e6590000 {
++			compatible = "renesas,usbhs-r8a774a3",
++				     "renesas,rcar-gen3-usbhs";
+ 			reg = <0 0xe6590000 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 704>, <&cpg CPG_MOD 703>;
++			dmas = <&usb_dmac0 0>, <&usb_dmac0 1>,
++			       <&usb_dmac1 0>, <&usb_dmac1 1>;
++			dma-names = "ch0", "ch1", "ch2", "ch3";
++			renesas,buswait = <11>;
++			phys = <&usb2_phy0>;
++			phy-names = "usb";
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 704>, <&cpg 703>;
++			status = "disabled";
+ 		};
+ 
+ 		usb_dmac0: dma-controller@e65a0000 {
++			compatible = "renesas,r8a774a3-usb-dmac",
++				     "renesas,usb-dmac";
+ 			reg = <0 0xe65a0000 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH
++				      GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "ch0", "ch1";
++			clocks = <&cpg CPG_MOD 330>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 330>;
++			#dma-cells = <1>;
++			dma-channels = <2>;
+ 		};
+ 
+ 		usb_dmac1: dma-controller@e65b0000 {
++			compatible = "renesas,r8a774a3-usb-dmac",
++				     "renesas,usb-dmac";
+ 			reg = <0 0xe65b0000 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH
++				      GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "ch0", "ch1";
++			clocks = <&cpg CPG_MOD 331>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 331>;
++			#dma-cells = <1>;
++			dma-channels = <2>;
+ 		};
+ 
+ 		usb3_phy0: usb-phy@e65ee000 {
+-- 
+2.7.4
+

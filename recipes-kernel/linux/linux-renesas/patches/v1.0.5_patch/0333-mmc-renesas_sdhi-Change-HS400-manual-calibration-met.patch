@@ -1,7 +1,7 @@
 From 17f0992db89de1257a15a168cddc5eeb24899e69 Mon Sep 17 00:00:00 2001
 From: Loc Vu <loc.vu.zn@renesas.com>
 Date: Thu, 11 Jun 2020 14:49:50 +0700
-Subject: [PATCH 333/350] mmc: renesas_sdhi: Change HS400 manual calibration
+Subject: [PATCH 333/455] mmc: renesas_sdhi: Change HS400 manual calibration
  method
 
 The manual calibration value is changed from a fixed value

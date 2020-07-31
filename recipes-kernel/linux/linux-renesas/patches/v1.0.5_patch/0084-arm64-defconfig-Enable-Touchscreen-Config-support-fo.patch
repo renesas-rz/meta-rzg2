@@ -1,7 +1,7 @@
 From 6c030765f1d30b1df09f30b5ee98f711d670bbdf Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:40:41 +0700
-Subject: [PATCH 084/350] arm64: defconfig: Enable Touchscreen Config support
+Subject: [PATCH 084/455] arm64: defconfig: Enable Touchscreen Config support
  for RZ/G2 SoC
 
 This patch enables config touchscreen for panel lvds support in

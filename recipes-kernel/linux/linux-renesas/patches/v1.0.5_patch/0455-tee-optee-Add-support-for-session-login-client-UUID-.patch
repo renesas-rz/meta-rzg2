@@ -1,0 +1,44 @@
+From 74f49f63862aca369b6a2efbb4f730d8ebdcf907 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 3 Aug 2020 10:46:26 +0700
+Subject: [PATCH 455/455] tee: optee: Add support for session login client UUID
+ generation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds support for client UUID generation for OP-TEE. For group based
+session
+logins membership is verified.
+
+Reference:
+https://github.com/linaro-swg/linux/commit/ad19acdcdbc52434ebcf27ca5f3a76294ca2ee89
+
+Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/tee/optee/call.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/tee/optee/call.c b/drivers/tee/optee/call.c
+index a5afbe6..d9c1117 100644
+--- a/drivers/tee/optee/call.c
++++ b/drivers/tee/optee/call.c
+@@ -241,9 +241,13 @@ int optee_open_session(struct tee_context *ctx,
+ 	msg_arg->params[1].attr = OPTEE_MSG_ATTR_TYPE_VALUE_INPUT |
+ 				  OPTEE_MSG_ATTR_META;
+ 	memcpy(&msg_arg->params[0].u.value, arg->uuid, sizeof(arg->uuid));
+-	memcpy(&msg_arg->params[1].u.value, arg->uuid, sizeof(arg->clnt_uuid));
+ 	msg_arg->params[1].u.value.c = arg->clnt_login;
+ 
++	rc = tee_session_calc_client_uuid((uuid_t *)&msg_arg->params[1].u.value,
++					  arg->clnt_login, arg->clnt_uuid);
++	if (rc)
++		goto out;
++
+ 	rc = optee_to_msg_param(msg_arg->params + 2, arg->num_params, param);
+ 	if (rc)
+ 		goto out;
+-- 
+2.7.4
+

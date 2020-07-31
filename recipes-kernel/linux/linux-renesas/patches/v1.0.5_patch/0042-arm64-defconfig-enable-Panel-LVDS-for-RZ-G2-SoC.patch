@@ -1,7 +1,7 @@
 From 4b8032981dd9d321b0e4045eda51cd946bd63d55 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 3 Mar 2020 13:48:12 +0700
-Subject: [PATCH 042/350] arm64: defconfig: enable Panel LVDS for RZ/G2 SoC
+Subject: [PATCH 042/455] arm64: defconfig: enable Panel LVDS for RZ/G2 SoC
 
 This patch enables config for supporting LVDS Panel in RZ/G2 SoC.
 

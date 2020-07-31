@@ -1,7 +1,7 @@
 From d575a9d16e04d61c8e011b74d19882d3ad146c16 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 13:52:37 +0700
-Subject: [PATCH 146/350] arm64: dts: renesas: r8a774b1: Add the emergency node
+Subject: [PATCH 146/455] arm64: dts: renesas: r8a774b1: Add the emergency node
  in thermal-zones
 
 This patch enables emerency shutdown support for r8a774b1 SoC.

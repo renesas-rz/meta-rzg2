@@ -1,7 +1,7 @@
 From 6879c67a6a0bce333a0f4a118d2de9b253c3090d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:47:41 +0700
-Subject: [PATCH 072/350] sched/fair: Change prefer_sibling type to bool
+Subject: [PATCH 072/455] sched/fair: Change prefer_sibling type to bool
 
 This variable is entirely local to update_sd_lb_stats, so we can
 safely change its type and slightly clean up its initialisation.

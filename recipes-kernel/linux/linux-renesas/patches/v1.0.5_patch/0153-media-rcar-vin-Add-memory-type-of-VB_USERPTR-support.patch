@@ -1,7 +1,7 @@
 From b522f4ab250419db9cfe2210ec7ef517462f3bf0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Sep 2019 11:11:27 +0700
-Subject: [PATCH 153/350] media: rcar-vin: Add memory type of VB_USERPTR
+Subject: [PATCH 153/455] media: rcar-vin: Add memory type of VB_USERPTR
  support
 
 This patch adds memory type of USERPTR support for VIN driver

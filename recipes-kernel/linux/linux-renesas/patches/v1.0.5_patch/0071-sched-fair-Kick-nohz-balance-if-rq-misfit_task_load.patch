@@ -1,7 +1,7 @@
 From 3e7f4ffd82075a49e2a23407fdbb6cde8db3936f Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 2 Jul 2019 16:35:50 +0700
-Subject: [PATCH 071/350] sched/fair: Kick nohz balance if rq->misfit_task_load
+Subject: [PATCH 071/455] sched/fair: Kick nohz balance if rq->misfit_task_load
 
 There already are a few conditions in nohz_kick_needed() to ensure
 a nohz kick is triggered, but they are not enough for some misfit

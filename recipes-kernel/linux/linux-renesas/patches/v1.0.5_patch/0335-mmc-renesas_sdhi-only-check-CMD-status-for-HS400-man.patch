@@ -1,7 +1,7 @@
 From 91861c9b05013a57f9511e2c33f0be86bc5e55e6 Mon Sep 17 00:00:00 2001
 From: Takeshi Saito <takeshi.saito.xv@renesas.com>
 Date: Thu, 11 Jun 2020 14:59:49 +0700
-Subject: [PATCH 335/350] mmc: renesas_sdhi: only check CMD status for HS400
+Subject: [PATCH 335/455] mmc: renesas_sdhi: only check CMD status for HS400
  manual correction
 
 R-Car Gen3 and RZG2 cannot use correction error status with HS400.

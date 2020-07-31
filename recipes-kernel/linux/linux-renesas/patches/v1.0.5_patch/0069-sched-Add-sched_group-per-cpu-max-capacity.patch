@@ -1,7 +1,7 @@
 From 49d42bbd40f70b66df47f75a0f3b9432e6986511 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 30 May 2019 14:31:37 +0700
-Subject: [PATCH 069/350] sched: Add sched_group per-cpu max capacity
+Subject: [PATCH 069/455] sched: Add sched_group per-cpu max capacity
 
 The current sg->min_capacity tracks the lowest per-cpu compute
 capacity available in the sched_group when rt/irq pressure is taken into

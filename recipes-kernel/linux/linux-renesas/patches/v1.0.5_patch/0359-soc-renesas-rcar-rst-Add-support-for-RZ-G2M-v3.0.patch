@@ -1,0 +1,55 @@
+From 13d2c5087b22c8b1b09abbd4d65bcce2052260d2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 15:24:38 +0700
+Subject: [PATCH 359/455] soc: renesas: rcar-rst: Add support for RZ/G2M v3.0
+
+Add support for RZ/G2M v3.0 (R8A774A3) to the R-Car RST driver.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig    | 8 ++++----
+ drivers/soc/renesas/rcar-rst.c | 2 ++
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 82769ec..387afec 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -3,10 +3,10 @@ config SOC_RENESAS
+ 	default y if ARCH_RENESAS
+ 	select SOC_BUS
+ 	select RST_RCAR if ARCH_RCAR_GEN1 || ARCH_RCAR_GEN2 || \
+-			   ARCH_R8A774A1 || ARCH_R8A774B1 || ARCH_R8A774C0 || \
+-			   ARCH_R8A774E1 || ARCH_R8A7795 || ARCH_R8A7796 || \
+-			   ARCH_R8A77965 || ARCH_R8A77970 || ARCH_R8A77980 || \
+-			   ARCH_R8A77990 || ARCH_R8A77995
++			   ARCH_R8A774A1 || ARCH_R8A774A3 || ARCH_R8A774B1 || \
++			   ARCH_R8A774C0 || ARCH_R8A774E1 || ARCH_R8A7795 || \
++			   ARCH_R8A7796  || ARCH_R8A77965 || ARCH_R8A77970 || \
++			   ARCH_R8A77980 || ARCH_R8A77990 || ARCH_R8A77995
+ 	select SYSC_R8A7743 if ARCH_R8A7743
+ 	select SYSC_R8A7745 if ARCH_R8A7745
+ 	select SYSC_R8A77470 if ARCH_R8A77470
+diff --git a/drivers/soc/renesas/rcar-rst.c b/drivers/soc/renesas/rcar-rst.c
+index 09a1e41..a2b3d04 100644
+--- a/drivers/soc/renesas/rcar-rst.c
++++ b/drivers/soc/renesas/rcar-rst.c
+@@ -2,6 +2,7 @@
+  * R-Car Gen1 RESET/WDT, R-Car Gen2, Gen3, and RZ/G RST Driver
+  *
+  * Copyright (C) 2016 Glider bvba
++ * Copyright (C) 2020 Renesas Electronics Corp.
+  *
+  * This file is subject to the terms and conditions of the GNU General Public
+  * License.  See the file "COPYING" in the main directory of this archive
+@@ -47,6 +48,7 @@ static const struct of_device_id rcar_rst_matches[] __initconst = {
+ 	{ .compatible = "renesas,r8a77470-rst", .data = &rcar_rst_gen2 },
+ 	/* RZ/G2 is handled like R-Car Gen3 */
+ 	{ .compatible = "renesas,r8a774a1-rst", .data = &rcar_rst_gen3 },
++	{ .compatible = "renesas,r8a774a3-rst", .data = &rcar_rst_gen3 },
+ 	{ .compatible = "renesas,r8a774b1-rst", .data = &rcar_rst_gen3 },
+ 	{ .compatible = "renesas,r8a774c0-rst", .data = &rcar_rst_gen3 },
+ 	{ .compatible = "renesas,r8a774e1-rst", .data = &rcar_rst_gen3 },
+-- 
+2.7.4
+

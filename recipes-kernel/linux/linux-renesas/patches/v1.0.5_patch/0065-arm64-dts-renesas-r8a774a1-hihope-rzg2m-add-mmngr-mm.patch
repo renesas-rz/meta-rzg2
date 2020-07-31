@@ -1,7 +1,7 @@
 From 1128b20b9e7263f1633c3e7da70830d2f7cef416 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 3 Jun 2019 15:03:18 +0700
-Subject: [PATCH 065/350] arm64: dts: renesas: r8a774a1-hihope-rzg2m: add
+Subject: [PATCH 065/455] arm64: dts: renesas: r8a774a1-hihope-rzg2m: add
  mmngr, mmngrbuf
 
 Add device node for mmngr, mmngrbuf. Reserve 256M for MMP CMA.

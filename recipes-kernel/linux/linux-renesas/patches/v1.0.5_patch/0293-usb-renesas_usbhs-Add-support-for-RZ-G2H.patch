@@ -1,7 +1,7 @@
 From 887e02378043f2aec33f40fa57796e4c34709a5e Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Fri, 10 Apr 2020 20:13:01 +0700
-Subject: [PATCH 293/350] usb: renesas_usbhs: Add support for RZ/G2H
+Subject: [PATCH 293/455] usb: renesas_usbhs: Add support for RZ/G2H
 
 This patch adds support for r8a774e1 SoC.
 

@@ -1,7 +1,7 @@
 From d00dc199b0ee254129f18fb72eed45d3e1592c09 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Wed, 15 Apr 2020 00:46:15 +0700
-Subject: [PATCH 265/350] arm64: dts: renesas: r8a774e1: Add USB3.0 host device
+Subject: [PATCH 265/455] arm64: dts: renesas: r8a774e1: Add USB3.0 host device
  node
 
 This patch adds USB3.0 (xHCI) host device node for SoC R8A774E1

@@ -1,7 +1,7 @@
 From 5a11f9b49e8f6f34f8f6a154c13dfc831b3cc286 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 9 Sep 2019 18:52:08 +0700
-Subject: [PATCH 134/350] media: rcar-csi2: Add support for R8A774A1
+Subject: [PATCH 134/455] media: rcar-csi2: Add support for R8A774A1
 
 This patch adds support CSI2 for r8a774a1 SoC.
 This is similar with RCar M3-W SoC.

@@ -1,0 +1,149 @@
+From aa8c7059752b1e528c69be7bdd0f3d4bff6f7a49 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 15:47:30 +0700
+Subject: [PATCH 362/455] clk: renesas: r8a774a1: Add R8A774A3 CPG/MSSR support
+
+Refer upstream commit id <2ba738d56db4ddb1c17e418cb501d303a8b481d2>
+support for R-Car M3-W+ and apply it for RZ/G2M v3.0.
+
+Add support for the RZ/G2M v3.0 (R8A774A3) SoC to the Renesas Clock
+Pulse Generator / Module Standby and Software Reset driver.
+
+RZ/G2M v3.0 is very similar to RZ/G2M v1.0 (R8A774A1), which allows for
+both SoCs to share a driver. RZ/G2M v3.0 lacks a few modules, so their
+clocks must be nullified.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/Kconfig             |  7 ++++++-
+ drivers/clk/renesas/Makefile            |  1 +
+ drivers/clk/renesas/r8a774a1-cpg-mssr.c | 21 ++++++++++++++++++---
+ drivers/clk/renesas/renesas-cpg-mssr.c  |  8 +++++++-
+ 4 files changed, 32 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/clk/renesas/Kconfig b/drivers/clk/renesas/Kconfig
+index 51500d1..7f1a9f8 100644
+--- a/drivers/clk/renesas/Kconfig
++++ b/drivers/clk/renesas/Kconfig
+@@ -9,6 +9,7 @@ config CLK_RENESAS
+ 	select CLK_R8A7745 if ARCH_R8A7745
+ 	select CLK_R8A77470 if ARCH_R8A77470
+ 	select CLK_R8A774A1 if ARCH_R8A774A1
++	select CLK_R8A774A3 if ARCH_R8A774A3
+ 	select CLK_R8A774B1 if ARCH_R8A774B1
+ 	select CLK_R8A774C0 if ARCH_R8A774C0
+ 	select CLK_R8A774E1 if ARCH_R8A774E1
+@@ -72,7 +73,11 @@ config CLK_R8A77470
+ 	select CLK_RCAR_GEN2_CPG
+ 
+ config CLK_R8A774A1
+-	bool "RZ/G2M clock support" if COMPILE_TEST
++	bool "RZ/G2M v1.3 clock support" if COMPILE_TEST
++	select CLK_RCAR_GEN3_CPG
++
++config CLK_R8A774A3
++	bool "RZ/G2M v3.0 clock support" if COMPILE_TEST
+ 	select CLK_RCAR_GEN3_CPG
+ 
+ config CLK_R8A774B1
+diff --git a/drivers/clk/renesas/Makefile b/drivers/clk/renesas/Makefile
+index b30025b..939cab1 100644
+--- a/drivers/clk/renesas/Makefile
++++ b/drivers/clk/renesas/Makefile
+@@ -8,6 +8,7 @@ obj-$(CONFIG_CLK_R8A7743)		+= r8a7743-cpg-mssr.o
+ obj-$(CONFIG_CLK_R8A7745)		+= r8a7745-cpg-mssr.o
+ obj-$(CONFIG_CLK_R8A77470)		+= r8a77470-cpg-mssr.o
+ obj-$(CONFIG_CLK_R8A774A1)		+= r8a774a1-cpg-mssr.o
++obj-$(CONFIG_CLK_R8A774A3)		+= r8a774a1-cpg-mssr.o
+ obj-$(CONFIG_CLK_R8A774B1)		+= r8a774b1-cpg-mssr.o
+ obj-$(CONFIG_CLK_R8A774C0)		+= r8a774c0-cpg-mssr.o
+ obj-$(CONFIG_CLK_R8A774E1)		+= r8a774e1-cpg-mssr.o
+diff --git a/drivers/clk/renesas/r8a774a1-cpg-mssr.c b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+index 0d6689f..33e268c 100644
+--- a/drivers/clk/renesas/r8a774a1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+@@ -1,8 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * r8a774a1 Clock Pulse Generator / Module Standby and Software Reset
++ * r8a774a1/r8a774a3 Clock Pulse Generator / Module Standby and Software Reset
+  *
+- * Copyright (C) 2018 Renesas Electronics Corp.
++ * Copyright (C) 2018-2020 Renesas Electronics Corp.
+  *
+  * Based on r8a7796-cpg-mssr.c
+  *
+@@ -13,6 +13,7 @@
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/soc/renesas/rcar-rst.h>
++#include <linux/of.h>
+ 
+ #include <dt-bindings/clock/r8a774a1-cpg-mssr.h>
+ 
+@@ -113,7 +114,7 @@ static const struct cpg_core_clk r8a774a1_core_clks[] __initconst = {
+ 	DEF_BASE("r",           R8A774A1_CLK_R,     CLK_TYPE_GEN3_R, CLK_RINT),
+ };
+ 
+-static const struct mssr_mod_clk r8a774a1_mod_clks[] __initconst = {
++static struct mssr_mod_clk r8a774a1_mod_clks[] __initdata = {
+ 	DEF_MOD("3dge",			 112,	R8A774A1_CLK_ZG),
+ 	DEF_MOD("tmu4",			 121,	R8A774A1_CLK_S0D6),
+ 	DEF_MOD("tmu3",			 122,	R8A774A1_CLK_S3D2),
+@@ -296,6 +297,14 @@ static const struct rcar_gen3_cpg_pll_config cpg_pll_configs[16] __initconst = {
+ 	{ 2,		192,	1,	192,	1,	32,	},
+ };
+ 
++/*
++ * Fixups for RZ/G2M v3.0 (aka R8A774A3)
++ */
++
++static const unsigned int r8a774a3_mod_nullify[] __initconst = {
++	MOD_CLK_ID(617),			/* FCPCI0 */
++};
++
+ static int __init r8a774a1_cpg_mssr_init(struct device *dev)
+ {
+ 	const struct rcar_gen3_cpg_pll_config *cpg_pll_config;
+@@ -312,6 +321,12 @@ static int __init r8a774a1_cpg_mssr_init(struct device *dev)
+ 		return -EINVAL;
+ 	}
+ 
++	if (of_device_is_compatible(dev->of_node, "renesas,r8a774a3-cpg-mssr"))
++		mssr_mod_nullify(r8a774a1_mod_clks,
++				 ARRAY_SIZE(r8a774a1_mod_clks),
++				 r8a774a3_mod_nullify,
++				 ARRAY_SIZE(r8a774a3_mod_nullify));
++
+ 	return rcar_gen3_cpg_init(cpg_pll_config, CLK_EXTALR, cpg_mode);
+ }
+ 
+diff --git a/drivers/clk/renesas/renesas-cpg-mssr.c b/drivers/clk/renesas/renesas-cpg-mssr.c
+index 93f4c09..d3cb472 100644
+--- a/drivers/clk/renesas/renesas-cpg-mssr.c
++++ b/drivers/clk/renesas/renesas-cpg-mssr.c
+@@ -6,7 +6,7 @@
+  * Based on clk-mstp.c, clk-rcar-gen2.c, and clk-rcar-gen3.c
+  *
+  * Copyright (C) 2013 Ideas On Board SPRL
+- * Copyright (C) 2015 Renesas Electronics Corp.
++ * Copyright (C) 2015-2020 Renesas Electronics Corp.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -677,6 +677,12 @@ static const struct of_device_id cpg_mssr_match[] = {
+ 		.data = &r8a774a1_cpg_mssr_info,
+ 	},
+ #endif
++#ifdef CONFIG_CLK_R8A774A3
++	{
++		.compatible = "renesas,r8a774a3-cpg-mssr",
++		.data = &r8a774a1_cpg_mssr_info,
++	},
++#endif
+ #ifdef CONFIG_CLK_R8A774B1
+ 	{
+ 		.compatible = "renesas,r8a774b1-cpg-mssr",
+-- 
+2.7.4
+

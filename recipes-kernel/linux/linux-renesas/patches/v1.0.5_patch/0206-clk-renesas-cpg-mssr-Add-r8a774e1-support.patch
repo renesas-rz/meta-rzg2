@@ -1,7 +1,7 @@
 From 719ada3b11429f19d002471d6ce57c38e9e0ef30 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 18:07:22 +0700
-Subject: [PATCH 206/350] clk: renesas: cpg-mssr: Add r8a774e1 support
+Subject: [PATCH 206/455] clk: renesas: cpg-mssr: Add r8a774e1 support
 
 Add RZ/G2H (R8A774E1) Clock Pulse Generator / Module Standby and Software
 Reset support.

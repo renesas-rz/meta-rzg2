@@ -1,7 +1,7 @@
 From 099f390cb1cb37c575e7af072e76771d65ea0263 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Tue, 14 Apr 2020 21:22:34 +0700
-Subject: [PATCH 287/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add MMNGR
+Subject: [PATCH 287/455] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add MMNGR
  driver support
 
 This patch adds MMNGR driver support for the R8A774E1 SoC

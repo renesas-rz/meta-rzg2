@@ -1,7 +1,7 @@
 From 2fd408a13674f16941e80447ec8520bb3b0f0d5b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 16:39:31 +0700
-Subject: [PATCH 209/350] dt-bindings: serial: sh-sci: Document r8a774e1
+Subject: [PATCH 209/455] dt-bindings: serial: sh-sci: Document r8a774e1
  bindings
 
 RZ/G2H (R8A774E1) SoC also has the R-Car Gen3 compatible SCIF and

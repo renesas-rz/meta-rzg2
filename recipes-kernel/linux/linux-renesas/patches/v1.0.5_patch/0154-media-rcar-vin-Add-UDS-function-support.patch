@@ -1,7 +1,7 @@
 From f55b1829334a1624c414ca215c8ac4049f65f5f0 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Sep 2019 11:30:43 +0700
-Subject: [PATCH 154/350] media: rcar-vin: Add UDS function support
+Subject: [PATCH 154/455] media: rcar-vin: Add UDS function support
 
 Add UDS (Up Down Scale) control for R-Car Gen3.
 UDS can be vertical and horizontal scaling.

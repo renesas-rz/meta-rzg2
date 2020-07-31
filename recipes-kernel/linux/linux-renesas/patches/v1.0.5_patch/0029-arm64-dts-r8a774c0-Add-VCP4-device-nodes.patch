@@ -1,7 +1,7 @@
 From 81a77fd5f2202a954443ccf3563c9165a6ba55d8 Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Mon, 1 Jul 2019 17:33:23 +0700
-Subject: [PATCH 029/350] arm64: dts: r8a774c0: Add VCP4 device nodes
+Subject: [PATCH 029/455] arm64: dts: r8a774c0: Add VCP4 device nodes
 
 Adds VCP4 device nodes (fcpcs, vcplf, vdpb) used by UVCS driver
 

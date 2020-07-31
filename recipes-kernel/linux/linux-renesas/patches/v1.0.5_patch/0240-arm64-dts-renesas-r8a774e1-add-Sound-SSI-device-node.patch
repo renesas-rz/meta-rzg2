@@ -1,7 +1,7 @@
 From 3436052a3088a71c4fabfcd4cc7893b8785160fa Mon Sep 17 00:00:00 2001
 From: Hao Bui <hao.bui.yg@renesas.com>
 Date: Tue, 7 Apr 2020 16:05:25 +0700
-Subject: [PATCH 240/350] arm64: dts: renesas: r8a774e1: add Sound SSI device
+Subject: [PATCH 240/455] arm64: dts: renesas: r8a774e1: add Sound SSI device
  node
 
 This patch adds Renesas R-Car Sound device node and

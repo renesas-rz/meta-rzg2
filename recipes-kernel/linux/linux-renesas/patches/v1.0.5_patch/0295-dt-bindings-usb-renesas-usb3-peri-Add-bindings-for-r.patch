@@ -1,7 +1,7 @@
 From 65d1051424b645dd19745cd0014c927ec2adf0a3 Mon Sep 17 00:00:00 2001
 From: hoahuynh <hoa.huynh.ud@renesas.com>
 Date: Fri, 10 Apr 2020 21:14:46 +0700
-Subject: [PATCH 295/350] dt-bindings: usb: renesas,usb3-peri: Add bindings for
+Subject: [PATCH 295/455] dt-bindings: usb: renesas,usb3-peri: Add bindings for
  r8a774e1
 
 Add Document for R8A774E1 (RZ/G2H)

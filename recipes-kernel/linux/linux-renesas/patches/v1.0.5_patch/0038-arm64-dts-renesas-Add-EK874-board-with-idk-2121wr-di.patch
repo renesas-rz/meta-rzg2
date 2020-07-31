@@ -1,7 +1,7 @@
 From 6f5c734f0f439e19a8df33f38ef2762f34d8593b Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 30 Jun 2020 11:12:27 +0700
-Subject: [PATCH 038/350] arm64: dts: renesas: Add EK874 board with idk-2121wr
+Subject: [PATCH 038/455] arm64: dts: renesas: Add EK874 board with idk-2121wr
  display support
 
 Commit <ae56c940f188c1dde440c8456229adaad733908e> upstream.

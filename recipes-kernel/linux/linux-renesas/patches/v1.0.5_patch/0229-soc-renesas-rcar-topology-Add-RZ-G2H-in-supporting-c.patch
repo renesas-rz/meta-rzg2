@@ -1,7 +1,7 @@
 From a3d1ad3c85866eb2a7e8fe49deaea4ed3896b0f6 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 8 Apr 2020 11:07:36 +0700
-Subject: [PATCH 229/350] soc: renesas: rcar-topology: Add RZ/G2H in supporting
+Subject: [PATCH 229/455] soc: renesas: rcar-topology: Add RZ/G2H in supporting
  capacity awareness
 
 RZ/G2H have 8 cores with 4 cores for each type (CA57 and CA57) same as

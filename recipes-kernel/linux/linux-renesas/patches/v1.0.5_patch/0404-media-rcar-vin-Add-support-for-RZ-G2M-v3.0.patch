@@ -1,0 +1,32 @@
+From 017009c8c0536f4baf9bafe5d0c9f69de8a2054c Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 28 Jul 2020 13:48:11 +0700
+Subject: [PATCH 404/455] media: rcar-vin: Add support for RZ/G2M v3.0
+
+According to the RZ/G2 User's manual, RZ/G2M v1.3 and RZ/G2M v3.0 VIN
+blocks are identical, therefore use RZ/G2M v1.3 (a.k.a R8A774A1)
+definitions to add RZ/G2M v3.0 (a.k.a R8A774A3) support.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-core.c b/drivers/media/platform/rcar-vin/rcar-core.c
+index dc6db07..6f2f57e 100644
+--- a/drivers/media/platform/rcar-vin/rcar-core.c
++++ b/drivers/media/platform/rcar-vin/rcar-core.c
+@@ -1159,6 +1159,10 @@ static const struct of_device_id rvin_of_id_table[] = {
+ 		.data = &rcar_info_r8a7796,
+ 	},
+ 	{
++		.compatible = "renesas,vin-r8a774a3",
++		.data = &rcar_info_r8a7796,
++	},
++	{
+ 		.compatible = "renesas,vin-r8a774b1",
+ 		.data = &rcar_info_r8a77965,
+ 	},
+-- 
+2.7.4
+

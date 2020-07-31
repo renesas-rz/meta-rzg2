@@ -1,7 +1,7 @@
 From fba48a00bcc71b9cbb0913996afb4374c06c425d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Fri, 20 Mar 2020 09:15:50 +0700
-Subject: [PATCH 210/350] arm64: dts: renesas: Initial r8a774e1 SoC device tree
+Subject: [PATCH 210/455] arm64: dts: renesas: Initial r8a774e1 SoC device tree
 
 Basic support for the RZ/G2H (R8A774E1) SoC. Added placeholders
 to avoid compilation error with the common platform code.

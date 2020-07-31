@@ -1,7 +1,7 @@
 From 9a528fef1f1cbef0f7698e8a859ba5e114b2aa43 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Mon, 30 Mar 2020 14:28:24 +0700
-Subject: [PATCH 192/350] drm: rcar-du: add support interlace mode for R8A774C0
+Subject: [PATCH 192/455] drm: rcar-du: add support interlace mode for R8A774C0
 
 This patch adds support interlace mode for r8a774c0 SoC.
 

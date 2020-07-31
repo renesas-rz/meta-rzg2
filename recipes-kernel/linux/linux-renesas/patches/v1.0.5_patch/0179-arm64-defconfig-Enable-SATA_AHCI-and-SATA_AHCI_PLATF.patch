@@ -1,7 +1,7 @@
 From b97d32b05a221e16b53c116eee7e0da09172cb39 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Tue, 31 Dec 2019 13:21:25 +0700
-Subject: [PATCH 179/350] arm64: defconfig: Enable SATA_AHCI and
+Subject: [PATCH 179/455] arm64: defconfig: Enable SATA_AHCI and
  SATA_AHCI_PLATFORM
 
 This patch enables config for SATA driver

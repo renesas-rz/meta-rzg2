@@ -1,7 +1,7 @@
 From a713033f913345df30ab2248cf05c13c66a9d8bb Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 24 Apr 2019 19:45:05 +0700
-Subject: [PATCH 033/350] drm: rcar-du: Enable alpha property on primary planes
+Subject: [PATCH 033/455] drm: rcar-du: Enable alpha property on primary planes
 
 The hardware supports alpha on all planes, and using it on the
 primary plane can be useful. Don't restrict the alpha property

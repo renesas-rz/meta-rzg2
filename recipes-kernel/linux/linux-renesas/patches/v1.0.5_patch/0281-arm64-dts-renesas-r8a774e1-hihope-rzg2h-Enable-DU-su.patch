@@ -1,7 +1,7 @@
 From c65b2e36887111334dd1c964047a3e1ec34f6517 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
 Date: Tue, 14 Apr 2020 17:01:28 +0700
-Subject: [PATCH 281/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h Enable DU
+Subject: [PATCH 281/455] arm64: dts: renesas: r8a774e1-hihope-rzg2h Enable DU
  support
 
 This patch enables DU support for Hihope RZ/G2H Platform

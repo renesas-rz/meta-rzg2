@@ -1,7 +1,7 @@
 From 296cb223fc85c7bf454437294d3275b0edb94880 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 18 Sep 2019 17:04:13 +0700
-Subject: [PATCH 152/350] media: i2c: ov5645: add virtual_channel parameter
+Subject: [PATCH 152/455] media: i2c: ov5645: add virtual_channel parameter
  support
 
 This patch adds virtual_channel parameter support based on OV5640

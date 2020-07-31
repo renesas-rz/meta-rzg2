@@ -1,7 +1,7 @@
 From 82de4fc23f1fbfbea1e950f3a6f77797eeba5e8d Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Wed, 4 Mar 2020 11:16:04 +0700
-Subject: [PATCH 111/350] dt-bindings: display: renesas: du: Document the
+Subject: [PATCH 111/455] dt-bindings: display: renesas: du: Document the
  r8a774b1 bindings
 
 Document the RZ/G2N (R8A774B1) SoC in the R-Car DU bindings.

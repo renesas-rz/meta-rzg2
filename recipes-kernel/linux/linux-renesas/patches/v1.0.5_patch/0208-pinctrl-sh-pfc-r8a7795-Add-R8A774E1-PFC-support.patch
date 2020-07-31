@@ -1,7 +1,7 @@
 From 7434afb6e9f01fc917bde96a3c3b769e41ee7185 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 19 Mar 2020 18:36:42 +0700
-Subject: [PATCH 208/350] pinctrl: sh-pfc: r8a7795: Add R8A774E1 PFC support
+Subject: [PATCH 208/455] pinctrl: sh-pfc: r8a7795: Add R8A774E1 PFC support
 
 Renesas RZ/G2H (r8a774e1) is pin compatible with R-Car H3 (r8a7795),
 however it doesn't have several automotive specific peripherals and

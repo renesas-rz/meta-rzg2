@@ -1,7 +1,7 @@
 From 2c6f8e45502678bd52db18968d8f9891a5c33a46 Mon Sep 17 00:00:00 2001
 From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
 Date: Wed, 15 Jan 2020 21:58:27 +0700
-Subject: [PATCH 193/350] mmc: tmio: Add support for pre_req and post_req
+Subject: [PATCH 193/455] mmc: tmio: Add support for pre_req and post_req
 
 This patch implements pre_req and post_req to support
  asynchronous mmc request.

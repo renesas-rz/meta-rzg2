@@ -1,7 +1,7 @@
 From f41191807b7088dd10e65b2a0cfd370b6a46097a Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
 Date: Thu, 16 May 2019 10:50:25 +0700
-Subject: [PATCH 046/350] arm64: dts: renesas: hihope-common: enable
+Subject: [PATCH 046/455] arm64: dts: renesas: hihope-common: enable
  TMU{0,1,2,3,4}
 
 This patch enables TMU{0,1,2,3,4} support for both Hihope-rzg2m and

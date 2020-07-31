@@ -1,7 +1,7 @@
 From f9f91b021c24bcfe25b6599db68dc54929345c95 Mon Sep 17 00:00:00 2001
 From: Binh Nguyen <binh.nguyen.uw@renesas.com>
 Date: Thu, 9 Apr 2020 10:40:45 +0700
-Subject: [PATCH 310/350] dt-bindings: iommu: ipmmu-vmsa: Add r8a774e1 support
+Subject: [PATCH 310/455] dt-bindings: iommu: ipmmu-vmsa: Add r8a774e1 support
 
 Document RZ/G2H (R8A774E1) SoC bindings.
 

@@ -1,7 +1,7 @@
 From e537b39ae96f1bdb53aa2b37a25ae4068ec58e62 Mon Sep 17 00:00:00 2001
 From: "Loc Phuoc Pham. Lam" <loc.lam.px@renesas.com>
 Date: Tue, 8 Oct 2019 00:06:20 +0700
-Subject: [PATCH 166/350] drivers: thermal: rcar_gen3_thermal: Fix interrupt
+Subject: [PATCH 166/455] drivers: thermal: rcar_gen3_thermal: Fix interrupt
  count issue
 
 When upgrading to v4.14, the upstream code has below issue:

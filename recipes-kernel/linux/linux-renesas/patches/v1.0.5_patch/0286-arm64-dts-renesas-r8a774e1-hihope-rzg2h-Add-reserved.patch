@@ -1,7 +1,7 @@
 From 6e85ac27a2153fff298156f5fadc576a6729470b Mon Sep 17 00:00:00 2001
 From: Son Lam <son.lam.ym@renesas.com>
 Date: Thu, 9 Apr 2020 14:32:06 +0700
-Subject: [PATCH 286/350] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
+Subject: [PATCH 286/455] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
  reserved memory regions
 
 This patch adds reserved memory regions:
