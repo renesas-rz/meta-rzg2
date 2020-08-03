@@ -24,16 +24,19 @@ SRC_URI_append_r8a774c0 += "\
 "
 
 SRC_URI_append_r8a774a1 += "\
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch ", "")} \
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0002-arm64-dts-r8a774a3-hihope-rzg2m-ecc-dual-Reduce-memo.patch ", "")} \
+  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch \
+					file://patches/option_patch/0002-arm64-dts-r8a774a3-hihope-rzg2m-ecc-dual-Reduce-memo.patch \
+					file://patches/option_patch/0003-arm64-dts-hihope-rzg2m-Re-order-CMA-area-and-remove-.patch ", "")} \
 "
 
 SRC_URI_append_r8a774b1 += "\
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch ", "")} \
+  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch \
+					 file://patches/option_patch/0002-arm64-dts-r8a774b1-hihope-rzg2n-rev2-Re-order-CMA-ar.patch ", "")} \
 "
 
 SRC_URI_append_r8a774e1 += "\
-  ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch ", "")} \
+  ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch \
+					 file://patches/option_patch/0002-arm64-dts-r8a774e1-hihope-rzg2h-Re-order-CMA-area-an.patch", "")} \
   ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Reduce-memor.patch \
 					 file://patches/option_patch/0002-arm64-dts-renesas-r8a774e1-hihope-rzg2h-remove-lossy.patch ", "")} \
 "
