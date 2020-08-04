@@ -26,7 +26,8 @@ SRC_URI_append_r8a774c0 += "\
 SRC_URI_append_r8a774a1 += "\
   ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch \
 					file://patches/option_patch/0002-arm64-dts-r8a774a3-hihope-rzg2m-ecc-dual-Reduce-memo.patch \
-					file://patches/option_patch/0003-arm64-dts-hihope-rzg2m-Re-order-CMA-area-and-remove-.patch ", "")} \
+					file://patches/option_patch/0003-arm64-dts-hihope-rzg2m-Re-order-CMA-area-and-remove-.patch \
+					file://patches/option_patch/0004-arm64-dts-hihope-rzg2m-enable-IPMMU-for-GSX.patch ", "")} \
 "
 
 SRC_URI_append_r8a774b1 += "\
@@ -36,7 +37,8 @@ SRC_URI_append_r8a774b1 += "\
 
 SRC_URI_append_r8a774e1 += "\
   ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch \
-					 file://patches/option_patch/0002-arm64-dts-r8a774e1-hihope-rzg2h-Re-order-CMA-area-an.patch", "")} \
+					 file://patches/option_patch/0002-arm64-dts-r8a774e1-hihope-rzg2h-Re-order-CMA-area-an.patch \
+					 file://patches/option_patch/0003-arm64-dts-r8a774e1-hihope-rzg2h-enable-IPMMU-for-GSX.patch ", "")} \
   ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Reduce-memor.patch \
 					 file://patches/option_patch/0002-arm64-dts-renesas-r8a774e1-hihope-rzg2h-remove-lossy.patch ", "")} \
 "

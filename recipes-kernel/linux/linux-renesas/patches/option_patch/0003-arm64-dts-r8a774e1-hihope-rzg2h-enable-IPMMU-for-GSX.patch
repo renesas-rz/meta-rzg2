@@ -1,0 +1,43 @@
+From 9f883ece45ac66eb2a8a709e256d286df4547d77 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 4 Aug 2020 09:51:50 +0700
+Subject: [PATCH] arm64: dts: r8a774e1-hihope-rzg2h: enable IPMMU for GSX
+
+This patch will enable support IPMMU and IPMMU domain of GSX
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ .../arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 8165d6a..6f6178d 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -106,3 +106,23 @@
+ 	clock-names = "du.0", "du.1", "du.3",
+ 		"dclkin.0", "dclkin.1", "dclkin.3";
+ };
++
++&ipmmu_mm {
++	status = "okay";
++};
++
++&ipmmu_pv0 {
++	status = "okay";
++};
++
++&ipmmu_pv1 {
++	status = "okay";
++};
++
++&ipmmu_pv2 {
++	status = "okay";
++};
++
++&ipmmu_pv3 {
++	status = "okay";
++};
+-- 
+1.9.1
+
