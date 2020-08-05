@@ -38,6 +38,7 @@ SRC_URI += " \
 	file://0009-plat-renesas-rzg-Change-value-condition-of-RZG_DRAM_.patch \
 	file://0010-plat-renesas-rzg-bl2_fusa-Add-ECC-support-for-RZ-G2H.patch \
 	file://0012-plat-rzg-bl2_fusa-Modify-ECC-setting-for-RZG2N-RZG2M.patch \
+	file://0013-plat-renesas-rzg-bl2_fusa-Optimize-source-code.patch \
 "
 
 SRC_URI += "${@'file://0011-Fix-ld-error-unrecognized-option-with-old-binutils.patch' \
