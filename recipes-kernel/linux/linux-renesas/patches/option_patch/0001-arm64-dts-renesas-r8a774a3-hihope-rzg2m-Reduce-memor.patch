@@ -1,0 +1,36 @@
+From 13eb65b5c2ba2c9c13b60421533ba1435e60853b Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 5 Aug 2020 15:52:31 +0700
+Subject: [PATCH] arm64: dts: renesas: r8a774a3-hihope-rzg2m: Reduce memory in
+ ECC Full Single setting mode
+
+ECC Full Single setting will need a half of memory in each memory bank.
+So that we will reduce the memory for satisfy it.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+index 268bb0d55ba5..caec3e055343 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+@@ -16,12 +16,12 @@
+ 	memory@48000000 {
+ 		device_type = "memory";
+ 		/* first 128MB is reserved for secure area. */
+-		reg = <0x0 0x48000000 0x0 0x78000000>;
++		reg = <0x0 0x48000000 0x0 0x4C000000>;
+ 	};
+ 
+ 	memory@600000000 {
+ 		device_type = "memory";
+-		reg = <0x6 0x00000000 0x0 0x80000000>;
++		reg = <0x6 0x00000000 0x0 0x40000000>;
+ 	};
+ 
+ 	reserved-memory {
+-- 
+2.17.1
+
