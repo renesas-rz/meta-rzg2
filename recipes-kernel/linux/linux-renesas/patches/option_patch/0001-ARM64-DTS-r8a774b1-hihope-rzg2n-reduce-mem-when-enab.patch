@@ -9,8 +9,9 @@ This commit limit mem to prevent Linux to access to ECC area.
 
 Currently, with 8bit data/5bit ECC, only 1984M can be used.
 - 128 MB : reserved for security area
-- 1984 MB : usable for kernel, user space
-- 1984 MB : used for ECC
+- 512 MB : usable for kernel map CMA area without ecc
+- 1728 MB : usable for kernel, user space other CMA area
+- 1728 MB : used for ECC
 
 Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
 ---
@@ -27,7 +28,7 @@ index 98fd863..2a8229d 100644
  	memory@480000000 {
  		device_type = "memory";
 -		reg = <0x4 0x80000000 0x0 0x80000000>;
-+		reg = <0x4 0x80000000 0x0 0x04000000>;
++		reg = <0x4 0x80000000 0x0 0x14000000>;
  	};
  
  	reserved-memory {

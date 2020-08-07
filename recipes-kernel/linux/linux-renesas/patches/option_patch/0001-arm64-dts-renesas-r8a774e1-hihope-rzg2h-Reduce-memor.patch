@@ -23,7 +23,7 @@ index 30b83d58c318..2551fdf86e9a 100644
  		device_type = "memory";
  		/* first 128MB is reserved for secure area. */
 -		reg = <0x0 0x48000000 0x0 0x78000000>;
-+		reg = <0x0 0x48000000 0x0 0x3C000000>;
++		reg = <0x0 0x48000000 0x0 0x4C000000>;
  	};
  
  	memory@500000000 {
