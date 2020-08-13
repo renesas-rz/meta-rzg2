@@ -1,5 +1,6 @@
 require u-boot-common_${PV}.inc
 require u-boot.inc
+require include/provisioning.inc
 
 DEPENDS += "bc-native dtc-native"
 
@@ -38,5 +39,9 @@ do_deploy_append() {
         rm -f ${UBOOT_SREC} ${UBOOT_SREC_SYMLINK}
         ln -sf ${UBOOT_SREC_IMAGE} ${UBOOT_SREC_SYMLINK}
         ln -sf ${UBOOT_SREC_IMAGE} ${UBOOT_SREC}
+    fi
+
+    if [ 1 -eq ${SECURE_BOOT} ] ; then
+	do_deploy_provisioning 0x50000000 "${UBOOT_SREC_SYMLINK}"
     fi
 }

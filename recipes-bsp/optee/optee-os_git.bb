@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = " \
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit deploy python3native
+require include/provisioning.inc
 
 PV = "3.9.0+renesas+git${SRCPV}"
 BRANCH = "master"
@@ -57,5 +58,9 @@ do_deploy() {
     # so we must adjust it to our address for our platform before using it.
     objcopy --adjust-vma=0x44100000 -I srec -O srec \
 	${S}/out/arm-plat-${PLATFORM}/core/tee.srec ${DEPLOYDIR}/tee-${MACHINE}.srec
+
+    if [ 1 -eq ${SECURE_BOOT} ] ; then
+    	do_deploy_provisioning 0x44100000 "${DEPLOYDIR}/tee-${MACHINE}.srec"
+    fi
 }
 addtask deploy before do_build after do_compile
