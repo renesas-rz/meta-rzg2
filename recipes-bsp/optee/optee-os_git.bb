@@ -19,6 +19,7 @@ SRC_URI = " \
     file://0001-arch-arm-plat-rzg-Add-platform-rzg2.patch \
     file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
     file://0003-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
+    file://0004-core-arm-plat-rzg-Disable-initial-console.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
