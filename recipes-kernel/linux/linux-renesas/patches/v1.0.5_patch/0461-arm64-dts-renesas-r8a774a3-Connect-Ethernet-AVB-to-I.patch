@@ -1,0 +1,28 @@
+From e35a49dd73f80c5b4142453c1bec8d3b14668c3c Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 5 Aug 2020 14:00:53 +0700
+Subject: [PATCH 461/462] arm64: dts: renesas: r8a774a3: Connect Ethernet-AVB
+ to IPMMU-DS0
+
+Add IPMMU-DS0 to the Ethernet-AVB device node.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 7877967..c48e8b8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -1191,6 +1191,7 @@
+ 			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
+ 			resets = <&cpg 812>;
+ 			phy-mode = "rgmii";
++			iommus = <&ipmmu_ds0 16>;
+ 			status = "disabled";
+ 		};
+ 
+-- 
+2.7.4
+

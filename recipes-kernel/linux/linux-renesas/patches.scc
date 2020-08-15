@@ -453,3 +453,10 @@ patch patches/v1.0.5_patch/0452-arm64-dts-renesas-Add-HiHope-RZ-G2M-board-v3.0-w
 patch patches/v1.0.5_patch/0453-mmc-renesas_sdhi-Add-PIO-mode-support.patch
 patch patches/v1.0.5_patch/0454-tee-add-support-for-session-s-client-UUID-generation.patch
 patch patches/v1.0.5_patch/0455-tee-optee-Add-support-for-session-login-client-UUID-.patch
+patch patches/v1.0.5_patch/0456-dt-bindings-iommu-ipmmu-vmsa-Add-r8a774a3-support.patch
+patch patches/v1.0.5_patch/0457-iommu-ipmmu-vmsa-Hook-up-r8a774a3-DT-matching-code.patch
+patch patches/v1.0.5_patch/0458-arm64-dts-renesas-r8a774a3-Add-IPMMU-device-nodes.patch
+patch patches/v1.0.5_patch/0459-arm64-dts-renesas-r8a774a3-Tie-SYS-DMAC-to-IPMMU-DS0.patch
+patch patches/v1.0.5_patch/0460-arm64-dts-renesas-r8a774a3-Tie-Audio-DMAC-to-IPMMU-M.patch
+patch patches/v1.0.5_patch/0461-arm64-dts-renesas-r8a774a3-Connect-Ethernet-AVB-to-I.patch
+patch patches/v1.0.5_patch/0462-arm64-dts-renesas-r8a774a3-Add-QoS-device-node.patch
