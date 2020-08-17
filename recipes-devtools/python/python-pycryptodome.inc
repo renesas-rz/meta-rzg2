@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=6dc0e2a13d2f25d6f123c434b761faba"
 inherit pypi
 
 RDEPENDS_${PN} += " \
+	${PYTHON_PN}-ctypes \
 	${PYTHON_PN}-io \
 	${PYTHON_PN}-math \
 "
