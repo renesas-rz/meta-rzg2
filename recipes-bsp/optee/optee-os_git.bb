@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = " \
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit deploy python3native
 require include/provisioning.inc
+require include/ecc-control.inc
 
 PV = "3.9.0+renesas+git${SRCPV}"
 BRANCH = "master"
@@ -20,6 +21,7 @@ SRC_URI = " \
     file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
     file://0003-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
     file://0004-core-arm-plat-rzg-Disable-initial-console.patch \
+    file://0005-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
@@ -42,7 +44,7 @@ EXTRA_OEMAKE = "-e MAKEFLAGS= \
 		"
 
 do_compile() {
-    oe_runmake PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n
+    oe_runmake PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n RZG_DRAM_ECC=${USE_ECC} RZG_ECC_FULL=${ECC_FULL}
 }
 
 # do_install() nothing
