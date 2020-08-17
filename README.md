@@ -128,3 +128,71 @@ For 64-bit application use environment script in _/opt/poky/x.x_
 ```bash
     $ source /opt/poky/x.x/environment-setup-aarch64-poky-linux
 ```
+
+## Build configs
+
+It is possible to change some build configs as below:
+* GPLv3: choose to not allow, or allow, GPLv3 packages
+  * **Non-GPLv3 (default):** not allow GPLv3 license. All recipes that has GPLv3 license will be downgrade to older version that has alternative license (done by meta-gplv2). In this setting customer can ignore the risk of strict license GPLv3
+  ```
+  INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
+  ```
+  * Allow-GPLv3: allow GPLv3 license. If user is fine with strict copy-left license GPLv3, can use this setting to get newer software version.
+  ```
+  #INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
+  ```
+* CIP Core: choose the version of CIP Core to build with. CIP Core are software packages that are maintained for long term by CIP community.
+  * **Buster-limited (default)**: use limited packages from CIP Core Buster
+  ```
+  MACHINE_FEATURES_append = " Buster-limited"
+  ```
+  * Buster-full: use as many packages from CIP Core Buster as possible. Note that currently GPLv3 must be allowed for building Buster-full.
+  ```
+  #INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
+  MACHINE_FEATURES_append = " Buster-full"
+  ```
+  * Jessie: not use CIP Core Buster, use limited packages from CIP Core Jessie instead
+  ```
+  #MACHINE_FEATURES_append = " Buster-limited"
+  ```
+  * None CIP Core: not use CIP Core at all, use all default version from Yocto 2.4 Rocko
+  ```
+  #INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
+  #MACHINE_FEATURES_append = " Buster-limited"
+  #BINUVERSION = "${@'2.31.1' if 'Buster' in '${MACHINE_FEATURES}' else '2.25'}"
+  #PREFERRED_VERSION_nativesdk-binutils = "${BINUVERSION}"
+  #GLIBCVERSION = "${@'2.28' if 'Buster' in '${MACHINE_FEATURES}' else '2.19'}"
+  #PREFERRED_VERSION_nativesdk-glibc-locale = "${GLIBCVERSION}"
+  #BBMASK .= "|glibc-mtrace"
+  #RDEPENDS_${PN}_remove_pn-packagegroup-core-tools-debug = "libc-mtrace"
+  #DEPENDS_remove_pn-openssh = "openssl10"
+  #DEPENDS_append_pn-openssh = " openssl"
+  BBMASK .= "|recipes-cip-core"
+  ```
+Below table show the version of recipes that change due to above setting.  
+Note that this table only show packages that change version, others are not shown.  
+Package versions noted with `(debian)` mean they are CIP Core packages. The source code is taken from Debian repo. Different with original version, Debian version has many bug fixes backported from newer version.
+
+|                        | **Buster-limited (non-GPLv3)** | Buster-full (allow GPLv3) | Jessie (non-GPLv3) | None CIP Core (allow GPLv3) |
+|------------------------|--------------------------------|---------------------------|--------------------|-----------------------------|
+| busybox                |  1.30.1 (debian)               |  1.30.1 (debian)          | 1.22   (debian)    | 1.24.1                      |
+| openssl                |  1.1.1d (debian)               |  1.1.1d (debian)          | 1.0.1t (debian)    | 1.0.2o                      |
+| glibc                  |  2.28   (debian)               |  2.28   (debian)          | 2.19   (debian)    | 2.26                        |
+| binutils               |  -                             |  2.31.1 (debian)          | -                  | -                           |
+| coreutils              |  6.9                           |  8.30   (debian)          | 6.9                | 8.27                        |
+| gnupg                  |  1.4.7                         |  2.2.12 (debian)          | 1.4.7              | 2.2.0                       |
+| libassuan              |  2.4.3                         |  2.5.2  (debian)          | 2.4.3              | 2.4.3                       |
+| libpam                 |  1.3.0                         |  1.3.1  (debian)          | 1.3.0              | 1.3.0                       |
+| libgcrypt              |  1.7.3                         |  1.8.4  (debian)          | 1.7.3              | 1.7.3                       |
+| libunistring           |  0.9.7                         |  0.9.10 (debian)          | 0.9.7              | 0.9.7                       |
+| perl                   |  5.24.1                        |  5.28.1 (debian)          | 5.24.1             | 5.24.1                      |
+| bash                   |  3.2.57                        |  4.4                      | 3.2.57             | 4.4                         |
+| diffutils              |  -                             |  3.6                      | -                  |                             |
+| dosfstools             |  2.11                          |  4.1                      | 2.11               | 4.1                         |
+| gawk                   |                                |  4.1.4                    | 3.1.5              | 4.1.4                       |
+| m4                     |                                |  1.4.18                   | 1.4.9              | 1.4.18                      |
+| make                   |  3.81                          |  4.2.1                    | 3.81               | 4.2.1                       |
+| sed                    |  4.1.2                         |  4.2.2                    | 4.1.2              | 4.2.2                       |
+
+binutils is an optional package, and will not be added to core-image at default, except in Buster-full (allow GPLv3) setting.  
+Besides, due to the license GPLv3, binutils cannot be added to core-image with non-GPLv3 setting
