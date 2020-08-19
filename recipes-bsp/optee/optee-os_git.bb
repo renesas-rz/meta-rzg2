@@ -20,7 +20,7 @@ SRC_URI = " \
     file://0001-arch-arm-plat-rzg-Add-platform-rzg2.patch \
     file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
     file://0003-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
-    file://0004-core-arm-plat-rzg-Disable-initial-console.patch \
+    file://0004-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
     file://0005-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
 "
 

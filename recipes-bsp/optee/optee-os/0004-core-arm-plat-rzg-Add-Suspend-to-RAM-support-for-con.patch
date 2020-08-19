@@ -1,0 +1,55 @@
+From 4e5f9c00287a49239d97a43eeed435a1d6daff71 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Wed, 19 Aug 2020 16:51:41 +0700
+Subject: [PATCH] core: arm: plat-rzg: Add Suspend to RAM support for console
+
+This patch will add support suspend to RAM for console.
+It also fix the address to setting register when init console.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ core/arch/arm/plat-rzg/main.c | 14 ++++++++++++++
+ core/drivers/scif.c           |  5 ++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
+index 921da8a1..5fc71cc6 100644
+--- a/core/arch/arm/plat-rzg/main.c
++++ b/core/arch/arm/plat-rzg/main.c
+@@ -130,3 +130,17 @@ void console_init(void)
+     scif_uart_init(&console_data, CONSOLE_UART_BASE);
+     register_serial_console(&console_data.chip);
+ }
++
++static void scif_backup_cb(enum suspend_to_ram_state state,
++			   uint32_t cpu_id __unused)
++{
++	if (state == SUS2RAM_STATE_SUSPEND) {
++		/* We must un-assign console chip to avoid other using. */
++		register_serial_console(NULL);
++	} else if (state == SUS2RAM_STATE_RESUME) {
++		/* We must re-init the console before using it. */
++		console_init();
++	}
++}
++
++suspend_to_ram_cbfunc(scif_backup_cb);
+diff --git a/core/drivers/scif.c b/core/drivers/scif.c
+index ff33ea3a..ac0a48ca 100644
+--- a/core/drivers/scif.c
++++ b/core/drivers/scif.c
+@@ -85,7 +85,10 @@ void scif_uart_init(struct scif_uart_data *pd, paddr_t base)
+ 	pd->chip.ops = &scif_uart_ops;
+ 
+ 	/* Set Transmit Enable in Control register */
+-	io_setbits16(base + SCIF_SCSCR, SCSCR_TE);
++	/* We must use the address by MMU setting instead of hard code
++	 * using physical address.
++	 */
++	io_setbits16(io_pa_or_va(&pd->base) + SCIF_SCSCR, SCSCR_TE);
+ 
+ 	scif_uart_flush(&pd->chip);
+ }
+-- 
+2.17.1
+
