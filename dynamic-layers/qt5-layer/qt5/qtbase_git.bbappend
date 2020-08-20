@@ -17,6 +17,7 @@ SRC_URI_append = " \
     file://0003-Blacklist-and-skip-failing-tests-for-Boot2Qt-64-bit-.patch \
     file://0004-Skip-failing-tests-in-tst_QWindow-on-Wayland.patch \
     file://0005-mkspecs-linux-oe-g-Add-check-oe-device-extra.pri-bef.patch \
+    file://0006-qt-base-remove-use-of-OE_QMAKE_WAYLAND_SCANNER.patch \
 "
 
 # switch to GLES 2 support
