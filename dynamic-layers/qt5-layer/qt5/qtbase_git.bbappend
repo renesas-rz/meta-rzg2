@@ -16,6 +16,7 @@ SRC_URI_append = " \
     file://0002-Make-tst_QOpenGLWindow-pass-on-platforms-where-the-d.patch \
     file://0003-Blacklist-and-skip-failing-tests-for-Boot2Qt-64-bit-.patch \
     file://0004-Skip-failing-tests-in-tst_QWindow-on-Wayland.patch \
+    file://0005-mkspecs-linux-oe-g-Add-check-oe-device-extra.pri-bef.patch \
 "
 
 # switch to GLES 2 support
