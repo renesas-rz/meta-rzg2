@@ -39,19 +39,6 @@ SDK_POSTPROCESS_COMMAND_prepend = " append_setup;"
 ### For cross-compile Qt ###
 TOOLCHAIN_HOST_TASK_append = ' nativesdk-qtbase-tools '
 
-# Create pri file to prevent below warning when running qmake
-#   "...usr/lib/qt5/mkspecs/oe-device-extra.pri: No such file or directory"
-fakeroot append_qt () {
-	# Generate oe-device-extra.pri
-	if [ -d ${SDK_OUTPUT}/${SDKPATH}/sysroots/${TARGET_SYS}/${libdir}/${QT_DIR_NAME}/mkspecs ] &&
-	   [ ! -f ${SDK_OUTPUT}/${SDKPATH}/sysroots/${TARGET_SYS}/${libdir}/${QT_DIR_NAME}/mkspecs/oe-device-extra.pri ]
-	then
-		touch ${SDK_OUTPUT}/${SDKPATH}/sysroots/${TARGET_SYS}/${libdir}/${QT_DIR_NAME}/mkspecs/oe-device-extra.pri
-	fi
-}
-SDK_POSTPROCESS_COMMAND_prepend = " append_qt;"
-
-
 ### For self-compile Qt ###
 IMAGE_INSTALL_append = ' packagegroup-qt5-toolchain-target '
 
