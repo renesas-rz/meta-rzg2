@@ -23,3 +23,17 @@ RDEPENDS_${PN}-plugins += "${DEP}"
 RDEPENDS_${PN}-examples += "${DEP}"
 
 DEPENDS_append_rzg2 = " mesa"
+
+DEPENDS_class-nativesdk = "qtbase qtdeclarative wayland"
+RDEPENDS_${PN}_class-nativesdk = ""
+RDEPENDS_${PN}-plugins_class-nativesdk = ""
+RDEPENDS_${PN}-examples_class-nativesdk = ""
+
+QMAKE_PROFILES_class-native = "${S}/src/qtwaylandscanner"
+QMAKE_PROFILES_class-nativesdk = "${S}/src/qtwaylandscanner"
+B_class-native = "${SEPB}/src/qtwaylandscanner"
+B_class-nativesdk = "${SEPB}/src/qtwaylandscanner"
+
+BBCLASSEXTEND =+ "native nativesdk"
+
+RPROVIDES_${PN} += " ${PN}-tools "
