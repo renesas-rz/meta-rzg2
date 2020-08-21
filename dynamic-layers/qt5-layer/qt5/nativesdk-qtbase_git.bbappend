@@ -35,7 +35,6 @@ do_configure() {
         -no-gif \
         -no-accessibility \
         -no-cups \
-        -no-gui \
         -no-qml-debug \
         -no-sql-mysql \
         -no-sql-sqlite \
@@ -79,3 +78,15 @@ do_configure() {
 # Avoid "Transaction check error" because of conflict in owner of directory
 # /opt/poky/*/sysroots/x86_64-pokysdk-linux/environment-setup.d
 DIRFILES=""
+
+ALLOW_EMPTY_${PN}-fonts = "1"
+
+FILES_${PN}-fonts-ttf-vera       = "${OE_QMAKE_PATH_QT_FONTS}/Vera*.ttf"
+FILES_${PN}-fonts-ttf-dejavu     = "${OE_QMAKE_PATH_QT_FONTS}/DejaVu*.ttf"
+FILES_${PN}-fonts-pfa            = "${OE_QMAKE_PATH_QT_FONTS}/*.pfa"
+FILES_${PN}-fonts-pfb            = "${OE_QMAKE_PATH_QT_FONTS}/*.pfb"
+FILES_${PN}-fonts-qpf            = "${OE_QMAKE_PATH_QT_FONTS}/*.qpf*"
+FILES_${PN}-fonts                = "${OE_QMAKE_PATH_QT_FONTS}/README \
+                                    ${OE_QMAKE_PATH_QT_FONTS}/fontdir"
+
+INSANE_SKIP_${PN} += " installed-vs-shipped"
