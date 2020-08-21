@@ -15,5 +15,5 @@ LIC_FILES_CHKSUM = " \
     file://LICENSE.FDL;md5=6d9f2a9af4c8b8c3c769f6cc1b6aaf7e \
 "
 
-# Solve issue build qtbase-native due to no exist "-no-nis" setting anymore.
-PACKAGECONFIG_CONFARGS_remove = "-no-nis"
+# Solve issue build qtbase-native due to no exist "-no-nis" and "-no-gui" setting anymore.
+PACKAGECONFIG_CONFARGS_remove = "-no-nis -no-gui"
