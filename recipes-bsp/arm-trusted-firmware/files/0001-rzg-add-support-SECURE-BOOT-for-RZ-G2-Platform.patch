@@ -1,4 +1,4 @@
-From 0e25c7b2ae0c215d4c87e857d04df816d4dc627f Mon Sep 17 00:00:00 2001
+From 473940f794e7a6c951758ca69c99cee00ba0b8f6 Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Wed, 12 Aug 2020 15:20:12 +0700
 Subject: [PATCH] rzg: add support SECURE BOOT for RZ/G2 Platform
@@ -10,7 +10,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  drivers/renesas/rzg/auth/auth_mod.c           | 178 +++++++-----------
  drivers/renesas/rzg/io/io_rcar.c              | 146 +++------------
  plat/renesas/rzg/bl2_plat_mem_params_desc.c   |  31 ++++
- plat/renesas/rzg/bl2_plat_setup.c             |  42 -----
+ plat/renesas/rzg/bl2_plat_setup.c             |  30 ---
  plat/renesas/rzg/include/platform_def.h       |  13 ++
  plat/renesas/rzg/include/rcar_def.h           |   6 +
  plat/renesas/rzg/plat_storage.c               |  19 ++
@@ -23,7 +23,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  tools/renesas/rzg_layout_create/makefile      |   6 +
  tools/renesas/rzg_layout_create/sa6.c         |  41 +++++
  tools/renesas/rzg_layout_create/sa6.ld.S      |  26 +++
- 16 files changed, 785 insertions(+), 271 deletions(-)
+ 16 files changed, 785 insertions(+), 259 deletions(-)
  create mode 100644 plat/renesas/rzg/sec_module/R_TSIP_Boot_Lib.h
  create mode 100644 plat/renesas/rzg/sec_module/sec_module.c
  create mode 100644 plat/renesas/rzg/sec_module/sec_module.h
@@ -527,7 +527,7 @@ index 3b124c7..bf23ba6 100644
  		.image_id = BL31_IMAGE_ID,
  
 diff --git a/plat/renesas/rzg/bl2_plat_setup.c b/plat/renesas/rzg/bl2_plat_setup.c
-index bc47855..647a409 100644
+index 441fedf..4fceb93 100644
 --- a/plat/renesas/rzg/bl2_plat_setup.c
 +++ b/plat/renesas/rzg/bl2_plat_setup.c
 @@ -33,7 +33,6 @@
@@ -538,35 +538,7 @@ index bc47855..647a409 100644
  #include "qos_init.h"
  #include "rcar_def.h"
  #include "rcar_private.h"
-@@ -229,9 +228,6 @@ void bl2_plat_flush_bl31_params(void)
- 	uint32_t product_cut, product, cut;
- 	uint32_t boot_dev, boot_cpu;
- 	uint32_t reg;
--#if RZG2_SECURE_BOOT
--	uint32_t lcs, val;
--#endif
- 
- 	reg = mmio_read_32(RCAR_MODEMR);
- 	boot_dev = reg & MODEMR_BOOT_DEV_MASK;
-@@ -301,17 +297,6 @@ mmu:
- 	mmio_write_32(IPMMUMM_IMSCTLR, IPMMUMM_IMSCTLR_ENABLE);
- 	mmio_write_32(IPMMUMM_IMAUXCTLR, IPMMUMM_IMAUXCTLR_NMERGE40_BIT);
- 
--#if RZG2_SECURE_BOOT
--	val = rcar_rom_get_lcs(&lcs);
--	if (val) {
--		ERROR("BL2: Failed to get the LCS. (%d)\n", val);
--		panic();
--	}
--
--	if (lcs == LCS_SE)
--		mmio_clrbits_32(P_ARMREG_SEC_CTRL, P_ARMREG_SEC_CTRL_PROT);
--#endif
--
- 	rcar_swdt_release();
- 	bl2_system_cpg_init();
- 
-@@ -383,28 +368,10 @@ cold_boot:
+@@ -369,28 +368,10 @@ cold_boot:
  	return 0;
  }
  
@@ -595,7 +567,7 @@ index bc47855..647a409 100644
  
  	if (!params) {
  		params = (bl2_to_bl31_params_mem_t *) PARAMS_BASE;
-@@ -415,17 +382,8 @@ int bl2_plat_handle_post_image_load(unsigned int image_id)
+@@ -401,19 +382,8 @@ int bl2_plat_handle_post_image_load(unsigned int image_id)
  
  	switch (image_id) {
  	case BL31_IMAGE_ID:
@@ -610,9 +582,11 @@ index bc47855..647a409 100644
 -		if (!ret)
 -			bl_mem_params->image_info.image_base = dest;
 -
- 		memcpy(&params->bl32_ep_info, &bl_mem_params->ep_info,
- 			sizeof(entry_point_info_t));
+-		memcpy(&params->bl32_ep_info, &bl_mem_params->ep_info,
+-			sizeof(entry_point_info_t));
  		break;
+ 	case BL33_IMAGE_ID:
+ 		memcpy(&params->bl33_ep_info, &bl_mem_params->ep_info,
 diff --git a/plat/renesas/rzg/include/platform_def.h b/plat/renesas/rzg/include/platform_def.h
 index bb0c7d3..f330651 100644
 --- a/plat/renesas/rzg/include/platform_def.h
