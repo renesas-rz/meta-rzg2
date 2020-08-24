@@ -1,7 +1,7 @@
-From c4512c1defab76c8beebcc76ca400ae4eff7be7b Mon Sep 17 00:00:00 2001
+From 35a93d935dc281bb009da11146b37571955c4d70 Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
-Date: Mon, 22 Jun 2020 14:45:32 +0700
-Subject: [PATCH 1/2] Add support RZ/G2 platform
+Date: Mon, 24 Aug 2020 19:35:46 +0700
+Subject: [PATCH] Add support RZ/G2 platform
 
 This patch adds support RZ/G2 Series:
 - G2M
@@ -93,7 +93,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  plat/renesas/rcar/bl31_plat_setup.c                |    8 +-
  plat/renesas/rzg/bl2_fusa.c                        |  173 +
  plat/renesas/rzg/bl2_plat_mem_params_desc.c        |   87 +
- plat/renesas/rzg/bl2_plat_setup.c                  | 1078 ++++
+ plat/renesas/rzg/bl2_plat_setup.c                  | 1069 ++++
  plat/renesas/rzg/include/platform_def.h            |  195 +
  plat/renesas/rzg/include/rcar_def.h                |  306 +
  plat/renesas/rzg/plat_storage.c                    |  252 +
@@ -103,7 +103,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  tools/renesas/rzg_layout_create/sa0.ld.S           |   28 +
  tools/renesas/rzg_layout_create/sa6.c              |  185 +
  tools/renesas/rzg_layout_create/sa6.ld.S           |  121 +
- 93 files changed, 32957 insertions(+), 4 deletions(-)
+ 93 files changed, 32948 insertions(+), 4 deletions(-)
  create mode 100644 drivers/renesas/rzg/auth/auth_mod.c
  create mode 100644 drivers/renesas/rzg/board/board.c
  create mode 100644 drivers/renesas/rzg/board/board.h
@@ -30921,10 +30921,10 @@ index 0000000..3b124c7
 +REGISTER_BL_IMAGE_DESCS(bl2_mem_params_descs)
 diff --git a/plat/renesas/rzg/bl2_plat_setup.c b/plat/renesas/rzg/bl2_plat_setup.c
 new file mode 100644
-index 0000000..3a30854
+index 0000000..b1dc9bd
 --- /dev/null
 +++ b/plat/renesas/rzg/bl2_plat_setup.c
-@@ -0,0 +1,1078 @@
+@@ -0,0 +1,1069 @@
 +/*
 + * Copyright (c) 2018-2019, Renesas Electronics Corporation. All rights reserved.
 + *
@@ -31152,7 +31152,7 @@ index 0000000..3a30854
 +{
 +	uint32_t product_cut, product, cut;
 +	uint32_t boot_dev, boot_cpu;
-+	uint32_t lcs, reg, val;
++	uint32_t reg;
 +
 +	reg = mmio_read_32(RCAR_MODEMR);
 +	boot_dev = reg & MODEMR_BOOT_DEV_MASK;
@@ -31221,15 +31221,6 @@ index 0000000..3a30854
 +mmu:
 +	mmio_write_32(IPMMUMM_IMSCTLR, IPMMUMM_IMSCTLR_ENABLE);
 +	mmio_write_32(IPMMUMM_IMAUXCTLR, IPMMUMM_IMAUXCTLR_NMERGE40_BIT);
-+
-+	val = rcar_rom_get_lcs(&lcs);
-+	if (val) {
-+		ERROR("BL2: Failed to get the LCS. (%d)\n", val);
-+		panic();
-+	}
-+
-+	if (lcs == LCS_SE)
-+		mmio_clrbits_32(P_ARMREG_SEC_CTRL, P_ARMREG_SEC_CTRL_PROT);
 +
 +	rcar_swdt_release();
 +	bl2_system_cpg_init();
