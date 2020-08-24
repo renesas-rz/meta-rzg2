@@ -40,6 +40,7 @@ SRC_URI += " \
 	file://0012-plat-rzg-bl2_fusa-Modify-ECC-setting-for-RZG2N-RZG2M.patch \
 	file://0013-plat-renesas-rzg-bl2_fusa-Optimize-source-code.patch \
 	file://0014-plat-renesas-rzg-Add-support-ECC-Full-Single-setting.patch \
+	file://0015-rzg-ddr-Update-lpddr4-to-rev-0.40.patch \
 "
 
 SRC_URI += "${@'file://0011-Fix-ld-error-unrecognized-option-with-old-binutils.patch' \
