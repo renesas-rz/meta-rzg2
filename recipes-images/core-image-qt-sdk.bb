@@ -37,7 +37,7 @@ SDK_POSTPROCESS_COMMAND_prepend = " append_setup;"
 
 
 ### For cross-compile Qt ###
-TOOLCHAIN_HOST_TASK_append = ' nativesdk-qtbase-tools '
+TOOLCHAIN_HOST_TASK_append = ' nativesdk-qtbase-tools nativesdk-qtwayland-tools'
 
 ### For self-compile Qt ###
 IMAGE_INSTALL_append = ' packagegroup-qt5-toolchain-target '
