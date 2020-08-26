@@ -8,6 +8,7 @@ RDEPENDS_${PN} += " \
     qtbase-tools \
     qtdeclarative-tools \
     qtxmlpatterns-tools \
+    qtwayland-tools \
 "
 
 # meta-qt5 still use qtwebkit and qtquick1, although they are removed from Qt 5.6
