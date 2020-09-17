@@ -1,0 +1,89 @@
+From 95983a9cc1475bccc3f2cc2c4332f0c4ea63d989 Mon Sep 17 00:00:00 2001
+From: tienle <tien.le.xw@renesas.com>
+Date: Wed, 29 Jul 2020 16:17:12 +0700
+Subject: [PATCH 387/441] arm64: dts: r8a774a3: Thermal support for RZ/G2M v3.0
+
+This patch enables thermal support for R8A774A3 SoC
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 53 ++++++++++++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index a90e69d..b4d009a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -520,10 +520,17 @@
+ 		};
+ 
+ 		tsc: thermal@e6198000 {
++			compatible = "renesas,r8a774a3-thermal";
+ 			reg = <0 0xe6198000 0 0x100>,
+ 			      <0 0xe61a0000 0 0x100>,
+ 			      <0 0xe61a8000 0 0x100>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 67 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 522>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 522>;
++			#thermal-sensor-cells = <1>;
+ 		};
+ 
+ 		intc_ex: interrupt-controller@e61c0000 {
+@@ -2455,6 +2462,50 @@
+ 		};
+ 	};
+ 
++	thermal-zones {
++		sensor_thermal1: sensor-thermal1 {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++			thermal-sensors = <&tsc 0>;
++
++			trips {
++				sensor1_crit: sensor1-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++		};
++
++		sensor_thermal2: sensor-thermal2 {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++			thermal-sensors = <&tsc 1>;
++
++			trips {
++				sensor2_crit: sensor2-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++		};
++
++		sensor_thermal3: sensor-thermal3 {
++			polling-delay-passive = <250>;
++			polling-delay = <1000>;
++			thermal-sensors = <&tsc 2>;
++
++			trips {
++				sensor3_crit: sensor3-crit {
++					temperature = <110000>;
++					hysteresis = <1000>;
++					type = "critical";
++				};
++			};
++		};
++	};
++
+ 	timer {
+ 		compatible = "arm,armv8-timer";
+ 		interrupts-extended = <&gic GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+-- 
+2.7.4
+

@@ -1,0 +1,44 @@
+From c3540afc7dac481919adde8e892175f016fde9d7 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 11:32:34 +0700
+Subject: [PATCH 029/441] arm64: dts: renesas: r8a774c0-cat874: add vspm_if,
+ vspi, vspb
+
+This commit enables vspb, vspi, vspmif for RZ/G2E CAT874.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 8e1d975..0d1567c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -96,6 +96,10 @@
+ 		compatible = "renesas,mmngrbuf";
+ 	};
+ 
++	vspm_if {
++		compatible = "renesas,vspm_if";
++	};
++
+ 	reg_12p0v: regulator-12p0v {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "D12.0V";
+@@ -503,3 +507,11 @@
+ 
+ 	status = "okay";
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+-- 
+2.7.4
+

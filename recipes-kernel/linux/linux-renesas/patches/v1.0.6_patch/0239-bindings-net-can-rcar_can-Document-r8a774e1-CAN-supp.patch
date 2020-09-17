@@ -1,0 +1,39 @@
+From 01943a196c1f5f3a34aa19bf7785a6237f29b0eb Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 14 Apr 2020 08:52:32 +0700
+Subject: [PATCH 239/441] bindings: net: can: rcar_can: Document r8a774e1 CAN
+ support.
+
+This patch documents RG/G2H (R8A774E1) bindings for CAN driver.
+
+Signed-off-by: Quynh Nguyen <quynhnguyen.xb@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/net/can/rcar_can.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/net/can/rcar_can.txt b/Documentation/devicetree/bindings/net/can/rcar_can.txt
+index b22bec8..b825bb0 100644
+--- a/Documentation/devicetree/bindings/net/can/rcar_can.txt
++++ b/Documentation/devicetree/bindings/net/can/rcar_can.txt
+@@ -7,6 +7,7 @@ Required properties:
+ 	      "renesas,can-r8a774a1" if CAN controller is a part of R8A774A1 SoC.
+ 	      "renesas,can-r8a774b1" if CAN controller is a part of R8A774B1 SoC.
+ 	      "renesas,can-r8a774c0" if CAN controller is a part of R8A774C0 SoC.
++	      "renesas,can-r8a774e1" if CAN controller is a part of R8A774E1 SoC.
+ 	      "renesas,can-r8a7778" if CAN controller is a part of R8A7778 SoC.
+ 	      "renesas,can-r8a7779" if CAN controller is a part of R8A7779 SoC.
+ 	      "renesas,can-r8a7790" if CAN controller is a part of R8A7790 SoC.
+@@ -32,7 +33,8 @@ Required properties:
+ - pinctrl-0: pin control group to be used for this controller.
+ - pinctrl-names: must be "default".
+ 
+-Required properties for R8A774A1, R8A774B1, R8A774C0, R8A7795, and R8A7796:
++Required properties for R8A774A1, R8A774B1, R8A774C0, R8A774E1, R8A7795,
++and R8A7796:
+ For the denoted SoCs, "clkp2" can be CANFD clock. This is a div6 clock and can
+ be used by both CAN and CAN FD controller at the same time. It needs to be
+ scaled to maximum frequency if any of these controllers use it. This is done
+-- 
+2.7.4
+

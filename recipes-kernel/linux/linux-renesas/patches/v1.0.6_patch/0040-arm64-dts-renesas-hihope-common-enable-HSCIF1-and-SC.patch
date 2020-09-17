@@ -1,0 +1,69 @@
+From b527f266c76aae67fe43f3f243d054b6e3a28d85 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 14:29:12 +0700
+Subject: [PATCH 040/441] arm64: dts: renesas: hihope-common: enable HSCIF1 and
+ SCIF0
+
+This patch enables HSCIF1 and SCIF0 support.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 27 ++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index fd765d8..21e69ec 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -11,6 +11,8 @@
+ 	aliases {
+ 		serial0 = &scif2;
+ 		serial1 = &hscif0;
++		serial2 = &hscif1;
++		serial3 = &scif0;
+ 	};
+ 
+ 	chosen {
+@@ -202,6 +204,21 @@
+ 	};
+ };
+ 
++&hscif1 {
++	pinctrl-0 = <&hscif1_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
++&scif0 {
++	pinctrl-0 = <&scif0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
+ &hsusb {
+ 	dr_mode = "otg";
+ 	status = "okay";
+@@ -258,6 +275,16 @@
+ 		function = "scif_clk";
+ 	};
+ 
++	hscif1_pins: hscif1 {
++		groups = "hscif1_data_a", "hscif1_ctrl_a";
++		function = "hscif1";
++	};
++
++	scif0_pins: scif0 {
++		groups = "scif0_data";
++		function = "scif0";
++	};
++
+ 	sdhi0_pins: sd0 {
+ 		groups = "sdhi0_data4", "sdhi0_ctrl";
+ 		function = "sdhi0";
+-- 
+2.7.4
+

@@ -1,0 +1,44 @@
+From 1f20c6d2780622f5b0bbc71a0b615f49a2685614 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 29 Jul 2020 16:22:14 +0700
+Subject: [PATCH 390/441] soc: renesas: rcar-topology: Support CAS for RZ/G2M
+ v3.0
+
+RZ/G2M v3.0 have 6 cores with 2 cores CA57 and 4 cores CA53 same as
+RZ/G2M v1.3. Therefore, add RZ/G2M v3.0 (R8A774A3) SoC to support
+Capacity Awareness Scheduler (CAS) by default.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig         | 2 +-
+ drivers/soc/renesas/rcar-topology.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 387afec..9986531 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -30,7 +30,7 @@ config SOC_RENESAS
+ 
+ config RCAR_CPU_TOPOLOGY
+ 	depends on (ARCH_R8A7795 || ARCH_R8A7796 || \
+-		    ARCH_R8A774A1 || ARCH_R8A774E1)
++		    ARCH_R8A774A1 || ARCH_R8A774A3 || ARCH_R8A774E1)
+ 	bool "R-Car CPU Topology"
+ 	default y
+ 	help
+diff --git a/drivers/soc/renesas/rcar-topology.c b/drivers/soc/renesas/rcar-topology.c
+index e1f247b..ed57745 100644
+--- a/drivers/soc/renesas/rcar-topology.c
++++ b/drivers/soc/renesas/rcar-topology.c
+@@ -29,6 +29,7 @@ static int __init rcar_topology_init(void)
+ 	if (of_machine_is_compatible("renesas,r8a7795") ||
+ 		of_machine_is_compatible("renesas,r8a7796") ||
+ 		of_machine_is_compatible("renesas,r8a774a1") ||
++		of_machine_is_compatible("renesas,r8a774a3") ||
+ 		of_machine_is_compatible("renesas,r8a774e1")) {
+ 		set_sched_topology(rcar_topology);
+ 	}
+-- 
+2.7.4
+

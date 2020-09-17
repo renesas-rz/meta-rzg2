@@ -1,0 +1,136 @@
+From 61068e28ecfa955c583f0f2c4ba747ee1b4c95d9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 16 Sep 2020 11:00:37 +0700
+Subject: [PATCH 325/441] arm64: dts: renesas: Set virtual channel for OV5645
+ camera for all RZ/G2 platforms
+
+This commit is created to add property "virtual-channel" to set virtual
+channel index for OV5645 camera.
+In HiHope common platform of G2M/N/H/E, virtual channel is support with:
+_ CSI: From 0 to 3.
+_ OV5645: From 0 to 3.
+And currently, set 0 to virtual channel as default.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts     | 2 ++
+ .../arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-mipi-2.1.dts | 2 ++
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts     | 4 ++++
+ .../arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.1.dts | 2 ++
+ arch/arm64/boot/dts/renesas/r8a774c0-ek874-mipi-2.1.dts               | 2 ++
+ arch/arm64/boot/dts/renesas/r8a774c0-es10-ek874-mipi-2.1.dts          | 2 ++
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts     | 4 ++++
+ 7 files changed, 18 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts
+index dd29188..8d88ab9 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex-mipi-2.1.dts
+@@ -67,6 +67,8 @@
+ 	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi20_ep: endpoint {
+ 			clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-mipi-2.1.dts
+index a08ee4b..58efe6b 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-mipi-2.1.dts
+@@ -78,6 +78,8 @@
+ 	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi20_ep: endpoint {
+ 			clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts
+index bc8295b..e59e10f 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex-mipi-2.1.dts
+@@ -68,6 +68,8 @@
+ 	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi20_ep: endpoint {
+ 			clock-lanes = <0>;
+@@ -110,6 +112,8 @@
+ 	enable-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi40_ep: endpoint {
+ 			clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.1.dts
+index b0bb4bc..cde814a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.1.dts
+@@ -78,6 +78,8 @@
+ 	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi20_ep: endpoint {
+ 			clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-ek874-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774c0-ek874-mipi-2.1.dts
+index 7e5a4f8..b6b0ae1 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-ek874-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-ek874-mipi-2.1.dts
+@@ -46,6 +46,8 @@
+ 	enable-gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi40_ep: endpoint {
+ 			clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-es10-ek874-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774c0-es10-ek874-mipi-2.1.dts
+index 8ef44bb..c8b2c90 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-es10-ek874-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-es10-ek874-mipi-2.1.dts
+@@ -46,6 +46,8 @@
+ 	enable-gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi40_ep: endpoint {
+ 			clock-lanes = <0>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+index 19aec95..28752bc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h-ex-mipi-2.1.dts
+@@ -68,6 +68,8 @@
+ 	enable-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio6 8 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi20_ep: endpoint {
+ 			clock-lanes = <0>;
+@@ -110,6 +112,8 @@
+ 	enable-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+ 	reset-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+ 
++	virtual-channel = /bits/ 8 <0>;
++
+ 	port {
+ 		ov5645_csi40_ep: endpoint {
+ 			clock-lanes = <0>;
+-- 
+2.7.4
+

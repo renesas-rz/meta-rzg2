@@ -1,0 +1,56 @@
+From d0f332121b3e40009ba53514d3cad30be01c1aa2 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Mon, 13 Apr 2020 15:00:01 +0700
+Subject: [PATCH 265/441] arm64: dts: renesas: r8a774e1: Add LVDS encoder to DT
+
+This patch adds LVDS encoder for R8A774E1 SoC
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 5841713..e1ec67a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -2135,13 +2135,19 @@
+ 				port@2 {
+ 					reg = <2>;
+ 					du_out_lvds0: endpoint {
++						remote-endpoint = <&lvds0_in>;
+ 					};
+ 				};
+ 			};
+ 		};
+ 
+ 		lvds0: lvds@feb90000 {
++			compatible = "renesas,r8a774e1-lvds";
+ 			reg = <0 0xfeb90000 0 0x14>;
++			clocks = <&cpg CPG_MOD 727>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 727>;
++			status = "disabled";
+ 
+ 			ports {
+ 				#address-cells = <1>;
+@@ -2150,6 +2156,8 @@
+ 				port@0 {
+ 					reg = <0>;
+ 					lvds0_in: endpoint {
++						remote-endpoint =
++							<&du_out_lvds0>;
+ 					};
+ 				};
+ 				port@1 {
+@@ -2158,7 +2166,6 @@
+ 					};
+ 				};
+ 			};
+-			/* placeholder */
+ 		};
+ 
+ 		prr: chipid@fff00044 {
+-- 
+2.7.4
+

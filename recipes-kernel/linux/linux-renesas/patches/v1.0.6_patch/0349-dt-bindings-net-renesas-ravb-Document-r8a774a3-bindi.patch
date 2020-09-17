@@ -1,0 +1,28 @@
+From 10be232b1cf191a026a829350973975668ef2866 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 16 Jul 2020 19:12:02 +0700
+Subject: [PATCH 349/441] dt-bindings: net: renesas: ravb: Document r8a774a3
+ bindings
+
+This patch adds document for EtherAVB driver on RZ/G2M v3.0 R8A774A3 SoC.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ Documentation/devicetree/bindings/net/renesas,ravb.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/renesas,ravb.txt b/Documentation/devicetree/bindings/net/renesas,ravb.txt
+index 83739ae..2696683 100644
+--- a/Documentation/devicetree/bindings/net/renesas,ravb.txt
++++ b/Documentation/devicetree/bindings/net/renesas,ravb.txt
+@@ -17,6 +17,7 @@ Required properties:
+ 		R-Car Gen2 and RZ/G1 devices.
+ 
+       - "renesas,etheravb-r8a774a1" for the R8A774A1 SoC.
++      - "renesas,etheravb-r8a774a3" for the R8A774A3 SoC.
+       - "renesas,etheravb-r8a774b1" for the R8A774B1 SoC.
+       - "renesas,etheravb-r8a774c0" for the R8A774C0 SoC.
+       - "renesas,etheravb-r8a774e1" for the R8A774E1 SoC.
+-- 
+2.7.4
+

@@ -1,0 +1,109 @@
+From d6ea48a872202a3253a8b4aa788c7c2ce7e7af9f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 15 Sep 2020 16:45:43 +0700
+Subject: [PATCH 197/441] arm64: dts: renesas: Add HiHope RZ/G2H main board
+ support
+
+Basic support for the HiHope RZ/G2H main board:
+	- Memory,
+	- Main crystal,
+	- Serial console
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |  1 +
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi     |  4 ++--
+ arch/arm64/boot/dts/renesas/hihope-rev4.dtsi       |  4 ++--
+ .../boot/dts/renesas/r8a774e1-hihope-rzg2h.dts     | 26 ++++++++++++++++++++++
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi          |  2 ++
+ 5 files changed, 33 insertions(+), 4 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 4aa0eba..dadea03 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -22,6 +22,7 @@ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-es10-cat874.dtb \
+ 			       r8a774c0-es10-ek874.dtb \
+ 			       r8a774c0-es10-ek874-idk-2121wr.dtb \
+ 			       r8a774c0-es10-ek874-mipi-2.1.dtb
++dtb-$(CONFIG_ARCH_R8A774E1) += r8a774e1-hihope-rzg2h.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-x.dtb r8a7795-h3ulcb.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-h3ulcb-kf.dtb
+ dtb-$(CONFIG_ARCH_R8A7795) += r8a7795-salvator-xs.dtb
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 1c45e3f..0e6d63a 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * Device Tree Source for the HiHope RZ/G2[MN] main board
+- * Rev.[2.0/3.0/4.0] common parts
++ * Device Tree Source for the HiHope RZ/G2H Rev.4.0 and
++ * HiHope RZ/G2[MN] Rev.[2.0/3.0/4.0] main board common parts
+  *
+  * Copyright (C) 2019 Renesas Electronics Corp.
+  */
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi b/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi
+index db09310..393e57c 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * Device Tree Source for the HiHope RZ/G2[MN] Rev.3.0/4.0 main board
+- * common parts
++ * Device Tree Source for the HiHope RZ/G2H Rev.4.0 and
++ * HiHope RZ/G2[MN] Rev.3.0/4.0 main board common parts
+  *
+  * Copyright (C) 2020 Renesas Electronics Corp.
+  */
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+new file mode 100644
+index 0000000..cdbe527
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2H main board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++/dts-v1/;
++#include "r8a774e1.dtsi"
++#include "hihope-rev4.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2H main board based on r8a774e1";
++	compatible = "hoperun,hihope-rzg2h", "renesas,r8a774e1";
++
++	memory@48000000 {
++		device_type = "memory";
++		/* first 128MB is reserved for secure area. */
++		reg = <0x0 0x48000000 0x0 0x78000000>;
++	};
++
++	memory@500000000 {
++		device_type = "memory";
++		reg = <0x5 0x00000000 0x0 0x80000000>;
++	};
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 149a129..df7db03 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -10,6 +10,8 @@
+ #include <dt-bindings/clock/r8a774e1-cpg-mssr.h>
+ #include <dt-bindings/power/r8a774e1-sysc.h>
+ 
++#define CPG_AUDIO_CLK_I		R8A774E1_CLK_S0D4
++
+ / {
+ 	compatible = "renesas,r8a774e1";
+ 	#address-cells = <2>;
+-- 
+2.7.4
+

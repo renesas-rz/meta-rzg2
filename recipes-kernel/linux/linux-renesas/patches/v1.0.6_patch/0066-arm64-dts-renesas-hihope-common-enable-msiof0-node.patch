@@ -1,0 +1,53 @@
+From e7dba74efa404c912569105f3f506dc6a1569db2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 14:53:08 +0700
+Subject: [PATCH 066/441] arm64: dts: renesas: hihope-common: enable msiof0
+ node
+
+This patch enable MSIOF0 on the common part for HiHope Board.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index bf85943..c5b3d26 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -13,6 +13,7 @@
+ 		serial1 = &hscif0;
+ 		serial2 = &hscif1;
+ 		serial3 = &scif0;
++		spi0 = &msiof0;
+ 	};
+ 
+ 	chosen {
+@@ -339,6 +340,12 @@
+ 		groups = "usb30";
+ 		function = "usb30";
+ 	};
++
++	msiof0_pins: spi0 {
++		groups = "msiof0_clk", "msiof0_sync",
++			 "msiof0_rxd", "msiof0_txd";
++		function = "msiof0";
++	};
+ };
+ 
+ &rcar_sound {
+@@ -506,3 +513,10 @@
+ &vspi0 {
+ 	status = "okay";
+ };
++
++&msiof0 {
++	pinctrl-0 = <&msiof0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+-- 
+2.7.4
+

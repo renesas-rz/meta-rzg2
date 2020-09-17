@@ -1,0 +1,57 @@
+From b61fbf106971a09d3806ca490ef4628db7f63b7a Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 16 Sep 2020 11:11:56 +0700
+Subject: [PATCH 345/441] arm64: dts: renesas: Add HiHope RZ/G2M v3.0 extension
+ board support
+
+The HiHope RZ/G2M v3.0 extension board is made of HiHope RZ/G2M v3.0
+platform (the main board) and the sub board that goes on top of
+main board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile                    |  3 ++-
+ .../arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts | 17 +++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 0cbe9c0..9e3fa6d 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -7,7 +7,8 @@ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb \
+ 			       r8a774a1-hihope-rzg2m-ex.dtb \
+ 			       r8a774a1-hihope-rzg2m-ex-idk-1110wr.dtb \
+ 			       r8a774a1-hihope-rzg2m-ex-mipi-2.1.dtb
+-dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m.dtb
++dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m.dtb \
++			       r8a774a3-hihope-rzg2m-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-rev2.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dtb \
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts
+new file mode 100644
+index 0000000..9d003a3
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts
+@@ -0,0 +1,17 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2M v3.0 sub board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++
++#include "r8a774a3-hihope-rzg2m.dts"
++#include "hihope-rzg2-ex.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2M v3.0 with sub board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m",
++		     "renesas,r8a774a3";
++};
+-- 
+2.7.4
+

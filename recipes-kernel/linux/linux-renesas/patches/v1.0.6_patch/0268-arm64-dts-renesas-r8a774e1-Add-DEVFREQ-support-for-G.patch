@@ -1,0 +1,56 @@
+From 3f7099513409ed68051b1c84b123cf7dc5487be8 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Wed, 8 Apr 2020 10:14:45 +0700
+Subject: [PATCH 268/441] arm64: dts: renesas: r8a774e1: Add DEVFREQ support
+ for GSX
+
+This commit adds opp table for gsx to use devfreq.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 07e0596..786ac87 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -293,6 +293,27 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	gsx_opp0: gsx_opp_table0 {
++		compatible = "operating-points-v2";
++
++		opp-200000000 {
++			opp-hz = /bits/ 64 <200000000>;
++			opp-microvolt = <830000>;
++		};
++		opp-300000000 {
++			opp-hz = /bits/ 64 <300000000>;
++			opp-microvolt = <830000>;
++		};
++		opp-400000000 {
++			opp-hz = /bits/ 64 <400000000>;
++			opp-microvolt = <830000>;
++		};
++		opp-600000000 {
++			opp-hz = /bits/ 64 <600000000>;
++			opp-microvolt = <830000>;
++		};
++	};
++
+ 	/* External PCIe clock - can be overridden by the board */
+ 	pcie_bus_clk: pcie_bus {
+ 		compatible = "fixed-clock";
+@@ -1762,6 +1783,7 @@
+ 			reg = <0 0xfd000000 0 0x40000>;
+ 			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&cpg CPG_MOD 112>;
++			operating-points-v2 = <&gsx_opp0>;
+ 			power-domains = <&sysc R8A774E1_PD_3DG_E>;
+ 			resets = <&cpg 112>;
+ 		};
+-- 
+2.7.4
+

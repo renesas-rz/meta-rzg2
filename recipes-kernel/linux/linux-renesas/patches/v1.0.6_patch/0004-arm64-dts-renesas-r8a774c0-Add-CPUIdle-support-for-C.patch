@@ -1,0 +1,57 @@
+From ca4601edf07cc4f10e92e6ced14228ca81739ae3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 10:03:24 +0700
+Subject: [PATCH 004/441] arm64: dts: renesas: r8a774c0: Add CPUIdle support
+ for CA53
+
+This patch adds CPUIdle (Core shutdown) support for r8a774c0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index 783a8cf..feb32d6 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -80,6 +80,7 @@
+ 			dynamic-power-coefficient = <277>;
+ 			clocks = <&cpg CPG_CORE R8A774C0_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 		};
+ 
+ 		a53_1: cpu@1 {
+@@ -91,6 +92,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774C0_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 		};
+ 
+ 		L2_CA53: cache-controller-0 {
+@@ -99,6 +101,20 @@
+ 			cache-unified;
+ 			cache-level = <2>;
+ 		};
++
++		idle-states {
++			entry-method = "psci";
++
++			CPU_SLEEP_1: cpu-sleep-1 {
++				compatible = "arm,idle-state";
++				arm,psci-suspend-param = <0x0010000>;
++				local-timer-stop;
++				entry-latency-us = <700>;
++				exit-latency-us = <700>;
++				min-residency-us = <5000>;
++				status = "okay";
++			};
++		};
+ 	};
+ 
+ 	extal_clk: extal {
+-- 
+2.7.4
+

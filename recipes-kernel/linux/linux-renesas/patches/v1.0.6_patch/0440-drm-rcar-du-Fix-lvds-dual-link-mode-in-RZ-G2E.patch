@@ -1,0 +1,68 @@
+From a15b6b14f39341309f3c9d1e325c8b5ffb76d57c Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 21 Sep 2020 10:28:52 +0700
+Subject: [PATCH 440/441] drm: rcar-du: Fix lvds dual link mode in RZ/G2E
+
+When connect Dual LVDS and DPAD0 together, kernel crashes due to no
+dot clock output from LVDS1 to DU1, which is used by DPAD0.
+This patches is created to fix above issue.
+
+Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c | 7 +++++++
+ drivers/gpu/drm/rcar-du/rcar_lvds.c    | 6 ++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+index cec4b5c..bca4507 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+@@ -681,6 +681,10 @@ static void rcar_du_crtc_atomic_enable(struct drm_crtc *crtc,
+ 		const struct drm_display_mode *mode =
+ 			&crtc->state->adjusted_mode;
+ 
++		if (rcar_lvds_dual_link(
++		    rcdu->encoders[RCAR_DU_OUTPUT_LVDS0]->base.bridge))
++			encoder = rcdu->encoders[RCAR_DU_OUTPUT_LVDS0];
++
+ 		rcar_lvds_clk_enable(encoder->base.bridge,
+ 				     mode->clock * 1000);
+ 	}
+@@ -703,6 +707,9 @@ static void rcar_du_crtc_atomic_disable(struct drm_crtc *crtc,
+ 		struct rcar_du_encoder *encoder =
+ 			rcdu->encoders[RCAR_DU_OUTPUT_LVDS0 + rcrtc->index];
+ 
++		if (rcar_lvds_dual_link(
++		    rcdu->encoders[RCAR_DU_OUTPUT_LVDS0]->base.bridge))
++			encoder = rcdu->encoders[RCAR_DU_OUTPUT_LVDS0];
+ 		/*
+ 		 * Disable the LVDS clock output, see
+ 		 * rcar_du_crtc_atomic_enable().
+diff --git a/drivers/gpu/drm/rcar-du/rcar_lvds.c b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+index fc3f6ce..db99123 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_lvds.c
++++ b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+@@ -368,6 +368,9 @@ int rcar_lvds_clk_enable(struct drm_bridge *bridge, unsigned long freq)
+ 	struct rcar_lvds *lvds = bridge_to_rcar_lvds(bridge);
+ 	int ret;
+ 
++	if (lvds->link_type != RCAR_LVDS_SINGLE_LINK && lvds->companion)
++		lvds = bridge_to_rcar_lvds(lvds->companion);
++
+ 	if (WARN_ON(!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)))
+ 		return -ENODEV;
+ 
+@@ -387,6 +390,9 @@ void rcar_lvds_clk_disable(struct drm_bridge *bridge)
+ {
+ 	struct rcar_lvds *lvds = bridge_to_rcar_lvds(bridge);
+ 
++	if (lvds->link_type != RCAR_LVDS_SINGLE_LINK && lvds->companion)
++		lvds = bridge_to_rcar_lvds(lvds->companion);
++
+ 	if (WARN_ON(!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)))
+ 		return;
+ 
+-- 
+2.7.4
+

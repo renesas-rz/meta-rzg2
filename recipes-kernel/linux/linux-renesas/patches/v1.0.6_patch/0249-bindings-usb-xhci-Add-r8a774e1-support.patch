@@ -1,0 +1,27 @@
+From 8008060f0721fd3b9c60717ee95e7166e45993d4 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Mon, 6 Apr 2020 20:53:26 +0700
+Subject: [PATCH 249/441] bindings: usb-xhci: Add r8a774e1 support
+
+Document RZ/G2H (R8A774E1) SoC bindings.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/usb-xhci.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/usb-xhci.txt b/Documentation/devicetree/bindings/usb/usb-xhci.txt
+index 35f1546..4714471 100644
+--- a/Documentation/devicetree/bindings/usb/usb-xhci.txt
++++ b/Documentation/devicetree/bindings/usb/usb-xhci.txt
+@@ -11,6 +11,7 @@ Required properties:
+     - "renesas,xhci-r8a774a1" for r8a774a1 SoC
+     - "renesas,xhci-r8a774b1" for r8a774b1 SoC
+     - "renesas,xhci-r8a774c0" for r8a774c0 SoC
++    - "renesas,xhci-r8a774e1" for r8a774e1 SoC
+     - "renesas,xhci-r8a7790" for r8a7790 SoC
+     - "renesas,xhci-r8a7791" for r8a7791 SoC
+     - "renesas,xhci-r8a7793" for r8a7793 SoC
+-- 
+2.7.4
+

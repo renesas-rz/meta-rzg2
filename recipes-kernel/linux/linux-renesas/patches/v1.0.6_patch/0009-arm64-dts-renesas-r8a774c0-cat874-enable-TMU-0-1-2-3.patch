@@ -1,0 +1,44 @@
+From 6dde39105d7ffca9133a0582289799560e336e57 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 1 Nov 2019 15:22:24 +0700
+Subject: [PATCH 009/441] arm64: dts: renesas: r8a774c0-cat874: enable
+ TMU{0,1,2,3,4}
+
+This patch enables TMU{0,1,2,3,4} support to the CAT874 board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 142f55f..ed94140 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -427,3 +427,23 @@
+ &cmt1 {
+ 	status = "okay";
+ };
++
++&tmu0 {
++	status = "okay";
++};
++
++&tmu1 {
++	status = "okay";
++};
++
++&tmu2 {
++	status = "okay";
++};
++
++&tmu3 {
++	status = "okay";
++};
++
++&tmu4 {
++	status = "okay";
++};
+-- 
+2.7.4
+

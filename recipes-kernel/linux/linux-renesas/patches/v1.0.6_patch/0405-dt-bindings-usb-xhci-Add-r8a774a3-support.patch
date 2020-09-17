@@ -1,0 +1,27 @@
+From 8d5de319794c5b2a63dc80f0d7eb3863389ea18c Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Tue, 28 Jul 2020 16:42:09 +0700
+Subject: [PATCH 405/441] dt-bindings: usb-xhci: Add r8a774a3 support
+
+Document RZ/G2M v3.0 (R8A774A3) SoC bindings.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/usb-xhci.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/usb-xhci.txt b/Documentation/devicetree/bindings/usb/usb-xhci.txt
+index 4714471..13a9585 100644
+--- a/Documentation/devicetree/bindings/usb/usb-xhci.txt
++++ b/Documentation/devicetree/bindings/usb/usb-xhci.txt
+@@ -9,6 +9,7 @@ Required properties:
+     - "marvell,armada-380-xhci" for Armada 38x SoCs
+     - "renesas,xhci-r8a7743" for r8a7743 SoC
+     - "renesas,xhci-r8a774a1" for r8a774a1 SoC
++    - "renesas,xhci-r8a774a3" for r8a774a3 SoC
+     - "renesas,xhci-r8a774b1" for r8a774b1 SoC
+     - "renesas,xhci-r8a774c0" for r8a774c0 SoC
+     - "renesas,xhci-r8a774e1" for r8a774e1 SoC
+-- 
+2.7.4
+

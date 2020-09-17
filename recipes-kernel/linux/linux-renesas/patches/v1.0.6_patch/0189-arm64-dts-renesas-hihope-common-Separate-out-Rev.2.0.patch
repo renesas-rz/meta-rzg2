@@ -1,0 +1,256 @@
+From b018d3dbe2a15ce7c88ca81565c8d1a1a87cdef2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 15 Sep 2020 14:58:44 +0700
+Subject: [PATCH 189/441] arm64: dts: renesas: hihope-common: Separate out
+ Rev.2.0 specific into hihope-rev2.dtsi file
+
+commit 99167613db6e439d877131e1fbe617e4420b954f upstream.
+
+Separate out Rev.2.0 specific hardware changes into hihope-rev2.dtsi
+file so that hihope-common.dtsi can be used by all the variants for
+RZ/G2M[N] boards.
+
+LED node names have been updated according to Rev.4.0 schematics.
+
+Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Reviewed-by: Marian-Cristian Rotariu <marian-cristian.rotariu.rb@bp.renesas.com>
+Link: https://lore.kernel.org/r/1593004330-5039-4-git-send-email-prabhakar.mahadev-lad.rj@bp.renesas.com
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+Signed-off-by: Pavel Machek <pavel@denx.de>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi     | 58 ++----------------
+ arch/arm64/boot/dts/renesas/hihope-rev2.dtsi       | 71 ++++++++++++++++++++++
+ .../dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts     |  2 +-
+ .../dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts     |  2 +-
+ 4 files changed, 77 insertions(+), 56 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/hihope-rev2.dtsi
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 04f9578..1c45e3f 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * Device Tree Source for the HiHope RZ/G2[MN] main board common parts
++ * Device Tree Source for the HiHope RZ/G2[MN] main board
++ * Rev.[2.0/3.0/4.0] common parts
+  *
+  * Copyright (C) 2019 Renesas Electronics Corp.
+  */
+@@ -13,7 +14,6 @@
+ 		serial1 = &hscif0;
+ 		serial2 = &hscif1;
+ 		serial3 = &scif0;
+-		spi0 = &msiof0;
+ 	};
+ 
+ 	chosen {
+@@ -35,17 +35,6 @@
+ 	leds {
+ 		compatible = "gpio-leds";
+ 
+-		bt_active_led {
+-			label = "blue:bt";
+-			gpios = <&gpio7  0 GPIO_ACTIVE_HIGH>;
+-			linux,default-trigger = "hci0-power";
+-			default-state = "off";
+-		};
+-
+-		led0 {
+-			gpios = <&gpio6 11 GPIO_ACTIVE_HIGH>;
+-		};
+-
+ 		led1 {
+ 			gpios = <&gpio6 12 GPIO_ACTIVE_HIGH>;
+ 		};
+@@ -58,11 +47,8 @@
+ 			gpios = <&gpio0  0 GPIO_ACTIVE_HIGH>;
+ 		};
+ 
+-		wlan_active_led {
+-			label = "yellow:wlan";
+-			gpios = <&gpio7  1 GPIO_ACTIVE_HIGH>;
+-			linux,default-trigger = "phy0tx";
+-			default-state = "off";
++		led4 {
++			gpios = <&gpio6 11 GPIO_ACTIVE_HIGH>;
+ 		};
+ 	};
+ 
+@@ -117,17 +103,6 @@
+ 			  1800000 0>;
+ 	};
+ 
+-	wlan_en_reg: regulator-wlan_en {
+-		compatible = "regulator-fixed";
+-		regulator-name = "wlan-en-regulator";
+-		regulator-min-microvolt = <1800000>;
+-		regulator-max-microvolt = <1800000>;
+-		startup-delay-us = <70000>;
+-
+-		gpio = <&gpio_expander 1 GPIO_ACTIVE_HIGH>;
+-		enable-active-high;
+-	};
+-
+ 	x302_clk: x302-clock {
+ 		compatible = "fixed-clock";
+ 		#clock-cells = <0>;
+@@ -214,11 +189,6 @@
+ 
+ 	uart-has-rtscts;
+ 	status = "okay";
+-
+-	bluetooth {
+-		compatible = "ti,wl1837-st";
+-		enable-gpios = <&gpio_expander 2 GPIO_ACTIVE_HIGH>;
+-	};
+ };
+ 
+ &hscif1 {
+@@ -245,13 +215,6 @@
+ 	clock-frequency = <400000>;
+ 	status = "okay";
+ 
+-	gpio_expander: gpio@20 {
+-		compatible = "onnn,pca9654";
+-		reg = <0x20>;
+-		gpio-controller;
+-		#gpio-cells = <2>;
+-	};
+-
+ 	versaclock5: clock-generator@6a {
+ 		compatible = "idt,5p49v5923";
+ 		reg = <0x6a>;
+@@ -361,12 +324,6 @@
+ 		groups = "usb30";
+ 		function = "usb30";
+ 	};
+-
+-	msiof0_pins: spi0 {
+-		groups = "msiof0_clk", "msiof0_sync",
+-			 "msiof0_rxd", "msiof0_txd";
+-		function = "msiof0";
+-	};
+ };
+ 
+ &rcar_sound {
+@@ -554,10 +511,3 @@
+ &vspi0 {
+ 	status = "okay";
+ };
+-
+-&msiof0 {
+-	pinctrl-0 = <&msiof0_pins>;
+-	pinctrl-names = "default";
+-
+-	status = "okay";
+-};
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi b/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi
+new file mode 100644
+index 0000000..45b265f
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi
+@@ -0,0 +1,71 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2[MN] main board Rev.2.0 common parts
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++#include "hihope-common.dtsi"
++
++/ {
++	leds {
++		compatible = "gpio-leds";
++
++		bt_active_led {
++			label = "blue:bt";
++			gpios = <&gpio7  0 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "hci0-power";
++			default-state = "off";
++		};
++
++		wlan_active_led {
++			label = "yellow:wlan";
++			gpios = <&gpio7  1 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "phy0tx";
++			default-state = "off";
++		};
++	};
++
++	wlan_en_reg: regulator-wlan_en {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <70000>;
++
++		gpio = <&gpio_expander 1 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++};
++
++&hscif0 {
++	bluetooth {
++		compatible = "ti,wl1837-st";
++		enable-gpios = <&gpio_expander 2 GPIO_ACTIVE_HIGH>;
++	};
++};
++
++&i2c4 {
++	gpio_expander: gpio@20 {
++		compatible = "onnn,pca9654";
++		reg = <0x20>;
++		gpio-controller;
++		#gpio-cells = <2>;
++	};
++};
++
++&pfc {
++	msiof0_pins: spi0 {
++		groups = "msiof0_clk", "msiof0_sync",
++			 "msiof0_rxd", "msiof0_txd";
++		function = "msiof0";
++	};
++};
++
++&msiof0 {
++	pinctrl-0 = <&msiof0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+index ed683ea..c0b5bc5 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+@@ -7,7 +7,7 @@
+ 
+ /dts-v1/;
+ #include "r8a774a1.dtsi"
+-#include "hihope-common.dtsi"
++#include "hihope-rev2.dtsi"
+ 
+ / {
+ 	model = "HopeRun HiHope RZ/G2M main board (Rev.2.0) based on r8a774a1";
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+index d77fed0..bf5966d 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+@@ -7,7 +7,7 @@
+ 
+ /dts-v1/;
+ #include "r8a774b1.dtsi"
+-#include "hihope-common.dtsi"
++#include "hihope-rev2.dtsi"
+ 
+ / {
+ 	model = "HopeRun HiHope RZ/G2N main board (Rev.2.0) based on r8a774b1";
+-- 
+2.7.4
+

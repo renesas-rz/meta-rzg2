@@ -1,0 +1,28 @@
+From cb4c863bd33e2540e5003bceb97736b1e2e499bb Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 12 May 2020 15:34:07 +0700
+Subject: [PATCH 305/441] mm: rzg2_mfis_ecc : Add compatible support for
+ r8a774e1
+
+Add support for RZ/G2H (r8a774e1)
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ mm/rzg2_mfis_ecc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mm/rzg2_mfis_ecc.c b/mm/rzg2_mfis_ecc.c
+index 76724af..226a567 100644
+--- a/mm/rzg2_mfis_ecc.c
++++ b/mm/rzg2_mfis_ecc.c
+@@ -436,6 +436,7 @@ static int mfis_ecc_remove(struct platform_device *pdev)
+ static const struct of_device_id mfis_ecc_of_table[] = {
+ 	{ .compatible = "renesas,mfis-ecc-r8a774c0" },
+ 	{ .compatible = "renesas,mfis-ecc-r8a774b1" },
++	{ .compatible = "renesas,mfis-ecc-r8a774e1" },
+ 	{ }
+ };
+ 
+-- 
+2.7.4
+

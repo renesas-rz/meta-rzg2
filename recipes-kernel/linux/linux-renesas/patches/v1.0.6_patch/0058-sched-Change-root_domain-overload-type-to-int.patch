@@ -1,0 +1,50 @@
+From a19f8aa97960ae631de987e488c3581bf14a3ce8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 30 May 2019 14:48:54 +0700
+Subject: [PATCH 058/441] sched: Change root_domain->overload type to int
+
+sizeof(_Bool) is implementation defined, so let's just go with 'int' as
+is done for other structures e.g. sched_domain_shared->has_idle_cores.
+
+The local 'overload' variable used in update_sd_lb_stats can remain
+bool, as it won't impact any struct layout and can be assigned to
+the root_domain field.
+
+Cherry-picked from https://patchwork.kernel.org/patch/10506519/
+
+cc: Ingo Molnar <mingo@redhat.com>
+cc: Peter Zijlstra <peterz@infradead.org>
+
+Signed-off-by: Valentin Schneider <valentin.schneider@arm.com>
+Signed-off-by: Morten Rasmussen <morten.rasmussen@arm.com>
+Signed-off-by: Gaku Inami <gaku.inami.xh@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ kernel/sched/sched.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index c09ccf9..d2923ab 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -721,7 +721,7 @@ struct root_domain {
+ 	cpumask_var_t		online;
+ 
+ 	/* Indicate more than one runnable task for any CPU */
+-	bool			overload;
++	int			overload;
+ 
+ 	/*
+ 	 * The bit corresponding to a CPU gets set here if such CPU has more
+@@ -1700,7 +1700,7 @@ static inline void add_nr_running(struct rq *rq, unsigned count)
+ 	if (prev_nr < 2 && rq->nr_running >= 2) {
+ #ifdef CONFIG_SMP
+ 		if (!rq->rd->overload)
+-			rq->rd->overload = true;
++			rq->rd->overload = 1;
+ #endif
+ 	}
+ 
+-- 
+2.7.4
+

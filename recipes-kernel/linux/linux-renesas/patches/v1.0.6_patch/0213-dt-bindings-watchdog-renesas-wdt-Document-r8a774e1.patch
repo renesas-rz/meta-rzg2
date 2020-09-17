@@ -1,0 +1,27 @@
+From a9bb617a50fdd61cf0758353c35eec3d530ad987 Mon Sep 17 00:00:00 2001
+From: Duy Bao Dang <duy.dang.yb@renesas.com>
+Date: Mon, 6 Apr 2020 14:23:35 +0700
+Subject: [PATCH 213/441] dt-bindings: watchdog: renesas-wdt: Document r8a774e1
+
+This patch adds compatible for watchdog driver on RZ/G2H.
+
+Signed-off-by: Duy Bao Dang <duy.dang.yb@renesas.com>
+---
+ Documentation/devicetree/bindings/watchdog/renesas,wdt.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt b/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt
+index 71f419d..e673059 100644
+--- a/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt
++++ b/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt
+@@ -10,6 +10,7 @@ Required properties:
+ 		 - "renesas,r8a774a1-wdt" (RZ/G2M)
+ 		 - "renesas,r8a774b1-wdt" (RZ/G2N)
+ 		 - "renesas,r8a774c0-wdt" (RZ/G2E)
++		 - "renesas,r8a774e1-wdt" (RZ/G2H)
+ 	         - "renesas,r8a7790-wdt" (R-Car H2)
+ 	         - "renesas,r8a7791-wdt" (R-Car M2-W)
+ 	         - "renesas,r8a7792-wdt" (R-Car V2H)
+-- 
+2.7.4
+

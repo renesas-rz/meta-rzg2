@@ -1,0 +1,124 @@
+From ac061aad6e371bbd605c66697233f7720119707c Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 5 Sep 2019 17:04:06 +0700
+Subject: [PATCH 097/441] net: phy: realtek: Add rtl8211e rx/tx delays config
+
+There are two chip pins named TXDLY and RXDLY which actually adds the 2ns
+delays to TXC and RXC for TXD/RXD latching. Alas this is the only
+documented info regarding the RGMII timing control configurations the PHY
+provides. It turns out the same settings can be setup via MDIO registers
+hidden in the extension pages layout. Particularly the extension page 0xa4
+provides a register 0x1c, which bits 1 and 2 control the described delays.
+They are used to implement the "rgmii-{id,rxid,txid}" phy-mode.
+
+The hidden RGMII configs register utilization was found in the rtl8211e
+U-boot driver:
+https://elixir.bootlin.com/u-boot/v2019.01/source/drivers/net/phy/realtek.c
+ #L99
+
+There is also a freebsd-folks discussion regarding this register:
+https://reviews.freebsd.org/D13591
+
+It confirms that the register bits field must control the so called
+configuration pins described in the table 12-13 of the official PHY
+datasheet:
+8:6 = PHY Address
+5:4 = Auto-Negotiation
+3 = Interface Mode Select
+2 = RX Delay
+1 = TX Delay
+0 = SELRGV
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit f81dadbcf7fd067baf184b63c179fc392bdb226e)
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/net/phy/realtek.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index 271e8ad..7d534c3 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -28,11 +28,15 @@
+ 
+ #define RTL821x_INSR				0x13
+ 
++#define RTL821x_EXT_PAGE_SELECT			0x1e
+ #define RTL821x_PAGE_SELECT			0x1f
+ 
+ #define RTL8211F_INSR				0x1d
+ 
+ #define RTL8211F_TX_DELAY			BIT(8)
++#define RTL8211E_TX_DELAY			BIT(1)
++#define RTL8211E_RX_DELAY			BIT(2)
++#define RTL8211E_MODE_MII_GMII			BIT(3)
+ 
+ #define RTL8201F_ISR				0x1e
+ #define RTL8201F_IER				0x13
+@@ -162,6 +166,52 @@ static int rtl8211c_config_init(struct phy_device *phydev)
+ 	return genphy_config_init(phydev);
+ }
+ 
++static int rtl8211e_config_init(struct phy_device *phydev)
++{
++	int ret = 0, oldpage;
++	u16 val;
++
++	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
++	switch (phydev->interface) {
++	case PHY_INTERFACE_MODE_RGMII:
++		val = 0;
++		break;
++	case PHY_INTERFACE_MODE_RGMII_ID:
++		val = RTL8211E_TX_DELAY | RTL8211E_RX_DELAY;
++		break;
++	case PHY_INTERFACE_MODE_RGMII_RXID:
++		val = RTL8211E_RX_DELAY;
++		break;
++	case PHY_INTERFACE_MODE_RGMII_TXID:
++		val = RTL8211E_TX_DELAY;
++		break;
++	default: /* the rest of the modes imply leaving delays as is. */
++		return 0;
++	}
++
++	/* According to a sample driver there is a 0x1c config register on the
++	 * 0xa4 extension page (0x7) layout. It can be used to disable/enable
++	 * the RX/TX delays otherwise controlled by RXDLY/TXDLY pins. It can
++	 * also be used to customize the whole configuration register:
++	 * 8:6 = PHY Address, 5:4 = Auto-Negotiation, 3 = Interface Mode Select,
++	 * 2 = RX Delay, 1 = TX Delay, 0 = SELRGV (see original PHY datasheet
++	 * for details).
++	 */
++	oldpage = phy_select_page(phydev, 0x7);
++	if (oldpage < 0)
++		goto err_restore_page;
++
++	ret = phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0xa4);
++	if (ret)
++		goto err_restore_page;
++
++	ret = phy_modify(phydev, 0x1c, RTL8211E_TX_DELAY | RTL8211E_RX_DELAY,
++			 val);
++
++err_restore_page:
++	return phy_restore_page(phydev, oldpage, ret);
++}
++
+ static int rtl8211f_config_init(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -274,6 +324,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.phy_id_mask	= 0x001fffff,
+ 		.features	= PHY_GBIT_FEATURES,
+ 		.flags		= PHY_HAS_INTERRUPT,
++		.config_init    = &rtl8211e_config_init,
+ 		.ack_interrupt	= &rtl821x_ack_interrupt,
+ 		.config_intr	= &rtl8211e_config_intr,
+ 		.suspend	= genphy_suspend,
+-- 
+2.7.4
+

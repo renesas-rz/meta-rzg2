@@ -1,0 +1,47 @@
+From 9a98def89178a41ee5ceb4cc794dcf6a4fb2c667 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 12 May 2020 15:32:09 +0700
+Subject: [PATCH 306/441] arm64: dts: renesas: r8a774e1: add device node for
+ MFIS
+
+Add support MFIS for r8a774e1.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index b3451f5..280c6f2 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -860,6 +860,26 @@
+ 			resets = <&cpg 407>;
+ 		};
+ 
++		mfis_ecc: mfis@e6260000 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "renesas,mfis-ecc-r8a774e1";
++			reg = <0 0xe6260000 0 0x1000>;
++			interrupts =	<GIC_SPI 409 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 410 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 411 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 412 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 413 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 414 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 415 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 307 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 295 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 300 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 446 IRQ_TYPE_LEVEL_HIGH>;
++		};
++
+ 		tmu0: timer@e61e0000 {
+ 			compatible = "renesas,tmu-r8a774e1","renesas,tmu";
+ 			reg = <0 0xe61e0000 0 0x30>;
+-- 
+2.7.4
+

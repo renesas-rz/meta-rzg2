@@ -1,0 +1,47 @@
+From f185f94dfe9e5b70976da4fd92b517258d19b9da Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Mon, 13 Apr 2020 14:58:49 +0700
+Subject: [PATCH 264/441] arm64: dts: renesas: r8a774e1: Add DU device to DT
+
+This patch adds DU's device node support for r8a774e1 SoC
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 6255c3d..5841713 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -2105,7 +2105,18 @@
+ 		};
+ 
+ 		du: display@feb00000 {
+-			reg = <0 0xfeb00000 0 0x70000>;
++			compatible = "renesas,du-r8a774e1";
++			reg = <0 0xfeb00000 0 0x80000>;
++			interrupts = <GIC_SPI 256 IRQ_TYPE_LEVEL_HIGH>,
++				   <GIC_SPI 268 IRQ_TYPE_LEVEL_HIGH>,
++				   <GIC_SPI 270 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 724>,
++				 <&cpg CPG_MOD 723>,
++				 <&cpg CPG_MOD 721>;
++			clock-names = "du.0", "du.1", "du.3";
++			status = "disabled";
++
++			vsps = <&vspd0 0 &vspd1 0 &vspd0 1>;
+ 
+ 			ports {
+ 				#address-cells = <1>;
+@@ -2127,7 +2138,6 @@
+ 					};
+ 				};
+ 			};
+-			/* placeholder */
+ 		};
+ 
+ 		lvds0: lvds@feb90000 {
+-- 
+2.7.4
+

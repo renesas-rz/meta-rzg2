@@ -1,0 +1,28 @@
+From 7a0c8c561c9b4839870a90076cfe434651c053bf Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Tue, 28 Jul 2020 14:27:33 +0700
+Subject: [PATCH 403/441] dt-bindings: rcar-gen3-phy-usb3: Add r8a774a3 support
+
+This patch adds bindings for R8A774A3 SoC.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt b/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt
+index ba2a636..6908b8d 100644
+--- a/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt
++++ b/Documentation/devicetree/bindings/phy/rcar-gen3-phy-usb3.txt
+@@ -9,6 +9,8 @@ need this driver.
+ Required properties:
+ - compatible: "renesas,r8a774a1-usb3-phy" if the device is a part of an R8A774A1
+ 	      SoC.
++	      "renesas,r8a774a3-usb3-phy" if the device is a part of an R8A774A3
++	      SoC.
+ 	      "renesas,r8a774b1-usb3-phy" if the device is a part of an R8A774B1
+ 	      SoC.
+ 	      "renesas,r8a774e1-usb3-phy" if the device is a part of an R8A774E1
+-- 
+2.7.4
+

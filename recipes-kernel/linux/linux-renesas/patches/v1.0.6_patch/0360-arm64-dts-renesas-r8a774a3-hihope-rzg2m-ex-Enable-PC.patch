@@ -1,0 +1,42 @@
+From 5e042542f495740669b6edee8849c62f4b25b500 Mon Sep 17 00:00:00 2001
+From: tienle <tien.le.xw@renesas.com>
+Date: Tue, 21 Jul 2020 13:20:07 +0700
+Subject: [PATCH 360/441] arm64: dts: renesas: r8a774a3-hihope-rzg2m-ex: Enable
+ PCIE1 as default
+
+In RZ/G2M, we can choose the output between PCIE1 and SATA
+by GP7_03 and SW43=OFF with following selections:
+- GPIO7_03 = HIGH -> PCIE1
+- GPIO7_03 = LOW -> SATA
+R8A774A3 SoC does not support SATA so that we enable PCIE1
+as default selection.
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts
+index 9d003a3..81b4d4a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m-ex.dts
+@@ -15,3 +15,16 @@
+ 	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m",
+ 		     "renesas,r8a774a3";
+ };
++
++&pciec1 {
++	status = "okay";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "pcie-en-gpio";
++	};
++};
+-- 
+2.7.4
+
