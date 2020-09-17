@@ -10,10 +10,10 @@ inherit deploy python3native
 require include/provisioning.inc
 require include/ecc-control.inc
 
-PV = "3.9.0+renesas+git${SRCPV}"
+PV = "3.10.0+renesas+git${SRCPV}"
 BRANCH = "master"
-#TAG: 3.9.0
-SRCREV = "af141c61fe7a2430f3b4bb89661d8414117013b3"
+#TAG: 3.10.0
+SRCREV = "d1c635434c55b7d75eadf471bde04926bd1e50a7"
 
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
@@ -22,6 +22,8 @@ SRC_URI = " \
     file://0003-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
     file://0004-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
     file://0005-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
+    file://0006-core-arm-plat-rzg-Re-structure-for-compatible-with-v.patch \
+    file://0007-mk-gcc-allow-setting-sysroot-for-libgcc-lookup.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
@@ -39,9 +41,6 @@ export LDcore="${LD}"
 libdir[unexport] = "1"
 
 S = "${WORKDIR}/git"
-EXTRA_OEMAKE = "-e MAKEFLAGS= \
-		LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
-		"
 
 do_compile() {
     oe_runmake PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n RZG_DRAM_ECC=${USE_ECC} RZG_ECC_FULL=${ECC_FULL}
