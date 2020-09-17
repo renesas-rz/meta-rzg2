@@ -1,0 +1,79 @@
+From 6896405f1ae7f98d0bee7eed659e7e1ec74e155b Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 17 Sep 2020 09:52:03 +0700
+Subject: [PATCH] core: arm: plat-rzg: Re-structure for compatible with v3.10.0
+
+OPTEE OS update to v3.10.0 will re-structure the thread handler, so that we
+modify to compatible with the newer.
+
+Reference: https://github.com/OP-TEE/optee_os/commit/651d75378f517f798eba7a508e8b457504c0a05c
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ core/arch/arm/plat-rzg/main.c | 26 +++++---------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
+
+diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
+index 5fc71cc6..14e5d85b 100644
+--- a/core/arch/arm/plat-rzg/main.c
++++ b/core/arch/arm/plat-rzg/main.c
+@@ -28,9 +28,8 @@
+  */
+ 
+ #include <console.h>
+-#include <kernel/generic_boot.h>
++#include <kernel/boot.h>
+ #include <kernel/panic.h>
+-#include <kernel/pm_stubs.h>
+ #include <mm/core_memprot.h>
+ #include <platform_config.h>
+ #include <stdint.h>
+@@ -63,8 +62,8 @@ register_dynamic_shm(NSEC_DDR_3_BASE, NSEC_DDR_3_SIZE);
+ static uint32_t suspend_to_ram_save_flag = 0U;
+ static uint32_t main_cpu_lock = (uint32_t)SPINLOCK_UNLOCK;
+ 
+-static unsigned long main_cpu_suspend(unsigned long a0,
+-                                unsigned long a1 __unused)
++unsigned long thread_cpu_suspend_handler(unsigned long a0,
++					 unsigned long a1 __unused)
+ {
+ 
+ 	uint32_t exceptions;
+@@ -88,8 +87,8 @@ static unsigned long main_cpu_suspend(unsigned long a0,
+ 	return 0U;
+ }
+ 
+-static unsigned long main_cpu_resume(unsigned long a0 __unused,
+-                                unsigned long a1 __unused)
++unsigned long thread_cpu_resume_handler(unsigned long a0 __unused,
++					unsigned long a1 __unused)
+ {
+ 	uint32_t exceptions;
+ 
+@@ -108,23 +107,8 @@ static unsigned long main_cpu_resume(unsigned long a0 __unused,
+ 	return 0U;
+ }
+ 
+-
+-static const struct thread_handlers handlers __nex_data = {
+-    .cpu_on = cpu_on_handler,
+-    .cpu_off = pm_do_nothing,
+-    .cpu_suspend = main_cpu_suspend,
+-    .cpu_resume = main_cpu_resume,
+-    .system_off = pm_do_nothing,
+-    .system_reset = pm_do_nothing,
+-};
+-
+ static struct scif_uart_data console_data __nex_bss;
+ 
+-const struct thread_handlers *generic_boot_get_handlers(void)
+-{
+-    return &handlers;
+-}
+-
+ void console_init(void)
+ {
+     scif_uart_init(&console_data, CONSOLE_UART_BASE);
+-- 
+2.17.1
+
