@@ -26,7 +26,7 @@ SRC_URI_append = " \
 "
 
 #Fix build break with glibc 2.28
-SRC_URI += "${@'file://Fix-build-error-major-minor.patch' if 'Buster' in '${CIP_MODE}' else ' '}"
+SRC_URI += "${@'file://Fix-build-error-major-minor.patch' if '${GLIBCVERSION}' >= '2.28' else ' '}"
 
 S = "${WORKDIR}/git"
 
