@@ -1,0 +1,28 @@
+From 3ad8c5967d0f4bbe4acf5c14b311dab9d722748b Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Thu, 30 Jul 2020 13:45:42 +0700
+Subject: [PATCH 414/443] dt-bindings: usb: renesas,usb3-peri: Add bindings for
+ r8a774a3
+
+Add Document for R8A774A3 (RZ/G2M v3.0) SoC.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt b/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt
+index 231747a..c7baa6d 100644
+--- a/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt
++++ b/Documentation/devicetree/bindings/usb/renesas,usb3-peri.txt
+@@ -3,6 +3,7 @@ Renesas Electronics USB3.0 Peripheral driver
+ Required properties:
+   - compatible: Must contain one of the following:
+ 	- "renesas,r8a774a1-usb3-peri"
++	- "renesas,r8a774a3-usb3-peri"
+ 	- "renesas,r8a774b1-usb3-peri"
+ 	- "renesas,r8a774c0-usb3-peri"
+ 	- "renesas,r8a774e1-usb3-peri"
+-- 
+2.7.4
+

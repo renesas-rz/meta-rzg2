@@ -1,0 +1,30 @@
+From ab1c11f2e8f219b7454f30346add4a411cce6b27 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 19 Sep 2019 11:11:27 +0700
+Subject: [PATCH 134/443] media: rcar-vin: Add memory type of VB_USERPTR
+ support
+
+This patch adds memory type of USERPTR support for VIN driver
+in RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-dma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-dma.c b/drivers/media/platform/rcar-vin/rcar-dma.c
+index 9232331..bbb0d89 100644
+--- a/drivers/media/platform/rcar-vin/rcar-dma.c
++++ b/drivers/media/platform/rcar-vin/rcar-dma.c
+@@ -1277,7 +1277,7 @@ int rvin_dma_register(struct rvin_dev *vin, int irq)
+ 
+ 	/* buffer queue */
+ 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+-	q->io_modes = VB2_MMAP | VB2_READ | VB2_DMABUF;
++	q->io_modes = VB2_MMAP | VB2_READ | VB2_DMABUF | VB2_USERPTR;
+ 	q->lock = &vin->lock;
+ 	q->drv_priv = vin;
+ 	q->buf_struct_size = sizeof(struct rvin_buffer);
+-- 
+2.7.4
+

@@ -1,0 +1,65 @@
+From 368bcdcacd0dff56e371d7f17b9e6aee6ee1e00b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 16 Sep 2020 11:09:17 +0700
+Subject: [PATCH 344/443] arm64: dts: renesas: Add HiHope RZ/G2M v3.0 main
+ board support
+
+Basic support for the HiHope RZ/G2M v3.0 main board:
+	- Memory,
+	- Main crystal,
+	- Serial console
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |  1 +
+ .../boot/dts/renesas/r8a774a3-hihope-rzg2m.dts     | 26 ++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 12775f3..0cbe9c0 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -7,6 +7,7 @@ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb \
+ 			       r8a774a1-hihope-rzg2m-ex.dtb \
+ 			       r8a774a1-hihope-rzg2m-ex-idk-1110wr.dtb \
+ 			       r8a774a1-hihope-rzg2m-ex-mipi-2.1.dtb
++dtb-$(CONFIG_ARCH_R8A774A3) += r8a774a3-hihope-rzg2m.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-rev2.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dtb \
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+new file mode 100644
+index 0000000..987c1f0
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2M v3.0 main board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++/dts-v1/;
++#include "r8a774a3.dtsi"
++#include "hihope-rev4.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2M v3.0 main board based on r8a774a3";
++	compatible = "hoperun,hihope-rzg2m", "renesas,r8a774a3";
++
++	memory@48000000 {
++		device_type = "memory";
++		/* first 128MB is reserved for secure area. */
++		reg = <0x0 0x48000000 0x0 0x78000000>;
++	};
++
++	memory@600000000 {
++		device_type = "memory";
++		reg = <0x6 0x00000000 0x0 0x80000000>;
++	};
++};
+-- 
+2.7.4
+

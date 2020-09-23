@@ -1,0 +1,31 @@
+From 24ea0c5d8439f8c0301ef4019f4aaec3c72b77f6 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 6 Mar 2020 14:54:07 +0700
+Subject: [PATCH 163/443] arm64: dts: renesas: r8a774a1: correct compatible
+ string for ipmmu-vc0
+
+This commit correct compatible string for ipmmu-vc0, which is
+impplemeted in mmngr driver NOT ipmmu-vmsa driver
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 9160441..b9af624 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -1135,7 +1135,7 @@
+ 		};
+ 
+ 		ipmmu_vc0: mmu@fe6b0000 {
+-			compatible = "renesas,ipmmu-r8a774a1";
++			compatible = "renesas,ipmmu-mmu-r8a774a1";
+ 			reg = <0 0xfe6b0000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 8>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-- 
+2.7.4
+

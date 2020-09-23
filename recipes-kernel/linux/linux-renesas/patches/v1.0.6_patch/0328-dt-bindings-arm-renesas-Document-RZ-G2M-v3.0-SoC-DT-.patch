@@ -1,0 +1,34 @@
+From 93200f3780e10d08714f323caa5d3f919167d347 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 14:49:58 +0700
+Subject: [PATCH 328/443] dt-bindings: arm: renesas: Document RZ/G2M v3.0 SoC
+ DT bindings
+
+Add device tree bindings documentation for the Renesas RZ/G2M v3.0
+(r8a774a3) SoC.
+Also update name for r8a774a1 SoC with RZ/G2M v1.3.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/arm/shmobile.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/arm/shmobile.txt b/Documentation/devicetree/bindings/arm/shmobile.txt
+index 51b8fff..2bbba92 100644
+--- a/Documentation/devicetree/bindings/arm/shmobile.txt
++++ b/Documentation/devicetree/bindings/arm/shmobile.txt
+@@ -23,8 +23,10 @@ SoCs:
+     compatible = "renesas,r8a7745"
+   - RZ/G1C (R8A77470)
+     compatible = "renesas,r8a77470"
+-  - RZ/G2M (R8A774A1)
++  - RZ/G2M v1.3 (R8A774A1)
+     compatible = "renesas,r8a774a1"
++  - RZ/G2M v3.0 (R8A774A3)
++    compatible = "renesas,r8a774a3"
+   - RZ/G2N (R8A774B1)
+     compatible = "renesas,r8a774b1"
+   - RZ/G2E (R8A774C0)
+-- 
+2.7.4
+

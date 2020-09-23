@@ -1,0 +1,44 @@
+From 623a870d3c39094ab0f098869c9b48de2a3e90c9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 19 Mar 2020 10:23:07 +0700
+Subject: [PATCH 181/443] dt-bindings: clock: renesas: cpg-mssr: Document
+ r8a774e1 binding
+
+Add binding documentation for the RZ/G2H (R8A774e1) Clock Pulse
+Generator driver.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/clock/renesas,cpg-mssr.txt | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/clock/renesas,cpg-mssr.txt b/Documentation/devicetree/bindings/clock/renesas,cpg-mssr.txt
+index 113d45b..db1206d 100644
+--- a/Documentation/devicetree/bindings/clock/renesas,cpg-mssr.txt
++++ b/Documentation/devicetree/bindings/clock/renesas,cpg-mssr.txt
+@@ -19,6 +19,7 @@ Required Properties:
+       - "renesas,r8a774a1-cpg-mssr" for the r8a774a1 SoC (RZ/G2M)
+       - "renesas,r8a774b1-cpg-mssr" for the r8a774a1 SoC (RZ/G2N)
+       - "renesas,r8a774c0-cpg-mssr" for the r8a774c0 SoC (RZ/G2E)
++      - "renesas,r8a774e1-cpg-mssr" for the r8a774e1 SoC (RZ/G2H)
+       - "renesas,r8a7790-cpg-mssr" for the r8a7790 SoC (R-Car H2)
+       - "renesas,r8a7791-cpg-mssr" for the r8a7791 SoC (R-Car M2-W)
+       - "renesas,r8a7792-cpg-mssr" for the r8a7792 SoC (R-Car V2H)
+@@ -39,10 +40,10 @@ Required Properties:
+     clock-names
+   - clock-names: List of external parent clock names. Valid names are:
+       - "extal" (r8a7743, r8a7745, r8a77470, r8a774a1, r8a774b1, r8a774c0,
+-		 r8a7790, r8a7791, r8a7792, r8a7793, r8a7794, r8a7795, r8a7796,
+-		 r8a77965, r8a77970, r8a77980, r8a77990, r8a77995)
+-      - "extalr" (r8a774a1, r8a774b1, r8a7795, r8a7796, r8a77965, r8a77970,
+-		  r8a77980)
++		 r8a774e1, r8a7790, r8a7791, r8a7792, r8a7793, r8a7794, r8a7795,
++		 r8a7796, r8a77965, r8a77970, r8a77980, r8a77990, r8a77995)
++      - "extalr" (r8a774a1, r8a774b1, r8a774e1, r8a7795, r8a7796, r8a77965,
++		  r8a77970, r8a77980)
+       - "usb_extal" (r8a7743, r8a7745, r8a77470, r8a7790, r8a7791, r8a7793,
+ 		     r8a7794)
+ 
+-- 
+2.7.4
+

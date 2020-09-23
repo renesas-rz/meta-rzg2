@@ -1,0 +1,45 @@
+From 3eccd8d43902105a4bbb274b7c3ce700e95de9de Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Thu, 9 Apr 2020 10:42:24 +0700
+Subject: [PATCH 296/443] iommu/ipmmu-vmsa: Hook up r8a774e1 DT matching code
+
+Support RZ/G2H (R8A774E1) IPMMU.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ drivers/iommu/ipmmu-vmsa.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/iommu/ipmmu-vmsa.c b/drivers/iommu/ipmmu-vmsa.c
+index ea4d19d..c6be954 100644
+--- a/drivers/iommu/ipmmu-vmsa.c
++++ b/drivers/iommu/ipmmu-vmsa.c
+@@ -758,6 +758,7 @@ static int ipmmu_init_platform_device(struct device *dev,
+ }
+ 
+ static const struct soc_device_attribute soc_rcar_gen3[] = {
++	{ .soc_id = "r8a774e1", },
+ 	{ .soc_id = "r8a774a1", },
+ 	{ .soc_id = "r8a774b1", },
+ 	{ .soc_id = "r8a774c0", },
+@@ -770,6 +771,7 @@ static const struct soc_device_attribute soc_rcar_gen3[] = {
+ };
+ 
+ static const struct soc_device_attribute soc_rcar_gen3_whitelist[] = {
++	{ .soc_id = "r8a774e1", },
+ 	{ .soc_id = "r8a774b1", },
+ 	{ .soc_id = "r8a774c0", },
+ 	{ .soc_id = "r8a7795", .revision = "ES3.*" },
+@@ -967,6 +969,9 @@ static const struct of_device_id ipmmu_of_ids[] = {
+ 		.compatible = "renesas,ipmmu-vmsa",
+ 		.data = &ipmmu_features_default,
+ 	}, {
++		.compatible = "renesas,ipmmu-r8a774e1",
++		.data = &ipmmu_features_rcar_gen3,
++	}, {
+ 		.compatible = "renesas,ipmmu-r8a774a1",
+ 		.data = &ipmmu_features_rcar_gen3,
+ 	}, {
+-- 
+2.7.4
+

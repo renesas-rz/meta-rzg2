@@ -1,0 +1,27 @@
+From dae7517a87b7c55bbc5b5450829f582505e06dbc Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Mon, 27 Jul 2020 08:15:44 +0700
+Subject: [PATCH 354/443] mmc: renesas_sdhi_internal_dmac: Add r8a774a3 support
+
+This patch adds SDHI support for RZ/G2Mv3.0 (R8A774A3) SoC.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_internal_dmac.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_internal_dmac.c b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+index a8c7ce4..33c69e0 100644
+--- a/drivers/mmc/host/renesas_sdhi_internal_dmac.c
++++ b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+@@ -283,6 +283,7 @@ static const struct soc_device_attribute gen3_soc_whitelist[] = {
+ 	  .data = (void *)BIT(SDHI_INTERNAL_DMAC_ONE_RX_ONLY) },
+ 	/* generic ones */
+ 	{ .soc_id = "r8a774a1" },
++	{ .soc_id = "r8a774a3" },
+ 	{ .soc_id = "r8a774b1" },
+ 	{ .soc_id = "r8a774c0" },
+ 	{ .soc_id = "r8a774e1" },
+-- 
+2.7.4
+

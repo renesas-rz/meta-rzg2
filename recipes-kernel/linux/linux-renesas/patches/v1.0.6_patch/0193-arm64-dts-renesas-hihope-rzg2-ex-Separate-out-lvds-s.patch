@@ -1,0 +1,263 @@
+From ddd1da93b2a4593f675bb52c414b8dca088305a0 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 15 Sep 2020 15:38:42 +0700
+Subject: [PATCH 193/443] arm64: dts: renesas: hihope-rzg2-ex: Separate out
+ lvds specific nodes into common file
+
+commit b0990638b625f4066396051c60b2f5480823f085 upstream.
+
+Separate out LVDS specific nodes into common file
+hihope-rzg2-ex-lvds.dtsi so that this can be re-used by RZ/G2M[N]
+variants.
+
+Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Reviewed-by: Marian-Cristian Rotariu <marian-cristian.rotariu.rb@bp.renesas.com>
+Link: https://lore.kernel.org/r/1593004330-5039-8-git-send-email-prabhakar.mahadev-lad.rj@bp.renesas.com
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+Signed-off-by: Pavel Machek <pavel@denx.de>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ .../boot/dts/renesas/hihope-rzg2-ex-lvds.dtsi      | 52 ++++++++++++++++++++++
+ arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi    | 49 --------------------
+ .../r8a774a1-hihope-rzg2m-rev2-ex-idk-1110wr.dts   | 39 +---------------
+ .../r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dts   | 38 +---------------
+ 4 files changed, 54 insertions(+), 124 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/hihope-rzg2-ex-lvds.dtsi
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex-lvds.dtsi b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex-lvds.dtsi
+new file mode 100644
+index 0000000..40c5e8d
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex-lvds.dtsi
+@@ -0,0 +1,52 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the RZ/G2[MN] HiHope sub board LVDS common parts
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++/ {
++	backlight {
++		compatible = "pwm-backlight";
++		pwms = <&pwm0 0 50000>;
++
++		brightness-levels = <0 2 8 16 32 64 128 255>;
++		default-brightness-level = <6>;
++	};
++};
++
++&gpio1 {
++	/*
++	 * When GP1_20 is LOW LVDS0 is connected to the LVDS connector
++	 * When GP1_20 is HIGH LVDS0 is connected to the LT8918L
++	 */
++	lvds-connector-en-gpio {
++		gpio-hog;
++		gpios = <20 GPIO_ACTIVE_HIGH>;
++		output-low;
++		line-name = "lvds-connector-en-gpio";
++	};
++};
++
++&lvds0 {
++	ports {
++		port@1 {
++			lvds_connector: endpoint {
++			};
++		};
++	};
++};
++
++&pfc {
++	pwm0_pins: pwm0 {
++		groups = "pwm0";
++		function = "pwm0";
++	};
++};
++
++&pwm0 {
++	pinctrl-0 = <&pwm0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+index 28fe17e..6870e22 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rzg2-ex.dtsi
+@@ -13,14 +13,6 @@
+ 	chosen {
+ 		bootargs = "ignore_loglevel rw root=/dev/nfs ip=on";
+ 	};
+-
+-	backlight {
+-		compatible = "pwm-backlight";
+-		pwms = <&pwm0 0 50000>;
+-
+-		brightness-levels = <0 2 8 16 32 64 128 255>;
+-		default-brightness-level = <6>;
+-	};
+ };
+ 
+ &avb {
+@@ -51,35 +43,6 @@
+ 	status = "okay";
+ };
+ 
+-&gpio1 {
+-	/*
+-	 * When GP1_20 is LOW LVDS0 is connected to the LVDS connector
+-	 * When GP1_20 is HIGH LVDS0 is connected to the LT8918L
+-	 */
+-	lvds-connector-en-gpio {
+-		gpio-hog;
+-		gpios = <20 GPIO_ACTIVE_HIGH>;
+-		output-low;
+-		line-name = "lvds-connector-en-gpio";
+-	};
+-};
+-
+-&lvds0 {
+-	/*
+-	 * Please include the LVDS panel .dtsi file and uncomment the below line
+-	 * to enable LVDS panel connected to RZ/G2[MN] boards.
+-	 */
+-
+-	/* status = "okay"; */
+-
+-	ports {
+-		port@1 {
+-			lvds_connector: endpoint {
+-			};
+-		};
+-	};
+-};
+-
+ &pciec0 {
+ 	status = "okay";
+ };
+@@ -115,16 +78,4 @@
+ 		groups = "can1_data";
+ 		function = "can1";
+ 	};
+-
+-	pwm0_pins: pwm0 {
+-		groups = "pwm0";
+-		function = "pwm0";
+-	};
+-};
+-
+-&pwm0 {
+-	pinctrl-0 = <&pwm0_pins>;
+-	pinctrl-names = "default";
+-
+-	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-idk-1110wr.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-idk-1110wr.dts
+index 3a1dcc9..c0e9d8c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-idk-1110wr.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2-ex-idk-1110wr.dts
+@@ -7,46 +7,9 @@
+  */
+ 
+ #include "r8a774a1-hihope-rzg2m-rev2-ex.dts"
++#include "hihope-rzg2-ex-lvds.dtsi"
+ #include "rzg2-advantech-idk-1110wr-panel.dtsi"
+ 
+-/ {
+-	backlight {
+-		compatible = "pwm-backlight";
+-		pwms = <&pwm0 0 50000>;
+-
+-		brightness-levels = <0 2 8 16 32 64 128 255>;
+-		default-brightness-level = <6>;
+-	};
+-
+-};
+-
+-&gpio1 {
+-	/*
+-	 * When GP1_20 is LOW LVDS0 is connected to the LVDS connector
+-	 * When GP1_20 is HIGH LVDS0 is connected to the LT8918L
+-	 */
+-	lvds-connector-en-gpio {
+-		gpio-hog;
+-		gpios = <20 GPIO_ACTIVE_HIGH>;
+-		output-low;
+-		line-name = "lvds-connector-en-gpio";
+-	};
+-};
+-
+ &lvds0 {
+ 	status = "okay";
+ };
+-
+-&pfc {
+-	pwm0_pins: pwm0 {
+-		groups = "pwm0";
+-		function = "pwm0";
+-	};
+-};
+-
+-&pwm0 {
+-	pinctrl-0 = <&pwm0_pins>;
+-	pinctrl-names = "default";
+-
+-	status = "okay";
+-};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dts
+index c22a943..4fe74ad 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dts
+@@ -7,45 +7,9 @@
+  */
+ 
+ #include "r8a774b1-hihope-rzg2n-rev2-ex.dts"
++#include "hihope-rzg2-ex-lvds.dtsi"
+ #include "rzg2-advantech-idk-1110wr-panel.dtsi"
+ 
+-/ {
+-	backlight {
+-		compatible = "pwm-backlight";
+-		pwms = <&pwm0 0 50000>;
+-
+-		brightness-levels = <0 2 8 16 32 64 128 255>;
+-		default-brightness-level = <6>;
+-	};
+-};
+-
+-&gpio1 {
+-	/*
+-	 * When GP1_20 is LOW LVDS0 is connected to the LVDS connector
+-	 * When GP1_20 is HIGH LVDS0 is connected to the LT8918L
+-	 */
+-	lvds-connector-en-gpio {
+-		gpio-hog;
+-		gpios = <20 GPIO_ACTIVE_HIGH>;
+-		output-low;
+-		line-name = "lvds-connector-en-gpio";
+-	};
+-};
+-
+ &lvds0 {
+ 	status = "okay";
+ };
+-
+-&pfc {
+-	pwm0_pins: pwm0 {
+-		groups = "pwm0";
+-		function = "pwm0";
+-	};
+-};
+-
+-&pwm0 {
+-	pinctrl-0 = <&pwm0_pins>;
+-	pinctrl-names = "default";
+-
+-	status = "okay";
+-};
+-- 
+2.7.4
+

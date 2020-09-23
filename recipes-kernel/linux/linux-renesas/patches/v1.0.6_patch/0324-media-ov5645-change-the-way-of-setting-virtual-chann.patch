@@ -1,0 +1,91 @@
+From e8ebfdfb38be6f336aa9be839ef358d439b88786 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 22 Apr 2020 17:26:46 +0700
+Subject: [PATCH 324/443] media: ov5645: change the way of setting virtual
+ channel
+
+This commit is created to change the way of setting virtual channel
+for OV5645.
+Currently, in previous patch, we use module parameter to set virtual
+channel. Limitation of this way is can not use if system have more than
+2 cameras OV5645.
+To avoid this limitation, we will get data from devicetree with
+"virtual-channel" property in OV5645 device node.
+Example:
+To use OV5645 in virtual channel 1, we define in devicetree
+as below:
+	ov5645 {
+		....
+		virtual-channel = /bits/ 8 <1>;
+		port {
+			...
+		};
+	};
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/i2c/ov5645.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/media/i2c/ov5645.c b/drivers/media/i2c/ov5645.c
+index f394267..9648a6c 100644
+--- a/drivers/media/i2c/ov5645.c
++++ b/drivers/media/i2c/ov5645.c
+@@ -74,15 +74,6 @@
+ #define OV5645_SDE_SAT_V		0x5584
+ #define OV5645_REG_DEBUG_MODE		0x4814
+ 
+-/*
+- * FIXME: remove this when a subdev API becomes available
+- * to set the MIPI CSI-2 virtual channel.
+- */
+-static unsigned int virtual_channel;
+-module_param(virtual_channel, int, 0644);
+-MODULE_PARM_DESC(virtual_channel,
+-		"MIPI CSI-2 virtual channel (0..3), default 0");
+-
+ struct reg_value {
+ 	u16 reg;
+ 	u8 val;
+@@ -127,6 +118,8 @@ struct ov5645 {
+ 
+ 	struct gpio_desc *enable_gpio;
+ 	struct gpio_desc *rst_gpio;
++
++	u8 virtual_channel;
+ };
+ 
+ static inline struct ov5645 *to_ov5645(struct v4l2_subdev *sd)
+@@ -1050,7 +1043,7 @@ static int ov5645_get_selection(struct v4l2_subdev *sd,
+ 
+ static int ov5645_set_virtual_channel(struct ov5645 *ov5645)
+ {
+-	u8 temp, channel = virtual_channel;
++	u8 temp, channel = ov5645->virtual_channel;
+ 	int ret;
+ 
+ 	if (channel > 3)
+@@ -1144,6 +1137,7 @@ static int ov5645_probe(struct i2c_client *client,
+ 	struct ov5645 *ov5645;
+ 	u8 chip_id_high, chip_id_low;
+ 	u32 xclk_freq;
++	u8 virtual_channel;
+ 	int ret;
+ 
+ 	ov5645 = devm_kzalloc(dev, sizeof(struct ov5645), GFP_KERNEL);
+@@ -1254,6 +1248,12 @@ static int ov5645_probe(struct i2c_client *client,
+ 		return PTR_ERR(ov5645->rst_gpio);
+ 	}
+ 
++	if (!of_property_read_u8(dev->of_node, "virtual-channel",
++							&virtual_channel))
++		ov5645->virtual_channel = virtual_channel;
++	else
++		ov5645->virtual_channel = 0;
++
+ 	mutex_init(&ov5645->power_lock);
+ 
+ 	v4l2_ctrl_handler_init(&ov5645->ctrls, 9);
+-- 
+2.7.4
+

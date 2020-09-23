@@ -1,0 +1,36 @@
+From 6e57efcf25fb92b2114a0b2041f01bfdbfdd65c4 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 29 Jul 2020 16:45:27 +0700
+Subject: [PATCH 392/443] arm64: dts: renesas: r8a774a3-hihope-rzg2m: add
+ mmngr, mmngrbuf
+
+This commit adds device nodes for mmngr, mmngrbuf.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+index b45204f..76bbb51 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+@@ -50,6 +50,15 @@
+ 			reg = <0x00000000 0x78000000 0x0 0x10000000>;
+ 		};
+ 	};
++
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>, <&lossy_decompress>;
++	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
++	};
+ };
+ 
+ &sound_card {
+-- 
+2.7.4
+

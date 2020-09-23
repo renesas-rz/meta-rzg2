@@ -1,0 +1,42 @@
+From 48dab24581c573cdf1da32cb41729164003c776e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 10:28:06 +0700
+Subject: [PATCH 011/443] arm64: dts: renesas: r8a774c0-cat874: Add reserved
+ memory region
+
+This patch adds reserved memory region for default CMA area:
+	256 MiB : 0x0058000000 -> 0x0067ffffff
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index ed94140..ffd0b23 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -65,6 +65,20 @@
+ 		reg = <0x0 0x48000000 0x0 0x78000000>;
+ 	};
+ 
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		/* global autoconfigured region for contiguous allocations */
++		linux,cma@58000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x58000000 0x0 0x10000000>;
++			linux,cma-default;
++		};
++	};
++
+ 	reg_12p0v: regulator-12p0v {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "D12.0V";
+-- 
+2.7.4
+

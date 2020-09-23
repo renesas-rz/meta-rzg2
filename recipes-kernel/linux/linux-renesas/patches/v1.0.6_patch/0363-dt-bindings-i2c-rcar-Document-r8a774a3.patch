@@ -1,0 +1,27 @@
+From a0eb421c95b8b06d2f0833ac2744e3f56b385513 Mon Sep 17 00:00:00 2001
+From: hiep pham <hieppham@renesas.com>
+Date: Mon, 27 Jul 2020 15:32:21 +0700
+Subject: [PATCH 363/443] dt-bindings: i2c: rcar: Document r8a774a3
+
+This patch adds compatible string for I2C driver.
+
+Signed-off-by: hiep pham <hieppham@renesas.com>
+---
+ Documentation/devicetree/bindings/i2c/renesas,i2c.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/i2c/renesas,i2c.txt b/Documentation/devicetree/bindings/i2c/renesas,i2c.txt
+index fe0ecbf..98bcdbd 100644
+--- a/Documentation/devicetree/bindings/i2c/renesas,i2c.txt
++++ b/Documentation/devicetree/bindings/i2c/renesas,i2c.txt
+@@ -5,6 +5,7 @@ Required properties:
+ 	"renesas,i2c-r8a7743" if the device is a part of a R8A7743 SoC.
+ 	"renesas,i2c-r8a7745" if the device is a part of a R8A7745 SoC.
+ 	"renesas,i2c-r8a774a1" if the device is a part of a R8A774A1 SoC.
++	"renesas,i2c-r8a774a3" if the device is a part of a R8A774A3 SoC.
+ 	"renesas,i2c-r8a774b1" if the device is a part of a R8A774B1 SoC.
+ 	"renesas,i2c-r8a774c0" if the device is a part of a R8A774C0 SoC.
+ 	"renesas,i2c-r8a774e1" if the device is a part of a R8A774E1 SoC.
+-- 
+2.7.4
+

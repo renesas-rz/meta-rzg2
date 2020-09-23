@@ -1,0 +1,116 @@
+From 9fd5650a524dd41d313c7621e374cfb959536979 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 Apr 2020 13:39:45 +0700
+Subject: [PATCH 223/443] arm64: dts: renesas: r8a774e1: Add CPU
+ capacity-dmips-mhz
+
+Based on commit <2250d856b279d992c392170860a78c2482b1859c> upstream
+
+Upstream commit set the capacity-dmips-mhz for R-Car H3 (r8a7795)
+based on dhrystone by calculate average result in 10 times.
+
+r8a7795 SoC (A57x4 + A53x4)
+CPU	max-freq	dhrystone
+---------------------------------
+A57	1500 MHz	11470943 lps/s
+A53	1200 MHz	 4798583 lps/s
+
+Based on above, capacity-dmips-mhz values are calculated as follows:
+r8a7795 SoC
+A57 : 1024 / (11470943 / 1500) * (11470943 / 1500) = 1024
+A53 : 1024 / (11470943 / 1500) * ( 4798583 / 1200) =  535
+
+However, since each CPUs have different max frequencies, the final
+CPU capacities of A53 are scaled by this difference, the values are
+as follows.
+
+[r8a7795 SoC]
+$ cat /sys/devices/system/cpu/cpu*/cpu_capacity
+1024	<---- CPU capacity of A57
+1024
+1024
+1024
+428	<---- CPU capacity of A53
+428
+428
+428
+
+RZ/G2H (r8a774e1) is similar with R-Car H3.
+Therefore appy this setting for r8a774e1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index dfd9ea7..d5094c7 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -146,6 +146,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_0>;
++			capacity-dmips-mhz = <1024>;
+ 		};
+ 
+ 		a57_1: cpu@1 {
+@@ -158,6 +159,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_0>;
++			capacity-dmips-mhz = <1024>;
+ 		};
+ 
+ 		a57_2: cpu@2 {
+@@ -170,6 +172,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_0>;
++			capacity-dmips-mhz = <1024>;
+ 		};
+ 
+ 		a57_3: cpu@3 {
+@@ -182,6 +185,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_0>;
++			capacity-dmips-mhz = <1024>;
+ 		};
+ 
+ 		a53_0: cpu@100 {
+@@ -194,6 +198,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
++			capacity-dmips-mhz = <535>;
+ 		};
+ 
+ 		a53_1: cpu@101 {
+@@ -206,6 +211,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
++			capacity-dmips-mhz = <535>;
+ 		};
+ 
+ 		a53_2: cpu@102 {
+@@ -218,6 +224,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
++			capacity-dmips-mhz = <535>;
+ 		};
+ 
+ 		a53_3: cpu@103 {
+@@ -230,6 +237,7 @@
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
++			capacity-dmips-mhz = <535>;
+ 		};
+ 
+ 		L2_CA57: cache-controller-0 {
+-- 
+2.7.4
+

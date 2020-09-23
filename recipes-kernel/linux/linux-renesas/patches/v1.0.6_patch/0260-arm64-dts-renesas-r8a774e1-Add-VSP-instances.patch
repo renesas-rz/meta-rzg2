@@ -1,0 +1,100 @@
+From e1273927455b4f6d9aca1135fd9b843555c3e727 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Tue, 14 Apr 2020 15:47:23 +0700
+Subject: [PATCH 260/443] arm64: dts: renesas: r8a774e1: Add VSP instances
+
+The r8a774e1 has 6 VSP instances.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 60 ++++++++++++++++++++++++++-----
+ 1 file changed, 51 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 8c68aba..a3f638c4 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1928,19 +1928,46 @@
+ 			/* placeholder */
+ 		};
+ 
++		vspbc: vsp@fe920000 {
++			compatible = "renesas,vsp2";
++			reg = <0 0xfe920000 0 0x8000>;
++			interrupts = <GIC_SPI 465 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 624>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++
++			renesas,fcp = <&fcpvb1>;
++		};
++
++		vspbd: vsp@fe960000 {
++			compatible = "renesas,vsp2";
++			reg = <0 0xfe960000 0 0x8000>;
++			interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 626>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++
++			renesas,fcp = <&fcpvb0>;
++		}
++
+ 		vspd0: vsp@fea20000 {
++			compatible = "renesas,vsp2";
+ 			reg = <0 0xfea20000 0 0x5000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 466 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 623>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 623>;
++
++			renesas,fcp = <&fcpvd0>;
+ 		};
+ 
+ 		vspd1: vsp@fea28000 {
++			compatible = "renesas,vsp2";
+ 			reg = <0 0xfea28000 0 0x5000>;
+-			/* placeholder */
+-		};
++			interrupts = <GIC_SPI 467 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 622>;
++			power-domains = <&sysc R8A774E1_PD_ALWAYS_ON>;
++			resets = <&cpg 622>;
+ 
+-		vspd2: vsp@fea30000 {
+-			reg = <0 0xfea30000 0 0x5000>;
+-			/* placeholder */
++			renesas,fcp = <&fcpvd1>;
+ 		};
+ 
+ 		vsp@fe9a0000 {
+@@ -1948,9 +1975,24 @@
+ 			/* placeholder */
+ 		};
+ 
+-		vspi0: vspm@fe9a0000 {
+-			reg = <0 0xfe9a0000 0 0x8000>, <0 0xfe9af000 0 0x200>;
+-			/* placeholder */
++		vspi0: vsp@fe9a0000 {
++			compatible = "renesas,vsp2";
++			reg = <0 0xfe9a0000 0 0x8000>;
++			interrupts = <GIC_SPI 444 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 631>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++
++			renesas,fcp = <&fcpvi0>;
++		};
++
++		vspi1: vsp@fe9b0000 {
++			compatible = "renesas,vsp2";
++			reg = <0 0xfe9b0000 0 0x8000>;
++			interrupts = <GIC_SPI 445 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 630>;
++			power-domains = <&sysc R8A774E1_PD_A3VP>;
++
++			renesas,fcp = <&fcpvi1>;
+ 		};
+ 
+ 		hdmi0: hdmi@fead0000 {
+-- 
+2.7.4
+

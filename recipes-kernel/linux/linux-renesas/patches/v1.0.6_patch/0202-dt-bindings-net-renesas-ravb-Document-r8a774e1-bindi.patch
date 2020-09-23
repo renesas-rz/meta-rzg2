@@ -1,0 +1,29 @@
+From 267c79b3e9ed7bb8b1e5ed93611dd8862d048173 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 7 Apr 2020 18:52:24 +0700
+Subject: [PATCH 202/443] dt-bindings: net: renesas: ravb: Document r8a774e1
+ bindings
+
+This patch adds document for EtherAVB driver on RZ/G2H (a.k.a R8A774E1).
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/net/renesas,ravb.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/renesas,ravb.txt b/Documentation/devicetree/bindings/net/renesas,ravb.txt
+index 886abb9..83739ae 100644
+--- a/Documentation/devicetree/bindings/net/renesas,ravb.txt
++++ b/Documentation/devicetree/bindings/net/renesas,ravb.txt
+@@ -19,6 +19,7 @@ Required properties:
+       - "renesas,etheravb-r8a774a1" for the R8A774A1 SoC.
+       - "renesas,etheravb-r8a774b1" for the R8A774B1 SoC.
+       - "renesas,etheravb-r8a774c0" for the R8A774C0 SoC.
++      - "renesas,etheravb-r8a774e1" for the R8A774E1 SoC.
+       - "renesas,etheravb-r8a7795" for the R8A7795 SoC.
+       - "renesas,etheravb-r8a7796" for the R8A7796 SoC.
+       - "renesas,etheravb-r8a77965" for the R8A77965 SoC.
+-- 
+2.7.4
+

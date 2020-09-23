@@ -1,0 +1,133 @@
+From 2c3b5824ffc48f37e9b9d12bc64a48166742fd6e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 15 Sep 2020 15:30:56 +0700
+Subject: [PATCH 192/443] arm64: dts: renesas: Add HiHope RZ/G2M[N] Rev.3.0/4.0
+ sub board support
+
+This commit refers and combines 2 upstream commits:
+<8fb161447da014417eb43944369e8f35bb4c1b56>
+<035329301e633c28601f333f16a73c29e3819fac>
+
+The HiHope RZ/G2M[N] sub board sits below the HiHope RZ/G2M[N] Rev.3.0/4.0
+main board.
+Also support SATA in HiHope RZ/G2M[N] Rev.3.0/4.0 Board by choosing
+the output between PCIE1 and SATA:
+- If we choose PCIE1:
+	+ Pin 7 of SW1001 on Main Board = ON
+	+ SW43 on Sub Board = OFF
+
+- If we choose SATA:
+	+ Pin 7 of SW1001 on Main Board = OFF
+	+ SW43 on Sub Board = ON
+
+We do not need to set GPIO7_03 to choose PCIE1 or SATA,
+so GPIO07_03 is set to input mode.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/Makefile               |  6 ++--
+ .../boot/dts/renesas/r8a774a1-hihope-rzg2m-ex.dts  | 30 ++++++++++++++++++++
+ .../boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts  | 33 ++++++++++++++++++++++
+ 3 files changed, 67 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex.dts
+ create mode 100644 arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+
+diff --git a/arch/arm64/boot/dts/renesas/Makefile b/arch/arm64/boot/dts/renesas/Makefile
+index 8146b63..4a22a2a 100644
+--- a/arch/arm64/boot/dts/renesas/Makefile
++++ b/arch/arm64/boot/dts/renesas/Makefile
+@@ -3,12 +3,14 @@ dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m-rev2.dtb \
+ 			       r8a774a1-hihope-rzg2m-rev2-ex.dtb \
+ 			       r8a774a1-hihope-rzg2m-rev2-ex-idk-1110wr.dtb \
+ 			       r8a774a1-hihope-rzg2m-rev2-ex-mipi-2.1.dtb
+-dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb
++dtb-$(CONFIG_ARCH_R8A774A1) += r8a774a1-hihope-rzg2m.dtb \
++			       r8a774a1-hihope-rzg2m-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n-rev2.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex-idk-1110wr.dtb \
+ 			       r8a774b1-hihope-rzg2n-rev2-ex-mipi-2.1.dtb
+-dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb
++dtb-$(CONFIG_ARCH_R8A774B1) += r8a774b1-hihope-rzg2n.dtb \
++			       r8a774b1-hihope-rzg2n-ex.dtb
+ dtb-$(CONFIG_ARCH_R8A774C0) += r8a774c0-cat874.dtb r8a774c0-ek874.dtb \
+ 			       r8a774c0-ek874-idk-2121wr.dtb \
+ 			       r8a774c0-ek874-mipi-2.1.dtb
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex.dts
+new file mode 100644
+index 0000000..449ed0a
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-ex.dts
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2M Rev.3.0/4.0 connected to
++ * sub board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++#include "r8a774a1-hihope-rzg2m.dts"
++#include "hihope-rzg2-ex.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2M with sub board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2m",
++		     "renesas,r8a774a1";
++};
++
++/* SW43 should be OFF, if in ON state SATA port will be activated */
++&pciec1 {
++	status = "okay";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-high;
++		line-name = "pcie-en-gpio";
++	};
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+new file mode 100644
+index 0000000..c7f2e64
+--- /dev/null
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+@@ -0,0 +1,33 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Device Tree Source for the HiHope RZ/G2N Rev.3.0/4.0 connected to
++ * sub board
++ *
++ * Copyright (C) 2020 Renesas Electronics Corp.
++ */
++
++#include "r8a774b1-hihope-rzg2n.dts"
++#include "hihope-rzg2-ex.dtsi"
++
++/ {
++	model = "HopeRun HiHope RZ/G2N with sub board";
++	compatible = "hoperun,hihope-rzg2-ex", "hoperun,hihope-rzg2n",
++		     "renesas,r8a774b1";
++};
++
++&gpio7 {
++	pcie-en-gpio {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		input;
++		line-name = "pcie-en-gpio";
++	};
++};
++
++&pciec1 {
++	status = "okay";
++};
++
++&sata {
++	status = "okay";
++};
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+From 7a28c6f4cb39663d35322e32ed8233239e8f2e69 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Mon, 6 Apr 2020 20:00:59 +0700
+Subject: [PATCH 211/443] spi: sh-msiof: Add r8a774e1 support
+
+Document RZ/G2H (R8A774E1) SoC bindings
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/spi/sh-msiof.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/spi/sh-msiof.txt b/Documentation/devicetree/bindings/spi/sh-msiof.txt
+index 1c2b4ba..02c40a1 100644
+--- a/Documentation/devicetree/bindings/spi/sh-msiof.txt
++++ b/Documentation/devicetree/bindings/spi/sh-msiof.txt
+@@ -6,6 +6,7 @@ Required properties:
+ 			 "renesas,msiof-r8a774a1" (RZ/G2M)
+ 			 "renesas,msiof-r8a774b1" (RZ/G2N)
+ 			 "renesas,msiof-r8a774c0" (RZ/G2E)
++			 "renesas,msiof-r8a774e1" (RZ/G2H)
+ 			 "renesas,msiof-r8a7790" (R-Car H2)
+ 			 "renesas,msiof-r8a7791" (R-Car M2-W)
+ 			 "renesas,msiof-r8a7792" (R-Car V2H)
+-- 
+2.7.4
+

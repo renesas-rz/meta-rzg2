@@ -1,0 +1,120 @@
+From 97e474d3bec5a3e3544e40dc00a6767de2c52365 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 14 Apr 2020 14:55:04 +0700
+Subject: [PATCH 282/443] arm64: dts: renesas: r8a774e1: Create thermal zone to
+ support IPA
+
+Based on commit <bcd5ff89708e8e888a2433e7a2605ee860bbf79b> from
+horms/renesas-bsp.git repo to apply this similar feature for RZ/G2H.
+
+Setup a thermal zone driven by SoC temperature sensor.
+Create passive trip points and bind them to CPUFreq cooling
+device that supports power extension.
+
+In R-Car Gen3, IPA is supportted for only one channel
+(on H3/M3/M3N board, it is channel THS3). Reason:
+Currently, IPA controls base on only CPU temperature.
+And only one thermal channel is assembled closest
+CPU cores is selected as target of IPA.
+If other channels are used, IPA controlling is not properly.
+
+Signed-off-by: Keita Kobayashi <keita.kobayashi.ym@renesas.com>
+[gaku.inami.xw: fix the trip temperature for cooling-device]
+[gaku.inami.xw: fix the power coefficient]
+Signed-off-by: Gaku Inami <gaku.inami.xw@bp.renesas.com>
+Signed-off-by: Hien Dang <hien.dang.eb@rvc.renesas.com>
+Signed-off-by: An Huynh <an.huynh.uj@rvc.renesas.com>
+[takeshi.kihara.df: fix W=1 dtc unit_address_vs_reg warnings]
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 37 +++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 622ea47..b146e4e 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -147,6 +147,10 @@
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			capacity-dmips-mhz = <1024>;
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <854>;
++			cooling-min-level = <0>;
++			cooling-max-level = <2>;
+ 		};
+ 
+ 		a57_1: cpu@1 {
+@@ -199,6 +203,10 @@
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			capacity-dmips-mhz = <535>;
++			#cooling-cells = <2>;
++			dynamic-power-coefficient = <277>;
++			cooling-min-level = <0>;
++			cooling-max-level = <2>;
+ 		};
+ 
+ 		a53_1: cpu@101 {
+@@ -2583,6 +2591,7 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&tsc 0>;
++			sustainable-power = <6313>;
+ 
+ 			trips {
+ 				sensor1_crit: sensor1-crit {
+@@ -2596,6 +2605,7 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&tsc 1>;
++			sustainable-power = <6313>;
+ 
+ 			trips {
+ 				sensor2_crit: sensor2-crit {
+@@ -2610,14 +2620,41 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+ 			thermal-sensors = <&tsc 2>;
++			sustainable-power = <6313>;
+ 
+ 			trips {
++				threshold: trip-point0 {
++					temperature = <90000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
++				target: trip-point1 {
++					temperature = <100000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
+ 				sensor3_crit: sensor3-crit {
+ 					temperature = <120000>;
+ 					hysteresis = <2000>;
+ 					type = "critical";
+ 				};
+ 			};
++
++			cooling-maps {
++				map0 {
++					trip = <&target>;
++					cooling-device = <&a57_0 0 2>;
++					contribution = <1024>;
++				};
++
++				map1 {
++					trip = <&target>;
++					cooling-device = <&a53_0 0 2>;
++					contribution = <1024>;
++				};
++			};
+ 		};
+ 	};
+ };
+-- 
+2.7.4
+

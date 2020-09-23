@@ -1,0 +1,118 @@
+From 4cf96cc56fdf3618da75d5fe207266824bb8c989 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 4 Mar 2020 14:48:05 +0700
+Subject: [PATCH 136/443] media: rcar-vin: Add each V4L2 callback function when
+ using csi2
+
+Supports cropcap, rvin_g_selection and rvin_s_selection even when
+csi2 is used. So this is for maintaining compatibility of the
+kernel v4.9.
+
+Signed-off-by: Koji Matsuoka <koji.matsuoka.xm@renesas.com>
+(cherry-pick from commit 10999af3167985d614baad29f863bc24e2bc80b4)
+from repository horms/renesas-bsp
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-v4l2.c | 51 ++++++++++++++++++++++++++---
+ 1 file changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-v4l2.c b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+index 5ded752..56edcd2 100644
+--- a/drivers/media/platform/rcar-vin/rcar-v4l2.c
++++ b/drivers/media/platform/rcar-vin/rcar-v4l2.c
+@@ -234,6 +234,41 @@ static int rvin_try_format(struct rvin_dev *vin, u32 which,
+ 	return ret;
+ }
+ 
++static int rvin_get_sd_format(struct rvin_dev *vin, struct v4l2_pix_format *pix)
++{
++	struct v4l2_subdev *sd;
++	struct media_pad *pad;
++	struct v4l2_subdev_format fmt = {
++		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
++	};
++
++	/* Get cropping size */
++	pad = media_entity_remote_pad(&vin->pad);
++	if (!pad)
++		return -EPIPE;
++
++	sd = media_entity_to_v4l2_subdev(pad->entity);
++	if (!sd)
++		return -EPIPE;
++
++	if (v4l2_subdev_call(sd, pad, get_fmt, NULL, &fmt))
++		return -EPIPE;
++
++	vin->source.width = pix->width = fmt.format.width;
++	vin->source.height = pix->height = fmt.format.height;
++	vin->crop = vin->source;
++
++	if (fmt.format.field == V4L2_FIELD_ALTERNATE)
++		vin->format.field = V4L2_FIELD_INTERLACED;
++	else
++		vin->format.field = fmt.format.field;
++
++	vin->format.bytesperline =
++	rvin_format_bytesperline(&vin->format);
++
++	return 0;
++}
++
+ static int rvin_querycap(struct file *file, void *priv,
+ 			 struct v4l2_capability *cap)
+ {
+@@ -303,6 +338,7 @@ static int rvin_g_selection(struct file *file, void *fh,
+ 			    struct v4l2_selection *s)
+ {
+ 	struct rvin_dev *vin = video_drvdata(file);
++	int ret;
+ 
+ 	if (s->type != V4L2_BUF_TYPE_VIDEO_CAPTURE)
+ 		return -EINVAL;
+@@ -310,6 +346,11 @@ static int rvin_g_selection(struct file *file, void *fh,
+ 	switch (s->target) {
+ 	case V4L2_SEL_TGT_CROP_BOUNDS:
+ 	case V4L2_SEL_TGT_CROP_DEFAULT:
++		if (vin->info->use_mc) {
++			ret = rvin_get_sd_format(vin, &vin->format);
++			if (ret)
++				return ret;
++		}
+ 		s->r.left = s->r.top = 0;
+ 		s->r.width = vin->source.width;
+ 		s->r.height = vin->source.height;
+@@ -703,11 +744,6 @@ static int rvin_mc_s_fmt_vid_cap(struct file *file, void *priv,
+ 
+ 	vin->format = f->fmt.pix;
+ 
+-	vin->crop.top = 0;
+-	vin->crop.left = 0;
+-	vin->crop.width = vin->format.width;
+-	vin->crop.height = vin->format.height;
+-
+ 	return 0;
+ }
+ 
+@@ -730,6 +766,9 @@ static const struct v4l2_ioctl_ops rvin_mc_ioctl_ops = {
+ 	.vidioc_s_fmt_vid_cap		= rvin_mc_s_fmt_vid_cap,
+ 	.vidioc_enum_fmt_vid_cap	= rvin_enum_fmt_vid_cap,
+ 
++	.vidioc_g_selection		= rvin_g_selection,
++	.vidioc_s_selection		= rvin_s_selection,
++
+ 	.vidioc_enum_input		= rvin_mc_enum_input,
+ 	.vidioc_g_input			= rvin_g_input,
+ 	.vidioc_s_input			= rvin_s_input,
+@@ -909,6 +948,8 @@ static int rvin_mc_open(struct file *file)
+ 	if (ret < 0)
+ 		goto err_unlock;
+ 
++	rvin_get_sd_format(vin, &vin->format);
++
+ 	ret = v4l2_pipeline_pm_use(&vin->vdev.entity, 1);
+ 	if (ret < 0)
+ 		goto err_pm;
+-- 
+2.7.4
+

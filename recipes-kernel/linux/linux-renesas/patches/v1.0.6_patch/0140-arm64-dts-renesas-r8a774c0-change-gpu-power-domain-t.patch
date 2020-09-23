@@ -1,0 +1,29 @@
+From c2ee2aea71e972c3d2e76cef1ad3d1ec211f03cb Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Date: Sat, 28 Sep 2019 13:46:01 +0700
+Subject: [PATCH 140/443] arm64: dts: renesas: r8a774c0: change gpu power
+ domain to PD_3DG_B
+
+This change power domain of RZ/G2E GPU to support ES1.1
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index e8a4532..c72f75c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -1746,7 +1746,7 @@
+ 			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&cpg CPG_MOD 112>;
+ 			operating-points-v2 = <&gsx_opp_table>;
+-			power-domains = <&sysc R8A774C0_PD_3DG_A>;
++			power-domains = <&sysc R8A774C0_PD_3DG_B>;
+ 			resets = <&cpg 112>;
+ 		};
+ 
+-- 
+2.7.4
+

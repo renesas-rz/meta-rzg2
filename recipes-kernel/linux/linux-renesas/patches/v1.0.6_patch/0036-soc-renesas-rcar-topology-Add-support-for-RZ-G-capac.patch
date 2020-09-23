@@ -1,0 +1,103 @@
+From 255f586c4c8ed33cb4c897499674662fa1ede28e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 27 Mar 2020 17:01:59 +0700
+Subject: [PATCH 036/443] soc: renesas: rcar-topology: Add support for RZ/G
+ capacity awareness
+
+Base on commit "soc: renesas: rcar-topology: Add support for R-Car
+capacity awareness" with detailed description:
+
+Some R-Car SoCs support big LITTLE architecture produced by ARM.
+In order to keep all CPUs support on big LITTLE architecture,
+this patch changes the sched domain flags that the tasks can be
+scheduled with capacity awareness. If you use big LITTLE without
+this patch, the CFS scheduler may make unintended behaviors.
+
+This patch applies for R8A774A1 SoC.
+
+Signed-off-by: Gaku Inami <gaku.inami.xw@bp.renesas.com>
+Signed-off-by: Takeshi Kihara <takeshi.kihara.df@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/soc/renesas/Kconfig         |  7 +++++++
+ drivers/soc/renesas/Makefile        |  1 +
+ drivers/soc/renesas/rcar-topology.c | 37 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+)
+ create mode 100644 drivers/soc/renesas/rcar-topology.c
+
+diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+index 178cdc0..94a74f3 100644
+--- a/drivers/soc/renesas/Kconfig
++++ b/drivers/soc/renesas/Kconfig
+@@ -26,6 +26,13 @@ config SOC_RENESAS
+ 	select SYSC_R8A77990 if ARCH_R8A77990
+ 	select SYSC_R8A77995 if ARCH_R8A77995
+ 
++config RCAR_CPU_TOPOLOGY
++	depends on (ARCH_R8A7795 || ARCH_R8A7796 || ARCH_R8A774A1)
++	bool "R-Car CPU Topology"
++	default y
++	help
++	 This enables the capacity awareness feature for R-Car series.
++
+ if SOC_RENESAS
+ 
+ # SoC
+diff --git a/drivers/soc/renesas/Makefile b/drivers/soc/renesas/Makefile
+index 3308fca..578cb4a 100644
+--- a/drivers/soc/renesas/Makefile
++++ b/drivers/soc/renesas/Makefile
+@@ -28,6 +28,7 @@ endif
+ # Family
+ obj-$(CONFIG_RST_RCAR)		+= rcar-rst.o
+ obj-$(CONFIG_SYSC_RCAR)		+= rcar-sysc.o
++obj-$(CONFIG_RCAR_CPU_TOPOLOGY)	+= rcar-topology.o
+ 
+ # EMS for R-Car Gen3
+ obj-$(CONFIG_RCAR_THERMAL_EMS_ENABLED) += rcar_ems_ctrl.o
+diff --git a/drivers/soc/renesas/rcar-topology.c b/drivers/soc/renesas/rcar-topology.c
+new file mode 100644
+index 0000000..5bed7ee
+--- /dev/null
++++ b/drivers/soc/renesas/rcar-topology.c
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ *  R-Car CPU topology for ARM big.LITTLE platforms
++ *
++ * Copyright (C) 2017 Renesas Electronics Corporation.
++ */
++
++#include <linux/cpuset.h>
++#include <linux/init.h>
++#include <linux/of.h>
++#include <linux/sched/topology.h>
++#include <linux/topology.h>
++
++static int rcar_cpu_cpu_flags(void)
++{
++	return SD_ASYM_CPUCAPACITY;
++}
++
++static struct sched_domain_topology_level rcar_topology[] = {
++#ifdef CONFIG_SCHED_MC
++	{ cpu_coregroup_mask, cpu_core_flags, SD_INIT_NAME(MC) },
++#endif
++	{ cpu_cpu_mask, rcar_cpu_cpu_flags, SD_INIT_NAME(DIE) },
++	{ NULL, }
++};
++
++static int __init rcar_topology_init(void)
++{
++	if (of_machine_is_compatible("renesas,r8a7795") ||
++		of_machine_is_compatible("renesas,r8a7796") ||
++		of_machine_is_compatible("renesas,r8a774a1")) {
++		set_sched_topology(rcar_topology);
++	}
++
++	return 0;
++}
++early_initcall(rcar_topology_init);
+-- 
+2.7.4
+

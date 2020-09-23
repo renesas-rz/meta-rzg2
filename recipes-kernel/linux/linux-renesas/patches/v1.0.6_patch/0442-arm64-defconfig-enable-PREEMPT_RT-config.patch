@@ -1,0 +1,26 @@
+From 76aa0a1fb4a81453c648f810dceb1fa24780e54e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 18 Sep 2020 14:03:39 +0700
+Subject: [PATCH 442/443] arm64: defconfig: enable PREEMPT_RT config
+
+This patch enables PREEMPT_RT_FULL config needed for RT kernel.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index ce19a44..39c0f8b 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -378,3 +378,6 @@ CONFIG_SATA_AHCI_PLATFORM=y
+ CONFIG_INPUT_UINPUT=m
+ CONFIG_INPUT_MOUSEDEV=m
+ CONFIG_TMPFS_POSIX_ACL=y
++
++#Enable RT config
++CONFIG_PREEMPT_RT_FULL=y
+-- 
+2.7.4
+

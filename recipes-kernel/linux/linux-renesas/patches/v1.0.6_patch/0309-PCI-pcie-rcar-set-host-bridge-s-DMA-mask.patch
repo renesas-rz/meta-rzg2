@@ -1,0 +1,30 @@
+From e770c6ce4618d49f39a392ad7ee607921780a402 Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Wed, 27 May 2020 11:27:29 +0700
+Subject: [PATCH 309/443] PCI: pcie-rcar: set host bridge's DMA mask
+
+This gives platform DMA mapping code a chance to disallow setting device
+DMA mask to something that host bridge can't support.
+
+Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ drivers/pci/controller/pcie-rcar.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/pci/controller/pcie-rcar.c b/drivers/pci/controller/pcie-rcar.c
+index cad8d17..246205c 100644
+--- a/drivers/pci/controller/pcie-rcar.c
++++ b/drivers/pci/controller/pcie-rcar.c
+@@ -475,6 +475,8 @@ static int rcar_pcie_enable(struct rcar_pcie *pcie)
+ 	bridge->ops = &rcar_pcie_ops;
+ 	bridge->map_irq = of_irq_parse_and_map_pci;
+ 	bridge->swizzle_irq = pci_common_swizzle;
++	bridge->dev.coherent_dma_mask = DMA_BIT_MASK(32);
++	bridge->dev.dma_mask = &bridge->dev.coherent_dma_mask;
+ 	if (IS_ENABLED(CONFIG_PCI_MSI))
+ 		bridge->msi = &pcie->msi.chip;
+ 
+-- 
+2.7.4
+

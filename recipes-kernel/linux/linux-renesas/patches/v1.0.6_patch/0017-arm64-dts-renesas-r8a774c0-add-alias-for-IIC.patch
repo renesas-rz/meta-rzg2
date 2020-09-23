@@ -1,0 +1,27 @@
+From 13141b1fbf5c48e84a128f28de16c2cdf56ee49c Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Mon, 1 Jul 2019 16:07:19 +0700
+Subject: [PATCH 017/443] arm64: dts: renesas: r8a774c0: add alias for IIC
+
+This patch adds alias for IIC for R8A774C0 SoC
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index 3eed66c..92bbf83 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -22,6 +22,7 @@
+ 		i2c4 = &i2c4;
+ 		i2c5 = &i2c5;
+ 		i2c6 = &i2c6;
++		i2c7 = &i2c_dvfs;
+ 		i2c8 = &i2c7;
+ 	};
+ 
+-- 
+2.7.4
+

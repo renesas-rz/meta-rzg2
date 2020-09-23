@@ -1,0 +1,30 @@
+From f0c0c78be1d9e64afc951664cbd491694ae4e022 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Mon, 27 Jul 2020 16:45:06 +0700
+Subject: [PATCH 377/443] spi: sh-msiof: Add r8a774a3 support
+
+Document RZ/G2M v3.0 (R8A774A3) SoC bindings and update for
+RZ/G2M v1.3 (R8A774A1)
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/spi/sh-msiof.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/spi/sh-msiof.txt b/Documentation/devicetree/bindings/spi/sh-msiof.txt
+index 02c40a1..5cd0b501 100644
+--- a/Documentation/devicetree/bindings/spi/sh-msiof.txt
++++ b/Documentation/devicetree/bindings/spi/sh-msiof.txt
+@@ -3,7 +3,8 @@ Renesas MSIOF spi controller
+ Required properties:
+ - compatible           : "renesas,msiof-r8a7743" (RZ/G1M)
+ 			 "renesas,msiof-r8a7745" (RZ/G1E)
+-			 "renesas,msiof-r8a774a1" (RZ/G2M)
++			 "renesas,msiof-r8a774a1" (RZ/G2M v1.3)
++			 "renesas,msiof-r8a774a3" (RZ/G2M v3.0)
+ 			 "renesas,msiof-r8a774b1" (RZ/G2N)
+ 			 "renesas,msiof-r8a774c0" (RZ/G2E)
+ 			 "renesas,msiof-r8a774e1" (RZ/G2H)
+-- 
+2.7.4
+

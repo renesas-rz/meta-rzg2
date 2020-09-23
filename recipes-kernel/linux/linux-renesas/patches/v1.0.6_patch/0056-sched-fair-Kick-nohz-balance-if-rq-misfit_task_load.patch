@@ -1,0 +1,58 @@
+From c88a7bfa33bbbac404cfce6967088f7c23054583 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 2 Jul 2019 16:35:50 +0700
+Subject: [PATCH 056/443] sched/fair: Kick nohz balance if rq->misfit_task_load
+
+There already are a few conditions in nohz_kick_needed() to ensure
+a nohz kick is triggered, but they are not enough for some misfit
+task scenarios. Excluding asym packing, those are:
+
+* rq->nr_running >=2: Not relevant here because we are running a
+misfit task, it needs to be migrated regardless and potentially
+through active balance.
+* sds->nr_busy_cpus > 1: If there is only the misfit task being run
+on a group of low capacity cpus, this will be evaluated to False.
+* rq->cfs.h_nr_running >=1 && check_cpu_capacity(): Not relevant
+* here,
+misfit task needs to be migrated regardless of rt/IRQ pressure
+
+As such, this commit adds an rq->misfit_task_load condition to
+trigger a nohz kick.
+
+The idea to kick a nohz balance for misfit tasks originally came
+from Leo Yan <leo.yan@linaro.org>, and a similar patch was submitted for
+the Android Common Kernel - see [1].
+
+[1]:
+https://lists.linaro.org/pipermail/eas-dev/2016-September/000551.html
+
+Cherry-picked from https://patchwork.kernel.org/patch/10506533/
+
+cc: Ingo Molnar <mingo@redhat.com>
+cc: Peter Zijlstra <peterz@infradead.org>
+
+Signed-off-by: Valentin Schneider <valentin.schneider@arm.com>
+Signed-off-by: Morten Rasmussen <morten.rasmussen@arm.com>
+[Changes the original fix due to the restructure of nohz balancing.]
+Signed-off-by: Gaku Inami <gaku.inami.xh@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ kernel/sched/fair.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index f9b38d7..9969a45 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -9383,7 +9383,7 @@ static void nohz_balancer_kick(struct rq *rq)
+ 	if (time_before(now, nohz.next_balance))
+ 		goto out;
+ 
+-	if (rq->nr_running >= 2) {
++	if ((rq->nr_running >= 2) || (rq->misfit_task_load)) {
+ 		flags = NOHZ_KICK_MASK;
+ 		goto out;
+ 	}
+-- 
+2.7.4
+
