@@ -1,7 +1,7 @@
-From ab4038baa5a12d355a6be96f125e526a510923ee Mon Sep 17 00:00:00 2001
+From 8077b3f70aebddf8e5a7724b27ebc65242b603ba Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Thu, 9 Jul 2020 08:38:01 +0700
-Subject: [PATCH 2/2] Fix ld error unrecognized option with old binutils
+Subject: [PATCH 10/14] Fix ld error unrecognized option with old binutils
 
 With older binutils version 2.25, below error will happen
    aarch64-poky-linux-ld.bfd: unrecognized option '--fix-cortex-a53-843419'
@@ -14,20 +14,25 @@ Fix this by modifying the option name.
 Signed-off-by: Hung Tran <hung.tran.jy@renesas.com>
 Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
 ---
- plat/renesas/rzg/platform.mk | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ plat/renesas/rzg/platform.mk | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/plat/renesas/rzg/platform.mk b/plat/renesas/rzg/platform.mk
-index 5c081bb..5d22ccd 100644
+index d48fadd..c14f784 100644
 --- a/plat/renesas/rzg/platform.mk
 +++ b/plat/renesas/rzg/platform.mk
-@@ -299,7 +299,8 @@ ERRATA_A53_835769  := 1
+@@ -325,7 +325,13 @@ ERRATA_A53_835769  := 1
  ifdef ERRATA_A53_843419
  ERRATA_A53_843419  := 1
  else
 -TF_LDFLAGS_aarch64	+= --fix-cortex-a53-843419
-+# Fix-ld-error-unrecognized-option-with-old-binutils
-+TF_LDFLAGS_aarch64	+= --fix-cortex-a53
++OLD_BINUTILS := $(shell ${LD} --fix-cortex-a53-843419 2>&1 >/dev/null | grep 'unrecognized option' >/dev/null; echo $$?)
++ifeq ($(OLD_BINUTILS),0)
++# Fix ld error 'unrecognized option' with old binutils
++TF_LDFLAGS_aarch64    += --fix-cortex-a53
++else
++TF_LDFLAGS_aarch64    += --fix-cortex-a53-843419
++endif
  endif
  ERRATA_A53_855873  := 1
  
