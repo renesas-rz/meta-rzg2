@@ -1,7 +1,7 @@
-From 950984a8366943c632a51c17929d64b8ad6e0f31 Mon Sep 17 00:00:00 2001
+From d9d20fb26d288b54f778d9750b15468fae64965e Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Thu, 2 Jul 2020 17:44:02 +0700
-Subject: [PATCH 8/8] plat: renesas: bl2_fusa: Add mem initialization b/f and
+Subject: [PATCH 07/14] plat: renesas: bl2_fusa: Add mem initialization b/f and
  a/f ECC enable
 
 Initialize memory before and after enabling ECC:
@@ -14,7 +14,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  1 file changed, 66 insertions(+)
 
 diff --git a/plat/renesas/rzg/bl2_fusa.c b/plat/renesas/rzg/bl2_fusa.c
-index 809f087..6a13dcd 100644
+index be34a0e..0c79460 100644
 --- a/plat/renesas/rzg/bl2_fusa.c
 +++ b/plat/renesas/rzg/bl2_fusa.c
 @@ -9,6 +9,7 @@
@@ -45,9 +45,9 @@ index 809f087..6a13dcd 100644
  struct rzg2_ecc_conf {
  	uint32_t fusaareacr;
  	uint32_t eccareacr;
-@@ -117,6 +131,19 @@ static const uint32_t adsplcr2 = 0;
- static const uint32_t adsplcr3 = 0;
+@@ -119,6 +133,19 @@ static const uint32_t adsplcr3 = 0;
  #endif //(RZG_DRAM_ECC_FULL == 1)
+ #endif //(RZG_HIHOPE_RZG2M == 1)
  
 +#if ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1))
 +/* Write zero-valued octa-byte words */
@@ -65,7 +65,7 @@ index 809f087..6a13dcd 100644
  /* Setup DRAM ECC configuration registers */
  #if (RZG_DRAM_ECC == 1 && RZG_EK874 == 1)
  static void bl2_enable_ecc_ek874(void)
-@@ -128,6 +155,12 @@ static void bl2_enable_ecc_ek874(void)
+@@ -130,6 +157,12 @@ static void bl2_enable_ecc_ek874(void)
  	conf = rzg2_ek874_conf;
  	nb_of_conf = ARRAY_SIZE(rzg2_ek874_conf);
  
@@ -78,7 +78,7 @@ index 809f087..6a13dcd 100644
  	for (n = 0; n < nb_of_conf; n++, conf++) {
  		mmio_write_32((uintptr_t)((uint32_t *)DFUSAAREACR + n), conf->fusaareacr);
  		mmio_write_32((uintptr_t)((uint32_t *)DECCAREACR + n), conf->eccareacr);
-@@ -137,6 +170,13 @@ static void bl2_enable_ecc_ek874(void)
+@@ -139,6 +172,13 @@ static void bl2_enable_ecc_ek874(void)
  					1 << ((conf->fusaareacr >> 24) & 0xf));
  
  	}
@@ -92,7 +92,7 @@ index 809f087..6a13dcd 100644
  }
  #endif
  
-@@ -150,6 +190,12 @@ static void bl2_enable_ecc_hihope_rzg2n(void)
+@@ -152,6 +192,12 @@ static void bl2_enable_ecc_hihope_rzg2n(void)
  	conf = rzg2_hihope_rzg2n_conf;
  	nb_of_conf = ARRAY_SIZE(rzg2_hihope_rzg2n_conf);
  
@@ -105,7 +105,7 @@ index 809f087..6a13dcd 100644
  	for (n = 0; n < nb_of_conf; n++, conf++) {
  		mmio_write_32((uintptr_t)((uint32_t *)DFUSAAREACR + n), conf->fusaareacr);
  		mmio_write_32((uintptr_t)((uint32_t *)DECCAREACR + n), conf->eccareacr);
-@@ -158,12 +204,25 @@ static void bl2_enable_ecc_hihope_rzg2n(void)
+@@ -160,12 +206,25 @@ static void bl2_enable_ecc_hihope_rzg2n(void)
  					n, conf->fusaareacr, conf->eccareacr,
  					1 << ((conf->fusaareacr >> 24) & 0xf));
  	}
@@ -131,7 +131,7 @@ index 809f087..6a13dcd 100644
  	mmio_write_32((uintptr_t)((uint32_t *)ADSPLCR0), adsplcr0);
  	mmio_write_32((uintptr_t)((uint32_t *)ADSPLCR1), adsplcr1);
  	mmio_write_32((uintptr_t)((uint32_t *)ADSPLCR2), adsplcr2);
-@@ -176,6 +235,13 @@ static void bl2_enable_ecc_hihope_rzg2m(void)
+@@ -178,6 +237,13 @@ static void bl2_enable_ecc_hihope_rzg2m(void)
  	NOTICE("     ADSPLCR2=0x%x\n", adsplcr2);
  	NOTICE("     ADSPLCR3=0x%x\n", adsplcr3);
  	NOTICE("     FUSACR=0x%x\n", fusacr);

@@ -36,14 +36,13 @@ SRC_URI += " \
 	file://0007-plat-renesas-bl2_fusa-Add-mem-initialization-b-f-and.patch \
 	file://0008-plat-renesas-rzg-Change-value-condition-of-RZG_DRAM_.patch \
 	file://0009-plat-renesas-rzg-bl2_fusa-Add-ECC-support-for-RZ-G2H.patch \
+	file://0010-Fix-ld-error-unrecognized-option-with-old-binutils.patch \
 	file://0011-plat-rzg-bl2_fusa-Modify-ECC-setting-for-RZG2N-RZG2M.patch \
 	file://0012-plat-renesas-rzg-bl2_fusa-Optimize-source-code.patch \
 	file://0013-plat-renesas-rzg-Add-support-ECC-Full-Single-setting.patch \
 	file://0014-rzg-ddr-Update-lpddr4-to-rev-0.40.patch \
+	file://0015-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
 "
-
-SRC_URI += "${@'file://0010-Fix-ld-error-unrecognized-option-with-old-binutils.patch' \
-	    if '${BINUVERSION}' == '2.25' else ''}"
 
 PV = "v2.3+renesas+git"
 
