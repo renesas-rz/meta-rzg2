@@ -1,0 +1,71 @@
+From b5f4d6c4fb1deaf472aae2397b4295d01b876d8f Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 29 Sep 2020 14:10:44 +0700
+Subject: [PATCH] v4l2object: Validate colorimetry in S/TRY_FMT
+
+This is in preparation for removing slow TRY_FMT probes for
+colorimetry. As we won't have tried that colorimetry we cannot
+assume the driver will accept it.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=785156
+
+Reference:
+https://github.com/GStreamer/gst-plugins-good/commit/558e9f4e574d8e1268d2d8d8fbccb1f13ecc391f
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ sys/v4l2/gstv4l2object.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index d30a73f6a..4ebce3d82 100644
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -3008,6 +3008,7 @@ gst_v4l2_object_set_format_full (GstV4l2Object * v4l2object, GstCaps * caps,
+   enum v4l2_quantization range = 0;
+   enum v4l2_ycbcr_encoding matrix = 0;
+   enum v4l2_xfer_func transfer = 0;
++  GstStructure *s;
+ 
+   GST_V4L2_CHECK_OPEN (v4l2object);
+   if (!try_only)
+@@ -3311,6 +3312,15 @@ gst_v4l2_object_set_format_full (GstV4l2Object * v4l2object, GstCaps * caps,
+   if (is_mplane && format.fmt.pix_mp.num_planes != n_v4l_planes)
+     goto invalid_planes;
+ 
++  gst_v4l2_object_get_colorspace (&format, &info.colorimetry);
++
++  s = gst_caps_get_structure (caps, 0);
++  if (gst_structure_has_field (s, "colorimetry") &&
++      !gst_video_colorimetry_matches (&info.colorimetry,
++          gst_structure_get_string (s, "colorimetry")))
++    goto invalid_colorimetry;
++
++
+   if (try_only)                 /* good enough for trying only */
+     return TRUE;
+ 
+@@ -3471,6 +3481,20 @@ invalid_planes:
+     }
+     return FALSE;
+   }
++invalid_colorimetry:
++  {
++    gchar *wanted_colorimetry;
++
++    wanted_colorimetry = gst_video_colorimetry_to_string (&info.colorimetry);
++
++    GST_ELEMENT_ERROR (v4l2object->element, RESOURCE, SETTINGS,
++        (_("Device '%s' does not support %s colorimetry"),
++            v4l2object->videodev, gst_structure_get_string (s, "colorimetry")),
++        ("Device wants %s colorimetry", wanted_colorimetry));
++
++    g_free (wanted_colorimetry);
++    return FALSE;
++  }
+ get_parm_failed:
+   {
+     /* it's possible that this call is not supported */
+-- 
+2.17.1
+
