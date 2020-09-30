@@ -37,6 +37,7 @@ SRC_URI_append_r8a774b1 += "\
 "
 
 SRC_URI_append_r8a774e1 += "\
+  ${@base_ifelse("${USE_ECC}" == "1",  " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Update-DRAM2.patch ", "")} \
   ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch \
 					 file://patches/option_patch/0002-arm64-dts-r8a774e1-hihope-rzg2h-Re-order-CMA-area-an.patch \
 					 file://patches/option_patch/0003-arm64-dts-r8a774e1-hihope-rzg2h-enable-IPMMU-for-GSX.patch ", "")} \
