@@ -1,6 +1,7 @@
 DESCRIPTION = "Firmware files for Bluetooth"
 LICENSE = "TI-TSPA"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f39eac9f4573be5b012e8313831e72a9"
+NO_GENERIC_LICENSE[TI-TSPA] = "LICENSE"
 
 PV = "8.7.1+git${SRCPV}"
 
