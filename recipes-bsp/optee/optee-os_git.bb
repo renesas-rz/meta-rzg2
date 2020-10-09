@@ -24,6 +24,7 @@ SRC_URI = " \
     file://0005-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
     file://0006-core-arm-plat-rzg-Re-structure-for-compatible-with-v.patch \
     file://0007-mk-gcc-allow-setting-sysroot-for-libgcc-lookup.patch \
+    file://0008-core-arm-plat-rzg-platform-config-Re-configure-memor.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
