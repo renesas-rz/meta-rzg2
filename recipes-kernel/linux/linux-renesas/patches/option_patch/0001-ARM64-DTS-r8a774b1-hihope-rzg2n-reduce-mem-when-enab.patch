@@ -41,7 +41,7 @@ index a6cc412..7629f47 100644
  	memory@480000000 {
  		device_type = "memory";
 -		reg = <0x4 0x80000000 0x0 0x80000000>;
-+		reg = <0x4 0x80000000 0x0 0x04000000>;
++		reg = <0x4 0x80000000 0x0 0x14000000>;
  	};
  
  	reserved-memory {
