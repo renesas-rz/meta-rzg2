@@ -8,7 +8,7 @@ UBOOT_URL = "git://github.com/renesas-rz/renesas-u-boot-cip.git"
 BRANCH = "v2018.09/rzg2"
 
 SRC_URI = "${UBOOT_URL};branch=${BRANCH}"
-SRCREV = "c9331aa5f507401acd768ffcdf9d2d9d84fe57b5"
+SRCREV = "5b019baddadac3f2cdcf3e1193022e4ce89d3300"
 PV = "v2018.09+git${SRCPV}"
 
 UBOOT_SREC_SUFFIX = "srec"
