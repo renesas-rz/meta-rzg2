@@ -1,0 +1,73 @@
+From d3e31d2bf2875da5062686728aa48c418c4ce515 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 1 Oct 2020 17:13:34 +0700
+Subject: [PATCH 442/446] gpu: drm: rcar-du: rcar_du_group: Fix DU3 start/stop
+ on G2N/H
+
+G2N/H like M3N, do not have DU2, just have DU3 so can apply this
+ to fix for G2N/H.
+
+Group start/stop is controlled by the DRES and DEN bits of DSYSR0 for
+the first group and DSYSR2 for the second group. On most DU instances,
+this maps to the first CRTC of the group. On M3-N, however, DU2 doesn't
+exist, but DSYSR2 does. There is no CRTC object there that maps to the
+correct DSYSR register.
+
+Commit 9144adc5e5a9 ("drm: rcar-du: Cache DSYSR value to ensure known
+initial value") switched group start/stop from using group read/write
+access to DSYSR to a CRTC-based API to cache the DSYSR value. While
+doing so, it introduced a regression on M3-N by accessing DSYSR3 instead
+of DSYSR2 to start/stop the second group.
+
+To fix this, access the DSYSR register directly through group read/write
+if the SoC is missing the first DU channel of the group. Keep using the
+rcar_du_crtc_dsysr_clr_set() function otherwise, to retain the DSYSR
+caching feature.
+
+Fixes: 9144adc5e5a9 ("drm: rcar-du: Cache DSYSR value to ensure known initial value")
+
+Referred from commit: 0bc3544a010c
+Repository: git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+Signed-off-by: Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_group.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_group.c b/drivers/gpu/drm/rcar-du/rcar_du_group.c
+index 3e87fbf..447c84f 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_group.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_group.c
+@@ -206,10 +206,25 @@ void rcar_du_group_put(struct rcar_du_group *rgrp)
+ 
+ static void __rcar_du_group_start_stop(struct rcar_du_group *rgrp, bool start)
+ {
+-	struct rcar_du_crtc *rcrtc = &rgrp->dev->crtcs[rgrp->index * 2];
++	struct rcar_du_device *rcdu = rgrp->dev;
++
++	/*
++	 * Group start/stop is controlled by the DRES and DEN bits of DSYSR0
++	 * for the first group and DSYSR2 for the second group. On most DU
++	 * instances, this maps to the first CRTC of the group, and we can just
++	 * use rcar_du_crtc_dsysr_clr_set() to access the correct DSYSR. On
++	 * M3-N, G2N, G2H, however, DU2 doesn't exist, but DSYSR2 does. We thus
++	 * need to access the register directly using group read/write.
++	 */
++	if (rcdu->info->channels_mask & BIT(rgrp->index * 2)) {
++		struct rcar_du_crtc *rcrtc = &rgrp->dev->crtcs[rgrp->index * 2];
+ 
+-	rcar_du_crtc_dsysr_clr_set(rcrtc, DSYSR_DRES | DSYSR_DEN,
+-				   start ? DSYSR_DEN : DSYSR_DRES);
++		rcar_du_crtc_dsysr_clr_set(rcrtc, DSYSR_DRES | DSYSR_DEN,
++					   start ? DSYSR_DEN : DSYSR_DRES);
++	} else {
++		rcar_du_group_write(rgrp, DSYSR,
++				    start ? DSYSR_DEN : DSYSR_DRES);
++	}
+ }
+ 
+ void rcar_du_group_start_stop(struct rcar_du_group *rgrp, bool start)
+-- 
+2.7.4
+

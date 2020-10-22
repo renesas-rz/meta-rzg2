@@ -1,0 +1,209 @@
+From be9df3ebcf14f521621faad148d69a624b5db440 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 21 Oct 2020 10:36:28 +0700
+Subject: [PATCH 445/446] arm64: dts: renesas: r8a774{a1,a3,b1,c0,e1}: remove
+ fcpvb and fcpvi device nodes
+
+This commit removes fcp support for VSPB and VSPI device nodes because
+they are already supported in VSPB and VSPI Manager nodes in RZ/G2 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 16 ----------------
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 16 ----------------
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 16 ----------------
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 18 -----------------
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 32 -------------------------------
+ 5 files changed, 98 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 2685028..842aa7b 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -2305,14 +2305,6 @@
+ 			resets = <&cpg 615>;
+ 		};
+ 
+-		fcpvb0: fcp@fe96f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe96f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 607>;
+-			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 607>;
+-		};
+-
+ 		fcpvd0: fcp@fea27000 {
+ 			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+@@ -2337,14 +2329,6 @@
+ 			resets = <&cpg 601>;
+ 		};
+ 
+-		fcpvi0: fcp@fe9af000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9af000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 611>;
+-			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 611>;
+-		};
+-
+ 		vsp@fe960000 {
+ 			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe960000 0 0x8000>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 053073a..5ae54cc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -2291,14 +2291,6 @@
+ 			renesas,#ch = <0>;
+ 		};
+ 
+-		fcpvb0: fcp@fe96f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe96f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 607>;
+-			power-domains = <&sysc R8A774A3_PD_A3VC>;
+-			resets = <&cpg 607>;
+-		};
+-
+ 		fcpvd0: fcp@fea27000 {
+ 			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+@@ -2323,14 +2315,6 @@
+ 			resets = <&cpg 601>;
+ 		};
+ 
+-		fcpvi0: fcp@fe9af000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9af000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 611>;
+-			power-domains = <&sysc R8A774A3_PD_A3VC>;
+-			resets = <&cpg 611>;
+-		};
+-
+ 		vsp@fe960000 {
+ 			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe960000 0 0x8000>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 391db3e..d2e51ff 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -2222,14 +2222,6 @@
+ 			renesas,fcp = <&fcpvd1>;
+ 		};
+ 
+-		fcpvb0: fcp@fe96f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe96f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 607>;
+-			power-domains = <&sysc R8A774B1_PD_A3VP>;
+-			resets = <&cpg 607>;
+-		};
+-
+ 		fcpvd0: fcp@fea27000 {
+ 			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+@@ -2246,14 +2238,6 @@
+ 			resets = <&cpg 602>;
+ 		};
+ 
+-		fcpvi0: fcp@fe9af000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9af000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 611>;
+-			power-domains = <&sysc R8A774B1_PD_A3VP>;
+-			resets = <&cpg 611>;
+-		};
+-
+ 		hdmi0: hdmi@fead0000 {
+ 			compatible = "renesas,r8a774b1-hdmi",
+ 				     "renesas,rcar-gen3-hdmi";
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index b4b5399..56a7c32 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -1909,15 +1909,6 @@
+ 			status = "disabled";
+ 		};
+ 
+-		fcpvb0: fcp@fe96f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe96f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 607>;
+-			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
+-			resets = <&cpg 607>;
+-			iommus = <&ipmmu_vp0 5>;
+-		};
+-
+ 		fcpvd0: fcp@fea27000 {
+ 			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+@@ -1936,15 +1927,6 @@
+ 			iommus = <&ipmmu_vi0 9>;
+ 		};
+ 
+-		fcpvi0: fcp@fe9af000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9af000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 611>;
+-			power-domains = <&sysc R8A774C0_PD_ALWAYS_ON>;
+-			resets = <&cpg 611>;
+-			iommus = <&ipmmu_vp0 8>;
+-		};
+-
+ 		csi40: csi2@feaa0000 {
+ 			compatible = "renesas,r8a774c0-csi2";
+ 			reg = <0 0xfeaa0000 0 0x10000>;
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index a2709f1..207e7c5 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -2185,22 +2185,6 @@
+ 			resets = <&cpg 614>;
+ 		};
+ 
+-		fcpvb0: fcp@fe96f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe96f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 607>;
+-			power-domains = <&sysc R8A774E1_PD_A3VP>;
+-			resets = <&cpg 607>;
+-		};
+-
+-		fcpvb1: fcp@fe92f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe92f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 606>;
+-			power-domains = <&sysc R8A774E1_PD_A3VP>;
+-			resets = <&cpg 606>;
+-		};
+-
+ 		fcpvd0: fcp@fea27000 {
+ 			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+@@ -2217,22 +2201,6 @@
+ 			resets = <&cpg 602>;
+ 		};
+ 
+-		fcpvi0: fcp@fe9af000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9af000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 611>;
+-			power-domains = <&sysc R8A774E1_PD_A3VP>;
+-			resets = <&cpg 611>;
+-		};
+-
+-		fcpvi1: fcp@fe9bf000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9bf000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 610>;
+-			power-domains = <&sysc R8A774E1_PD_A3VP>;
+-			resets = <&cpg 610>;
+-		};
+-
+ 		vsp@fe960000 {
+ 			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe960000 0 0x8000>;
+-- 
+2.7.4
+
