@@ -441,3 +441,8 @@ patch patches/v1.0.6_patch/0440-drm-rcar-du-Fix-lvds-dual-link-mode-in-RZ-G2E.pa
 patch patches/v1.0.6_patch/0441-clk-renesas-Replace-PLL3-multiplication-setting.patch
 patch patches/v1.0.6_patch/0442-arm64-defconfig-enable-PREEMPT_RT-config.patch
 patch patches/v1.0.6_patch/0443-gpio-gpio-rcar-prevent-to-force-the-interrupt-handle.patch
+patch patches/v1.0.6_patch/0444-gpu-drm-rcar-du-rcar_du_group-Fix-DU3-start-stop-on-.patch
+patch patches/v1.0.6_patch/0445-mm-rzg2_mfis_ecc-disable-interrupt-as-default.patch
+patch patches/v1.0.6_patch/0446-drm-rcar_du_encoder-Reject-modes-with-a-clock-freque.patch
+patch patches/v1.0.6_patch/0447-arm64-dts-renesas-r8a774-a1-a3-b1-c0-e1-remove-fcpvb.patch
+patch patches/v1.0.6_patch/0448-arm64-dts-renesas-r8a774-a1-b1-e1-remove-fcpf-device.patch

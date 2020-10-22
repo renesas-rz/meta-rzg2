@@ -1,0 +1,54 @@
+From f8f07c8fd470495a62b2e0138a45d616dd920a58 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 21 Oct 2020 15:37:22 +0700
+Subject: [PATCH 446/448] drm: rcar_du_encoder: Reject modes with a clock
+ frequency higher than 75MHz in RZ/G2E
+
+In Electrical Characteristics manual of RZ/G2, G2E's timing of DOTCLKOUT
+output cycle time is minimum 13.3ns. It means G2E can support maximum
+clock frequency 75MHz with DPAD Output.
+Therefore, implement a .mode_valid() handler to reject modes with an
+unsupported clock frequency.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_encoder.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_encoder.c b/drivers/gpu/drm/rcar-du/rcar_du_encoder.c
+index de8fe74..a5f5d19 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_encoder.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_encoder.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include <linux/export.h>
++#include <linux/of.h>
+ 
+ #include <drm/drmP.h>
+ #include <drm/drm_crtc.h>
+@@ -26,8 +27,21 @@
+ /* -----------------------------------------------------------------------------
+  * Encoder
+  */
++static enum drm_mode_status rcar_du_encoder_mode_valid(
++					struct drm_encoder *crtc,
++					const struct drm_display_mode *mode)
++{
++	struct rcar_du_encoder *renc = to_rcar_encoder(crtc);
++
++	if (of_machine_is_compatible("renesas,r8a774c0") &&
++	    renc->output == RCAR_DU_OUTPUT_DPAD0 && mode->clock > 75000)
++		return MODE_BAD;
++	else
++		return MODE_OK;
++}
+ 
+ static const struct drm_encoder_helper_funcs encoder_helper_funcs = {
++	.mode_valid = rcar_du_encoder_mode_valid,
+ };
+ 
+ static const struct drm_encoder_funcs encoder_funcs = {
+-- 
+2.7.4
+
