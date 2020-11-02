@@ -5,18 +5,14 @@ LIC_FILES_CHKSUM = "file://GPL-COPYING;md5=9450224a11928f85794c948d3539a882"
 PR = "r0"
  
 SRC_URI = " \
-	file://bayer2raw.c \
-	file://bayer2raw.h \
-	file://bayer.frag \
-	file://bayer.vert \
-	file://GPL-COPYING \
-	file://Makefile "
+	file://bayer2raw.tar.gz \
+"
 
-inherit autotools pkgconfig
+inherit pkgconfig
 
 DEPENDS = "virtual/libgles2"
 
-S = "${WORKDIR}/"
+S = "${WORKDIR}/bayer2raw"
 
 PACKAGES = "${PN}-dbg ${PN}"
 FILES_${PN} = " \
@@ -28,11 +24,6 @@ FILES_${PN}-dbg = " \
 	${libdir}/.debug \
 "
 
-do_compile() {
-	cd ${S}
-	oe_runmake
-}
- 
 do_install() {
 	install -d ${D}${libdir}
 	install -m 755 ${S}/*.so ${D}${libdir}
