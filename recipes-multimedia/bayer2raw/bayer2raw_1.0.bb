@@ -6,6 +6,8 @@ PR = "r0"
  
 SRC_URI = " \
 	file://bayer2raw.tar.gz \
+        file://0001-Remove-empty-output-surface-and-use-glTexSubImage2D-.patch \
+        file://0002-Use-EGLImageKHR-to-store-the-output-data-in-user-mem.patch \
 "
 
 inherit pkgconfig
