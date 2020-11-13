@@ -142,13 +142,13 @@ It is possible to change some build configs as below:
   #INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
   ```
 * CIP Core: choose the version of CIP Core to build with. CIP Core are software packages that are maintained for long term by CIP community.
-  * **Buster-limited (default)**: use limited packages from CIP Core Buster
+  * Buster-limited: use limited packages from CIP Core Buster
   ```
   CIP_MODE = "Buster-limited"
   ```
-  * Buster-full: use as many packages from CIP Core Buster as possible. Note that currently GPLv3 must be allowed for building Buster-full.
+  * **Buster-full (default)**: use as many packages from CIP Core Buster as possible (include packages in Buster-limited).  
+  Note: although perl package is available for Buster-full, it is excluded at default because of its complex dependencies (especially it depends on binutils, which requires GPLv3 enabled, thus conflict with Non-GPLv3 config). As a result, perl version in poky will be used instead.
   ```
-  #INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
   CIP_MODE = "Buster-full"
   ```
   * Jessie: not use CIP Core Buster, use limited packages from CIP Core Jessie instead
@@ -175,7 +175,7 @@ Package versions noted with `(debian)` mean they are CIP Core packages. The sour
 | libpam                 |  1.3.0                         |  1.3.1  (debian)          | 1.3.0              | 1.3.0                       |
 | libgcrypt              |  1.7.3                         |  1.8.4  (debian)          | 1.7.3              | 1.7.3                       |
 | libunistring           |  0.9.7                         |  0.9.10 (debian)          | 0.9.7              | 0.9.7                       |
-| perl                   |  5.24.1                        |  5.28.1 (debian)          | 5.24.1             | 5.24.1                      |
+| perl                   |  5.24.1                        | ~~5.28.1 (debian)~~ 5.24.1| 5.24.1             | 5.24.1                      |
 | bash                   |  3.2.57                        |  4.4                      | 3.2.57             | 4.4                         |
 | diffutils              |  -                             |  3.6                      | -                  |                             |
 | dosfstools             |  2.11                          |  4.1                      | 2.11               | 4.1                         |
@@ -184,5 +184,4 @@ Package versions noted with `(debian)` mean they are CIP Core packages. The sour
 | make                   |  3.81                          |  4.2.1                    | 3.81               | 4.2.1                       |
 | sed                    |  4.1.2                         |  4.2.2                    | 4.1.2              | 4.2.2                       |
 
-binutils is an optional package, and will not be added to core-image at default, except in Buster-full (allow GPLv3) setting.  
-Besides, due to the license GPLv3, binutils cannot be added to core-image with non-GPLv3 setting
+binutils is an optional package, and due to its GPLv3 license, it cannot be added to core-image with non-GPLv3 setting.
