@@ -1,0 +1,68 @@
+From e32f049bad9b1d95b590eb52c3d6601bd27babf6 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Sat, 7 Nov 2020 11:26:00 +0700
+Subject: [PATCH 452/452] net: ethernet: renesas: ravb_main: Fix bit fields
+ checking in ravb_hwtstamp_get()
+
+In the function ravb_hwtstamp_get() in ravb_main.c with the existing
+values for RAVB_RXTSTAMP_TYPE_V2_L2_EVENT (0x2) and RAVB_RXTSTAMP_TYPE_ALL
+(0x6)
+
+if (priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE_V2_L2_EVENT)
+	config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+else if (priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE_ALL)
+	config.rx_filter = HWTSTAMP_FILTER_ALL;
+
+if the test on RAVB_RXTSTAMP_TYPE_ALL should be true,
+it will never be reached.
+
+This issue can be verified with 'hwtstamp_config' testing program
+(tools/testing/selftests/net/hwtstamp_config.c). Setting filter type
+to ALL and subsequent retrieving it gives incorrect value:
+
+$ hwtstamp_config eth0 OFF ALL
+flags = 0
+tx_type = OFF
+rx_filter = ALL
+$ hwtstamp_config eth0
+flags = 0
+tx_type = OFF
+rx_filter = PTP_V2_L2_EVENT
+
+Correct this by converting if-else's to switch.
+
+Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+
+Signed-off-by: Andrew Gabbasov <andrew_gabbasov@mentor.com>
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 8ed2ae3..a455b42 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1744,12 +1744,16 @@ static int ravb_hwtstamp_get(struct net_device *ndev, struct ifreq *req)
+ 	config.flags = 0;
+ 	config.tx_type = priv->tstamp_tx_ctrl ? HWTSTAMP_TX_ON :
+ 						HWTSTAMP_TX_OFF;
+-	if (priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE_V2_L2_EVENT)
++	switch (priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE) {
++	case RAVB_RXTSTAMP_TYPE_V2_L2_EVENT:
+ 		config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+-	else if (priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE_ALL)
++		break;
++	case RAVB_RXTSTAMP_TYPE_ALL:
+ 		config.rx_filter = HWTSTAMP_FILTER_ALL;
+-	else
++		break;
++	default:
+ 		config.rx_filter = HWTSTAMP_FILTER_NONE;
++	}
+ 
+ 	return copy_to_user(req->ifr_data, &config, sizeof(config)) ?
+ 		-EFAULT : 0;
+-- 
+2.7.4
+

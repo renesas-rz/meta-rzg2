@@ -444,3 +444,9 @@ patch patches/v1.0.6_patch/0443-mm-rzg2_mfis_ecc-disable-interrupt-as-default.pa
 patch patches/v1.0.6_patch/0444-drm-rcar_du_encoder-Reject-modes-with-a-clock-freque.patch
 patch patches/v1.0.6_patch/0445-arm64-dts-renesas-r8a774-a1-a3-b1-c0-e1-remove-fcpvb.patch
 patch patches/v1.0.6_patch/0446-arm64-dts-renesas-r8a774-a1-b1-e1-remove-fcpf-device.patch
+patch patches/v1.0.6_patch/0447-dt-bindings-can-rcar_canfd-document-for-r8a774e1-can.patch
+patch patches/v1.0.6_patch/0448-arm64-dts-renesas-r8a774e1-add-device-node-for-canfd.patch
+patch patches/v1.0.6_patch/0449-arm64-dts-renesas-cat875-enable-canfd-channel-0.patch
+patch patches/v1.0.6_patch/0450-arm64-dts-renesas-hihope-rzg2-ex.dtsi-enable-canfd-c.patch
+patch patches/v1.0.6_patch/0451-dt-bindings-can-rcar_canfd-document-for-r8a774a3-can.patch
+patch patches/v1.0.6_patch/0452-net-ethernet-renesas-ravb_main-Fix-bit-fields-checki.patch
