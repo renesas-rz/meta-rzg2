@@ -51,6 +51,7 @@ SRC_URI += " \
 	file://0023-rzg-g2e-add-support-for-identifying-board-revision.patch \
 	file://0024-drivers-renesas-rzg-wdt-Create-init-counter-function.patch \
 	file://0025-plat-rzg-bl2_fusa-re-work-initialize-memory-of-FUSA-.patch \
+	file://0026-plat-renesas-Implement-SiP-Service-Call.patch \
 "
 
 PV = "v2.4+git"
