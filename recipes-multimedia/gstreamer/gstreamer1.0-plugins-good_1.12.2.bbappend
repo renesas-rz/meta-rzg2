@@ -17,6 +17,7 @@ SRC_URI_append = " \
   file://0001-v4l2object-Validate-colorimetry-in-S-TRY_FMT.patch \
   file://0002-v4l2object-Introduce-quirk-to-skip-slow-probes.patch \
   file://0003-v4l2src-Speedup-camera-startup-by-skipping-try_fmt.patch \
+  file://0004-v4l2src-Ensure-all-caps-a-fixated.patch \
 "
 
 EXTRA_OECONF_append = " \
