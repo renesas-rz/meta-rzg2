@@ -1,0 +1,35 @@
+From eef3553177b881021dd3c8fb7985353fbb2cdffa Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 14 Dec 2020 09:40:33 +0700
+Subject: [PATCH] arm64: dts: cat874: reduce mem to 960M when enable DRAM-ECC
+
+When enable DRAM-ECC, a part of DRAM used to store ECC.
+This commit limit mem to prevent Linux to access to ECC area.
+
+Currently, with 8bit data/5bit ECC, only 960M can be used.
+- 128 MB : reserved for security area
+- 960 MB : usable for kernel, user space
+- 960 MB : used for ECC
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/cat874-common.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/cat874-common.dtsi b/arch/arm64/boot/dts/renesas/cat874-common.dtsi
+index 6710e19..760f359 100644
+--- a/arch/arm64/boot/dts/renesas/cat874-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/cat874-common.dtsi
+@@ -52,7 +52,7 @@
+ 	memory@48000000 {
+ 		device_type = "memory";
+ 		/* first 128MB is reserved for secure area. */
+-		reg = <0x0 0x48000000 0x0 0x78000000>;
++		reg = <0x0 0x48000000 0x0 0x3C000000>;
+ 	};
+ 
+ 	reserved-memory {
+-- 
+2.7.4
+
