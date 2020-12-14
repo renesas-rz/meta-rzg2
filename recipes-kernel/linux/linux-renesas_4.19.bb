@@ -20,7 +20,7 @@ SRC_URI_append += "\
 "
 
 SRC_URI_append_r8a774c0 += "\
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "")} \
+  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-arm64-dts-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "")} \
 "
 
 SRC_URI_append_r8a774a1 += "\
