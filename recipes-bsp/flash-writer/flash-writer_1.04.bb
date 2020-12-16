@@ -1,6 +1,6 @@
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=7f62d8fc087d1e90350a140c9f8c8e99"
 LICENSE="BSD-3-Clause"
-PV = "1.02+git${SRCPV}"
+PV = "1.04+git${SRCPV}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -8,7 +8,7 @@ FLASH_WRITER_URL = "git://github.com/renesas-rz/rzg2_flash_writer.git"
 BRANCH = "master"
 
 SRC_URI = "${FLASH_WRITER_URL};branch=${BRANCH}"
-SRCREV = "a93b599de1f8b571c1e3868685e944436449c756"
+SRCREV = "757e29806159dc239064ea33a65012511518e635"
 
 SRC_URI_append = " \
 	${@base_conditional("SECURE_BOOT", "1", "file://0001-Add-Secure-Boot-Injection.patch", "",d)} \
