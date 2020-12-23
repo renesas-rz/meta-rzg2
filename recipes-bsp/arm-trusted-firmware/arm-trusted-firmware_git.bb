@@ -22,8 +22,8 @@ SRC_URI = " \
 	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
 "
 
-#Tag v2.3
-SRCREV = "8ff55a9e14a23d7c7f89f52465bcc6307850aa33"
+#Tag v2.4
+SRCREV = "e2c509a39c6cc4dda8734e6509cdbe6e3603cdfc"
 SRCREV_mbedtls = "04a049bda1ceca48060b57bc4bcf5203ce591421"
 
 SRC_URI += " \
@@ -44,7 +44,7 @@ SRC_URI += " \
 	file://0015-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
 "
 
-PV = "v2.3+renesas+git"
+PV = "v2.4+git"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
