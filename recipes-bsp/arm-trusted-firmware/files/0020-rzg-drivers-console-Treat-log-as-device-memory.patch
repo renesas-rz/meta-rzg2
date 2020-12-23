@@ -1,0 +1,93 @@
+From e7909a3926140b7923c33069c6009ebabefbf814 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 23 Dec 2020 09:23:43 +0700
+Subject: [PATCH 20/22] rzg: drivers: console: Treat log as device memory
+
+This commit refers from commit
+<605767475ec42f4250edbfd10be7e605f7d3aa1d>
+which supports for rcar-gen3.
+Apply it as a bug-fix commit for rzg platform.
+
+The BL31 log driver is registered before the xlat tables are initialized,
+at that point the log memory is configured as device memory and can only
+be accessed with up-to-32bit aligned accesses. Adjust the driver to do
+just that.
+
+The memset() call has to be replaced by a loop of 32bit writes to the log,
+the memcpy() is trivial to replace with a single 32bit write of the entire
+TLOG word. In the end, this even simplifies the code.
+
+Signed-off-by: Marek Vasut <marek.vasut+renesas@gmail.com>
+Change-Id: Ie9152e782e67d93e7236069a294df812e2b873bf
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/renesas/rzg/console/rzg_printf.c | 34 ++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/renesas/rzg/console/rzg_printf.c b/drivers/renesas/rzg/console/rzg_printf.c
+index 023da46..6937418 100644
+--- a/drivers/renesas/rzg/console/rzg_printf.c
++++ b/drivers/renesas/rzg/console/rzg_printf.c
+@@ -19,11 +19,22 @@
+ 
+ #define INDEX_TIMER_COUNT	(4U)
+ 
++#define RZG_LOG_HEAD	(('T' << 0) | ('L' << 8) | ('O' << 16) | ('G' << 24))
++
++/*
++ * The log is initialized and used before BL31 xlat tables are initialized,
++ * therefore the log memory is a device memory at that point. Make sure the
++ * memory is correclty aligned and accessed only with up-to 32bit, aligned,
++ * writes.
++ */
++CASSERT((RZG_BL31_LOG_BASE & 0x7) == 0, assert_bl31_log_base_unaligned);
++CASSERT((RZG_BL31_LOG_MAX & 0x7) == 0, assert_bl31_log_max_unaligned);
++
+ extern RZG_INSTANTIATE_LOCK typedef struct log_head {
+-	uint8_t head[4];
++	uint32_t head;
+ 	uint32_t index;
+ 	uint32_t size;
+-	uint8_t res[4];
++	uint32_t res;
+ } loghead_t;
+ 
+ typedef struct log_map {
+@@ -67,14 +78,12 @@ int32_t rzg_set_log_data(int32_t c)
+ int32_t rzg_log_init(void)
+ {
+ 
+-	static const uint8_t const_header[] = "TLOG";
+-	logmap_t *t_log;
++	logmap_t *t_log = (logmap_t *)RZG_BL31_LOG_BASE;
++	uint32_t *log_data = (uint32_t *)t_log->log_data;
+ 	int16_t init_flag = 0;
++	int i;
+ 
+-	t_log = (logmap_t *) RZG_BL31_LOG_BASE;
+-	if (memcmp
+-	    ((const void *)t_log->header.head, (const void *)const_header,
+-	     sizeof(t_log->header.head)) != 0) {
++	if (t_log->header.head != RZG_LOG_HEAD) {
+ 		/*
+ 		 * Log header is not "TLOG", then log area initialize
+ 		 */
+@@ -87,11 +96,10 @@ int32_t rzg_log_init(void)
+ 		init_flag = 1;
+ 	}
+ 	if (init_flag == 1) {
+-		(void)memset((void *)t_log->log_data, 0,
+-			     (size_t) RZG_BL31_LOG_MAX);
+-		(void)memcpy((void *)t_log->header.head,
+-			     (const void *)const_header,
+-			     sizeof(t_log->header.head));
++		for (i = 0; i < RZG_BL31_LOG_MAX; i += 4)
++			*log_data++ = 0;
++
++		t_log->header.head = RZG_LOG_HEAD;
+ 		t_log->header.index = 0U;
+ 		t_log->header.size = 0U;
+ 	}
+-- 
+2.7.4
+
