@@ -15,7 +15,7 @@ IMAGE_FEATURES += " \
     ssh-server-openssh \
 "
 
-IMAGE_INSTALL_append = " kernel-devsrc ltp"
+IMAGE_INSTALL_append = " kernel-devsrc"
 
 # Add some necessary tool
 TOOLCHAIN_HOST_TASK_append = " nativesdk-bison nativesdk-flex nativesdk-python3-pycryptodome nativesdk-python3-pycryptodomex"
