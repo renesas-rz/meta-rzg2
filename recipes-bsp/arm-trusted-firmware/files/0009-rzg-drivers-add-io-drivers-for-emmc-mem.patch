@@ -1,0 +1,1025 @@
+From af098d015fe92dcd700342d586c6e000d599f6d7 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 27 Oct 2020 13:38:39 +0700
+Subject: [PATCH 09/18] rzg: drivers: add io drivers for emmc/mem
+
+This commit adds io driver used for emmc and mem.
+Refer from commit "rcar_gen3: drivers: io [emmc/mem]".
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/renesas/rzg/io/io_common.h  |  16 ++
+ drivers/renesas/rzg/io/io_emmcdrv.c | 173 ++++++++++++
+ drivers/renesas/rzg/io/io_emmcdrv.h |  13 +
+ drivers/renesas/rzg/io/io_memdrv.c  | 149 ++++++++++
+ drivers/renesas/rzg/io/io_memdrv.h  |  13 +
+ drivers/renesas/rzg/io/io_private.h |  20 ++
+ drivers/renesas/rzg/io/io_rzg.c     | 548 ++++++++++++++++++++++++++++++++++++
+ drivers/renesas/rzg/io/io_rzg.h     |  14 +
+ 8 files changed, 946 insertions(+)
+ create mode 100644 drivers/renesas/rzg/io/io_common.h
+ create mode 100644 drivers/renesas/rzg/io/io_emmcdrv.c
+ create mode 100644 drivers/renesas/rzg/io/io_emmcdrv.h
+ create mode 100644 drivers/renesas/rzg/io/io_memdrv.c
+ create mode 100644 drivers/renesas/rzg/io/io_memdrv.h
+ create mode 100644 drivers/renesas/rzg/io/io_private.h
+ create mode 100644 drivers/renesas/rzg/io/io_rzg.c
+ create mode 100644 drivers/renesas/rzg/io/io_rzg.h
+
+diff --git a/drivers/renesas/rzg/io/io_common.h b/drivers/renesas/rzg/io/io_common.h
+new file mode 100644
+index 0000000..d35b6c9
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_common.h
+@@ -0,0 +1,16 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef IO_COMMON_H
++#define IO_COMMON_H
++
++typedef struct io_drv_spec {
++	size_t offset;
++	size_t length;
++	uint32_t partition;
++} io_drv_spec_t;
++
++#endif /* IO_COMMON_H */
+diff --git a/drivers/renesas/rzg/io/io_emmcdrv.c b/drivers/renesas/rzg/io/io_emmcdrv.c
+new file mode 100644
+index 0000000..017e779
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_emmcdrv.c
+@@ -0,0 +1,173 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <string.h>
++
++#include <common/debug.h>
++#include <drivers/io/io_driver.h>
++#include <drivers/io/io_storage.h>
++
++#include "io_common.h"
++#include "io_emmcdrv.h"
++#include "io_private.h"
++#include "emmc_config.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++#include "emmc_def.h"
++
++static int32_t emmcdrv_dev_open(const uintptr_t spec __attribute__ ((unused)),
++				io_dev_info_t **dev_info);
++static int32_t emmcdrv_dev_close(io_dev_info_t *dev_info);
++
++typedef struct {
++	uint32_t in_use;
++	uintptr_t base;
++	signed long long file_pos;
++	EMMC_PARTITION_ID partition;
++} file_state_t;
++
++static file_state_t current_file = { 0 };
++
++static EMMC_PARTITION_ID emmcdrv_bootpartition = PARTITION_ID_USER;
++
++static io_type_t device_type_emmcdrv(void)
++{
++	return IO_TYPE_MEMMAP;
++}
++
++static int32_t emmcdrv_block_seek(io_entity_t *entity, int32_t mode,
++				  signed long long offset)
++{
++	if (mode != IO_SEEK_SET)
++		return IO_FAIL;
++
++	((file_state_t *) entity->info)->file_pos = offset;
++
++	return IO_SUCCESS;
++}
++
++static int32_t emmcdrv_block_read(io_entity_t *entity, uintptr_t buffer,
++				  size_t length, size_t *length_read)
++{
++	file_state_t *fp = (file_state_t *) entity->info;
++	uint32_t sector_add, sector_num, emmc_dma = 0;
++	int32_t result = IO_SUCCESS;
++
++	sector_add = current_file.file_pos >> EMMC_SECTOR_SIZE_SHIFT;
++	sector_num = (length + EMMC_SECTOR_SIZE - 1U) >> EMMC_SECTOR_SIZE_SHIFT;
++
++	NOTICE("BL2: Load dst=0x%lx src=(p:%d)0x%llx(%d) len=0x%lx(%d)\n",
++	       buffer,
++	       current_file.partition, current_file.file_pos,
++	       sector_add, length, sector_num);
++
++	if ((buffer + length - 1U) <= (uintptr_t)UINT32_MAX)
++		emmc_dma = LOADIMAGE_FLAGS_DMA_ENABLE;
++
++	if (emmc_read_sector((uint32_t *) buffer, sector_add, sector_num,
++			     emmc_dma) != EMMC_SUCCESS)
++		result = IO_FAIL;
++
++	*length_read = length;
++	fp->file_pos += (signed long long)length;
++
++	return result;
++}
++
++static int32_t emmcdrv_block_open(io_dev_info_t *dev_info,
++				  const uintptr_t spec, io_entity_t *entity)
++{
++	const io_drv_spec_t *block_spec = (io_drv_spec_t *) spec;
++
++	if (current_file.in_use != 0U) {
++		WARN("mmc_block: Only one open spec at a time\n");
++		return IO_RESOURCES_EXHAUSTED;
++	}
++
++	current_file.file_pos = 0;
++	current_file.in_use = 1;
++
++	if (emmcdrv_bootpartition == PARTITION_ID_USER) {
++		emmcdrv_bootpartition = mmc_drv_obj.boot_partition_en;
++		if ((PARTITION_ID_BOOT_1 == emmcdrv_bootpartition) ||
++		    (PARTITION_ID_BOOT_2 == emmcdrv_bootpartition)) {
++			current_file.partition = emmcdrv_bootpartition;
++
++			NOTICE("BL2: eMMC boot from partition %d\n",
++			       emmcdrv_bootpartition);
++			goto done;
++		}
++		return IO_FAIL;
++	}
++
++	if ((PARTITION_ID_USER == block_spec->partition) ||
++	    (PARTITION_ID_BOOT_1 == block_spec->partition) ||
++	    (PARTITION_ID_BOOT_2 == block_spec->partition))
++		current_file.partition = block_spec->partition;
++	else
++		current_file.partition = emmcdrv_bootpartition;
++
++done:
++	if (emmc_select_partition(current_file.partition) != EMMC_SUCCESS)
++		return IO_FAIL;
++
++	entity->info = (uintptr_t) &current_file;
++
++	return IO_SUCCESS;
++}
++
++static int32_t emmcdrv_block_close(io_entity_t *entity)
++{
++	memset((void *)&current_file, 0, sizeof(current_file));
++	entity->info = 0U;
++
++	return IO_SUCCESS;
++}
++
++static const io_dev_funcs_t emmcdrv_dev_funcs = {
++	.type = &device_type_emmcdrv,
++	.open = &emmcdrv_block_open,
++	.seek = &emmcdrv_block_seek,
++	.size = NULL,
++	.read = &emmcdrv_block_read,
++	.write = NULL,
++	.close = &emmcdrv_block_close,
++	.dev_init = NULL,
++	.dev_close = &emmcdrv_dev_close
++};
++
++static const io_dev_info_t emmcdrv_dev_info = {
++	.funcs = &emmcdrv_dev_funcs,
++	.info = (uintptr_t) 0
++};
++
++static const io_dev_connector_t emmcdrv_dev_connector = {
++	&emmcdrv_dev_open,
++};
++
++static int32_t emmcdrv_dev_open(const uintptr_t spec __attribute__ ((unused)),
++				io_dev_info_t **dev_info)
++{
++	*dev_info = (io_dev_info_t *) &emmcdrv_dev_info;
++
++	return IO_SUCCESS;
++}
++
++static int32_t emmcdrv_dev_close(io_dev_info_t *dev_info)
++{
++	return IO_SUCCESS;
++}
++
++int32_t rzg_register_io_dev_emmcdrv(const io_dev_connector_t **dev_con)
++{
++	int32_t rc;
++
++	rc = io_register_device(&emmcdrv_dev_info);
++	if (rc == IO_SUCCESS)
++		*dev_con = &emmcdrv_dev_connector;
++
++	return rc;
++}
+diff --git a/drivers/renesas/rzg/io/io_emmcdrv.h b/drivers/renesas/rzg/io/io_emmcdrv.h
+new file mode 100644
+index 0000000..180514e
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_emmcdrv.h
+@@ -0,0 +1,13 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef IO_EMMCDRV_H
++#define IO_EMMCDRV_H
++
++struct io_dev_connector;
++int32_t rzg_register_io_dev_emmcdrv(const io_dev_connector_t **connector);
++
++#endif /* IO_EMMCDRV_H */
+diff --git a/drivers/renesas/rzg/io/io_memdrv.c b/drivers/renesas/rzg/io/io_memdrv.c
+new file mode 100644
+index 0000000..15245bf
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_memdrv.c
+@@ -0,0 +1,149 @@
++/*
++ * Copyright (c) 2015-2019, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <string.h>
++
++#include <common/debug.h>
++#include <drivers/io/io_driver.h>
++#include <drivers/io/io_storage.h>
++
++#include "io_common.h"
++#include "io_private.h"
++#include "io_memdrv.h"
++#include "rzg_def.h"
++
++extern void rzg_dma_exec(uintptr_t dst, uint32_t src, uint32_t len);
++
++static int32_t memdrv_dev_open(const uintptr_t dev __attribute__ ((unused)),
++			       io_dev_info_t **dev_info);
++static int32_t memdrv_dev_close(io_dev_info_t *dev_info);
++
++/* As we need to be able to keep state for seek, only one file can be open
++ * at a time. Make this a structure and point to the entity->info. When we
++ * can malloc memory we can change this to support more open files.
++ */
++typedef struct {
++	uint32_t in_use;
++	uintptr_t base;
++	signed long long file_pos;
++} file_state_t;
++
++static file_state_t current_file = { 0 };
++
++static io_type_t device_type_memdrv(void)
++{
++	return IO_TYPE_MEMMAP;
++}
++
++static int32_t memdrv_block_open(io_dev_info_t *dev_info, const uintptr_t spec,
++				 io_entity_t *entity)
++{
++	const io_drv_spec_t *block_spec = (io_drv_spec_t *) spec;
++
++	/* Since we need to track open state for seek() we only allow one open
++	 * spec at a time. When we have dynamic memory we can malloc and set
++	 * entity->info.
++	 */
++	if (current_file.in_use != 0U)
++		return IO_RESOURCES_EXHAUSTED;
++
++	/* File cursor offset for seek and incremental reads etc. */
++	current_file.base = block_spec->offset;
++	current_file.file_pos = 0;
++	current_file.in_use = 1;
++
++	entity->info = (uintptr_t) &current_file;
++
++	return IO_SUCCESS;
++}
++
++static int32_t memdrv_block_seek(io_entity_t *entity, int32_t mode,
++				 signed long long offset)
++{
++	if (mode != IO_SEEK_SET)
++		return IO_FAIL;
++
++	((file_state_t *) entity->info)->file_pos = offset;
++
++	return IO_SUCCESS;
++}
++
++static int32_t memdrv_block_read(io_entity_t *entity, uintptr_t buffer,
++				 size_t length, size_t *cnt)
++{
++	file_state_t *fp;
++
++	fp = (file_state_t *) entity->info;
++
++	NOTICE("BL2: dst=0x%lx src=0x%llx len=%ld(0x%lx)\n",
++	       buffer, (unsigned long long)fp->base +
++	       (unsigned long long)fp->file_pos, length, length);
++
++	if (FLASH_MEMORY_SIZE < (fp->file_pos + (signed long long)length)) {
++		ERROR("BL2: check load image (source address)\n");
++		return IO_FAIL;
++	}
++
++	rzg_dma_exec(buffer, fp->base + (uintptr_t)fp->file_pos, length);
++	fp->file_pos += (signed long long)length;
++	*cnt = length;
++
++	return IO_SUCCESS;
++}
++
++static int32_t memdrv_block_close(io_entity_t *entity)
++{
++	entity->info = 0U;
++
++	memset((void *)&current_file, 0, sizeof(current_file));
++
++	return IO_SUCCESS;
++}
++
++static const io_dev_funcs_t memdrv_dev_funcs = {
++	.type = &device_type_memdrv,
++	.open = &memdrv_block_open,
++	.seek = &memdrv_block_seek,
++	.size = NULL,
++	.read = &memdrv_block_read,
++	.write = NULL,
++	.close = &memdrv_block_close,
++	.dev_init = NULL,
++	.dev_close = &memdrv_dev_close,
++};
++
++static const io_dev_info_t memdrv_dev_info = {
++	.funcs = &memdrv_dev_funcs,
++	.info = 0,
++};
++
++static const io_dev_connector_t memdrv_dev_connector = {
++	.dev_open = &memdrv_dev_open
++};
++
++static int32_t memdrv_dev_open(const uintptr_t dev __attribute__ ((unused)),
++			       io_dev_info_t **dev_info)
++{
++	*dev_info = (io_dev_info_t *) &memdrv_dev_info;
++
++	return IO_SUCCESS;
++}
++
++static int32_t memdrv_dev_close(io_dev_info_t *dev_info)
++{
++	return IO_SUCCESS;
++}
++
++int32_t rzg_register_io_dev_memdrv(const io_dev_connector_t **dev_con)
++{
++	int32_t result;
++
++	result = io_register_device(&memdrv_dev_info);
++	if (result == IO_SUCCESS)
++		*dev_con = &memdrv_dev_connector;
++
++	return result;
++}
+diff --git a/drivers/renesas/rzg/io/io_memdrv.h b/drivers/renesas/rzg/io/io_memdrv.h
+new file mode 100644
+index 0000000..02708b1
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_memdrv.h
+@@ -0,0 +1,13 @@
++/*
++ * Copyright (c) 2015-2017, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef IO_MEMDRV_H
++#define IO_MEMDRV_H
++
++struct io_dev_connector;
++int32_t rzg_register_io_dev_memdrv(const io_dev_connector_t **connector);
++
++#endif /* IO_MEMDRV_H */
+diff --git a/drivers/renesas/rzg/io/io_private.h b/drivers/renesas/rzg/io/io_private.h
+new file mode 100644
+index 0000000..e862181
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_private.h
+@@ -0,0 +1,20 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef IO_PRIVATE_H
++#define IO_PRIVATE_H
++
++/*
++ * Return codes reported by 'io_*' APIs
++ * The value of fail should not overlap with define of the errno.
++ * The errno is in "include/lib/stdlib/sys/errno.h".
++ */
++#define IO_SUCCESS		(0)
++#define IO_FAIL			(-0x81)
++#define IO_NOT_SUPPORTED	(-0x82)
++#define IO_RESOURCES_EXHAUSTED	(-0x83)
++
++#endif /* IO_PRIVATE_H */
+diff --git a/drivers/renesas/rzg/io/io_rzg.c b/drivers/renesas/rzg/io/io_rzg.c
+new file mode 100644
+index 0000000..91c2e66
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_rzg.c
+@@ -0,0 +1,548 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <errno.h>
++#include <stdint.h>
++#include <string.h>
++
++#include <platform_def.h>
++
++#include <arch_helpers.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <drivers/io/io_driver.h>
++#include <drivers/io/io_storage.h>
++#include <lib/mmio.h>
++#include <plat/common/platform.h>
++#include <tools_share/firmware_image_package.h>
++#include <tools_share/uuid.h>
++
++#include "io_rzg.h"
++#include "io_common.h"
++#include "io_private.h"
++
++extern int32_t plat_get_drv_source(uint32_t id, uintptr_t *dev,
++				   uintptr_t *image_spec);
++
++extern int auth_mod_verify_img(unsigned int img_id, void *ptr,
++				unsigned int len);
++
++static int32_t rzg_dev_open(const uintptr_t dev_spec __attribute__ ((unused)),
++			     io_dev_info_t **dev_info);
++static int32_t rzg_dev_close(io_dev_info_t *dev_info);
++
++typedef struct {
++	const int32_t name;
++	const uint32_t offset;
++	const uint32_t attr;
++} plat_rzg_name_offset_t;
++
++typedef struct {
++	/* Put position above the struct to allow {0} on static init.
++	 * It is a workaround for a known bug in GCC
++	 * http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
++	 */
++	uint32_t position;
++	uint32_t no_load;
++	uintptr_t offset;
++	uint32_t size;
++	uintptr_t dst;
++	uintptr_t partition;	/* for eMMC */
++	/* RZG_EMMC_PARTITION_BOOT_0 */
++	/* RZG_EMMC_PARTITION_BOOT_1 */
++	/* RZG_EMMC_PARTITION_USER   */
++} file_state_t;
++
++#define RZG_GET_FLASH_ADR(a, b)	((uint32_t)((0x40000U * (a)) + (b)))
++#define RZG_ATTR_SET_CALCADDR(a)	((a) & 0xF)
++#define RZG_ATTR_SET_ISNOLOAD(a)	(((a) & 0x1) << 16U)
++#define RZG_ATTR_SET_CERTOFF(a)	(((a) & 0xF) << 8U)
++#define RZG_ATTR_SET_ALL(a, b, c)	((uint32_t)(RZG_ATTR_SET_CALCADDR(a) |\
++					RZG_ATTR_SET_ISNOLOAD(b) | 	\
++					RZG_ATTR_SET_CERTOFF(c)))
++
++#define RZG_ATTR_GET_CALCADDR(a)	((a) & 0xFU)
++#define RZG_ATTR_GET_ISNOLOAD(a)	(((a) >> 16) & 0x1U)
++#define RZG_ATTR_GET_CERTOFF(a)	((uint32_t)(((a) >> 8) & 0xFU))
++
++#define RZG_MAX_BL3X_IMAGE		(8U)
++#define RZG_SECTOR6_CERT_OFFSET	(0x400U)
++#define RZG_SDRAM_certESS		(0x43F00000U)
++#define RZG_CERT_SIZE			(0x800U)
++#define RZG_CERT_INFO_SIZE_OFFSET	(0x264U)
++#define RZG_CERT_INFO_DST_OFFSET	(0x154U)
++#define RZG_CERT_LOAD			(1U)
++
++#define RZG_FLASH_CERT_HEADER		RZG_GET_FLASH_ADR(6U, 0U)
++#define RZG_EMMC_CERT_HEADER		(0x00030000U)
++
++#define RZG_COUNT_LOAD_BL31		(0U)
++#define RZG_COUNT_LOAD_BL33		(2U)
++
++#define RZG_MAX_LOAD_IMAGE		(RZG_MAX_BL3X_IMAGE + RZG_COUNT_LOAD_BL33)
++
++static const plat_rzg_name_offset_t name_offset[] = {
++
++	{BL31_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL31,    0, RZG_COUNT_LOAD_BL31)  },
++
++	/* BL3-2 is optional in the platform */
++	{BL32_IMAGE_ID,  0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL31+1, 0, RZG_COUNT_LOAD_BL31+1)},
++
++	/* BL33 is non trusted firmwarel in the platform */
++	{BL33_IMAGE_ID,  0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33,   0, RZG_COUNT_LOAD_BL33)  },
++	{BL332_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+1, 0, RZG_COUNT_LOAD_BL33+1)},
++	{BL333_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+2, 0, RZG_COUNT_LOAD_BL33+2)},
++	{BL334_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+3, 0, RZG_COUNT_LOAD_BL33+3)},
++	{BL335_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+4, 0, RZG_COUNT_LOAD_BL33+4)},
++	{BL336_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+5, 0, RZG_COUNT_LOAD_BL33+5)},
++	{BL337_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+6, 0, RZG_COUNT_LOAD_BL33+6)},
++	{BL338_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL33+7, 0, RZG_COUNT_LOAD_BL33+7)},
++};
++
++static file_state_t current_file = { 0 };
++
++static uintptr_t rzg_handle, rzg_spec;
++static uint64_t rzg_image_header[RZG_MAX_LOAD_IMAGE] = { 0U };
++static uint64_t rzg_image_header_prttn[RZG_MAX_LOAD_IMAGE] = { 0U };
++static uint64_t rzg_image_number = { 0U };
++static uint32_t rzg_cert_load = { 0U };
++
++static io_type_t device_type_rzg(void)
++{
++	return IO_TYPE_FIRMWARE_IMAGE_PACKAGE;
++}
++
++static int32_t file_to_offset(const int32_t name, uintptr_t *offset,
++			      uint32_t *cert, uint32_t *no_load,
++			      uintptr_t *partition)
++{
++	uint32_t addr;
++	int32_t i;
++
++	for (i = 0; i < ARRAY_SIZE(name_offset); i++) {
++		if (name != name_offset[i].name)
++			continue;
++
++		addr = RZG_ATTR_GET_CALCADDR(name_offset[i].attr);
++		if ((rzg_image_number + RZG_COUNT_LOAD_BL33) < addr)
++			continue;
++
++		*offset = rzg_image_header[addr];
++		*cert = RZG_CERT_SIZE;
++		*cert *= RZG_ATTR_GET_CERTOFF(name_offset[i].attr);
++		*cert += RZG_SDRAM_certESS;
++		*no_load = RZG_ATTR_GET_ISNOLOAD(name_offset[i].attr);
++		*partition = rzg_image_header_prttn[addr];
++		return IO_SUCCESS;
++	}
++
++	return -EINVAL;
++}
++
++void rzg_read_certificate(uint64_t cert, uint32_t *len, uintptr_t *dst)
++{
++	uintptr_t size, dsth, dstl;
++
++	cert &= 0xFFFFFFFFU;
++
++	size = cert + RZG_CERT_INFO_SIZE_OFFSET;
++	*len = mmio_read_32(size) * 4U;
++	dstl = cert + RZG_CERT_INFO_DST_OFFSET;
++	dsth = dstl + 4U;
++	*dst = ((uintptr_t) mmio_read_32(dsth) << 32) +
++	    ((uintptr_t) mmio_read_32(dstl));
++}
++
++static int32_t check_load_area(uintptr_t dst, uintptr_t len)
++{
++	uint32_t legacy = dst + len <= UINT32_MAX - 1 ? 1 : 0;
++	uintptr_t dram_start, dram_end;
++	uintptr_t prot_start, prot_end;
++	int32_t result = IO_SUCCESS;
++
++	dram_start = legacy ? DRAM1_BASE : DRAM_40BIT_BASE;
++
++	dram_end = legacy ? DRAM1_BASE + DRAM1_SIZE :
++	    DRAM_40BIT_BASE + DRAM_40BIT_SIZE;
++
++	prot_start = legacy ? DRAM_PROTECTED_BASE : DRAM_40BIT_PROTECTED_BASE;
++
++	prot_end = prot_start + DRAM_PROTECTED_SIZE;
++
++	if (dst < dram_start || dst > dram_end - len) {
++		ERROR("BL2: dst address is on the protected area.\n");
++		result = IO_FAIL;
++		goto done;
++	}
++
++	/* load image is within SDRAM protected area */
++	if (dst >= prot_start && dst < prot_end) {
++		ERROR("BL2: dst address is on the protected area.\n");
++		result = IO_FAIL;
++	}
++
++	if (dst < prot_start && dst > prot_start - len) {
++		ERROR("BL2: loaded data is on the protected area.\n");
++		result = IO_FAIL;
++	}
++done:
++	if (result == IO_FAIL)
++		ERROR("BL2: Out of range : dst=0x%lx len=0x%lx\n", dst, len);
++
++	return result;
++}
++
++static int32_t load_bl33x(void)
++{
++	static int32_t loaded = IO_NOT_SUPPORTED;
++	uintptr_t dst, partition, handle;
++	uint32_t noload, cert, len, i;
++	uintptr_t offset;
++	int32_t rc;
++	size_t cnt;
++	const int32_t img[] = {
++		BL33_IMAGE_ID,
++		BL332_IMAGE_ID,
++		BL333_IMAGE_ID,
++		BL334_IMAGE_ID,
++		BL335_IMAGE_ID,
++		BL336_IMAGE_ID,
++		BL337_IMAGE_ID,
++		BL338_IMAGE_ID
++	};
++
++	if (loaded != IO_NOT_SUPPORTED)
++		return loaded;
++
++	for (i = 1; i < rzg_image_number; i++) {
++		rc = file_to_offset(img[i], &offset, &cert, &noload,
++				    &partition);
++		if (rc != IO_SUCCESS) {
++			WARN("load_bl33x: failed to get offset\n");
++			loaded = IO_FAIL;
++			return loaded;
++		}
++
++		rzg_read_certificate((uint64_t) cert, &len, &dst);
++		((io_drv_spec_t *) rzg_spec)->partition = partition;
++
++		rc = io_open(rzg_handle, rzg_spec, &handle);
++		if (rc != IO_SUCCESS) {
++			WARN("Failed to open FIP (%i)\n", rc);
++			loaded = IO_FAIL;
++			return loaded;
++		}
++
++		rc = io_seek(handle, IO_SEEK_SET, offset);
++		if (rc != IO_SUCCESS) {
++			WARN("load_bl33x: failed to seek\n");
++			loaded = IO_FAIL;
++			return loaded;
++		}
++
++		rc = check_load_area(dst, len);
++		if (rc != IO_SUCCESS) {
++			WARN("load_bl33x: check load area\n");
++			loaded = IO_FAIL;
++			return loaded;
++		}
++
++		rc = io_read(handle, dst, len, &cnt);
++		if (rc != IO_SUCCESS) {
++			WARN("load_bl33x: failed to read\n");
++			loaded = IO_FAIL;
++			return loaded;
++		}
++#if TRUSTED_BOARD_BOOT
++		rc = auth_mod_verify_img(img[i], (void *)dst, len);
++		if (rc) {
++			memset((void *)dst, 0x00, len);
++			loaded = IO_FAIL;
++			return loaded;
++		}
++#endif
++		io_close(handle);
++	}
++
++	loaded = IO_SUCCESS;
++
++	return loaded;
++}
++
++static int32_t rzg_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
++{
++	uint64_t header[64] __aligned(FLASH_TRANS_SIZE_UNIT) = {
++	0};
++	uintptr_t handle;
++	ssize_t offset;
++	uint32_t i;
++	int32_t rc;
++	size_t cnt;
++
++	/* Obtain a reference to the image by querying the platform layer */
++	rc = plat_get_drv_source(name, &rzg_handle, &rzg_spec);
++	if (rc != IO_SUCCESS) {
++		WARN("Failed to obtain reference to img %ld (%i)\n", name, rc);
++		return IO_FAIL;
++	}
++
++	if (RZG_CERT_LOAD == rzg_cert_load)
++		return IO_SUCCESS;
++
++	rc = io_open(rzg_handle, rzg_spec, &handle);
++	if (rc != IO_SUCCESS) {
++		WARN("Failed to access img %ld (%i)\n", name, rc);
++		return IO_FAIL;
++	}
++
++	/* get start address list   */
++	/* [0] address num          */
++	/* [1] BL33-1 image address */
++	/* [2] BL33-2 image address */
++	/* [3] BL33-3 image address */
++	/* [4] BL33-4 image address */
++	/* [5] BL33-5 image address */
++	/* [6] BL33-6 image address */
++	/* [7] BL33-7 image address */
++	/* [8] BL33-8 image address */
++	offset = name == EMMC_DEV_ID ? RZG_EMMC_CERT_HEADER :
++	    RZG_FLASH_CERT_HEADER;
++	rc = io_seek(handle, IO_SEEK_SET, offset);
++	if (rc != IO_SUCCESS) {
++		WARN("Firmware Image Package header failed to seek\n");
++		goto error;
++	}
++#if RZG_BL2_DCACHE == 1
++	inv_dcache_range((uint64_t) header, sizeof(header));
++#endif
++	rc = io_read(handle, (uintptr_t) &header, sizeof(header), &cnt);
++	if (rc != IO_SUCCESS) {
++		WARN("Firmware Image Package header failed to read\n");
++		goto error;
++	}
++
++	rzg_image_number = header[0];
++	for (i = 0; i < rzg_image_number + RZG_COUNT_LOAD_BL33; i++) {
++		rzg_image_header[i] = header[i * 2 + 1];
++		rzg_image_header_prttn[i] = header[i * 2 + 2];
++	}
++
++	if (rzg_image_number == 0 || rzg_image_number > RZG_MAX_BL3X_IMAGE) {
++		WARN("Firmware Image Package header check failed.\n");
++		goto error;
++	}
++
++	rc = io_seek(handle, IO_SEEK_SET, offset + RZG_SECTOR6_CERT_OFFSET);
++	if (rc != IO_SUCCESS) {
++		WARN("Firmware Image Package header failed to seek cert\n");
++		goto error;
++	}
++#if RZG_BL2_DCACHE == 1
++	inv_dcache_range(RZG_SDRAM_certESS,
++			 RZG_CERT_SIZE * (RZG_COUNT_LOAD_BL33 + rzg_image_number));
++#endif
++	rc = io_read(handle, RZG_SDRAM_certESS,
++		     RZG_CERT_SIZE * (RZG_COUNT_LOAD_BL33 + rzg_image_number), &cnt);
++	if (rc != IO_SUCCESS) {
++		WARN("cert file read error.\n");
++		goto error;
++	}
++
++	rzg_cert_load = RZG_CERT_LOAD;
++error:
++
++	if (rc != IO_SUCCESS)
++		rc = IO_FAIL;
++
++	io_close(handle);
++
++	return rc;
++
++}
++
++static int32_t rzg_file_open(io_dev_info_t *info, const uintptr_t file_spec,
++			      io_entity_t *entity)
++{
++	const io_drv_spec_t *spec = (io_drv_spec_t *) file_spec;
++	uintptr_t partition, offset, dst;
++	uint32_t noload, cert, len;
++	int32_t rc;
++
++	/* Only one file open at a time. We need to  track state (ie, file
++	 * cursor position). Since the header lives at * offset zero, this entry
++	 * should never be zero in an active file.
++	 * Once the system supports dynamic memory allocation we will allow more
++	 * than one open file at a time. */
++	if (current_file.offset != 0U) {
++		WARN("rzg_file_open : Only one open file at a time.\n");
++		return IO_RESOURCES_EXHAUSTED;
++	}
++
++	rc = file_to_offset(spec->offset, &offset, &cert, &noload, &partition);
++	if (rc != IO_SUCCESS) {
++		WARN("Failed to open file name %ld (%i)\n", spec->offset, rc);
++		return IO_FAIL;
++	}
++
++	if (noload) {
++		current_file.offset = 1;
++		current_file.dst = 0;
++		current_file.size = 1;
++		current_file.position = 0;
++		current_file.no_load = noload;
++		current_file.partition = 0;
++		entity->info = (uintptr_t) &current_file;
++
++		return IO_SUCCESS;
++	}
++
++	rzg_read_certificate((uint64_t) cert, &len, &dst);
++
++	/*----------------*
++	 * Baylibre: HACK *
++	 *----------------*/
++	if (BL31_IMAGE_ID == spec->offset && len < RZG_TRUSTED_SRAM_SIZE) {
++		WARN("rzg2 ignoring the BL31 size from certificate,"
++		     "using RZG_TRUSTED_SRAM_SIZE instead\n");
++		len = RZG_TRUSTED_SRAM_SIZE;
++	}
++
++	current_file.partition = partition;
++	current_file.no_load = noload;
++	current_file.offset = offset;
++	current_file.position = 0;
++	current_file.size = len;
++	current_file.dst = dst;
++	entity->info = (uintptr_t) &current_file;
++
++	return IO_SUCCESS;
++}
++
++static int32_t rzg_file_len(io_entity_t *entity, size_t *length)
++{
++	*length = ((file_state_t *) entity->info)->size;
++
++	NOTICE("%s: len: 0x%08lx\n", __func__, *length);
++
++	return IO_SUCCESS;
++}
++
++static int32_t rzg_file_read(io_entity_t *entity, uintptr_t buffer,
++			      size_t length, size_t *cnt)
++{
++	file_state_t *fp = (file_state_t *) entity->info;
++	ssize_t offset = fp->offset + fp->position;
++	uintptr_t handle;
++	int32_t rc;
++
++#ifdef SPD_NONE
++	static uint32_t load_bl33x_counter = 1;
++#else
++	static uint32_t load_bl33x_counter;
++#endif
++	if (current_file.no_load) {
++		*cnt = length;
++		return IO_SUCCESS;
++	}
++
++	((io_drv_spec_t *) rzg_spec)->partition = fp->partition;
++
++	rc = io_open(rzg_handle, rzg_spec, &handle);
++	if (rc != IO_SUCCESS) {
++		WARN("Failed to open FIP (%i)\n", rc);
++		return IO_FAIL;
++	}
++
++	rc = io_seek(handle, IO_SEEK_SET, offset);
++	if (rc != IO_SUCCESS) {
++		WARN("rzg_file_read: failed to seek\n");
++		goto error;
++	}
++
++	if (load_bl33x_counter == RZG_COUNT_LOAD_BL33) {
++		rc = check_load_area(buffer, length);
++		if (rc != IO_SUCCESS) {
++			WARN("rzg_file_read: load area err\n");
++			goto error;
++		}
++	}
++
++	rc = io_read(handle, buffer, length, cnt);
++	if (rc != IO_SUCCESS) {
++		WARN("Failed to read payload (%i)\n", rc);
++		goto error;
++	}
++
++	fp->position += *cnt;
++	io_close(handle);
++
++	load_bl33x_counter += 1;
++	if (load_bl33x_counter == (RZG_COUNT_LOAD_BL33 + 1))
++		return load_bl33x();
++
++	return IO_SUCCESS;
++error:
++	io_close(handle);
++	return IO_FAIL;
++}
++
++static int32_t rzg_file_close(io_entity_t *entity)
++{
++	if (current_file.offset)
++		memset(&current_file, 0, sizeof(current_file));
++
++	entity->info = 0U;
++
++	return IO_SUCCESS;
++}
++
++static const io_dev_funcs_t rzg_dev_funcs = {
++	.type = &device_type_rzg,
++	.open = &rzg_file_open,
++	.seek = NULL,
++	.size = &rzg_file_len,
++	.read = &rzg_file_read,
++	.write = NULL,
++	.close = &rzg_file_close,
++	.dev_init = &rzg_dev_init,
++	.dev_close = &rzg_dev_close,
++};
++
++static const io_dev_info_t rzg_dev_info = {
++	.funcs = &rzg_dev_funcs,
++	.info = (uintptr_t) 0
++};
++
++static const io_dev_connector_t rzg_dev_connector = {
++	.dev_open = &rzg_dev_open
++};
++
++static int32_t rzg_dev_open(const uintptr_t dev_spec __attribute__ ((unused)),
++			     io_dev_info_t **dev_info)
++{
++	*dev_info = (io_dev_info_t *) &rzg_dev_info;
++
++	return IO_SUCCESS;
++}
++
++static int32_t rzg_dev_close(io_dev_info_t *dev_info)
++{
++	rzg_handle = 0;
++	rzg_spec = 0;
++
++	return IO_SUCCESS;
++}
++
++int32_t rzg_register_io_dev(const io_dev_connector_t **dev_con)
++{
++	int32_t result;
++
++	result = io_register_device(&rzg_dev_info);
++	if (result == IO_SUCCESS)
++		*dev_con = &rzg_dev_connector;
++
++	return result;
++}
+diff --git a/drivers/renesas/rzg/io/io_rzg.h b/drivers/renesas/rzg/io/io_rzg.h
+new file mode 100644
+index 0000000..8c10934
+--- /dev/null
++++ b/drivers/renesas/rzg/io/io_rzg.h
+@@ -0,0 +1,14 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef IO_RZG_H
++#define IO_RZG_H
++
++int32_t rzg_register_io_dev(const io_dev_connector_t **dev_con);
++int32_t rzg_get_certificate(const int32_t name, uint32_t *cert);
++void rzg_read_certificate(uint64_t cert, uint32_t *size, uintptr_t *dest);
++
++#endif /* IO_RZG_H */
+-- 
+2.7.4
+

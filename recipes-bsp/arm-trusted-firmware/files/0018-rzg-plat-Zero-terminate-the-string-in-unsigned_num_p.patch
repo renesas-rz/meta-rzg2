@@ -1,7 +1,7 @@
-From fde920fe3aa19268c58cf4adfe2c4e3c6644398d Mon Sep 17 00:00:00 2001
+From c6e8a6312343daf15bb7d9cf14a2a13e6d7dff74 Mon Sep 17 00:00:00 2001
 From: Hien Huynh <hien.huynh.px@renesas.com>
-Date: Thu, 24 Sep 2020 21:45:03 +0700
-Subject: [PATCH 15/15] rzg: plat: Zero-terminate the string in
+Date: Mon, 12 Oct 2020 16:54:38 +0700
+Subject: [PATCH 18/18] rzg: plat: Zero-terminate the string in
  unsigned_num_print()
 
 Based on upstream commit <dcd08687bffbe5c6ab16b69b805e51b4b0fd7b3c> for
@@ -13,21 +13,22 @@ Signed-off-by: Marek Vasut <marek.vasut+renesas@gmail.com>
 Change-Id: Ic0ac1ebca255002522159a9152ab41991f043d05
 Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
 ---
- plat/renesas/rzg/bl2_plat_setup.c | 1 +
- 1 file changed, 1 insertion(+)
+ plat/renesas/rzg/bl2_plat_setup.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/plat/renesas/rzg/bl2_plat_setup.c b/plat/renesas/rzg/bl2_plat_setup.c
-index 441fedf..bde7984 100644
+index 7228e11..9e4efb5 100644
 --- a/plat/renesas/rzg/bl2_plat_setup.c
 +++ b/plat/renesas/rzg/bl2_plat_setup.c
-@@ -127,6 +127,7 @@ static void unsigned_num_print(unsigned long long int unum, unsigned int radix,
+@@ -122,6 +122,8 @@ static void unsigned_num_print(unsigned long long int unum, unsigned int radix,
  
  	while (--i >= 0)
  		*string++ = num_buf[i];
++
 +	*string = 0;
  }
  
- #if (RCAR_LOSSY_ENABLE == 1)
+ #if (RZG_LOSSY_ENABLE == 1)
 -- 
 2.7.4
 

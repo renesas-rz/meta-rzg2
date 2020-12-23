@@ -1,0 +1,5654 @@
+From a6fd8ef3a6413767a5ce2f74fc383f015caa7930 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 22 Oct 2020 21:28:20 +0700
+Subject: [PATCH 01/18] rzg: initial commit for the RZG gen2 boards
+
+Refer from commit id:
+<7e532c4bf7229f0771cae95b2572f7cb5103a4ae>
+which initialize the rcar-gen3 boards to add support
+RZ/G2 Series which almost based on RCar Gen3 definition source:
+- G2H (v3.0): RCar H3N and RCar H3 ver3.0
+- G2M (v1.x, v3.0): RCar M3 ver1.1, ver1.3 and ver3.0
+- G2N (v1.1): RCar M3N ver1.1
+- G2E (v1.0, v1.1): RCar E3 ver1.0, ver1.1
+
+And also adjust some differences with RCar Gen3 environment:
+- Disable all suspend to RAM macros by setting 0 as default:
+RZG_SYSTEM_SUSPEND, PMIC_ROHM_BD9571.
+- Do not support avs driver because RZ/G2 platform does not support it.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ .gitignore                                         |   4 +
+ drivers/renesas/rzg/common.c                       |  34 +
+ plat/renesas/rzg/aarch64/plat_helpers.S            | 392 +++++++++
+ plat/renesas/rzg/aarch64/platform_common.c         | 271 ++++++
+ plat/renesas/rzg/bl2_cpg_init.c                    | 313 +++++++
+ plat/renesas/rzg/bl2_interrupt_error.c             | 109 +++
+ plat/renesas/rzg/bl2_plat_mem_params_desc.c        |  88 ++
+ plat/renesas/rzg/bl2_plat_setup.c                  | 938 +++++++++++++++++++++
+ plat/renesas/rzg/bl2_secure_setting.c              | 352 ++++++++
+ plat/renesas/rzg/bl31_plat_setup.c                 | 118 +++
+ plat/renesas/rzg/include/plat.ld.S                 |  36 +
+ plat/renesas/rzg/include/plat_macros.S             |  88 ++
+ plat/renesas/rzg/include/platform_def.h            | 192 +++++
+ plat/renesas/rzg/include/registers/axi_registers.h | 246 ++++++
+ plat/renesas/rzg/include/registers/cpg_registers.h | 136 +++
+ .../rzg/include/registers/lifec_registers.h        | 144 ++++
+ plat/renesas/rzg/include/rzg_def.h                 | 298 +++++++
+ plat/renesas/rzg/include/rzg_private.h             | 107 +++
+ plat/renesas/rzg/include/rzg_version.h             |  17 +
+ plat/renesas/rzg/plat_image_load.c                 |  38 +
+ plat/renesas/rzg/plat_pm.c                         | 299 +++++++
+ plat/renesas/rzg/plat_storage.c                    | 252 ++++++
+ plat/renesas/rzg/plat_topology.c                   |  46 +
+ plat/renesas/rzg/platform.mk                       | 394 +++++++++
+ tools/renesas/rzg_layout_create/makefile           | 116 +++
+ tools/renesas/rzg_layout_create/sa0.c              |  30 +
+ tools/renesas/rzg_layout_create/sa0.ld.S           |  28 +
+ tools/renesas/rzg_layout_create/sa6.c              | 185 ++++
+ tools/renesas/rzg_layout_create/sa6.ld.S           | 121 +++
+ 29 files changed, 5392 insertions(+)
+ create mode 100644 drivers/renesas/rzg/common.c
+ create mode 100644 plat/renesas/rzg/aarch64/plat_helpers.S
+ create mode 100644 plat/renesas/rzg/aarch64/platform_common.c
+ create mode 100644 plat/renesas/rzg/bl2_cpg_init.c
+ create mode 100644 plat/renesas/rzg/bl2_interrupt_error.c
+ create mode 100644 plat/renesas/rzg/bl2_plat_mem_params_desc.c
+ create mode 100644 plat/renesas/rzg/bl2_plat_setup.c
+ create mode 100644 plat/renesas/rzg/bl2_secure_setting.c
+ create mode 100644 plat/renesas/rzg/bl31_plat_setup.c
+ create mode 100644 plat/renesas/rzg/include/plat.ld.S
+ create mode 100644 plat/renesas/rzg/include/plat_macros.S
+ create mode 100644 plat/renesas/rzg/include/platform_def.h
+ create mode 100644 plat/renesas/rzg/include/registers/axi_registers.h
+ create mode 100644 plat/renesas/rzg/include/registers/cpg_registers.h
+ create mode 100644 plat/renesas/rzg/include/registers/lifec_registers.h
+ create mode 100644 plat/renesas/rzg/include/rzg_def.h
+ create mode 100644 plat/renesas/rzg/include/rzg_private.h
+ create mode 100644 plat/renesas/rzg/include/rzg_version.h
+ create mode 100644 plat/renesas/rzg/plat_image_load.c
+ create mode 100644 plat/renesas/rzg/plat_pm.c
+ create mode 100644 plat/renesas/rzg/plat_storage.c
+ create mode 100644 plat/renesas/rzg/plat_topology.c
+ create mode 100644 plat/renesas/rzg/platform.mk
+ create mode 100644 tools/renesas/rzg_layout_create/makefile
+ create mode 100644 tools/renesas/rzg_layout_create/sa0.c
+ create mode 100644 tools/renesas/rzg_layout_create/sa0.ld.S
+ create mode 100644 tools/renesas/rzg_layout_create/sa6.c
+ create mode 100644 tools/renesas/rzg_layout_create/sa6.ld.S
+
+diff --git a/.gitignore b/.gitignore
+index 64b389b..79c5104 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -15,6 +15,10 @@ tools/renesas/rcar_layout_create/*.bin
+ tools/renesas/rcar_layout_create/*.srec
+ tools/renesas/rcar_layout_create/*.map
+ tools/renesas/rcar_layout_create/*.elf
++tools/renesas/rzg_layout_create/*.bin
++tools/renesas/rzg_layout_create/*.srec
++tools/renesas/rzg_layout_create/*.map
++tools/renesas/rzg_layout_create/*.elf
+ tools/fiptool/fiptool
+ tools/fiptool/fiptool.exe
+ tools/cert_create/src/*.o
+diff --git a/drivers/renesas/rzg/common.c b/drivers/renesas/rzg/common.c
+new file mode 100644
+index 0000000..556af55
+--- /dev/null
++++ b/drivers/renesas/rzg/common.c
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <lib/mmio.h>
++
++#include "rzg_private.h"
++
++void
++#if IMAGE_BL31
++    __attribute__ ((section(".system_ram")))
++#endif
++    cpg_write(uintptr_t regadr, uint32_t regval)
++{
++	uint32_t value = (regval);
++	mmio_write_32((uintptr_t) RZG_CPGWPR, ~value);
++	mmio_write_32(regadr, value);
++}
++
++void
++#if IMAGE_BL31
++    __attribute__ ((section(".system_ram")))
++#endif
++    mstpcr_write(uint32_t mstpcr, uint32_t mstpsr, uint32_t target_bit)
++{
++	uint32_t reg;
++	reg = mmio_read_32(mstpcr);
++	reg &= ~target_bit;
++	cpg_write(mstpcr, reg);
++	while ((mmio_read_32(mstpsr) & target_bit) != 0U) {
++	}
++}
+diff --git a/plat/renesas/rzg/aarch64/plat_helpers.S b/plat/renesas/rzg/aarch64/plat_helpers.S
+new file mode 100644
+index 0000000..2177e7e
+--- /dev/null
++++ b/plat/renesas/rzg/aarch64/plat_helpers.S
+@@ -0,0 +1,392 @@
++/*
++ * Copyright (c) 2013-2020, ARM Limited and Contributors. All rights reserved.
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <arch.h>
++#include <asm_macros.S>
++#include <common/bl_common.h>
++#include <common/runtime_svc.h>
++#include <cortex_a57.h>
++#include <platform_def.h>
++
++#include "rzg_def.h"
++
++	.globl	plat_get_my_entrypoint
++	.extern	plat_set_my_stack
++	.globl	platform_mem_init
++
++	.globl	plat_crash_console_init
++	.globl	plat_crash_console_putc
++	.globl	plat_crash_console_flush
++	.globl	plat_invalidate_icache
++	.globl	plat_report_exception
++	.globl	plat_secondary_reset
++	.globl	plat_reset_handler
++	.globl	plat_my_core_pos
++	.extern	rzg_log_init
++
++	.extern console_rzg_init
++	.extern console_rzg_putc
++	.extern console_rzg_flush
++
++#if IMAGE_BL2
++	#define	INT_ID_MASK	(0x3ff)
++	.extern bl2_interrupt_error_type
++	.extern bl2_interrupt_error_id
++	.globl  bl2_enter_bl31
++	.extern gicv2_acknowledge_interrupt
++	.extern rzg_swdt_exec
++#endif
++
++	/* -----------------------------------------------------
++	 * void platform_get_core_pos (mpidr)
++	 * -----------------------------------------------------
++	 */
++func platform_get_core_pos
++	and     x1, x0, #MPIDR_CPU_MASK
++	and     x0, x0, #MPIDR_CLUSTER_MASK
++	add     x0, x1, x0, LSR #6
++	ret
++endfunc platform_get_core_pos
++
++	/* -----------------------------------------------------
++	 * void platform_my_core_pos
++	 * -----------------------------------------------------
++	 */
++func plat_my_core_pos
++	mrs     x0, mpidr_el1
++	b	platform_get_core_pos
++endfunc plat_my_core_pos
++
++	/* -----------------------------------------------------
++	 * void platform_get_my_entrypoint (unsigned int mpid);
++	 *
++	 * Main job of this routine is to distinguish between
++	 * a cold and warm boot.
++	 * On a cold boot the secondaries first wait for the
++	 * platform to be initialized after which they are
++	 * hotplugged in. The primary proceeds to perform the
++	 * platform initialization.
++	 * On a warm boot, each cpu jumps to the address in its
++	 * mailbox.
++	 *
++	 * TODO: Not a good idea to save lr in a temp reg
++	 * -----------------------------------------------------
++	 */
++func plat_get_my_entrypoint
++	mrs	x0, mpidr_el1
++	mov	x9, x30 /* lr */
++
++#if defined(IMAGE_BL2)
++	/* always cold boot on bl2 */
++	mov	x0, #0
++	ret	x9
++#else
++       ldr 	x1, =BOOT_KIND_BASE
++       ldr	x21, [x1]
++
++	/* Check the reset info */
++	and	x1, x21, #0x000c
++	cmp	x1, #0x0008
++	beq	el3_panic
++	cmp	x1, #0x000c
++	beq	el3_panic
++
++	/* Check the boot kind */
++	and	x1, x21, #0x0003
++	cmp	x1, #0x0002
++	beq	el3_panic
++	cmp	x1, #0x0003
++	beq	el3_panic
++
++	/* warm boot or cold boot */
++	and	x1, x21, #1
++	cmp	x1, #0
++	bne	warm_reset
++
++	/* Cold boot */
++	mov	x0, #0
++	b	exit
++
++warm_reset:
++	/* --------------------------------------------------------------------
++	 * A per-cpu mailbox is maintained in the trusted SDRAM. Its flushed out
++	 * of the caches after every update using normal memory so its safe to
++	 * read it here with SO attributes
++	 * ---------------------------------------------------------------------
++	 */
++	ldr	x10, =MBOX_BASE
++	bl	platform_get_core_pos
++	lsl	x0, x0, #CACHE_WRITEBACK_SHIFT
++	ldr	x0, [x10, x0]
++	cbz	x0, _panic
++exit:
++	ret	x9
++_panic:
++	b	do_panic
++#endif
++
++endfunc plat_get_my_entrypoint
++
++	/* ---------------------------------------------
++	 * plat_secondary_reset
++	 *
++	 * ---------------------------------------------
++	 */
++func plat_secondary_reset
++	mrs	x0, sctlr_el3
++	bic	x0, x0, #SCTLR_EE_BIT
++	msr	sctlr_el3, x0
++	isb
++
++	mrs	x0, cptr_el3
++	bic	w0, w0, #TCPAC_BIT
++	bic	w0, w0, #TTA_BIT
++	bic	w0, w0, #TFP_BIT
++	msr	cptr_el3, x0
++
++	mov_imm	x0, PARAMS_BASE
++	mov_imm	x2, BL31_BASE
++       ldr x3, =BOOT_KIND_BASE
++	mov x1, #0x1
++	str x1, [x3]
++	br	x2	/* jump to BL31 */
++	nop
++	nop
++	nop
++endfunc plat_secondary_reset
++
++	/* ---------------------------------------------
++	 * plat_enter_bl31
++	 *
++	 * ---------------------------------------------
++	 */
++func bl2_enter_bl31
++	mov	x20, x0
++        /*
++         * MMU needs to be disabled because both BL2 and BL31 execute
++         * in EL3, and therefore share the same address space.
++         * BL31 will initialize the address space according to its
++         * own requirement.
++         */
++#if RZG_BL2_DCACHE == 1
++	/* Disable mmu and data cache */
++	bl	disable_mmu_el3
++	/* Data cache clean and invalidate */
++	mov	x0, #DCCISW
++	bl	dcsw_op_all
++	/* TLB invalidate all, EL3 */
++	tlbi	alle3
++#endif /* RZG_BL2_DCACHE == 1 */
++	bl	disable_mmu_icache_el3
++	/* Invalidate instruction cache */
++	ic	iallu
++	dsb	sy
++	isb
++	ldp	x0, x1, [x20, #ENTRY_POINT_INFO_PC_OFFSET]
++	msr	elr_el3, x0
++	msr	spsr_el3, x1
++	exception_return
++endfunc bl2_enter_bl31
++
++	/* -----------------------------------------------------
++	 * void platform_mem_init (void);
++	 *
++	 * Zero out the mailbox registers in the shared memory
++	 * and set the rzg_boot_kind_flag.
++	 * The mmu is turned off right now and only the primary can
++	 * ever execute this code. Secondaries will read the
++	 * mailboxes using SO accesses.
++	 * -----------------------------------------------------
++	 */
++func platform_mem_init
++#if !IMAGE_BL2
++	ldr	x0, =MBOX_BASE
++	mov	w1, #PLATFORM_CORE_COUNT
++loop:
++	str	xzr, [x0], #CACHE_WRITEBACK_GRANULE
++	subs	w1, w1, #1
++	b.gt	loop
++#endif
++	ret
++endfunc platform_mem_init
++
++	/* ---------------------------------------------
++	 * void plat_report_exception(unsigned int type)
++	 * Function to report an unhandled exception
++	 * with platform-specific means.
++	 * ---------------------------------------------
++	 */
++func plat_report_exception
++	/* Switch to SP_EL0 */
++	msr	spsel, #0
++#if IMAGE_BL2
++	mov	w1, #FIQ_SP_EL0
++	cmp	w0, w1
++	beq	rep_exec_fiq_elx
++	b	rep_exec_panic_type
++rep_exec_fiq_elx:
++	bl	gicv2_acknowledge_interrupt
++	mov	x2, #INT_ID_MASK
++	and	x0, x0, x2
++	mov	x1, #ARM_IRQ_SEC_WDT
++	cmp	x0, x1
++	bne	rep_exec_panic_id
++	mrs	x0, ELR_EL3
++	b	rzg_swdt_exec
++rep_exec_panic_type:
++	/* x0 is interrupt TYPE */
++	b	bl2_interrupt_error_type
++rep_exec_panic_id:
++	/* x0 is interrupt ID */
++	b	bl2_interrupt_error_id
++rep_exec_end:
++#endif
++	ret
++endfunc plat_report_exception
++
++	/* ---------------------------------------------
++	 * int plat_crash_console_init(void)
++	 * Function to initialize log area
++	 * ---------------------------------------------
++	 */
++func plat_crash_console_init
++#if IMAGE_BL2
++	mov	x0, #0
++#else
++	mov	x1, sp
++	mov_imm	x2, RZG_CRASH_STACK
++	mov	sp, x2
++	str	x1, [sp, #-16]!
++	str	x30, [sp, #-16]!
++	bl	console_rzg_init
++	ldr	x30, [sp], #16
++	ldr	x1, [sp], #16
++	mov	sp, x1
++#endif
++	ret
++endfunc plat_crash_console_init
++
++	/* ---------------------------------------------
++	 * int plat_crash_console_putc(int c)
++	 * Function to store a character to log area
++	 * ---------------------------------------------
++	 */
++func plat_crash_console_putc
++	mov	x1, sp
++	mov_imm	x2, RZG_CRASH_STACK
++	mov	sp, x2
++	str	x1, [sp, #-16]!
++	str	x30, [sp, #-16]!
++	str	x3, [sp, #-16]!
++	str	x4, [sp, #-16]!
++	str	x5, [sp, #-16]!
++	bl	console_rzg_putc
++	ldr	x5, [sp], #16
++	ldr	x4, [sp], #16
++	ldr	x3, [sp], #16
++	ldr	x30, [sp], #16
++	ldr	x1, [sp], #16
++	mov	sp, x1
++	ret
++endfunc plat_crash_console_putc
++
++	/* ---------------------------------------------
++	 * int plat_crash_console_flush()
++	 * ---------------------------------------------
++	 */
++func plat_crash_console_flush
++	b	console_rzg_flush
++endfunc plat_crash_console_flush
++
++	/* --------------------------------------------------------------------
++	 * void plat_reset_handler(void);
++	 *
++	 * Before adding code in this function, refer to the guidelines in
++	 * docs/firmware-design.md to determine whether the code should reside
++	 * within the FIRST_RESET_HANDLER_CALL block or not.
++	 *
++	 * For RZ/G2H:
++	 * - Set the L2 Tag RAM latency to 2 (i.e. 3 cycles) for Cortex-A57
++	 * - Set the L2 Data setup latency to 1 (i.e. 1 cycles) for Cortex-A57
++	 * - Set the L2 Data RAM latency to 3 (i.e. 4 cycles) for Cortex-A57
++	 * For RZ/G2M and RZ/G2N:
++	 * - Set the L2 Tag RAM latency to 2 (i.e. 3 cycles) for Cortex-A57
++	 * - Set the L2 Data setup latency to 0 (i.e. 0 cycles) for Cortex-A57
++	 * - Set the L2 Data RAM latency to 3 (i.e. 4 cycles) for Cortex-A57
++	 *
++	 * --------------------------------------------------------------------
++	 */
++func plat_reset_handler
++	/*
++	 * On RZ/G2H		:  x2 := 0
++	 * On RZ/G2M and RZ/G2N :  x2 := 1
++	 */
++	/* read PRR */
++	ldr	x0, =0xFFF00044
++	ldr	w0, [x0]
++	ubfx	w0, w0, 8, 8
++	/* RZ/G2H? */
++	cmp	w0, #0x4F
++	b.eq	RZG2H
++	/* set RZ/G2M or RZ/G2N */
++	mov	x2, #1
++	b	CHK_A5x
++RZG2H:
++	/* set RZ/G2H */
++	mov	x2, #0
++	/* --------------------------------------------------------------------
++	 * Determine whether this code is executed on a Cortex-A53 or on a
++	 * Cortex-A57 core.
++	 * --------------------------------------------------------------------
++	 */
++CHK_A5x:
++	mrs	x0, midr_el1
++	ubfx	x1, x0, MIDR_PN_SHIFT, #12
++	cmp     w1, #((CORTEX_A57_MIDR >> MIDR_PN_SHIFT) & MIDR_PN_MASK)
++	b.eq	A57
++	ret
++A57:
++	/* Get data from CORTEX_A57_L2CTLR_EL1	*/
++	mrs	x0, CORTEX_A57_L2CTLR_EL1
++	/*
++	 * On RZ G2H/G2M/G2N
++	 *
++	 * L2 Tag RAM latency is bit8-6 of CORTEX_A57_L2CTLR_EL1
++	 * L2 Data RAM setup is bit5 of CORTEX_A57_L2CTLR_EL1
++	 * L2 Data RAM latency is bit2-0 of CORTEX_A57_L2CTLR_EL1
++	 */
++	/* clear bit of L2 RAM	*/
++	/* ~(0x1e7) -> x1	*/
++	mov	x1, #0x1e7
++	neg	x1, x1
++	/* clear bit of L2 RAM -> x0 */
++	and	x0, x0, x1
++	/* L2 Tag RAM latency (3 cycles) */
++	orr	x0, x0, #0x2 << 6
++	/* If M3/M3N then L2 RAM setup is 0 */
++	cbnz	x2, M3_L2
++	/* L2 Data RAM setup (1 cycle) */
++	orr	x0, x0, #0x1 << 5
++M3_L2:
++	/* L2 Data RAM latency (4 cycles) */
++	orr	x0, x0, #0x3
++	/* Store data to L2CTLR_EL1 */
++	msr	CORTEX_A57_L2CTLR_EL1, x0
++apply_l2_ram_latencies:
++	ret
++endfunc plat_reset_handler
++
++	/* ---------------------------------------------
++	 * void plat_invalidate_icache(void)
++	 * Instruction Cache Invalidate All to PoU
++	 * ---------------------------------------------
++	 */
++func plat_invalidate_icache
++	ic	iallu
++
++	ret
++endfunc plat_invalidate_icache
+diff --git a/plat/renesas/rzg/aarch64/platform_common.c b/plat/renesas/rzg/aarch64/platform_common.c
+new file mode 100644
+index 0000000..c3253b5
+--- /dev/null
++++ b/plat/renesas/rzg/aarch64/platform_common.c
+@@ -0,0 +1,271 @@
++/*
++ * Copyright (c) 2013-2014, ARM Limited and Contributors. All rights reserved.
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <platform_def.h>
++
++#include <arch.h>
++#include <arch_helpers.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <common/interrupt_props.h>
++#include <drivers/arm/gicv2.h>
++#include <drivers/arm/gic_common.h>
++#include <lib/mmio.h>
++#include <lib/xlat_tables/xlat_tables_v2.h>
++#include <plat/common/platform.h>
++
++#include "rzg_def.h"
++#include "rzg_private.h"
++#include "rzg_version.h"
++
++#if (IMAGE_BL2)
++extern void rzg_read_certificate(uint64_t cert, uint32_t *len, uintptr_t *p);
++extern int32_t rzg_get_certificate(const int32_t name, uint32_t *cert);
++#endif
++
++const uint8_t version_of_renesas[VERSION_OF_RENESAS_MAXLEN]
++		__attribute__ ((__section__("ro"))) = VERSION_OF_RENESAS;
++
++#define MAP_SHARED_RAM		MAP_REGION_FLAT(RZG_SHARED_MEM_BASE,	\
++					RZG_SHARED_MEM_SIZE,		\
++					MT_MEMORY | MT_RW | MT_SECURE)
++
++#define MAP_FLASH0		MAP_REGION_FLAT(FLASH0_BASE,		\
++					FLASH0_SIZE,			\
++					MT_MEMORY | MT_RO | MT_SECURE)
++
++#define MAP_DRAM1_NS		MAP_REGION_FLAT(DRAM1_NS_BASE,		\
++					DRAM1_NS_SIZE,			\
++					MT_MEMORY | MT_RW | MT_NS)
++
++#define MAP_DEVICE_RZG		MAP_REGION_FLAT(DEVICE_RZG_BASE,	\
++					DEVICE_RZG_SIZE,		\
++					MT_DEVICE | MT_RW | MT_SECURE)
++
++#define MAP_DEVICE_RZG2	MAP_REGION_FLAT(DEVICE_RZG_BASE2,	\
++					DEVICE_RZG_SIZE2,		\
++					MT_DEVICE | MT_RW | MT_SECURE)
++
++#define MAP_SRAM		MAP_REGION_FLAT(DEVICE_SRAM_BASE,	\
++					DEVICE_SRAM_SIZE,		\
++					MT_MEMORY | MT_RO | MT_SECURE)
++
++#define MAP_SRAM_STACK		MAP_REGION_FLAT(DEVICE_SRAM_STACK_BASE,	\
++					DEVICE_SRAM_STACK_SIZE,		\
++					MT_MEMORY | MT_RW | MT_SECURE)
++
++#define MAP_ATFW_CRASH  	MAP_REGION_FLAT(RZG_BL31_CRASH_BASE,	\
++					RZG_BL31_CRASH_SIZE,		\
++					MT_MEMORY | MT_RW | MT_SECURE)
++
++#define MAP_ATFW_LOG		MAP_REGION_FLAT(RZG_BL31_LOG_BASE,	\
++					RZG_BL31_LOG_SIZE,		\
++					MT_DEVICE | MT_RW | MT_SECURE)
++#if IMAGE_BL2
++#define MAP_DRAM0		MAP_REGION_FLAT(DRAM1_BASE,		\
++					DRAM1_SIZE,			\
++					MT_MEMORY | MT_RW | MT_SECURE)
++
++#define MAP_REG0		MAP_REGION_FLAT(DEVICE_RZG_BASE,	\
++					DEVICE_RZG_SIZE,		\
++					MT_DEVICE | MT_RW | MT_SECURE)
++
++#define MAP_RAM0		MAP_REGION_FLAT(RZG_SYSRAM_BASE,	\
++					RZG_SYSRAM_SIZE,		\
++					MT_MEMORY | MT_RW | MT_SECURE)
++
++#define MAP_REG1		MAP_REGION_FLAT(REG1_BASE,		\
++					REG1_SIZE,			\
++					MT_DEVICE | MT_RW | MT_SECURE)
++
++#define MAP_ROM			MAP_REGION_FLAT(ROM0_BASE,		\
++					ROM0_SIZE,			\
++					MT_MEMORY | MT_RO | MT_SECURE)
++
++#define MAP_REG2		MAP_REGION_FLAT(REG2_BASE,		\
++					REG2_SIZE,			\
++					MT_DEVICE | MT_RW | MT_SECURE)
++
++#define MAP_DRAM1		MAP_REGION_FLAT(DRAM_40BIT_BASE,	\
++					DRAM_40BIT_SIZE,		\
++					MT_MEMORY | MT_RW | MT_SECURE)
++#endif
++
++#ifdef BL32_BASE
++#define MAP_BL32_MEM		MAP_REGION_FLAT(BL32_BASE,		\
++					BL32_LIMIT - BL32_BASE,		\
++					MT_MEMORY | MT_RW | MT_SECURE)
++#endif
++
++#if IMAGE_BL2
++static const mmap_region_t rzg_mmap[] = {
++	MAP_FLASH0,	/*   0x08000000 -   0x0BFFFFFF  RPC area            */
++	MAP_DRAM0,	/*   0x40000000 -   0xBFFFFFFF  DRAM area(Legacy)   */
++	MAP_REG0,	/*   0xE6000000 -   0xE62FFFFF  SoC register area   */
++	MAP_RAM0,	/*   0xE6300000 -   0xE6303FFF  System RAM area     */
++	MAP_REG1,	/*   0xE6400000 -   0xEAFFFFFF  SoC register area   */
++	MAP_ROM,	/*   0xEB100000 -   0xEB127FFF  boot ROM area       */
++	MAP_REG2,	/*   0xEC000000 -   0xFFFFFFFF  SoC register area   */
++	MAP_DRAM1,	/* 0x0400000000 - 0x07FFFFFFFF  DRAM area(4GB over) */
++	{0}
++};
++#endif
++
++#if IMAGE_BL31
++static const mmap_region_t rzg_mmap[] = {
++	MAP_SHARED_RAM,
++	MAP_ATFW_CRASH,
++	MAP_ATFW_LOG,
++	MAP_DEVICE_RZG,
++	MAP_DEVICE_RZG2,
++	MAP_SRAM,
++	MAP_SRAM_STACK,
++	{0}
++};
++#endif
++
++#if IMAGE_BL32
++static const mmap_region_t rzg_mmap[] = {
++	MAP_DEVICE0,
++	MAP_DEVICE1,
++	{0}
++};
++#endif
++
++CASSERT(ARRAY_SIZE(rzg_mmap) + RZG_BL_REGIONS
++	<= MAX_MMAP_REGIONS, assert_max_mmap_regions);
++
++/*
++ * Macro generating the code for the function setting up the pagetables as per
++ * the platform memory map & initialize the mmu, for the given exception level
++ */
++#if USE_COHERENT_MEM
++void rzg_configure_mmu_el3(unsigned long total_base,
++			    unsigned long total_size,
++			    unsigned long ro_start,
++			    unsigned long ro_limit,
++			    unsigned long coh_start,
++			    unsigned long coh_limit)
++{
++	mmap_add_region(total_base, total_base, total_size,
++			MT_MEMORY | MT_RW | MT_SECURE);
++	mmap_add_region(ro_start, ro_start, ro_limit - ro_start,
++			MT_MEMORY | MT_RO | MT_SECURE);
++	mmap_add_region(coh_start, coh_start, coh_limit - coh_start,
++			MT_DEVICE | MT_RW | MT_SECURE);
++	mmap_add(rzg_mmap);
++
++	init_xlat_tables();
++	enable_mmu_el3(0);
++}
++#else
++void rzg_configure_mmu_el3(unsigned long total_base,
++			    unsigned long total_size,
++			    unsigned long ro_start,
++			    unsigned long ro_limit)
++{
++	mmap_add_region(total_base, total_base, total_size,
++			MT_MEMORY | MT_RW | MT_SECURE);
++	mmap_add_region(ro_start, ro_start, ro_limit - ro_start,
++			MT_MEMORY | MT_RO | MT_SECURE);
++	mmap_add(rzg_mmap);
++
++	init_xlat_tables();
++	enable_mmu_el3(0);
++}
++#endif
++
++uintptr_t plat_get_ns_image_entrypoint(void)
++{
++#if (IMAGE_BL2)
++	uint32_t cert, len;
++	uintptr_t dst;
++	int32_t ret;
++
++	ret = rzg_get_certificate(NON_TRUSTED_FW_CONTENT_CERT_ID, &cert);
++	if (ret) {
++		ERROR("%s : cert file load error", __func__);
++		return NS_IMAGE_OFFSET;
++	}
++
++	rzg_read_certificate((uint64_t) cert, &len, &dst);
++
++	return dst;
++#else
++	return NS_IMAGE_OFFSET;
++#endif
++}
++
++unsigned int plat_get_syscnt_freq2(void)
++{
++	unsigned int freq;
++
++	freq = mmio_read_32(ARM_SYS_CNTCTL_BASE + CNTFID_OFF);
++	if (freq == 0)
++		panic();
++
++	return freq;
++}
++
++void plat_rzg_gic_init(void)
++{
++	gicv2_distif_init();
++	gicv2_pcpu_distif_init();
++	gicv2_cpuif_enable();
++}
++
++static const interrupt_prop_t interrupt_props[] = {
++#if IMAGE_BL2
++	INTR_PROP_DESC(ARM_IRQ_SEC_WDT, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++#else
++	INTR_PROP_DESC(ARM_IRQ_SEC_PHY_TIMER, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_0, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_1, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_2, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_3, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_4, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_5, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_6, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_SGI_7, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_EDGE),
++	INTR_PROP_DESC(ARM_IRQ_SEC_RPC, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_TIMER, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_TIMER_UP, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_WDT, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_CRYPT, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_CRYPT_SecPKA, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++	INTR_PROP_DESC(ARM_IRQ_SEC_CRYPT_PubPKA, GIC_HIGHEST_SEC_PRIORITY,
++		       GICV2_INTR_GROUP0, GIC_INTR_CFG_LEVEL),
++#endif
++};
++
++static const gicv2_driver_data_t plat_gicv2_driver_data = {
++	.interrupt_props = interrupt_props,
++	.interrupt_props_num = (uint32_t) ARRAY_SIZE(interrupt_props),
++	.gicd_base = RZG_GICD_BASE,
++	.gicc_base = RZG_GICC_BASE,
++};
++
++void plat_rzg_gic_driver_init(void)
++{
++	gicv2_driver_init(&plat_gicv2_driver_data);
++}
+diff --git a/plat/renesas/rzg/bl2_cpg_init.c b/plat/renesas/rzg/bl2_cpg_init.c
+new file mode 100644
+index 0000000..89d661e
+--- /dev/null
++++ b/plat/renesas/rzg/bl2_cpg_init.c
+@@ -0,0 +1,313 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/debug.h>
++#include <lib/mmio.h>
++
++#include "rzg_def.h"
++#include "cpg_registers.h"
++#include "rzg_private.h"
++
++static void bl2_secure_cpg_init(void);
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2H)
++static void bl2_realtime_cpg_init_g2h(void);
++static void bl2_system_cpg_init_g2h(void);
++#endif
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2M)
++static void bl2_realtime_cpg_init_g2m(void);
++static void bl2_system_cpg_init_g2m(void);
++#endif
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2N)
++static void bl2_realtime_cpg_init_g2n(void);
++static void bl2_system_cpg_init_g2n(void);
++#endif
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2E)
++static void bl2_realtime_cpg_init_g2e(void);
++static void bl2_system_cpg_init_g2e(void);
++#endif
++
++typedef struct {
++	uintptr_t adr;
++	uint32_t val;
++} reg_setting_t;
++
++static void bl2_secure_cpg_init(void)
++{
++	uint32_t stop_cr2, reset_cr2;
++	uint32_t stop_cr4, reset_cr4;
++	uint32_t stop_cr5, reset_cr5;
++
++#if RZG_LSI == RZG_G2E
++	reset_cr2 = 0x10000000U;
++	stop_cr2 = 0xEFFFFFFFU;
++#else
++	reset_cr2 = 0x14000000U;
++	stop_cr2 = 0xEBFFFFFFU;
++#endif
++
++	reset_cr4 = 0x80000003U;
++	stop_cr4 = 0x7FFFFFFFU;
++	reset_cr5 = 0x40000000U;
++	stop_cr5 = 0xBFFFFFFFU;
++
++	/** Secure Module Stop Control Registers */
++	cpg_write(SCMSTPCR0, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR2, stop_cr2);
++	cpg_write(SCMSTPCR3, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR4, stop_cr4);
++	cpg_write(SCMSTPCR5, stop_cr5);
++	cpg_write(SCMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR8, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR9, 0xFFFDFFFFU);
++	cpg_write(SCMSTPCR10, 0xFFFFFFFFU);
++	cpg_write(SCMSTPCR11, 0xFFFFFFFFU);
++
++	/** Secure Software Reset Access Enable Control Registers */
++	cpg_write(SCSRSTECR0, 0x00000000U);
++	cpg_write(SCSRSTECR1, 0x00000000U);
++	cpg_write(SCSRSTECR2, reset_cr2);
++	cpg_write(SCSRSTECR3, 0x00000000U);
++	cpg_write(SCSRSTECR4, reset_cr4);
++	cpg_write(SCSRSTECR5, reset_cr5);
++	cpg_write(SCSRSTECR6, 0x00000000U);
++	cpg_write(SCSRSTECR7, 0x00000000U);
++	cpg_write(SCSRSTECR8, 0x00000000U);
++	cpg_write(SCSRSTECR9, 0x00020000U);
++	cpg_write(SCSRSTECR10, 0x00000000U);
++	cpg_write(SCSRSTECR11, 0x00000000U);
++}
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2H)
++static void bl2_realtime_cpg_init_g2h(void)
++{
++	uint32_t cr0, cr8;
++
++	cr0 = 0x00210000U;
++	cr8 = 0x01F1FFF7U;
++
++	cpg_write(RMSTPCR0, cr0);
++	cpg_write(RMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR2, 0x040E0FDCU);
++	cpg_write(RMSTPCR3, 0xFFFFFFDFU);
++	cpg_write(RMSTPCR4, 0x80000004U);
++	cpg_write(RMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(RMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR8, cr8);
++	cpg_write(RMSTPCR9, 0xFFFFFFFEU);
++	cpg_write(RMSTPCR10, 0xFFFEFFE0U);
++	cpg_write(RMSTPCR11, 0x000000B7U);
++}
++
++static void bl2_system_cpg_init_g2h(void)
++{
++	/** System Module Stop Control Registers */
++	cpg_write(SMSTPCR0, 0x00210000U);
++	cpg_write(SMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR2, 0x040E2FDCU);
++	cpg_write(SMSTPCR3, 0xFFFFFBDFU);
++	cpg_write(SMSTPCR4, 0x80000004U);
++	cpg_write(SMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(SMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR8, 0x01F1FFF5U);
++	cpg_write(SMSTPCR9, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR10, 0xFFFEFFE0U);
++	cpg_write(SMSTPCR11, 0x000000B7U);
++}
++#endif
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2M)
++static void bl2_realtime_cpg_init_g2m(void)
++{
++	/** Realtime Module Stop Control Registers */
++	cpg_write(RMSTPCR0, 0x00200000U);
++	cpg_write(RMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR2, 0x040E0FDCU);
++	cpg_write(RMSTPCR3, 0xFFFFFFDFU);
++	cpg_write(RMSTPCR4, 0x80000004U);
++	cpg_write(RMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(RMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR8, 0x01F1FFF7U);
++	cpg_write(RMSTPCR9, 0xFFFFFFFEU);
++	cpg_write(RMSTPCR10, 0xFFFEFFE0U);
++	cpg_write(RMSTPCR11, 0x000000B7U);
++}
++
++static void bl2_system_cpg_init_g2m(void)
++{
++	/** System Module Stop Control Registers */
++	cpg_write(SMSTPCR0, 0x00200000U);
++	cpg_write(SMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR2, 0x040E2FDCU);
++	cpg_write(SMSTPCR3, 0xFFFFFBDFU);
++	cpg_write(SMSTPCR4, 0x80000004U);
++	cpg_write(SMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(SMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR8, 0x01F1FFF7U);
++	cpg_write(SMSTPCR9, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR10, 0xFFFEFFE0U);
++	cpg_write(SMSTPCR11, 0x000000B7U);
++}
++#endif
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2N)
++static void bl2_realtime_cpg_init_g2n(void)
++{
++	/** Realtime Module Stop Control Registers */
++	cpg_write(RMSTPCR0, 0x00210000U);
++	cpg_write(RMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR2, 0x040E0FDCU);
++	cpg_write(RMSTPCR3, 0xFFFFFFDFU);
++	cpg_write(RMSTPCR4, 0x80000004U);
++	cpg_write(RMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(RMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR8, 0x00F1FFF7U);
++	cpg_write(RMSTPCR9, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR10, 0xFFFFFFE0U);
++	cpg_write(RMSTPCR11, 0x000000B7U);
++}
++
++static void bl2_system_cpg_init_g2n(void)
++{
++	/* System Module Stop Control Registers */
++	cpg_write(SMSTPCR0, 0x00210000U);
++	cpg_write(SMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR2, 0x040E2FDCU);
++	cpg_write(SMSTPCR3, 0xFFFFFBDFU);
++	cpg_write(SMSTPCR4, 0x80000004U);
++	cpg_write(SMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(SMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR8, 0x00F1FFF7U);
++	cpg_write(SMSTPCR9, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR10, 0xFFFFFFE0U);
++	cpg_write(SMSTPCR11, 0x000000B7U);
++}
++#endif
++
++#if (RZG_LSI == RZG_AUTO) || (RZG_LSI == RZG_G2E)
++static void bl2_realtime_cpg_init_g2e(void)
++{
++	/* Realtime Module Stop Control Registers */
++	cpg_write(RMSTPCR0, 0x00210000U);
++	cpg_write(RMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR2, 0x000E0FDCU);
++	cpg_write(RMSTPCR3, 0xFFFFFFDFU);
++	cpg_write(RMSTPCR4, 0x80000004U);
++	cpg_write(RMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(RMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(RMSTPCR8, 0x00F1FFF7U);
++	cpg_write(RMSTPCR9, 0xFFFFFFDFU);
++	cpg_write(RMSTPCR10, 0xFFFFFFE8U);
++	cpg_write(RMSTPCR11, 0x000000B7U);
++}
++
++static void bl2_system_cpg_init_g2e(void)
++{
++	/* System Module Stop Control Registers */
++	cpg_write(SMSTPCR0, 0x00210000U);
++	cpg_write(SMSTPCR1, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR2, 0x000E2FDCU);
++	cpg_write(SMSTPCR3, 0xFFFFFBDFU);
++	cpg_write(SMSTPCR4, 0x80000004U);
++	cpg_write(SMSTPCR5, 0xC3FFFFFFU);
++	cpg_write(SMSTPCR6, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR7, 0xFFFFFFFFU);
++	cpg_write(SMSTPCR8, 0x00F1FFF7U);
++	cpg_write(SMSTPCR9, 0xFFFFFFDFU);
++	cpg_write(SMSTPCR10, 0xFFFFFFE8U);
++	cpg_write(SMSTPCR11, 0x000000B7U);
++}
++#endif
++
++void bl2_cpg_init(void)
++{
++	uint32_t boot_cpu = mmio_read_32(RZG_MODEMR) & MODEMR_BOOT_CPU_MASK;
++#if RZG_LSI == RZG_AUTO
++	uint32_t product = mmio_read_32(RZG_PRR) & PRR_PRODUCT_MASK;
++#endif
++	bl2_secure_cpg_init();
++
++	if (boot_cpu == MODEMR_BOOT_CPU_CA57 ||
++	    boot_cpu == MODEMR_BOOT_CPU_CA53) {
++#if RZG_LSI == RZG_AUTO
++
++		switch (product) {
++		case PRR_PRODUCT_G2H:
++			bl2_realtime_cpg_init_g2h();
++			break;
++		case PRR_PRODUCT_G2M:
++			bl2_realtime_cpg_init_g2m();
++			break;
++		case PRR_PRODUCT_G2N:
++			bl2_realtime_cpg_init_g2n();
++			break;
++		case PRR_PRODUCT_G2E:
++			bl2_realtime_cpg_init_g2e();
++			break;
++		default:
++			panic();
++			break;
++		}
++#elif RZG_LSI == RZG_G2H
++		bl2_realtime_cpg_init_g2h();
++#elif RZG_LSI == RZG_G2M
++		bl2_realtime_cpg_init_g2m();
++#elif RZG_LSI == RZG_G2N
++		bl2_realtime_cpg_init_g2n();
++#elif RZG_LSI == RZG_G2E
++		bl2_realtime_cpg_init_g2e();
++#else
++#error "Don't have CPG initialize routine(unknown)."
++#endif
++	}
++}
++
++void bl2_system_cpg_init(void)
++{
++#if RZG_LSI == RZG_AUTO
++	uint32_t product = mmio_read_32(RZG_PRR) & PRR_PRODUCT_MASK;
++
++	switch (product) {
++	case PRR_PRODUCT_G2H:
++		bl2_system_cpg_init_g2h();
++		break;
++	case PRR_PRODUCT_G2M:
++		bl2_system_cpg_init_g2m();
++		break;
++	case PRR_PRODUCT_G2N:
++		bl2_system_cpg_init_g2n();
++		break;
++	case PRR_PRODUCT_G2E:
++		bl2_system_cpg_init_g2e();
++		break;
++	default:
++		panic();
++		break;
++	}
++#elif RZG_LSI == RZG_G2H
++	bl2_system_cpg_init_g2h();
++#elif RZG_LSI == RZG_G2M
++	bl2_system_cpg_init_g2m();
++#elif RZG_LSI == RZG_G2N
++	bl2_system_cpg_init_g2n();
++#elif RZG_LSI == RZG_G2E
++	bl2_system_cpg_init_g2e();
++#else
++#error "Don't have CPG initialize routine(unknown)."
++#endif
++}
+diff --git a/plat/renesas/rzg/bl2_interrupt_error.c b/plat/renesas/rzg/bl2_interrupt_error.c
+new file mode 100644
+index 0000000..c5fed2e
+--- /dev/null
++++ b/plat/renesas/rzg/bl2_interrupt_error.c
+@@ -0,0 +1,109 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <arch_helpers.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <common/runtime_svc.h>
++#include <drivers/arm/gicv2.h>
++#include <lib/mmio.h>
++
++#include "rzg_def.h"
++
++#define SWDT_ERROR_ID	(1024U)
++#define SWDT_ERROR_TYPE	(16U)
++#define SWDT_CHAR_MAX	(13U)
++
++extern void rzg_swdt_release(void);
++
++void bl2_interrupt_error_id(uint32_t int_id)
++{
++	ERROR("\n");
++	if (int_id >= SWDT_ERROR_ID) {
++		ERROR("Unhandled exception occurred.\n");
++		ERROR("     Exception type = FIQ_SP_EL0\n");
++		panic();
++	}
++
++	/* Clear the interrupt request */
++	gicv2_end_of_interrupt((uint32_t) int_id);
++	rzg_swdt_release();
++	ERROR("Unhandled exception occurred.\n");
++	ERROR("     Exception type = FIQ_SP_EL0\n");
++	ERROR("     SPSR_EL3 = 0x%x\n", (uint32_t) read_spsr_el3());
++	ERROR("     ELR_EL3  = 0x%x\n", (uint32_t) read_elr_el3());
++	ERROR("     ESR_EL3  = 0x%x\n", (uint32_t) read_esr_el3());
++	ERROR("     FAR_EL3  = 0x%x\n", (uint32_t) read_far_el3());
++	ERROR("\n");
++	panic();
++}
++
++void bl2_interrupt_error_type(uint32_t ex_type)
++{
++	const uint8_t interrupt_ex[SWDT_ERROR_TYPE][SWDT_CHAR_MAX] = {
++		"SYNC SP EL0",
++		"IRQ SP EL0",
++		"FIQ SP EL0",
++		"SERR SP EL0",
++		"SYNC SP ELx",
++		"IRQ SP ELx",
++		"FIQ SP ELx",
++		"SERR SP ELx",
++		"SYNC AARCH64",
++		"IRQ AARCH64",
++		"FIQ AARCH64",
++		"SERR AARCH64",
++		"SYNC AARCH32",
++		"IRQ AARCH32",
++		"FIQ AARCH32",
++		"SERR AARCH32"
++	};
++	char msg[128];
++
++	/* Clear the interrupt request  */
++	if (ex_type >= SWDT_ERROR_TYPE) {
++		ERROR("\n");
++		ERROR("Unhandled exception occurred.\n");
++		ERROR("     Exception type = Unknown (%d)\n", ex_type);
++		goto loop;
++	}
++
++	rzg_swdt_release();
++	ERROR("\n");
++	ERROR("Unhandled exception occurred.\n");
++	snprintf(msg, sizeof(msg), "     Exception type = %s\n",
++		 &interrupt_ex[ex_type][0]);
++	ERROR("%s", msg);
++	switch (ex_type) {
++	case SYNC_EXCEPTION_SP_EL0:
++		ERROR("     SPSR_EL3 = 0x%x\n", (uint32_t) read_spsr_el3());
++		ERROR("     ELR_EL3  = 0x%x\n", (uint32_t) read_elr_el3());
++		ERROR("     ESR_EL3  = 0x%x\n", (uint32_t) read_esr_el3());
++		ERROR("     FAR_EL3  = 0x%x\n", (uint32_t) read_far_el3());
++		break;
++	case IRQ_SP_EL0:
++		ERROR("     SPSR_EL3 = 0x%x\n", (uint32_t) read_spsr_el3());
++		ERROR("     ELR_EL3  = 0x%x\n", (uint32_t) read_elr_el3());
++		ERROR("     IAR_EL3  = 0x%x\n", gicv2_acknowledge_interrupt());
++		break;
++	case FIQ_SP_EL0:
++		ERROR("     SPSR_EL3 = 0x%x\n", (uint32_t) read_spsr_el3());
++		ERROR("     ELR_EL3  = 0x%x\n", (uint32_t) read_elr_el3());
++		ERROR("     IAR_EL3  = 0x%x\n", gicv2_acknowledge_interrupt());
++		break;
++	case SERROR_SP_EL0:
++		ERROR("     SPSR_EL3 = 0x%x\n", (uint32_t) read_spsr_el3());
++		ERROR("     ELR_EL3  = 0x%x\n", (uint32_t) read_elr_el3());
++		ERROR("     ESR_EL3  = 0x%x\n", (uint32_t) read_esr_el3());
++		ERROR("     FAR_EL3  = 0x%x\n", (uint32_t) read_far_el3());
++		break;
++	default:
++		break;
++	}
++loop:
++	ERROR("\n");
++	panic();
++}
+diff --git a/plat/renesas/rzg/bl2_plat_mem_params_desc.c b/plat/renesas/rzg/bl2_plat_mem_params_desc.c
+new file mode 100644
+index 0000000..9bd058c
+--- /dev/null
++++ b/plat/renesas/rzg/bl2_plat_mem_params_desc.c
+@@ -0,0 +1,88 @@
++/*
++ * Copyright (c) 2016-2019, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <platform_def.h>
++
++#include <common/bl_common.h>
++#include <common/desc_image_load.h>
++#include <lib/xlat_tables/xlat_tables_defs.h>
++#include <plat/common/platform.h>
++
++#if (RZG_BL33_EXECUTION_EL != 0) && (RZG_BL33_EXECUTION_EL != 1)
++#error
++#endif
++
++#if (RZG_BL33_EXECUTION_EL == 0)
++#define BL33_MODE MODE_EL1
++#else
++#define BL33_MODE MODE_EL2
++#endif
++
++extern uint64_t fdt_blob[PAGE_SIZE_4KB / sizeof(uint64_t)];
++
++static bl_mem_params_node_t bl2_mem_params_descs[] = {
++	{
++		.image_id = BL31_IMAGE_ID,
++
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP, VERSION_2,
++			entry_point_info_t, SECURE | EXECUTABLE | EP_FIRST_EXE),
++		.ep_info.spsr = SPSR_64(MODE_EL3,
++			MODE_SP_ELX, DISABLE_ALL_EXCEPTIONS),
++		.ep_info.pc = BL31_BASE,
++
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP, VERSION_2,
++			image_info_t, IMAGE_ATTRIB_PLAT_SETUP),
++		.image_info.image_max_size = BL31_LIMIT - BL31_BASE,
++		.image_info.image_base = BL31_BASE,
++
++# ifdef BL32_BASE
++		.next_handoff_image_id = BL32_IMAGE_ID,
++# else
++		.next_handoff_image_id = BL33_IMAGE_ID,
++# endif
++	},
++# ifdef BL32_BASE
++	{
++		.image_id = BL32_IMAGE_ID,
++
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP, VERSION_2,
++			entry_point_info_t, SECURE | EXECUTABLE),
++		.ep_info.pc = BL32_BASE,
++		.ep_info.spsr = 0,
++		.ep_info.args.arg3 = (uintptr_t)fdt_blob,
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP, VERSION_2,
++			image_info_t, 0),
++		.image_info.image_max_size = BL32_LIMIT - BL32_BASE,
++		.image_info.image_base = BL32_BASE,
++
++		.next_handoff_image_id = BL33_IMAGE_ID,
++	},
++#endif
++	{
++		.image_id = BL33_IMAGE_ID,
++
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP, VERSION_2,
++			entry_point_info_t, NON_SECURE | EXECUTABLE),
++		.ep_info.spsr = SPSR_64(BL33_MODE, MODE_SP_ELX,
++			DISABLE_ALL_EXCEPTIONS),
++		.ep_info.pc = BL33_BASE,
++#ifdef RZG_BL33_ARG0
++		.ep_info.args.arg0 = RZG_BL33_ARG0,
++#endif
++		.ep_info.args.arg1 = (uintptr_t)fdt_blob,
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP, VERSION_2,
++			image_info_t, 0),
++		.image_info.image_max_size =
++				(uint32_t) (DRAM_LIMIT - BL33_BASE),
++		.image_info.image_base = BL33_BASE,
++
++		.next_handoff_image_id = INVALID_IMAGE_ID,
++	}
++};
++
++REGISTER_BL_IMAGE_DESCS(bl2_mem_params_descs)
+diff --git a/plat/renesas/rzg/bl2_plat_setup.c b/plat/renesas/rzg/bl2_plat_setup.c
+new file mode 100644
+index 0000000..f576613
+--- /dev/null
++++ b/plat/renesas/rzg/bl2_plat_setup.c
+@@ -0,0 +1,938 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <string.h>
++
++#include <libfdt.h>
++
++#include <platform_def.h>
++
++#include <arch_helpers.h>
++#include <bl1/bl1.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <common/desc_image_load.h>
++#include <drivers/console.h>
++#include <lib/mmio.h>
++#include <lib/xlat_tables/xlat_tables_defs.h>
++#include <plat/common/platform.h>
++
++#include "boot_init_dram.h"
++#include "cpg_registers.h"
++#include "board.h"
++#include "emmc_def.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++
++#if PMIC_ROHM_BD9571 && RZG_SYSTEM_RESET_KEEPON_DDR
++#include "iic_dvfs.h"
++#endif
++
++#include "io_common.h"
++#include "qos_init.h"
++#include "rzg_def.h"
++#include "rzg_private.h"
++#include "rzg_version.h"
++#include "rom_api.h"
++
++#if RZG_BL2_DCACHE == 1
++/*
++ * Following symbols are only used during plat_arch_setup() only
++ * when RZG_BL2_DCACHE is enabled.
++ */
++#define BL2_RO_BASE		BL_CODE_BASE
++#define BL2_RO_LIMIT		BL_CODE_END
++
++#if USE_COHERENT_MEM
++#define BL2_COHERENT_RAM_BASE	BL_COHERENT_RAM_BASE
++#define BL2_COHERENT_RAM_LIMIT	BL_COHERENT_RAM_END
++#endif
++
++#endif
++
++extern void plat_rzg_gic_driver_init(void);
++extern void plat_rzg_gic_init(void);
++extern void bl2_enter_bl31(const struct entry_point_info *bl_ep_info);
++extern void bl2_system_cpg_init(void);
++extern void bl2_secure_setting(void);
++extern void bl2_cpg_init(void);
++extern void rzg_io_emmc_setup(void);
++extern void rzg_io_setup(void);
++extern void rzg_swdt_release(void);
++extern void rzg_swdt_init(void);
++extern void rzg_rpc_init(void);
++extern void rzg_pfc_init(void);
++extern void rzg_dma_init(void);
++
++static void bl2_init_generic_timer(void);
++
++/* RZ/G Gen2 product check */
++#if RZG_LSI == RZG_G2H
++#define TARGET_PRODUCT			PRR_PRODUCT_G2H
++#define TARGET_NAME			"RZ/G2H"
++#elif RZG_LSI == RZG_G2M
++#define TARGET_PRODUCT			PRR_PRODUCT_G2M
++#define TARGET_NAME			"RZ/G2M"
++#elif RZG_LSI == RZG_G2N
++#define TARGET_PRODUCT			PRR_PRODUCT_G2N
++#define TARGET_NAME			"RZ/G2N"
++#elif RZG_LSI == RZG_G2E
++#define TARGET_PRODUCT			PRR_PRODUCT_G2E
++#define TARGET_NAME			"RZ/G2E"
++#elif RZG_LSI == RZG_AUTO
++#define TARGET_NAME			"RZ/G2M/N/H"
++#endif
++
++#if (RZG_LSI != RZG_G2E)
++#define GPIO_INDT			(GPIO_INDT1)
++#define GPIO_BKUP_TRG_SHIFT		((uint32_t)1U<<8U)
++#endif
++
++CASSERT((PARAMS_BASE + sizeof(bl2_to_bl31_params_mem_t) + 0x100)
++	 < (RZG_SHARED_MEM_BASE + RZG_SHARED_MEM_SIZE),
++	assert_bl31_params_do_not_fit_in_shared_memory);
++
++static meminfo_t bl2_tzram_layout __aligned(CACHE_WRITEBACK_GRANULE);
++
++/* FDT with DRAM configuration */
++uint64_t fdt_blob[PAGE_SIZE_4KB / sizeof(uint64_t)];
++static void *fdt = (void *)fdt_blob;
++
++static void unsigned_num_print(unsigned long long int unum, unsigned int radix,
++				char *string)
++{
++	/* Just need enough space to store 64 bit decimal integer */
++	char num_buf[20];
++	int i = 0;
++	unsigned int rem;
++
++	do {
++		rem = unum % radix;
++		if (rem < 0xa)
++			num_buf[i] = '0' + rem;
++		else
++			num_buf[i] = 'a' + (rem - 0xa);
++		i++;
++		unum /= radix;
++	} while (unum > 0U);
++
++	while (--i >= 0)
++		*string++ = num_buf[i];
++}
++
++#if (RZG_LOSSY_ENABLE == 1)
++typedef struct bl2_lossy_info {
++	uint32_t magic;
++	uint32_t a0;
++	uint32_t b0;
++} bl2_lossy_info_t;
++
++static void bl2_lossy_gen_fdt(uint32_t no, uint64_t start_addr,
++			      uint64_t end_addr, uint32_t format,
++			      uint32_t enable, int fcnlnode)
++{
++	const uint64_t fcnlsize = cpu_to_fdt64(end_addr - start_addr);
++	char nodename[40] = { 0 };
++	int ret, node;
++
++	/* Ignore undefined addresses */
++	if (start_addr == 0 && end_addr == 0)
++		return;
++
++	snprintf(nodename, sizeof(nodename), "lossy-decompression@");
++	unsigned_num_print(start_addr, 16, nodename + strlen(nodename));
++
++	node = ret = fdt_add_subnode(fdt, fcnlnode, nodename);
++	if (ret < 0) {
++		NOTICE("BL2: Cannot create FCNL node (ret=%i)\n", ret);
++		panic();
++	}
++
++	ret = fdt_setprop_string(fdt, node, "compatible",
++				 "renesas,lossy-decompression");
++	if (ret < 0) {
++		NOTICE("BL2: Cannot add FCNL compat string (ret=%i)\n", ret);
++		panic();
++	}
++
++	ret = fdt_appendprop_string(fdt, node, "compatible",
++				    "shared-dma-pool");
++	if (ret < 0) {
++		NOTICE("BL2: Cannot append FCNL compat string (ret=%i)\n", ret);
++		panic();
++	}
++
++	ret = fdt_setprop_u64(fdt, node, "reg", start_addr);
++	if (ret < 0) {
++		NOTICE("BL2: Cannot add FCNL reg prop (ret=%i)\n", ret);
++		panic();
++	}
++
++	ret = fdt_appendprop(fdt, node, "reg", &fcnlsize, sizeof(fcnlsize));
++	if (ret < 0) {
++		NOTICE("BL2: Cannot append FCNL reg size prop (ret=%i)\n", ret);
++		panic();
++	}
++
++	ret = fdt_setprop(fdt, node, "no-map", NULL, 0);
++	if (ret < 0) {
++		NOTICE("BL2: Cannot add FCNL no-map prop (ret=%i)\n", ret);
++		panic();
++	}
++
++	ret = fdt_setprop_u32(fdt, node, "renesas,formats", format);
++	if (ret < 0) {
++		NOTICE("BL2: Cannot add FCNL formats prop (ret=%i)\n", ret);
++		panic();
++	}
++}
++
++static void bl2_lossy_setting(uint32_t no, uint64_t start_addr,
++			      uint64_t end_addr, uint32_t format,
++			      uint32_t enable, int fcnlnode)
++{
++	bl2_lossy_info_t info;
++	uint32_t reg;
++
++	bl2_lossy_gen_fdt(no, start_addr, end_addr, format, enable, fcnlnode);
++
++	reg = format | (start_addr >> 20);
++	mmio_write_32(AXI_DCMPAREACRA0 + 0x8 * no, reg);
++	mmio_write_32(AXI_DCMPAREACRB0 + 0x8 * no, end_addr >> 20);
++	mmio_write_32(AXI_DCMPAREACRA0 + 0x8 * no, reg | enable);
++
++	info.magic = 0x12345678U;
++	info.a0 = mmio_read_32(AXI_DCMPAREACRA0 + 0x8 * no);
++	info.b0 = mmio_read_32(AXI_DCMPAREACRB0 + 0x8 * no);
++
++	mmio_write_32(LOSSY_PARAMS_BASE + sizeof(info) * no, info.magic);
++	mmio_write_32(LOSSY_PARAMS_BASE + sizeof(info) * no + 0x4, info.a0);
++	mmio_write_32(LOSSY_PARAMS_BASE + sizeof(info) * no + 0x8, info.b0);
++
++	NOTICE("     Entry %d: DCMPAREACRAx:0x%x DCMPAREACRBx:0x%x\n", no,
++	       mmio_read_32(AXI_DCMPAREACRA0 + 0x8 * no),
++	       mmio_read_32(AXI_DCMPAREACRB0 + 0x8 * no));
++}
++#endif
++
++void bl2_plat_flush_bl31_params(void)
++{
++	uint32_t product_cut, product, cut;
++	uint32_t boot_dev, boot_cpu;
++	uint32_t reg;
++
++	reg = mmio_read_32(RZG_MODEMR);
++	boot_dev = reg & MODEMR_BOOT_DEV_MASK;
++
++	if (boot_dev == MODEMR_BOOT_DEV_EMMC_25X1 ||
++	    boot_dev == MODEMR_BOOT_DEV_EMMC_50X8)
++		emmc_terminate();
++
++	if ((reg & MODEMR_BOOT_CPU_MASK) != MODEMR_BOOT_CPU_CR7)
++		bl2_secure_setting();
++
++	reg = mmio_read_32(RZG_PRR);
++	product_cut = reg & (PRR_PRODUCT_MASK | PRR_CUT_MASK);
++	product = reg & PRR_PRODUCT_MASK;
++	cut = reg & PRR_CUT_MASK;
++
++	if (product == PRR_PRODUCT_G2M && PRR_PRODUCT_30 > cut)
++		goto tlb;
++
++	/* Disable MFIS write protection */
++	mmio_write_32(MFISWPCNTR, MFISWPCNTR_PASSWORD | 1);
++
++tlb:
++	reg = mmio_read_32(RZG_MODEMR);
++	boot_cpu = reg & MODEMR_BOOT_CPU_MASK;
++	if (boot_cpu != MODEMR_BOOT_CPU_CA57 &&
++	    boot_cpu != MODEMR_BOOT_CPU_CA53)
++		goto mmu;
++
++	if (product == PRR_PRODUCT_G2N) {
++		mmio_write_32(IPMMUVI0_IMSCTLR, IMSCTLR_DISCACHE);
++		mmio_write_32(IPMMUPV0_IMSCTLR, IMSCTLR_DISCACHE);
++	} else if ((product_cut == (PRR_PRODUCT_G2E | PRR_PRODUCT_10)) ||
++		   (product_cut == (PRR_PRODUCT_G2E | PRR_PRODUCT_11))) {
++		mmio_write_32(IPMMUVI0_IMSCTLR, IMSCTLR_DISCACHE);
++		mmio_write_32(IPMMUVP0_IMSCTLR, IMSCTLR_DISCACHE);
++		mmio_write_32(IPMMUPV0_IMSCTLR, IMSCTLR_DISCACHE);
++	}
++
++	if ((product == PRR_PRODUCT_G2N) ||
++	    (product_cut == (PRR_PRODUCT_G2E | PRR_PRODUCT_10))) {
++		mmio_write_32(IPMMUHC_IMSCTLR, IMSCTLR_DISCACHE);
++		mmio_write_32(IPMMURT_IMSCTLR, IMSCTLR_DISCACHE);
++		mmio_write_32(IPMMUMP_IMSCTLR, IMSCTLR_DISCACHE);
++
++		mmio_write_32(IPMMUDS0_IMSCTLR, IMSCTLR_DISCACHE);
++		mmio_write_32(IPMMUDS1_IMSCTLR, IMSCTLR_DISCACHE);
++	}
++
++mmu:
++	mmio_write_32(IPMMUMM_IMSCTLR, IPMMUMM_IMSCTLR_ENABLE);
++	mmio_write_32(IPMMUMM_IMAUXCTLR, IPMMUMM_IMAUXCTLR_NMERGE40_BIT);
++
++	rzg_swdt_release();
++	bl2_system_cpg_init();
++
++#if RZG_BL2_DCACHE == 1
++	/* Disable data cache (clean and invalidate) */
++	disable_mmu_el3();
++#endif
++}
++
++static uint32_t is_ddr_backup_mode(void)
++{
++#if RZG_SYSTEM_SUSPEND
++	static uint32_t reason = RZG_COLD_BOOT;
++	static uint32_t once;
++
++#if PMIC_ROHM_BD9571 && RZG_SYSTEM_RESET_KEEPON_DDR
++	uint8_t data;
++#endif
++	if (once)
++		return reason;
++
++	once = 1;
++	if ((mmio_read_32(GPIO_INDT) & GPIO_BKUP_TRG_SHIFT) == 0)
++		return reason;
++
++#if PMIC_ROHM_BD9571 && RZG_SYSTEM_RESET_KEEPON_DDR
++	if (rzg_iic_dvfs_receive(PMIC, REG_KEEP10, &data)) {
++		ERROR("BL2: REG Keep10 READ ERROR.\n");
++		panic();
++	}
++
++	if (KEEP10_MAGIC != data)
++		reason = RZG_WARM_BOOT;
++#else
++	reason = RZG_WARM_BOOT;
++#endif
++	return reason;
++#else
++	return RZG_COLD_BOOT;
++#endif
++}
++
++int bl2_plat_handle_pre_image_load(unsigned int image_id)
++{
++	u_register_t *boot_kind = (void *) BOOT_KIND_BASE;
++	bl_mem_params_node_t *bl_mem_params;
++
++	if (image_id != BL31_IMAGE_ID)
++		return 0;
++
++	bl_mem_params = get_bl_mem_params_node(image_id);
++
++	if (is_ddr_backup_mode() == RZG_COLD_BOOT)
++		goto cold_boot;
++
++	*boot_kind  = RZG_WARM_BOOT;
++	flush_dcache_range(BOOT_KIND_BASE, sizeof(*boot_kind));
++
++	console_flush();
++	bl2_plat_flush_bl31_params();
++
++	/* will not return */
++	bl2_enter_bl31(&bl_mem_params->ep_info);
++
++cold_boot:
++	*boot_kind  = RZG_COLD_BOOT;
++	flush_dcache_range(BOOT_KIND_BASE, sizeof(*boot_kind));
++
++	return 0;
++}
++
++int bl2_plat_handle_post_image_load(unsigned int image_id)
++{
++	static bl2_to_bl31_params_mem_t *params;
++	bl_mem_params_node_t *bl_mem_params;
++
++	if (!params) {
++		params = (bl2_to_bl31_params_mem_t *) PARAMS_BASE;
++		memset((void *)PARAMS_BASE, 0, sizeof(*params));
++	}
++
++	bl_mem_params = get_bl_mem_params_node(image_id);
++
++	switch (image_id) {
++	case BL31_IMAGE_ID:
++		break;
++	case BL32_IMAGE_ID:
++		memcpy(&params->bl32_ep_info, &bl_mem_params->ep_info,
++			sizeof(entry_point_info_t));
++		break;
++	case BL33_IMAGE_ID:
++		memcpy(&params->bl33_ep_info, &bl_mem_params->ep_info,
++			sizeof(entry_point_info_t));
++		break;
++	}
++
++	return 0;
++}
++
++struct meminfo *bl2_plat_sec_mem_layout(void)
++{
++	return &bl2_tzram_layout;
++}
++
++static void bl2_populate_compatible_string(void *dt)
++{
++	uint32_t board_type;
++	uint32_t board_rev;
++	uint32_t reg;
++	int ret;
++
++	fdt_setprop_u32(fdt, 0, "#address-cells", 2);
++	fdt_setprop_u32(fdt, 0, "#size-cells", 2);
++
++	/* Populate compatible string */
++	rzg_get_board_type(&board_type, &board_rev);
++	switch (board_type) {
++	case BOARD_HIHOPE_RZG2H:
++	case BOARD_HIHOPE_RZG2M:
++	case BOARD_HIHOPE_RZG2N:
++		ret = fdt_setprop_string(fdt, 0, "compatible",
++					 "renesas,hihope");
++		break;
++	case BOARD_EK874:
++		ret = fdt_setprop_string(fdt, 0, "compatible",
++					 "renesas,ek874");
++		break;
++	default:
++		NOTICE("BL2: Cannot set compatible string, board unsupported\n");
++		panic();
++	}
++
++	if (ret < 0) {
++		NOTICE("BL2: Cannot set compatible string (ret=%i)\n", ret);
++		panic();
++	}
++
++	reg = mmio_read_32(RZG_PRR);
++	switch (reg & PRR_PRODUCT_MASK) {
++	case PRR_PRODUCT_G2H:
++		ret = fdt_appendprop_string(fdt, 0, "compatible",
++					    "renesas,r8a774e1");
++		break;
++	case PRR_PRODUCT_G2M:
++		ret = fdt_appendprop_string(fdt, 0, "compatible",
++					    "renesas,r8a774a1");
++		break;
++	case PRR_PRODUCT_G2N:
++		ret = fdt_appendprop_string(fdt, 0, "compatible",
++					    "renesas,r8a774b1");
++		break;
++	case PRR_PRODUCT_G2E:
++		ret = fdt_appendprop_string(fdt, 0, "compatible",
++					    "renesas,r8a774c0");
++		break;
++	default:
++		NOTICE("BL2: Cannot set compatible string, SoC unsupported\n");
++		panic();
++	}
++
++	if (ret < 0) {
++		NOTICE("BL2: Cannot set compatible string (ret=%i)\n", ret);
++		panic();
++	}
++}
++
++static void bl2_advertise_dram_entries(uint64_t dram_config[8])
++{
++	char nodename[32] = { 0 };
++	uint64_t start, size;
++	uint64_t fdtsize;
++	int ret, node, chan;
++
++	for (chan = 0; chan < 4; chan++) {
++		start = dram_config[2 * chan];
++		size = dram_config[2 * chan + 1];
++		if (!size)
++			continue;
++
++		NOTICE("BL2: CH%d: %llx - %llx, %lld %siB\n",
++			chan, start, start + size - 1,
++			(size >> 30) ? : size >> 20,
++			(size >> 30) ? "G" : "M");
++	}
++
++	/*
++	 * We add the DT nodes in reverse order here. The fdt_add_subnode()
++	 * adds the DT node before the first existing DT node, so we have
++	 * to add them in reverse order to get nodes sorted by address in
++	 * the resulting DT.
++	 */
++	for (chan = 3; chan >= 0; chan--) {
++		start = dram_config[2 * chan];
++		size = dram_config[2 * chan + 1];
++		if (!size)
++			continue;
++
++		/*
++		 * Channel 0 is mapped in 32bit space and the first
++		 * 128 MiB are reserved
++		 */
++		if (chan == 0) {
++			if (size > 0x80000000) {
++				start = dram_config[2 * chan] + 0x80000000;
++				size -= 0x80000000;
++				fdtsize = cpu_to_fdt64(size);
++
++				snprintf(nodename, sizeof(nodename), "memory@");
++				unsigned_num_print(start, 16, nodename + strlen(nodename));
++				node = ret = fdt_add_subnode(fdt, 0, nodename);
++				if (ret < 0)
++					goto err;
++
++				ret = fdt_setprop_string(fdt, node, "device_type", "memory");
++				if (ret < 0)
++					goto err;
++
++				ret = fdt_setprop_u64(fdt, node, "reg", start);
++				if (ret < 0)
++					goto err;
++
++				ret = fdt_appendprop(fdt, node, "reg", &fdtsize,
++				sizeof(fdtsize));
++				if (ret < 0)
++					goto err;
++				}
++
++			start = 0x48000000;
++			size -= 0x8000000;
++		}
++
++		fdtsize = cpu_to_fdt64(size);
++
++		snprintf(nodename, sizeof(nodename), "memory@");
++		unsigned_num_print(start, 16, nodename + strlen(nodename));
++		node = ret = fdt_add_subnode(fdt, 0, nodename);
++		if (ret < 0)
++			goto err;
++
++		ret = fdt_setprop_string(fdt, node, "device_type", "memory");
++		if (ret < 0)
++			goto err;
++
++		ret = fdt_setprop_u64(fdt, node, "reg", start);
++		if (ret < 0)
++			goto err;
++
++		ret = fdt_appendprop(fdt, node, "reg", &fdtsize,
++					 sizeof(fdtsize));
++		if (ret < 0)
++			goto err;
++	}
++
++	return;
++err:
++	NOTICE("BL2: Cannot add memory node to FDT (ret=%i)\n", ret);
++	panic();
++}
++
++static void bl2_advertise_dram_size(uint32_t product)
++{
++	uint64_t dram_config[8] = {
++		[0] = 0x400000000ULL,
++		[2] = 0x500000000ULL,
++		[4] = 0x600000000ULL,
++		[6] = 0x700000000ULL,
++	};
++
++	switch (product) {
++	case PRR_PRODUCT_G2H:
++#if (RZG_DRAM_LPDDR4_MEMCONF == 0)
++		/* 4GB(1GBx4) */
++		dram_config[1] = 0x40000000ULL;
++		dram_config[3] = 0x40000000ULL;
++		dram_config[5] = 0x40000000ULL;
++		dram_config[7] = 0x40000000ULL;
++#elif (RZG_DRAM_LPDDR4_MEMCONF == 1) && \
++      (RZG_DRAM_CHANNEL        == 5) && \
++      (RZG_DRAM_SPLIT          == 2)
++		/* 4GB(2GBx2 2ch split) */
++		dram_config[1] = 0x80000000ULL;
++		dram_config[3] = 0x80000000ULL;
++#elif (RZG_DRAM_LPDDR4_MEMCONF == 1) && (RZG_DRAM_CHANNEL == 15)
++		/* 8GB(2GBx4: default) */
++		dram_config[1] = 0x80000000ULL;
++		dram_config[3] = 0x80000000ULL;
++		dram_config[5] = 0x80000000ULL;
++		dram_config[7] = 0x80000000ULL;
++#endif /* RZG_DRAM_LPDDR4_MEMCONF == 0 */
++		break;
++
++	case PRR_PRODUCT_G2M:
++		/* 4GB(2GBx2 2ch split) */
++		dram_config[1] = 0x80000000ULL;
++		dram_config[5] = 0x80000000ULL;
++		break;
++
++	case PRR_PRODUCT_G2N:
++		/* 4GB(2GBx2) */
++		dram_config[1] = 0x100000000ULL;
++		break;
++
++	case PRR_PRODUCT_G2E:
++#if (RZG_DRAM_DDR3L_MEMCONF == 0)
++		/* 1GB(512MBx2) */
++		dram_config[1] = 0x40000000ULL;
++#elif (RZG_DRAM_DDR3L_MEMCONF == 1)
++		/* 2GB(512MBx4) */
++		dram_config[1] = 0x80000000ULL;
++#elif (RZG_DRAM_DDR3L_MEMCONF == 2)
++		/* 4GB(1GBx4) */
++		dram_config[1] = 0x100000000ULL;
++#endif /* RZG_DRAM_DDR3L_MEMCONF == 0 */
++		break;
++
++	}
++
++	bl2_advertise_dram_entries(dram_config);
++}
++
++void bl2_el3_early_platform_setup(u_register_t arg1, u_register_t arg2,
++				  u_register_t arg3, u_register_t arg4)
++{
++	uint32_t reg, midr, lcs, boot_dev, boot_cpu, sscg, type, rev;
++	uint32_t product, major, minor;
++	int32_t ret;
++	const char *str;
++	const char *unknown = "unknown";
++	const char *cpu_ca57 = "CA57";
++	const char *cpu_ca53 = "CA53";
++	const char *product_g2h = "G2H";
++	const char *product_g2m = "G2M";
++	const char *product_g2n = "G2N";
++	const char *product_g2e = "G2E";
++	const char *lcs_secure = "SE";
++	const char *lcs_cm = "CM";
++	const char *lcs_dm = "DM";
++	const char *lcs_sd = "SD";
++	const char *lcs_fa = "FA";
++	const char *sscg_off = "PLL1 nonSSCG Clock select";
++	const char *sscg_on = "PLL1 SSCG Clock select";
++	const char *boot_hyper80 = "HyperFlash(80MHz)";
++	const char *boot_qspi40 = "QSPI Flash(40MHz)";
++	const char *boot_qspi80 = "QSPI Flash(80MHz)";
++	const char *boot_emmc25x1 = "eMMC(25MHz x1)";
++	const char *boot_emmc50x8 = "eMMC(50MHz x8)";
++#if (RZG_LSI == RZG_G2E)
++	const char *boot_hyper160 = "HyperFlash(150MHz)";
++#else
++	const char *boot_hyper160 = "HyperFlash(160MHz)";
++#endif
++#if (RZG_LOSSY_ENABLE == 1)
++	int fcnlnode;
++#endif
++
++	bl2_init_generic_timer();
++
++	reg = mmio_read_32(RZG_MODEMR);
++	boot_dev = reg & MODEMR_BOOT_DEV_MASK;
++	boot_cpu = reg & MODEMR_BOOT_CPU_MASK;
++
++	bl2_cpg_init();
++
++	if (boot_cpu == MODEMR_BOOT_CPU_CA57 ||
++	    boot_cpu == MODEMR_BOOT_CPU_CA53) {
++		rzg_pfc_init();
++		rzg_console_boot_init();
++	}
++
++	plat_rzg_gic_driver_init();
++	plat_rzg_gic_init();
++	rzg_swdt_init();
++
++	/* FIQ interrupts are taken to EL3 */
++	write_scr_el3(read_scr_el3() | SCR_FIQ_BIT);
++
++	write_daifclr(DAIF_FIQ_BIT);
++
++	reg = read_midr();
++	midr = reg & (MIDR_PN_MASK << MIDR_PN_SHIFT);
++	switch (midr) {
++	case MIDR_CA57:
++		str = cpu_ca57;
++		break;
++	case MIDR_CA53:
++		str = cpu_ca53;
++		break;
++	default:
++		str = unknown;
++		break;
++	}
++
++	NOTICE("BL2: RZ/G Initial Program Loader(%s) Rev.%s\n", str,
++	       version_of_renesas);
++
++	reg = mmio_read_32(RZG_PRR);
++	product = reg & PRR_PRODUCT_MASK;
++
++	switch (product) {
++	case PRR_PRODUCT_G2H:
++		str = product_g2h;
++		break;
++	case PRR_PRODUCT_G2M:
++		str = product_g2m;
++		break;
++	case PRR_PRODUCT_G2N:
++		str = product_g2n;
++		break;
++	case PRR_PRODUCT_G2E:
++		str = product_g2e;
++		break;
++	default:
++		str = unknown;
++		break;
++	}
++
++	if ((PRR_PRODUCT_G2M == product) &&
++	    (PRR_PRODUCT_20 == (reg & RZG_MAJOR_MASK))) {
++		if (RZG_G2M_CUT_VER11 == (reg & PRR_CUT_MASK)) {
++			/* G2M Ver.1.1 or Ver.1.2 */
++			NOTICE("BL2: PRR is RZG %s Ver.1.1 / Ver.1.2\n",
++				str);
++		} else {
++			NOTICE("BL2: PRR is RZG %s Ver.1.%d\n",
++				str,
++				(reg & RZG_MINOR_MASK) + RZG_G2M_MINOR_OFFSET);
++		}
++	} else {
++		major = (reg & RZG_MAJOR_MASK) >> RZG_MAJOR_SHIFT;
++		major = major + RZG_MAJOR_OFFSET;
++		minor = reg & RZG_MINOR_MASK;
++		NOTICE("BL2: PRR is RZG %s Ver.%d.%d\n", str, major, minor);
++	}
++
++	if (product == PRR_PRODUCT_G2E) {
++		reg = mmio_read_32(RZG_MODEMR);
++		sscg = reg & RZG_SSCG_MASK;
++		str = sscg == RZG_SSCG_ENABLE ? sscg_on : sscg_off;
++		NOTICE("BL2: %s\n", str);
++	}
++
++	rzg_get_board_type(&type, &rev);
++
++	switch (type) {
++	case BOARD_HIHOPE_RZG2H:
++	case BOARD_HIHOPE_RZG2M:
++	case BOARD_HIHOPE_RZG2N:
++	case BOARD_EK874:
++		break;
++	default:
++		type = BOARD_UNKNOWN;
++		break;
++	}
++
++	if (type == BOARD_UNKNOWN || rev == BOARD_REV_UNKNOWN)
++		NOTICE("BL2: Board is %s Rev.---\n", GET_BOARD_NAME(type));
++	else {
++		NOTICE("BL2: Board is %s Rev.%d.%d\n",
++		       GET_BOARD_NAME(type),
++		       GET_BOARD_MAJOR(rev), GET_BOARD_MINOR(rev));
++	}
++
++#if (RZG_LSI != RZG_AUTO)
++	if (product != TARGET_PRODUCT) {
++		ERROR("BL2: IPL was been built for the %s.\n", TARGET_NAME);
++		ERROR("BL2: Please write the correct IPL to flash memory.\n");
++		panic();
++	}
++#endif
++	switch (boot_dev) {
++	case MODEMR_BOOT_DEV_HYPERFLASH160:
++		str = boot_hyper160;
++		break;
++	case MODEMR_BOOT_DEV_HYPERFLASH80:
++		str = boot_hyper80;
++		break;
++	case MODEMR_BOOT_DEV_QSPI_FLASH40:
++		str = boot_qspi40;
++		break;
++	case MODEMR_BOOT_DEV_QSPI_FLASH80:
++		str = boot_qspi80;
++		break;
++	case MODEMR_BOOT_DEV_EMMC_25X1:
++		str = boot_emmc25x1;
++		break;
++	case MODEMR_BOOT_DEV_EMMC_50X8:
++		str = boot_emmc50x8;
++		break;
++	default:
++		str = unknown;
++		break;
++	}
++	NOTICE("BL2: Boot device is %s\n", str);
++
++	reg = rzg_rom_get_lcs(&lcs);
++	if (reg) {
++		str = unknown;
++		goto lcm_state;
++	}
++
++	switch (lcs) {
++	case LCS_CM:
++		str = lcs_cm;
++		break;
++	case LCS_DM:
++		str = lcs_dm;
++		break;
++	case LCS_SD:
++		str = lcs_sd;
++		break;
++	case LCS_SE:
++		str = lcs_secure;
++		break;
++	case LCS_FA:
++		str = lcs_fa;
++		break;
++	default:
++		str = unknown;
++		break;
++	}
++
++lcm_state:
++	NOTICE("BL2: LCM state is %s\n", str);
++
++	is_ddr_backup_mode();
++
++	bl2_tzram_layout.total_base = BL31_BASE;
++	bl2_tzram_layout.total_size = BL31_LIMIT - BL31_BASE;
++
++	if (boot_cpu == MODEMR_BOOT_CPU_CA57 ||
++	    boot_cpu == MODEMR_BOOT_CPU_CA53) {
++		ret = rzg_dram_init();
++		if (ret) {
++			NOTICE("BL2: Failed to DRAM initialize (%d).\n", ret);
++			panic();
++		}
++		rzg_qos_init();
++	}
++
++	/* Set up FDT */
++	ret = fdt_create_empty_tree(fdt, sizeof(fdt_blob));
++	if (ret) {
++		NOTICE("BL2: Cannot allocate FDT for U-Boot (ret=%i)\n", ret);
++		panic();
++	}
++
++	/* Add platform compatible string */
++	bl2_populate_compatible_string(fdt);
++
++	/* Print DRAM layout */
++	bl2_advertise_dram_size(product);
++
++	if (boot_dev == MODEMR_BOOT_DEV_EMMC_25X1 ||
++	    boot_dev == MODEMR_BOOT_DEV_EMMC_50X8) {
++		if (rzg_emmc_init() != EMMC_SUCCESS) {
++			NOTICE("BL2: Failed to eMMC driver initialize.\n");
++			panic();
++		}
++		rzg_emmc_memcard_power(EMMC_POWER_ON);
++		if (rzg_emmc_mount() != EMMC_SUCCESS) {
++			NOTICE("BL2: Failed to eMMC mount operation.\n");
++			panic();
++		}
++	} else {
++		rzg_rpc_init();
++		rzg_dma_init();
++	}
++
++	reg = mmio_read_32(RST_WDTRSTCR);
++	reg &= ~WDTRSTCR_RWDT_RSTMSK;
++	reg |= WDTRSTCR_PASSWORD;
++	mmio_write_32(RST_WDTRSTCR, reg);
++
++	mmio_write_32(CPG_CPGWPR, CPGWPR_PASSWORD);
++	mmio_write_32(CPG_CPGWPCR, CPGWPCR_PASSWORD);
++
++	reg = mmio_read_32(RZG_PRR);
++	if ((reg & RZG_CPU_MASK_CA57) == RZG_CPU_HAVE_CA57)
++		mmio_write_32(CPG_CA57DBGRCR,
++			      DBGCPUPREN | mmio_read_32(CPG_CA57DBGRCR));
++
++	if ((reg & RZG_CPU_MASK_CA53) == RZG_CPU_HAVE_CA53)
++		mmio_write_32(CPG_CA53DBGRCR,
++			      DBGCPUPREN | mmio_read_32(CPG_CA53DBGRCR));
++
++#if (RZG_LOSSY_ENABLE == 1)
++	NOTICE("BL2: Lossy Decomp areas\n");
++
++	fcnlnode = fdt_add_subnode(fdt, 0, "reserved-memory");
++	if (fcnlnode < 0) {
++		NOTICE("BL2: Cannot create reserved mem node (ret=%i)\n",
++			fcnlnode);
++		panic();
++	}
++
++	bl2_lossy_setting(0, LOSSY_ST_ADDR0, LOSSY_END_ADDR0,
++			  LOSSY_FMT0, LOSSY_ENA_DIS0, fcnlnode);
++	bl2_lossy_setting(1, LOSSY_ST_ADDR1, LOSSY_END_ADDR1,
++			  LOSSY_FMT1, LOSSY_ENA_DIS1, fcnlnode);
++	bl2_lossy_setting(2, LOSSY_ST_ADDR2, LOSSY_END_ADDR2,
++			  LOSSY_FMT2, LOSSY_ENA_DIS2, fcnlnode);
++#endif
++
++	fdt_pack(fdt);
++	NOTICE("BL2: FDT at %p\n", fdt);
++
++	if (boot_dev == MODEMR_BOOT_DEV_EMMC_25X1 ||
++	    boot_dev == MODEMR_BOOT_DEV_EMMC_50X8)
++		rzg_io_emmc_setup();
++	else
++		rzg_io_setup();
++}
++
++void bl2_el3_plat_arch_setup(void)
++{
++#if RZG_BL2_DCACHE == 1
++	NOTICE("BL2: D-Cache enable\n");
++	rzg_configure_mmu_el3(BL2_BASE,
++			       BL2_END - BL2_BASE,
++			       BL2_RO_BASE, BL2_RO_LIMIT
++#if USE_COHERENT_MEM
++			       , BL2_COHERENT_RAM_BASE, BL2_COHERENT_RAM_LIMIT
++#endif
++	    );
++#endif
++}
++
++void bl2_platform_setup(void)
++{
++
++}
++
++static void bl2_init_generic_timer(void)
++{
++#if (RZG_LSI == RZG_G2E)
++	uint32_t reg_cntfid = EXTAL_EK874;
++#else /* RZG_LSI == RZG_G2E */
++	uint32_t reg_cntfid;
++	uint32_t modemr;
++	uint32_t modemr_pll;
++	uint32_t pll_table[] = {
++		EXTAL_MD14_MD13_TYPE_0,	/* MD14/MD13 : 0b00 */
++		EXTAL_MD14_MD13_TYPE_1,	/* MD14/MD13 : 0b01 */
++		EXTAL_MD14_MD13_TYPE_2,	/* MD14/MD13 : 0b10 */
++		EXTAL_MD14_MD13_TYPE_3	/* MD14/MD13 : 0b11 */
++	};
++
++	modemr = mmio_read_32(RZG_MODEMR);
++	modemr_pll = (modemr & MODEMR_BOOT_PLL_MASK);
++
++	/* Set frequency data in CNTFID0 */
++	reg_cntfid = pll_table[modemr_pll >> MODEMR_BOOT_PLL_SHIFT];
++#endif /* RZG_LSI == RZG_G2E */
++	/* Update memory mapped and register based freqency */
++	write_cntfrq_el0((u_register_t )reg_cntfid);
++	mmio_write_32(ARM_SYS_CNTCTL_BASE + (uintptr_t)CNTFID_OFF, reg_cntfid);
++	/* Enable counter */
++	mmio_setbits_32(RZG_CNTC_BASE + (uintptr_t)CNTCR_OFF,
++			(uint32_t)CNTCR_EN);
++}
+diff --git a/plat/renesas/rzg/bl2_secure_setting.c b/plat/renesas/rzg/bl2_secure_setting.c
+new file mode 100644
+index 0000000..4d0f64a
+--- /dev/null
++++ b/plat/renesas/rzg/bl2_secure_setting.c
+@@ -0,0 +1,352 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <lib/mmio.h>
++#include <lib/utils_def.h>
++
++#include "axi_registers.h"
++#include "lifec_registers.h"
++#include "micro_delay.h"
++
++static void lifec_security_setting(void);
++static void axi_security_setting(void);
++
++static const struct {
++	uint32_t reg;
++	uint32_t val;
++} lifec[] = {
++	/** LIFEC0 (SECURITY) settings					*/
++	/* Security attribute setting for master ports                  */
++	/* Bit 0: ARM realtime core (Cortex-R7) master port             */
++	/*       0: Non-Secure                                          */
++	{
++	SEC_SRC, 0x0000001EU},
++	/** Security attribute setting for slave ports 0 to 15		*/
++	    /*      {SEC_SEL0,              0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL1,              0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL2,              0xFFFFFFFFU},                   */
++	    /* Bit19: AXI-Bus (Main Memory domain AXI) slave ports          */
++	    /*        0: registers accessed from secure resource only       */
++	    /* Bit 9: DBSC4 register access slave ports.                    */
++	    /*        0: registers accessed from secure resource only.      */
++#if (LIFEC_DBSC_PROTECT_ENABLE == 1)
++	{
++	SEC_SEL3, 0xFFF7FDFFU},
++#else
++	{
++	SEC_SEL3, 0xFFFFFFFFU},
++#endif
++	    /*      {SEC_SEL4,              0xFFFFFFFFU},                   */
++	    /* Bit 6: Boot ROM slave ports.                                 */
++	    /*        0: registers accessed from secure resource only       */
++	{
++	SEC_SEL5, 0xFFFFFFBFU},
++	    /* Bit13: SCEG PKA (secure APB) slave ports                     */
++	    /*        0: registers accessed from secure resource only       */
++	    /*        1: Reserved[RZ/G2E]                                 */
++	    /* Bit12: SCEG PKA (public APB) slave ports                     */
++	    /*        0: registers accessed from secure resource only       */
++	    /*        1: Reserved[RZ/G2E]                                 */
++	    /* Bit10: SCEG Secure Core slave ports                          */
++	    /*        0: registers accessed from secure resource only       */
++#if (RZG_LSI == RZG_G2E)
++	{
++	SEC_SEL6, 0xFFFFFBFFU},
++#else
++	{
++	SEC_SEL6, 0xFFFFCBFFU},
++#endif
++	    /*      {SEC_SEL7,              0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL8,              0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL9,              0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL10,             0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL11,             0xFFFFFFFFU},                   */
++	    /*      {SEC_SEL12,             0xFFFFFFFFU},                   */
++	    /* Bit22: RPC slave ports.                                      */
++	    /*        0: registers accessed from secure resource only.      */
++#if (RZG_RPC_HYPERFLASH_LOCKED == 1)
++	    {SEC_SEL13,          0xFFBFFFFFU},
++#endif
++	    /* Bit27: System Timer (SCMT) slave ports                       */
++	    /*        0: registers accessed from secure resource only       */
++	    /* Bit26: System Watchdog Timer (SWDT) slave ports              */
++	    /*        0: registers accessed from secure resource only       */
++	{
++	SEC_SEL14, 0xF3FFFFFFU},
++	    /* Bit13: RST slave ports. */
++	    /*        0: registers accessed from secure resource only       */
++	    /* Bit 7: Life Cycle 0 slave ports                              */
++	    /*        0: registers accessed from secure resource only       */
++	{
++	SEC_SEL15, 0xFFFFFF3FU},
++	/** Security group 0 attribute setting for master ports 0	*/
++	/** Security group 1 attribute setting for master ports 0	*/
++	    /*      {SEC_GRP0CR0,           0x00000000U},                   */
++	    /*      {SEC_GRP1CR0,           0x00000000U},                   */
++	/** Security group 0 attribute setting for master ports 1	*/
++	/** Security group 1 attribute setting for master ports 1	*/
++	    /*      {SEC_GRP0CR1,           0x00000000U},                   */
++	    /*      {SEC_GRP1CR1,           0x00000000U},                   */
++	/** Security group 0 attribute setting for master ports 2 	*/
++	/** Security group 1 attribute setting for master ports 2 	*/
++	    /* Bit17: SCEG Secure Core master ports.                        */
++	    /*        SecurityGroup3                                        */
++	{
++	SEC_GRP0CR2, 0x00020000U}, {
++	SEC_GRP1CR2, 0x00020000U},
++	/** Security group 0 attribute setting for master ports 3 	*/
++	/** Security group 1 attribute setting for master ports 3 	*/
++	    /*      {SEC_GRP0CR3,           0x00000000U},                   */
++	    /*      {SEC_GRP1CR3,           0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 0 	*/
++	/** Security group 1 attribute setting for slave ports 0 	*/
++	    /*      {SEC_GRP0COND0,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND0,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 1 	*/
++	/** Security group 1 attribute setting for slave ports 1 	*/
++	    /*      {SEC_GRP0COND1,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND1,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 2 	*/
++	/** Security group 1 attribute setting for slave ports 2 	*/
++	    /*      {SEC_GRP0COND2,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND2,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 3	*/
++	/** Security group 1 attribute setting for slave ports 3	*/
++	    /* Bit19: AXI-Bus (Main Memory domain AXI) slave ports.         */
++	    /*        SecurityGroup3                                        */
++	    /* Bit 9: DBSC4 register access slave ports.                    */
++	    /*        SecurityGroup3                                        */
++#if (LIFEC_DBSC_PROTECT_ENABLE == 1)
++	{
++	SEC_GRP0COND3, 0x00080200U}, {
++	SEC_GRP1COND3, 0x00080200U},
++#else
++	{
++	SEC_GRP0COND3, 0x00000000U}, {
++	SEC_GRP1COND3, 0x00000000U},
++#endif
++	/** Security group 0 attribute setting for slave ports 4	*/
++	/** Security group 1 attribute setting for slave ports 4	*/
++	    /*      {SEC_GRP0COND4,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND4,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 5	*/
++	/** Security group 1 attribute setting for slave ports 5	*/
++	    /* Bit 6: Boot ROM slave ports                                  */
++	    /*        SecurityGroup3                                        */
++	{
++	SEC_GRP0COND5, 0x00000040U}, {
++	SEC_GRP1COND5, 0x00000040U},
++	/** Security group 0 attribute setting for slave ports 6	*/
++	/** Security group 1 attribute setting for slave ports 6	*/
++	    /* Bit13: SCEG PKA (secure APB) slave ports                     */
++	    /*        SecurityGroup3                                        */
++	    /*        Reserved[RZ/G2E]                                    */
++	    /* Bit12: SCEG PKA (public APB) slave ports                     */
++	    /*        SecurityGroup3                                        */
++	    /*        Reserved[RZ/G2E]                                    */
++	    /* Bit10: SCEG Secure Core slave ports                          */
++	    /*        SecurityGroup3                                        */
++#if RZG_LSI == RZG_G2E
++	{
++	SEC_GRP0COND6, 0x00000400U}, {
++	SEC_GRP1COND6, 0x00000400U},
++#else
++	{
++	SEC_GRP0COND6, 0x00003400U}, {
++	SEC_GRP1COND6, 0x00003400U},
++#endif
++	/** Security group 0 attribute setting for slave ports 7	*/
++	/** Security group 1 attribute setting for slave ports 7	*/
++	    /*      {SEC_GRP0COND7,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND7,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 8	*/
++	/** Security group 1 attribute setting for slave ports 8	*/
++	    /*      {SEC_GRP0COND8,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND8,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 9	*/
++	/** Security group 1 attribute setting for slave ports 9	*/
++	    /*      {SEC_GRP0COND9,         0x00000000U},                   */
++	    /*      {SEC_GRP1COND9,         0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 10	*/
++	/** Security group 1 attribute setting for slave ports 10	*/
++	    /*      {SEC_GRP0COND10,        0x00000000U},                   */
++	    /*      {SEC_GRP1COND10,        0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 11	*/
++	/** Security group 1 attribute setting for slave ports 11	*/
++	    /*      {SEC_GRP0COND11,        0x00000000U},                   */
++	    /*      {SEC_GRP1COND11,        0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 12	*/
++	/** Security group 1 attribute setting for slave ports 12	*/
++	    /*      {SEC_GRP0COND12,        0x00000000U},                   */
++	    /*      {SEC_GRP1COND12,        0x00000000U},                   */
++	/** Security group 0 attribute setting for slave ports 13	*/
++	/** Security group 1 attribute setting for slave ports 13	*/
++	    /* Bit22: RPC slave ports.                                      */
++	    /*        SecurityGroup3                                        */
++#if (RZG_RPC_HYPERFLASH_LOCKED == 1)
++	    {SEC_GRP0COND13,     0x00400000U},
++	    {SEC_GRP1COND13,     0x00400000U},
++#endif
++	/** Security group 0 attribute setting for slave ports 14	*/
++	/** Security group 1 attribute setting for slave ports 14	*/
++	    /* Bit26: System Timer (SCMT) slave ports                       */
++	    /*        SecurityGroup3                                        */
++	    /* Bit27: System Watchdog Timer (SWDT) slave ports              */
++	    /*        SecurityGroup3                                        */
++	{
++	SEC_GRP0COND14, 0x0C000000U}, {
++	SEC_GRP1COND14, 0x0C000000U},
++	/** Security group 0 attribute setting for slave ports 15	*/
++	/** Security group 1 attribute setting for slave ports 15 	*/
++	    /* Bit13: RST slave ports                                       */
++	    /*        SecurityGroup3                                        */
++	    /* Bit 7: Life Cycle 0 slave ports                              */
++	    /*        SecurityGroup3                                        */
++	    /* Bit 6: TDBG slave ports                                      */
++	    /*        SecurityGroup3                                        */
++	{
++	SEC_GRP0COND15, 0x000000C0U}, {
++	SEC_GRP1COND15, 0x000000C0U},
++	/** Security write protection attribute setting slave ports 0	*/
++	    /*      {SEC_READONLY0,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 1	*/
++	    /*      {SEC_READONLY1,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 2	*/
++	    /*      {SEC_READONLY2,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 3	*/
++	    /*      {SEC_READONLY3,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 4	*/
++	    /*      {SEC_READONLY4,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 5	*/
++	    /*      {SEC_READONLY5,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 6	*/
++	    /*      {SEC_READONLY6,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 7	*/
++	    /*      {SEC_READONLY7,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 8	*/
++	    /*      {SEC_READONLY8,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 9	*/
++	    /*      {SEC_READONLY9,         0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 10	*/
++	    /*      {SEC_READONLY10,        0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 11	*/
++	    /*      {SEC_READONLY11,        0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 12	*/
++	    /*      {SEC_READONLY12,        0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 13	*/
++	    /*      {SEC_READONLY13,        0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 14	*/
++	    /*      {SEC_READONLY14,        0x00000000U},                   */
++	/** Security write protection attribute setting slave ports 15	*/
++	    /*      {SEC_READONLY15,        0x00000000U}                    */
++};
++
++/* AXI settings */
++static const struct {
++	uint32_t reg;
++	uint32_t val;
++} axi[] = {
++	/* DRAM protection                      */
++	/* AXI dram protected area division     */
++	{
++	AXI_DPTDIVCR0,  0x0E0403F0U}, {
++	AXI_DPTDIVCR1,  0x0E0407E0U}, {
++	AXI_DPTDIVCR2,  0x0E080000U}, {
++	AXI_DPTDIVCR3,  0x0E080000U}, {
++	AXI_DPTDIVCR4,  0x0E080000U}, {
++	AXI_DPTDIVCR5,  0x0E080000U}, {
++	AXI_DPTDIVCR6,  0x0E080000U}, {
++	AXI_DPTDIVCR7,  0x0E080000U}, {
++	AXI_DPTDIVCR8,  0x0E080000U}, {
++	AXI_DPTDIVCR9,  0x0E080000U}, {
++	AXI_DPTDIVCR10, 0x0E080000U}, {
++	AXI_DPTDIVCR11, 0x0E080000U}, {
++	AXI_DPTDIVCR12, 0x0E080000U}, {
++	AXI_DPTDIVCR13, 0x0E080000U}, {
++	AXI_DPTDIVCR14, 0x0E080000U},
++	    /* AXI dram protected area setting      */
++	{
++	AXI_DPTCR0,  0x0E000000U}, {
++	AXI_DPTCR1,  0x0E000E0EU}, {
++	AXI_DPTCR2,  0x0E000000U}, {
++	AXI_DPTCR3,  0x0E000000U}, {
++	AXI_DPTCR4,  0x0E000000U}, {
++	AXI_DPTCR5,  0x0E000000U}, {
++	AXI_DPTCR6,  0x0E000000U}, {
++	AXI_DPTCR7,  0x0E000000U}, {
++	AXI_DPTCR8,  0x0E000000U}, {
++	AXI_DPTCR9,  0x0E000000U}, {
++	AXI_DPTCR10, 0x0E000000U}, {
++	AXI_DPTCR11, 0x0E000000U}, {
++	AXI_DPTCR12, 0x0E000000U}, {
++	AXI_DPTCR13, 0x0E000000U}, {
++	AXI_DPTCR14, 0x0E000000U}, {
++	AXI_DPTCR15, 0x0E000000U},
++	    /* SRAM ptotection                      */
++	    /* AXI sram protected area division     */
++	{
++	AXI_SPTDIVCR0,  0x0E0E6304U}, {
++	AXI_SPTDIVCR1,  0x0E0E6360U}, {
++	AXI_SPTDIVCR2,  0x0E0E6360U}, {
++	AXI_SPTDIVCR3,  0x0E0E6360U}, {
++	AXI_SPTDIVCR4,  0x0E0E6360U}, {
++	AXI_SPTDIVCR5,  0x0E0E6360U}, {
++	AXI_SPTDIVCR6,  0x0E0E6360U}, {
++	AXI_SPTDIVCR7,  0x0E0E6360U}, {
++	AXI_SPTDIVCR8,  0x0E0E6360U}, {
++	AXI_SPTDIVCR9,  0x0E0E6360U}, {
++	AXI_SPTDIVCR10, 0x0E0E6360U}, {
++	AXI_SPTDIVCR11, 0x0E0E6360U}, {
++	AXI_SPTDIVCR12, 0x0E0E6360U}, {
++	AXI_SPTDIVCR13, 0x0E0E6360U}, {
++	AXI_SPTDIVCR14, 0x0E0E6360U},
++	    /* AXI sram protected area setting      */
++	{
++	AXI_SPTCR0,  0x0E000E0EU}, {
++	AXI_SPTCR1,  0x0E000000U}, {
++	AXI_SPTCR2,  0x0E000000U}, {
++	AXI_SPTCR3,  0x0E000000U}, {
++	AXI_SPTCR4,  0x0E000000U}, {
++	AXI_SPTCR5,  0x0E000000U}, {
++	AXI_SPTCR6,  0x0E000000U}, {
++	AXI_SPTCR7,  0x0E000000U}, {
++	AXI_SPTCR8,  0x0E000000U}, {
++	AXI_SPTCR9,  0x0E000000U}, {
++	AXI_SPTCR10, 0x0E000000U}, {
++	AXI_SPTCR11, 0x0E000000U}, {
++	AXI_SPTCR12, 0x0E000000U}, {
++	AXI_SPTCR13, 0x0E000000U}, {
++	AXI_SPTCR14, 0x0E000000U}, {
++	AXI_SPTCR15, 0x0E000000U}
++};
++
++static void lifec_security_setting(void)
++{
++	uint32_t i;
++
++	for (i = 0; i < ARRAY_SIZE(lifec); i++)
++		mmio_write_32(lifec[i].reg, lifec[i].val);
++}
++
++/* SRAM/DRAM protection setting */
++static void axi_security_setting(void)
++{
++	uint32_t i;
++
++	for (i = 0; i < ARRAY_SIZE(axi); i++)
++		mmio_write_32(axi[i].reg, axi[i].val);
++}
++
++void bl2_secure_setting(void)
++{
++	const uint32_t delay = 10;
++
++	lifec_security_setting();
++	axi_security_setting();
++	rzg_micro_delay(delay);
++
++	return;
++}
+diff --git a/plat/renesas/rzg/bl31_plat_setup.c b/plat/renesas/rzg/bl31_plat_setup.c
+new file mode 100644
+index 0000000..3653360
+--- /dev/null
++++ b/plat/renesas/rzg/bl31_plat_setup.c
+@@ -0,0 +1,118 @@
++/*
++ * Copyright (c) 2013-2014, ARM Limited and Contributors. All rights reserved.
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stddef.h>
++
++#include <arch.h>
++#include <arch_helpers.h>
++#include <bl31/bl31.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <drivers/arm/cci.h>
++#include <drivers/console.h>
++#include <lib/mmio.h>
++#include <plat/common/platform.h>
++
++#include "pwrc.h"
++#include "rzg_def.h"
++#include "rzg_private.h"
++#include "rzg_version.h"
++
++#define BL31_RO_BASE		BL_CODE_BASE
++#define BL31_RO_LIMIT		BL_CODE_END
++
++#if USE_COHERENT_MEM
++#define BL31_COHERENT_RAM_BASE	BL_COHERENT_RAM_BASE
++#define BL31_COHERENT_RAM_LIMIT	BL_COHERENT_RAM_END
++#endif
++
++extern void plat_rzg_gic_driver_init(void);
++extern void plat_rzg_gic_init(void);
++
++u_register_t rzg_boot_mpidr;
++
++static int cci_map[] = {
++	CCI500_CLUSTER0_SL_IFACE_IX_FOR_G2M,
++	CCI500_CLUSTER1_SL_IFACE_IX_FOR_G2M
++};
++
++void plat_cci_init(void)
++{
++	cci_init(RZG_CCI_BASE, cci_map, ARRAY_SIZE(cci_map));
++}
++
++void plat_cci_enable(void)
++{
++	cci_enable_snoop_dvm_reqs(MPIDR_AFFLVL1_VAL(read_mpidr()));
++}
++
++void plat_cci_disable(void)
++{
++	cci_disable_snoop_dvm_reqs(MPIDR_AFFLVL1_VAL(read_mpidr()));
++}
++
++struct entry_point_info *bl31_plat_get_next_image_ep_info(uint32_t type)
++{
++	bl2_to_bl31_params_mem_t *from_bl2 = (bl2_to_bl31_params_mem_t *)
++					     PARAMS_BASE;
++	entry_point_info_t *next_image_info;
++
++	next_image_info = (type == NON_SECURE) ?
++		&from_bl2->bl33_ep_info : &from_bl2->bl32_ep_info;
++
++	return next_image_info->pc ? next_image_info : NULL;
++}
++
++void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
++				u_register_t arg2, u_register_t arg3)
++{
++	rzg_console_runtime_init();
++
++	NOTICE("BL3-1 : Rev.%s\n", version_of_renesas);
++
++	if (RZG_CLUSTER_A53A57 == rzg_pwrc_get_cluster()) {
++		plat_cci_init();
++		plat_cci_enable();
++	}
++}
++
++void bl31_plat_arch_setup(void)
++{
++	rzg_configure_mmu_el3(BL31_BASE,
++			       BL31_LIMIT - BL31_BASE,
++			       BL31_RO_BASE, BL31_RO_LIMIT
++#if USE_COHERENT_MEM
++			       , BL31_COHERENT_RAM_BASE, BL31_COHERENT_RAM_LIMIT
++#endif
++	    );
++	rzg_pwrc_code_copy_to_system_ram();
++}
++
++void bl31_platform_setup(void)
++{
++	plat_rzg_gic_driver_init();
++	plat_rzg_gic_init();
++
++	/* enable the system level generic timer */
++	mmio_write_32(RZG_CNTC_BASE + CNTCR_OFF, CNTCR_FCREQ(U(0)) | CNTCR_EN);
++
++	rzg_pwrc_setup();
++#if 0
++	/* TODO: there is a broad number of RZ/G2 SoC configurations; to
++	   support all of them, Renesas use the pwrc driver to discover what
++	   cores are on/off before announcing the topology.
++	   This code hasnt been ported yet
++	   */
++
++	rzg_setup_topology();
++#endif
++
++	/* mask should match the kernel's MPIDR_HWID_BITMASK so the core can be
++	   identified during cpuhotplug (check the kernel's psci migrate set of
++	   functions */
++	rzg_boot_mpidr = read_mpidr_el1() & 0x0000ffffU;
++}
+diff --git a/plat/renesas/rzg/include/plat.ld.S b/plat/renesas/rzg/include/plat.ld.S
+new file mode 100644
+index 0000000..3427012
+--- /dev/null
++++ b/plat/renesas/rzg/include/plat.ld.S
+@@ -0,0 +1,36 @@
++/*
++ * Copyright (c) 2018, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++#ifndef RZG_PLAT_LD_S
++#define RZG_PLAT_LD_S
++
++#include <lib/xlat_tables/xlat_tables_defs.h>
++#include <platform_def.h>
++
++MEMORY {
++    SRAM (rwx): ORIGIN = BL31_SRAM_BASE, LENGTH = DEVICE_SRAM_SIZE
++    PRAM (r): ORIGIN = BL31_LIMIT - DEVICE_SRAM_SIZE, LENGTH = DEVICE_SRAM_SIZE
++}
++
++SECTIONS
++{
++	/* SRAM_COPY is in PRAM */
++	. = BL31_LIMIT - DEVICE_SRAM_SIZE;
++	__SRAM_COPY_START__ = .;
++
++	.system_ram : {
++		/* system ram start is in SRAM */
++		__system_ram_start__ = .;
++		*(.system_ram*)
++		*iic_dvfs.o(.rodata)
++	        __system_ram_end__ = .;
++	} >SRAM AT>PRAM
++
++    ASSERT(__BL31_END__ <= BL31_LIMIT - DEVICE_SRAM_SIZE,
++    "BL31 image too large - writing on top of SRAM!")
++
++}
++
++#endif /* RZG_PLAT_LD_S */
+diff --git a/plat/renesas/rzg/include/plat_macros.S b/plat/renesas/rzg/include/plat_macros.S
+new file mode 100644
+index 0000000..760d76f
+--- /dev/null
++++ b/plat/renesas/rzg/include/plat_macros.S
+@@ -0,0 +1,88 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <drivers/arm/cci.h>
++#include <drivers/arm/gic_common.h>
++#include <drivers/arm/gicv2.h>
++
++#include "rzg_def.h"
++
++.section .rodata.gic_reg_name, "aS"
++gicc_regs:
++	.asciz "gicc_hppir", "gicc_ahppir", "gicc_ctlr", ""
++gicd_pend_reg:
++	.asciz "gicd_ispendr regs (Offsets 0x200 - 0x278)\n Offset:\t\t\tvalue\n"
++newline:
++	.asciz "\n"
++spacer:
++	.asciz ":\t\t0x"
++
++	/* ---------------------------------------------
++	 * The below macro prints out relevant GIC
++	 * registers whenever an unhandled exception is
++	 * taken in BL3-1.
++	 * Clobbers: x0 - x10, x16, x17, sp
++	 * ---------------------------------------------
++	 */
++	.macro plat_print_gic_regs
++	mov_imm	x17, RZG_GICC_BASE
++	mov_imm	x16, RZG_GICD_BASE
++print_gicc_regs:
++	/* gicc base address is now in x17 */
++	adr	x6, gicc_regs	/* Load the gicc reg list to x6 */
++	/* Load the gicc regs to gp regs used by str_in_crash_buf_print */
++	ldr	w8, [x17, #GICC_HPPIR]
++	ldr	w9, [x17, #GICC_AHPPIR]
++	ldr	w10, [x17, #GICC_CTLR]
++	/* Store to the crash buf and print to console */
++	bl	str_in_crash_buf_print
++
++	/* Print the GICD_ISPENDR regs */
++	add	x7, x16, #GICD_ISPENDR
++	adr	x4, gicd_pend_reg
++	bl	asm_print_str
++gicd_ispendr_loop:
++	sub	x4, x7, x16
++	cmp	x4, #0x280
++	b.eq	exit_print_gic_regs
++	bl	asm_print_hex
++	adr	x4, spacer
++	bl	asm_print_str
++	ldr	x4, [x7], #8
++	bl	asm_print_hex
++	adr	x4, newline
++	bl	asm_print_str
++	b	gicd_ispendr_loop
++exit_print_gic_regs:
++	.endm
++
++.section .rodata.cci_reg_name, "aS"
++cci_iface_regs:
++	.asciz "cci_snoop_ctrl_cluster0", "cci_snoop_ctrl_cluster1" , ""
++
++	/* ------------------------------------------------
++	 * The below macro prints out relevant interconnect
++	 * registers whenever an unhandled exception is
++	 * taken in BL3-1.
++	 * Clobbers: x0 - x9, sp
++	 * ------------------------------------------------
++	 */
++	.macro plat_print_interconnect_regs
++	adr	x6, cci_iface_regs
++	/* Store in x7 the base address of the first interface */
++	mov_imm	x7, (CCI500_BASE + SLAVE_IFACE3_OFFSET)
++	ldr	w8, [x7, #SNOOP_CTRL_REG]
++	/* Store in x7 the base address of the second interface */
++	mov_imm	x7, (CCI500_BASE + SLAVE_IFACE4_OFFSET)
++	ldr	w9, [x7, #SNOOP_CTRL_REG]
++	/* Store to the crash buf and print to console */
++	bl	str_in_crash_buf_print
++	.endm
++
++	.macro plat_crash_print_regs
++	plat_print_gic_regs
++	plat_print_interconnect_regs
++	.endm
+diff --git a/plat/renesas/rzg/include/platform_def.h b/plat/renesas/rzg/include/platform_def.h
+new file mode 100644
+index 0000000..5997803
+--- /dev/null
++++ b/plat/renesas/rzg/include/platform_def.h
+@@ -0,0 +1,192 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PLATFORM_DEF_H
++#define PLATFORM_DEF_H
++
++#ifndef __ASSEMBLER__
++#include <stdlib.h>
++#endif
++
++#include <arch.h>
++
++#include "rzg_def.h"
++
++/*******************************************************************************
++ * Platform binary types for linking
++ ******************************************************************************/
++#define PLATFORM_LINKER_FORMAT          "elf64-littleaarch64"
++#define PLATFORM_LINKER_ARCH            aarch64
++
++/*******************************************************************************
++ * Generic platform constants
++ ******************************************************************************/
++ #define FIRMWARE_WELCOME_STR	"Booting RZ/G gen2 Trusted Firmware\n"
++
++/* Size of cacheable stacks */
++#if IMAGE_BL1
++#if TRUSTED_BOARD_BOOT
++#define PLATFORM_STACK_SIZE 	U(0x1000)
++#else
++#define PLATFORM_STACK_SIZE 	U(0x440)
++#endif
++#elif IMAGE_BL2
++#if TRUSTED_BOARD_BOOT
++#define PLATFORM_STACK_SIZE 	U(0x1000)
++#else
++#define PLATFORM_STACK_SIZE 	U(0x400)
++#endif
++#elif IMAGE_BL31
++#define PLATFORM_STACK_SIZE 	U(0x400)
++#elif IMAGE_BL32
++#define PLATFORM_STACK_SIZE 	U(0x440)
++#endif
++
++#define BL332_IMAGE_ID		(NS_BL2U_IMAGE_ID + 1)
++#define BL333_IMAGE_ID		(NS_BL2U_IMAGE_ID + 2)
++#define BL334_IMAGE_ID		(NS_BL2U_IMAGE_ID + 3)
++#define BL335_IMAGE_ID		(NS_BL2U_IMAGE_ID + 4)
++#define BL336_IMAGE_ID		(NS_BL2U_IMAGE_ID + 5)
++#define BL337_IMAGE_ID		(NS_BL2U_IMAGE_ID + 6)
++#define BL338_IMAGE_ID		(NS_BL2U_IMAGE_ID + 7)
++
++#define BL332_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 8)
++#define BL333_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 9)
++#define BL334_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 10)
++#define BL335_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 11)
++#define BL336_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 12)
++#define BL337_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 13)
++#define BL338_KEY_CERT_ID	(NS_BL2U_IMAGE_ID + 14)
++
++#define BL332_CERT_ID		(NS_BL2U_IMAGE_ID + 15)
++#define BL333_CERT_ID		(NS_BL2U_IMAGE_ID + 16)
++#define BL334_CERT_ID		(NS_BL2U_IMAGE_ID + 17)
++#define BL335_CERT_ID		(NS_BL2U_IMAGE_ID + 18)
++#define BL336_CERT_ID		(NS_BL2U_IMAGE_ID + 19)
++#define BL337_CERT_ID		(NS_BL2U_IMAGE_ID + 20)
++#define BL338_CERT_ID		(NS_BL2U_IMAGE_ID + 21)
++
++/* io drivers id */
++#define FLASH_DEV_ID		U(0)
++#define EMMC_DEV_ID		U(1)
++
++/*
++ * RZ/G2H Cortex-A57
++ * L1:I/48KB(16KBx3way) D/32KB(16KBx2way) L2:2MB(128KBx16way)
++ *          Cortex-A53
++ * L1:I/32KB(16KBx2way) D/32KB(8KBx4way) L2:512KB(32KBx16way)
++ */
++#define PLATFORM_CACHE_LINE_SIZE	64
++#define PLATFORM_CLUSTER_COUNT		U(2)
++#define PLATFORM_CLUSTER0_CORE_COUNT	U(4)
++#define PLATFORM_CLUSTER1_CORE_COUNT	U(4)
++#define PLATFORM_CORE_COUNT		(PLATFORM_CLUSTER1_CORE_COUNT + \
++					 PLATFORM_CLUSTER0_CORE_COUNT)
++#define PLATFORM_MAX_CPUS_PER_CLUSTER	U(4)
++
++#define PLAT_MAX_PWR_LVL		MPIDR_AFFLVL2
++#define PLAT_NUM_PWR_DOMAINS		(PLATFORM_CORE_COUNT + \
++					 PLATFORM_CLUSTER_COUNT + 1)
++
++#define PLAT_MAX_RET_STATE		U(1)
++#define PLAT_MAX_OFF_STATE		U(2)
++
++#define MAX_IO_DEVICES			U(3)
++#define MAX_IO_HANDLES			U(4)
++
++/*******************************************************************************
++ * BL2 specific defines.
++ ******************************************************************************/
++/* Put BL2 just below BL3-1. BL2_BASE is calculated using the current BL2 debug
++ * size plus a little space for growth. */
++#define RZG_SYSRAM_BASE		U(0xE6300000)
++#if (RZG_LSI == RZG_G2E)
++#define BL2_LIMIT			U(0xE6320000)
++#else
++#define BL2_LIMIT			U(0xE6360000)
++#endif
++
++#if (RZG_LSI == RZG_G2E)
++#define BL2_BASE			U(0xE6304000)
++#define BL2_IMAGE_LIMIT			U(0xE6318000)
++#else
++#define BL2_BASE			U(0xE6304000)
++#define BL2_IMAGE_LIMIT			U(0xE632E800)
++#endif
++#define RZG_SYSRAM_SIZE		(BL2_BASE - RZG_SYSRAM_BASE)
++
++/*******************************************************************************
++ * BL31 specific defines.
++ ******************************************************************************/
++/* Put BL3-1 at the top of the Trusted SRAM. BL31_BASE is calculated using the
++ * current BL3-1 debug size plus a little space for growth. */
++#define BL31_BASE		(RZG_TRUSTED_SRAM_BASE)
++#define BL31_LIMIT		(RZG_TRUSTED_SRAM_BASE + \
++				 RZG_TRUSTED_SRAM_SIZE)
++#define	RZG_BL31_LOG_BASE	(0x44040000)
++#define	RZG_BL31_SDRAM_BTM	(RZG_BL31_LOG_BASE + 0x14000)
++#define	RZG_BL31_LOG_SIZE	(RZG_BL31_SDRAM_BTM - RZG_BL31_LOG_BASE)
++#define BL31_SRAM_BASE		(DEVICE_SRAM_BASE)
++#define BL31_SRAM_LIMIT		(DEVICE_SRAM_BASE + DEVICE_SRAM_SIZE)
++
++/*******************************************************************************
++ * BL32 specific defines.
++ ******************************************************************************/
++#ifndef SPD_NONE
++#define BL32_BASE		U(0x44100000)
++#define BL32_LIMIT		(BL32_BASE + U(0x100000))
++#endif
++
++/*******************************************************************************
++ * BL33
++ ******************************************************************************/
++#define BL33_BASE		DRAM1_NS_BASE
++
++
++/*******************************************************************************
++ * Platform specific page table and MMU setup constants
++ ******************************************************************************/
++#if IMAGE_BL1
++#define MAX_XLAT_TABLES		U(2)
++#elif IMAGE_BL2
++#define MAX_XLAT_TABLES		U(5)
++#elif IMAGE_BL31
++#define MAX_XLAT_TABLES		U(4)
++#elif IMAGE_BL32
++#define MAX_XLAT_TABLES		U(3)
++#endif
++
++#if IMAGE_BL2
++#define PLAT_PHY_ADDR_SPACE_SIZE	(ULL(1) << 40)
++#define PLAT_VIRT_ADDR_SPACE_SIZE	(ULL(1) << 40)
++#else
++#define PLAT_PHY_ADDR_SPACE_SIZE	(ULL(1) << 32)
++#define PLAT_VIRT_ADDR_SPACE_SIZE	(ULL(1) << 32)
++#endif
++
++#define MAX_MMAP_REGIONS	(RZG_MMAP_ENTRIES + RZG_BL_REGIONS)
++
++/*******************************************************************************
++ * Declarations and constants to access the mailboxes safely. Each mailbox is
++ * aligned on the biggest cache line size in the platform. This is known only
++ * to the platform as it might have a combination of integrated and external
++ * caches. Such alignment ensures that two maiboxes do not sit on the same cache
++ * line at any cache level. They could belong to different cpus/clusters &
++ * get written while being protected by different locks causing corruption of
++ * a valid mailbox address.
++ ******************************************************************************/
++#define CACHE_WRITEBACK_SHIFT   (6)
++#define CACHE_WRITEBACK_GRANULE (1 << CACHE_WRITEBACK_SHIFT)
++
++/*******************************************************************************
++ * Size of the per-cpu data in bytes that should be reserved in the generic
++ * per-cpu data structure for the RZG port.
++ ******************************************************************************/
++#if !USE_COHERENT_MEM
++#define PLAT_PCPU_DATA_SIZE	(2)
++#endif
++
++#endif /* PLATFORM_DEF_H */
+diff --git a/plat/renesas/rzg/include/registers/axi_registers.h b/plat/renesas/rzg/include/registers/axi_registers.h
+new file mode 100644
+index 0000000..7af0262
+--- /dev/null
++++ b/plat/renesas/rzg/include/registers/axi_registers.h
+@@ -0,0 +1,246 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef AXI_REGISTERS_H
++#define AXI_REGISTERS_H
++
++/* AXI registers */
++
++/* AXI base address */
++#define	AXI_BASE	(0xE6780000U)
++
++/* address split */
++
++/* AXI address split control 0 */
++#define	AXI_ADSPLCR0	(AXI_BASE + 0x4008U)
++/* AXI address split control 1 */
++#define	AXI_ADSPLCR1	(AXI_BASE + 0x400CU)
++/* AXI address split control 2 */
++#define	AXI_ADSPLCR2	(AXI_BASE + 0x4010U)
++/* AXI address split control 3 */
++#define	AXI_ADSPLCR3	(AXI_BASE + 0x4014U)
++
++/* functional safety */
++
++/* AXI functional safety control */
++#define	AXI_FUSACR	(AXI_BASE + 0x4020U)
++
++/* decompression */
++
++/* AXI decompression area configuration A0 */
++#define	AXI_DCMPAREACRA0	(AXI_BASE + 0x4100U)
++/* AXI decompression area configuration B0 */
++#define	AXI_DCMPAREACRB0	(AXI_BASE + 0x4104U)
++/* AXI decompression area configuration A1 */
++#define	AXI_DCMPAREACRA1	(AXI_BASE + 0x4108U)
++/* AXI decompression area configuration B1 */
++#define	AXI_DCMPAREACRB1	(AXI_BASE + 0x410CU)
++/* AXI decompression area configuration A2 */
++#define	AXI_DCMPAREACRA2	(AXI_BASE + 0x4110U)
++/* AXI decompression area configuration B2 */
++#define	AXI_DCMPAREACRB2	(AXI_BASE + 0x4114U)
++/* AXI decompression area configuration A3 */
++#define	AXI_DCMPAREACRA3	(AXI_BASE + 0x4118U)
++/* AXI decompression area configuration B3 */
++#define	AXI_DCMPAREACRB3	(AXI_BASE + 0x411CU)
++/* AXI decompression area configuration A4 */
++#define	AXI_DCMPAREACRA4	(AXI_BASE + 0x4120U)
++/* AXI decompression area configuration B4 */
++#define	AXI_DCMPAREACRB4	(AXI_BASE + 0x4124U)
++/* AXI decompression area configuration A5 */
++#define	AXI_DCMPAREACRA5	(AXI_BASE + 0x4128U)
++/* AXI decompression area configuration B5 */
++#define	AXI_DCMPAREACRB5	(AXI_BASE + 0x412CU)
++/* AXI decompression area configuration A6 */
++#define	AXI_DCMPAREACRA6	(AXI_BASE + 0x4130U)
++/* AXI decompression area configuration B6 */
++#define	AXI_DCMPAREACRB6	(AXI_BASE + 0x4134U)
++/* AXI decompression area configuration A7 */
++#define	AXI_DCMPAREACRA7	(AXI_BASE + 0x4138U)
++/* AXI decompression area configuration B7 */
++#define	AXI_DCMPAREACRB7	(AXI_BASE + 0x413CU)
++/* AXI decompression area configuration A8 */
++#define	AXI_DCMPAREACRA8	(AXI_BASE + 0x4140U)
++/* AXI decompression area configuration B8 */
++#define	AXI_DCMPAREACRB8	(AXI_BASE + 0x4144U)
++/* AXI decompression area configuration A9 */
++#define	AXI_DCMPAREACRA9	(AXI_BASE + 0x4148U)
++/* AXI decompression area configuration B9 */
++#define	AXI_DCMPAREACRB9	(AXI_BASE + 0x414CU)
++/* AXI decompression area configuration A10 */
++#define	AXI_DCMPAREACRA10	(AXI_BASE + 0x4150U)
++/* AXI decompression area configuration B10 */
++#define	AXI_DCMPAREACRB10	(AXI_BASE + 0x4154U)
++/* AXI decompression area configuration A11 */
++#define	AXI_DCMPAREACRA11	(AXI_BASE + 0x4158U)
++/* AXI decompression area configuration B11 */
++#define	AXI_DCMPAREACRB11	(AXI_BASE + 0x415CU)
++/* AXI decompression area configuration A12 */
++#define	AXI_DCMPAREACRA12	(AXI_BASE + 0x4160U)
++/* AXI decompression area configuration B12 */
++#define	AXI_DCMPAREACRB12	(AXI_BASE + 0x4164U)
++/* AXI decompression area configuration A13 */
++#define	AXI_DCMPAREACRA13	(AXI_BASE + 0x4168U)
++/* AXI decompression area configuration B13 */
++#define	AXI_DCMPAREACRB13	(AXI_BASE + 0x416CU)
++/* AXI decompression area configuration A14 */
++#define	AXI_DCMPAREACRA14	(AXI_BASE + 0x4170U)
++/* AXI decompression area configuration B14 */
++#define	AXI_DCMPAREACRB14	(AXI_BASE + 0x4174U)
++/* AXI decompression area configuration A15 */
++#define	AXI_DCMPAREACRA15	(AXI_BASE + 0x4178U)
++/* AXI decompression area configuration B15 */
++#define	AXI_DCMPAREACRB15	(AXI_BASE + 0x417CU)
++/* AXI decompression shadow area configuration */
++#define	AXI_DCMPSHDWCR	(AXI_BASE + 0x4280U)
++
++/* SDRAM protection */
++
++/* AXI dram protected area division 0 */
++#define	AXI_DPTDIVCR0	(AXI_BASE + 0x4400U)
++/* AXI dram protected area division 1 */
++#define	AXI_DPTDIVCR1	(AXI_BASE + 0x4404U)
++/* AXI dram protected area division 2 */
++#define	AXI_DPTDIVCR2	(AXI_BASE + 0x4408U)
++/* AXI dram protected area division 3 */
++#define	AXI_DPTDIVCR3	(AXI_BASE + 0x440CU)
++/* AXI dram protected area division 4 */
++#define	AXI_DPTDIVCR4	(AXI_BASE + 0x4410U)
++/* AXI dram protected area division 5 */
++#define	AXI_DPTDIVCR5	(AXI_BASE + 0x4414U)
++/* AXI dram protected area division 6 */
++#define	AXI_DPTDIVCR6	(AXI_BASE + 0x4418U)
++/* AXI dram protected area division 7 */
++#define	AXI_DPTDIVCR7	(AXI_BASE + 0x441CU)
++/* AXI dram protected area division 8 */
++#define	AXI_DPTDIVCR8	(AXI_BASE + 0x4420U)
++/* AXI dram protected area division 9 */
++#define	AXI_DPTDIVCR9	(AXI_BASE + 0x4424U)
++/* AXI dram protected area division 10 */
++#define	AXI_DPTDIVCR10	(AXI_BASE + 0x4428U)
++/* AXI dram protected area division 11 */
++#define	AXI_DPTDIVCR11	(AXI_BASE + 0x442CU)
++/* AXI dram protected area division 12 */
++#define	AXI_DPTDIVCR12	(AXI_BASE + 0x4430U)
++/* AXI dram protected area division 13 */
++#define	AXI_DPTDIVCR13	(AXI_BASE + 0x4434U)
++/* AXI dram protected area division 14 */
++#define	AXI_DPTDIVCR14	(AXI_BASE + 0x4438U)
++
++/* AXI dram protected area setting 0 */
++#define	AXI_DPTCR0	(AXI_BASE + 0x4440U)
++/* AXI dram protected area setting 1 */
++#define	AXI_DPTCR1	(AXI_BASE + 0x4444U)
++/* AXI dram protected area setting 2 */
++#define	AXI_DPTCR2	(AXI_BASE + 0x4448U)
++/* AXI dram protected area setting 3 */
++#define	AXI_DPTCR3	(AXI_BASE + 0x444CU)
++/* AXI dram protected area setting 4 */
++#define	AXI_DPTCR4	(AXI_BASE + 0x4450U)
++/* AXI dram protected area setting 5 */
++#define	AXI_DPTCR5	(AXI_BASE + 0x4454U)
++/* AXI dram protected area setting 6 */
++#define	AXI_DPTCR6	(AXI_BASE + 0x4458U)
++/* AXI dram protected area setting 7 */
++#define	AXI_DPTCR7	(AXI_BASE + 0x445CU)
++/* AXI dram protected area setting 8 */
++#define	AXI_DPTCR8	(AXI_BASE + 0x4460U)
++/* AXI dram protected area setting 9 */
++#define	AXI_DPTCR9	(AXI_BASE + 0x4464U)
++/* AXI dram protected area setting 10 */
++#define	AXI_DPTCR10	(AXI_BASE + 0x4468U)
++/* AXI dram protected area setting 11 */
++#define	AXI_DPTCR11	(AXI_BASE + 0x446CU)
++/* AXI dram protected area setting 12 */
++#define	AXI_DPTCR12	(AXI_BASE + 0x4470U)
++/* AXI dram protected area setting 13 */
++#define	AXI_DPTCR13	(AXI_BASE + 0x4474U)
++/* AXI dram protected area setting 14 */
++#define	AXI_DPTCR14	(AXI_BASE + 0x4478U)
++/* AXI dram protected area setting 15 */
++#define	AXI_DPTCR15	(AXI_BASE + 0x447CU)
++
++/* SRAM protection */
++
++/* AXI sram protected area division 0 */
++#define	AXI_SPTDIVCR0	(AXI_BASE + 0x4500U)
++/* AXI sram protected area division 1 */
++#define	AXI_SPTDIVCR1	(AXI_BASE + 0x4504U)
++/* AXI sram protected area division 2 */
++#define	AXI_SPTDIVCR2	(AXI_BASE + 0x4508U)
++/* AXI sram protected area division 3 */
++#define	AXI_SPTDIVCR3	(AXI_BASE + 0x450CU)
++/* AXI sram protected area division 4 */
++#define	AXI_SPTDIVCR4	(AXI_BASE + 0x4510U)
++/* AXI sram protected area division 5 */
++#define	AXI_SPTDIVCR5	(AXI_BASE + 0x4514U)
++/* AXI sram protected area division 6 */
++#define	AXI_SPTDIVCR6	(AXI_BASE + 0x4518U)
++/* AXI sram protected area division 7 */
++#define	AXI_SPTDIVCR7	(AXI_BASE + 0x451CU)
++/* AXI sram protected area division 8 */
++#define	AXI_SPTDIVCR8	(AXI_BASE + 0x4520U)
++/* AXI sram protected area division 9 */
++#define	AXI_SPTDIVCR9	(AXI_BASE + 0x4524U)
++/* AXI sram protected area division 10 */
++#define	AXI_SPTDIVCR10	(AXI_BASE + 0x4528U)
++/* AXI sram protected area division 11 */
++#define	AXI_SPTDIVCR11	(AXI_BASE + 0x452CU)
++/* AXI sram protected area division 12 */
++#define	AXI_SPTDIVCR12	(AXI_BASE + 0x4530U)
++/* AXI sram protected area division 13 */
++#define	AXI_SPTDIVCR13	(AXI_BASE + 0x4534U)
++/* AXI sram protected area division 14 */
++#define	AXI_SPTDIVCR14	(AXI_BASE + 0x4538U)
++
++/* AXI sram protected area setting 0 */
++#define	AXI_SPTCR0	(AXI_BASE + 0x4540U)
++/* AXI sram protected area setting 1 */
++#define	AXI_SPTCR1	(AXI_BASE + 0x4544U)
++/* AXI sram protected area setting 2 */
++#define	AXI_SPTCR2	(AXI_BASE + 0x4548U)
++/* AXI sram protected area setting 3 */
++#define	AXI_SPTCR3	(AXI_BASE + 0x454CU)
++/* AXI sram protected area setting 4 */
++#define	AXI_SPTCR4	(AXI_BASE + 0x4550U)
++/* AXI sram protected area setting 5 */
++#define	AXI_SPTCR5	(AXI_BASE + 0x4554U)
++/* AXI sram protected area setting 6 */
++#define	AXI_SPTCR6	(AXI_BASE + 0x4558U)
++/* AXI sram protected area setting 7 */
++#define	AXI_SPTCR7	(AXI_BASE + 0x455CU)
++/* AXI sram protected area setting 8 */
++#define	AXI_SPTCR8	(AXI_BASE + 0x4560U)
++/* AXI sram protected area setting 9 */
++#define	AXI_SPTCR9	(AXI_BASE + 0x4564U)
++/* AXI sram protected area setting 10 */
++#define	AXI_SPTCR10	(AXI_BASE + 0x4568U)
++/* AXI sram protected area setting 11 */
++#define	AXI_SPTCR11	(AXI_BASE + 0x456CU)
++/* AXI sram protected area setting 12 */
++#define	AXI_SPTCR12	(AXI_BASE + 0x4570U)
++/* AXI sram protected area setting 13 */
++#define	AXI_SPTCR13	(AXI_BASE + 0x4574U)
++/* AXI sram protected area setting 14 */
++#define	AXI_SPTCR14	(AXI_BASE + 0x4578U)
++/* AXI sram protected area setting 15 */
++#define	AXI_SPTCR15	(AXI_BASE + 0x457CU)
++
++/* EDC base address */
++#define	EDC_BASE	(0xFF840000U)
++
++/* EDC edc enable */
++#define	EDC_EDCEN	(EDC_BASE + 0x0010U)
++/* EDC edc status 0 */
++#define	EDC_EDCST0	(EDC_BASE + 0x0020U)
++/* EDC edc status 1 */
++#define	EDC_EDCST1	(EDC_BASE + 0x0024U)
++/* EDC edc interrupt enable 0 */
++#define	EDC_EDCINTEN0	(EDC_BASE + 0x0040U)
++/* EDC edc interrupt enable 1 */
++#define	EDC_EDCINTEN1	(EDC_BASE + 0x0044U)
++
++#endif /* AXI_REGISTERS_H */
+diff --git a/plat/renesas/rzg/include/registers/cpg_registers.h b/plat/renesas/rzg/include/registers/cpg_registers.h
+new file mode 100644
+index 0000000..2c5f021
+--- /dev/null
++++ b/plat/renesas/rzg/include/registers/cpg_registers.h
+@@ -0,0 +1,136 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef CPG_REGISTERS_H
++#define CPG_REGISTERS_H
++
++/* CPG base address */
++#define	CPG_BASE	(0xE6150000U)
++
++/* CPG system module stop control 2 */
++#define CPG_SMSTPCR2	(CPG_BASE + 0x0138U)
++/* CPG software reset 2 */
++#define CPG_SRCR2	(CPG_BASE + 0x00B0U)
++/* CPG module stop status 2 */
++#define CPG_MSTPSR2	(CPG_BASE + 0x0040U)
++/* CPG write protect */
++#define CPG_CPGWPR	(CPG_BASE + 0x0900U)
++/* CPG write protect control */
++#define CPG_CPGWPCR	(CPG_BASE + 0x0904U)
++/* CPG system module stop control 9 */
++#define CPG_SMSTPCR9    (CPG_BASE + 0x0994U)
++/* CPG module stop status 9 */
++#define CPG_MSTPSR9     (CPG_BASE + 0x09A4U)
++
++/* CPG (SECURITY) registers */
++
++/* Secure Module Stop Control Register 0 */
++#define	SCMSTPCR0	(CPG_BASE + 0x0B20U)
++/* Secure Module Stop Control Register 1 */
++#define	SCMSTPCR1	(CPG_BASE + 0x0B24U)
++/* Secure Module Stop Control Register 2 */
++#define	SCMSTPCR2	(CPG_BASE + 0x0B28U)
++/* Secure Module Stop Control Register 3 */
++#define	SCMSTPCR3	(CPG_BASE + 0x0B2CU)
++/* Secure Module Stop Control Register 4 */
++#define	SCMSTPCR4	(CPG_BASE + 0x0B30U)
++/* Secure Module Stop Control Register 5 */
++#define	SCMSTPCR5	(CPG_BASE + 0x0B34U)
++/* Secure Module Stop Control Register 6 */
++#define	SCMSTPCR6	(CPG_BASE + 0x0B38U)
++/* Secure Module Stop Control Register 7 */
++#define	SCMSTPCR7	(CPG_BASE + 0x0B3CU)
++/* Secure Module Stop Control Register 8 */
++#define	SCMSTPCR8	(CPG_BASE + 0x0B40U)
++/* Secure Module Stop Control Register 9 */
++#define	SCMSTPCR9	(CPG_BASE + 0x0B44U)
++/* Secure Module Stop Control Register 10 */
++#define	SCMSTPCR10	(CPG_BASE + 0x0B48U)
++/* Secure Module Stop Control Register 11 */
++#define	SCMSTPCR11	(CPG_BASE + 0x0B4CU)
++
++/* CPG (SECURITY) registers */
++
++/* Secure Software Reset Access Enable Control Register 0 */
++#define	SCSRSTECR0	(CPG_BASE + 0x0B80U)
++/* Secure Software Reset Access Enable Control Register 1 */
++#define	SCSRSTECR1	(CPG_BASE + 0x0B84U)
++/* Secure Software Reset Access Enable Control Register 2 */
++#define	SCSRSTECR2	(CPG_BASE + 0x0B88U)
++/* Secure Software Reset Access Enable Control Register 3 */
++#define	SCSRSTECR3	(CPG_BASE + 0x0B8CU)
++/* Secure Software Reset Access Enable Control Register 4 */
++#define	SCSRSTECR4	(CPG_BASE + 0x0B90U)
++/* Secure Software Reset Access Enable Control Register 5 */
++#define	SCSRSTECR5	(CPG_BASE + 0x0B94U)
++/* Secure Software Reset Access Enable Control Register 6 */
++#define	SCSRSTECR6	(CPG_BASE + 0x0B98U)
++/* Secure Software Reset Access Enable Control Register 7 */
++#define	SCSRSTECR7	(CPG_BASE + 0x0B9CU)
++/* Secure Software Reset Access Enable Control Register 8 */
++#define	SCSRSTECR8	(CPG_BASE + 0x0BA0U)
++/* Secure Software Reset Access Enable Control Register 9 */
++#define	SCSRSTECR9	(CPG_BASE + 0x0BA4U)
++/* Secure Software Reset Access Enable Control Register 10 */
++#define	SCSRSTECR10	(CPG_BASE + 0x0BA8U)
++/* Secure Software Reset Access Enable Control Register 11 */
++#define	SCSRSTECR11	(CPG_BASE + 0x0BACU)
++
++/* CPG (REALTIME) registers */
++
++/* Realtime Module Stop Control Register 0 */
++#define	RMSTPCR0	(CPG_BASE + 0x0110U)
++/* Realtime Module Stop Control Register 1 */
++#define	RMSTPCR1	(CPG_BASE + 0x0114U)
++/* Realtime Module Stop Control Register 2 */
++#define	RMSTPCR2	(CPG_BASE + 0x0118U)
++/* Realtime Module Stop Control Register 3 */
++#define	RMSTPCR3	(CPG_BASE + 0x011CU)
++/* Realtime Module Stop Control Register 4 */
++#define	RMSTPCR4	(CPG_BASE + 0x0120U)
++/* Realtime Module Stop Control Register 5 */
++#define	RMSTPCR5	(CPG_BASE + 0x0124U)
++/* Realtime Module Stop Control Register 6 */
++#define	RMSTPCR6	(CPG_BASE + 0x0128U)
++/* Realtime Module Stop Control Register 7 */
++#define	RMSTPCR7	(CPG_BASE + 0x012CU)
++/* Realtime Module Stop Control Register 8 */
++#define	RMSTPCR8	(CPG_BASE + 0x0980U)
++/* Realtime Module Stop Control Register 9 */
++#define	RMSTPCR9	(CPG_BASE + 0x0984U)
++/* Realtime Module Stop Control Register 10 */
++#define	RMSTPCR10	(CPG_BASE + 0x0988U)
++/* Realtime Module Stop Control Register 11 */
++#define	RMSTPCR11	(CPG_BASE + 0x098CU)
++
++/* CPG (SYSTEM) registers */
++
++/* System Module Stop Control Register 0 */
++#define	SMSTPCR0	(CPG_BASE + 0x0130U)
++/* System Module Stop Control Register 1 */
++#define	SMSTPCR1	(CPG_BASE + 0x0134U)
++/* System Module Stop Control Register 2 */
++#define	SMSTPCR2	(CPG_BASE + 0x0138U)
++/* System Module Stop Control Register 3 */
++#define	SMSTPCR3	(CPG_BASE + 0x013CU)
++/* System Module Stop Control Register 4 */
++#define	SMSTPCR4	(CPG_BASE + 0x0140U)
++/* System Module Stop Control Register 5 */
++#define	SMSTPCR5	(CPG_BASE + 0x0144U)
++/* System Module Stop Control Register 6 */
++#define	SMSTPCR6	(CPG_BASE + 0x0148U)
++/* System Module Stop Control Register 7 */
++#define	SMSTPCR7	(CPG_BASE + 0x014CU)
++/* System Module Stop Control Register 8 */
++#define	SMSTPCR8	(CPG_BASE + 0x0990U)
++/* System Module Stop Control Register 9 */
++#define	SMSTPCR9	(CPG_BASE + 0x0994U)
++/* System Module Stop Control Register 10 */
++#define	SMSTPCR10	(CPG_BASE + 0x0998U)
++/* System Module Stop Control Register 11 */
++#define	SMSTPCR11	(CPG_BASE + 0x099CU)
++
++#endif /* CPG_REGISTERS_H */
+diff --git a/plat/renesas/rzg/include/registers/lifec_registers.h b/plat/renesas/rzg/include/registers/lifec_registers.h
+new file mode 100644
+index 0000000..8cf8969
+--- /dev/null
++++ b/plat/renesas/rzg/include/registers/lifec_registers.h
+@@ -0,0 +1,144 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef LIFEC_REGISTERS_H
++#define LIFEC_REGISTERS_H
++
++#define	LIFEC_SEC_BASE	(0xE6110000U)
++
++#define	SEC_SRC		(LIFEC_SEC_BASE + 0x0008U)
++#define	SEC_SEL0	(LIFEC_SEC_BASE + 0x0030U)
++#define	SEC_SEL1	(LIFEC_SEC_BASE + 0x0034U)
++#define	SEC_SEL2	(LIFEC_SEC_BASE + 0x0038U)
++#define	SEC_SEL3	(LIFEC_SEC_BASE + 0x003CU)
++#define	SEC_SEL4	(LIFEC_SEC_BASE + 0x0058U)
++#define	SEC_SEL5	(LIFEC_SEC_BASE + 0x005CU)
++#define SEC_SEL6	(LIFEC_SEC_BASE + 0x0060U)
++#define	SEC_SEL7	(LIFEC_SEC_BASE + 0x0064U)
++#define	SEC_SEL8	(LIFEC_SEC_BASE + 0x0068U)
++#define	SEC_SEL9	(LIFEC_SEC_BASE + 0x006CU)
++#define	SEC_SEL10	(LIFEC_SEC_BASE + 0x0070U)
++#define	SEC_SEL11	(LIFEC_SEC_BASE + 0x0074U)
++#define	SEC_SEL12	(LIFEC_SEC_BASE + 0x0078U)
++#define	SEC_SEL13	(LIFEC_SEC_BASE + 0x007CU)
++#define	SEC_SEL14	(LIFEC_SEC_BASE + 0x0080U)
++#define	SEC_SEL15	(LIFEC_SEC_BASE + 0x0084U)
++#define	SEC_GRP0CR0	(LIFEC_SEC_BASE + 0x0138U)
++#define	SEC_GRP1CR0	(LIFEC_SEC_BASE + 0x013CU)
++#define	SEC_GRP0CR1	(LIFEC_SEC_BASE + 0x0140U)
++#define	SEC_GRP1CR1	(LIFEC_SEC_BASE + 0x0144U)
++#define	SEC_GRP0CR2	(LIFEC_SEC_BASE + 0x0148U)
++#define	SEC_GRP1CR2	(LIFEC_SEC_BASE + 0x014CU)
++#define	SEC_GRP0CR3	(LIFEC_SEC_BASE + 0x0150U)
++#define	SEC_GRP1CR3	(LIFEC_SEC_BASE + 0x0154U)
++#define	SEC_GRP0COND0	(LIFEC_SEC_BASE + 0x0158U)
++#define	SEC_GRP1COND0	(LIFEC_SEC_BASE + 0x015CU)
++#define	SEC_GRP0COND1	(LIFEC_SEC_BASE + 0x0160U)
++#define	SEC_GRP1COND1	(LIFEC_SEC_BASE + 0x0164U)
++#define	SEC_GRP0COND2	(LIFEC_SEC_BASE + 0x0168U)
++#define	SEC_GRP1COND2	(LIFEC_SEC_BASE + 0x016CU)
++#define	SEC_GRP0COND3	(LIFEC_SEC_BASE + 0x0170U)
++#define	SEC_GRP1COND3	(LIFEC_SEC_BASE + 0x0174U)
++#define	SEC_GRP0COND4	(LIFEC_SEC_BASE + 0x0178U)
++#define	SEC_GRP1COND4	(LIFEC_SEC_BASE + 0x017CU)
++#define	SEC_GRP0COND5	(LIFEC_SEC_BASE + 0x0180U)
++#define	SEC_GRP1COND5	(LIFEC_SEC_BASE + 0x0184U)
++#define	SEC_GRP0COND6	(LIFEC_SEC_BASE + 0x0188U)
++#define	SEC_GRP1COND6	(LIFEC_SEC_BASE + 0x018CU)
++#define	SEC_GRP0COND7	(LIFEC_SEC_BASE + 0x0190U)
++#define	SEC_GRP1COND7	(LIFEC_SEC_BASE + 0x0194U)
++#define	SEC_GRP0COND8	(LIFEC_SEC_BASE + 0x0198U)
++#define	SEC_GRP1COND8	(LIFEC_SEC_BASE + 0x019CU)
++#define	SEC_GRP0COND9	(LIFEC_SEC_BASE + 0x01A0U)
++#define	SEC_GRP1COND9	(LIFEC_SEC_BASE + 0x01A4U)
++#define	SEC_GRP0COND10	(LIFEC_SEC_BASE + 0x01A8U)
++#define	SEC_GRP1COND10	(LIFEC_SEC_BASE + 0x01ACU)
++#define	SEC_GRP0COND11	(LIFEC_SEC_BASE + 0x01B0U)
++#define	SEC_GRP1COND11	(LIFEC_SEC_BASE + 0x01B4U)
++#define	SEC_GRP0COND12	(LIFEC_SEC_BASE + 0x01B8U)
++#define	SEC_GRP1COND12	(LIFEC_SEC_BASE + 0x01BCU)
++#define	SEC_GRP0COND13	(LIFEC_SEC_BASE + 0x01C0U)
++#define	SEC_GRP1COND13	(LIFEC_SEC_BASE + 0x01C4U)
++#define	SEC_GRP0COND14	(LIFEC_SEC_BASE + 0x01C8U)
++#define	SEC_GRP1COND14	(LIFEC_SEC_BASE + 0x01CCU)
++#define	SEC_GRP0COND15	(LIFEC_SEC_BASE + 0x01D0U)
++#define	SEC_GRP1COND15	(LIFEC_SEC_BASE + 0x01D4U)
++#define	SEC_READONLY0	(LIFEC_SEC_BASE + 0x01D8U)
++#define	SEC_READONLY1	(LIFEC_SEC_BASE + 0x01DCU)
++#define	SEC_READONLY2	(LIFEC_SEC_BASE + 0x01E0U)
++#define	SEC_READONLY3	(LIFEC_SEC_BASE + 0x01E4U)
++#define	SEC_READONLY4	(LIFEC_SEC_BASE + 0x01E8U)
++#define	SEC_READONLY5	(LIFEC_SEC_BASE + 0x01ECU)
++#define	SEC_READONLY6	(LIFEC_SEC_BASE + 0x01F0U)
++#define	SEC_READONLY7	(LIFEC_SEC_BASE + 0x01F4U)
++#define	SEC_READONLY8	(LIFEC_SEC_BASE + 0x01F8U)
++#define	SEC_READONLY9	(LIFEC_SEC_BASE + 0x01FCU)
++#define	SEC_READONLY10	(LIFEC_SEC_BASE + 0x0200U)
++#define	SEC_READONLY11	(LIFEC_SEC_BASE + 0x0204U)
++#define	SEC_READONLY12	(LIFEC_SEC_BASE + 0x0208U)
++#define	SEC_READONLY13	(LIFEC_SEC_BASE + 0x020CU)
++#define	SEC_READONLY14	(LIFEC_SEC_BASE + 0x0210U)
++#define	SEC_READONLY15	(LIFEC_SEC_BASE + 0x0214U)
++
++#define	LIFEC_SAFE_BASE	(0xE6120000U)
++#define	SAFE_GRP0CR0	(LIFEC_SAFE_BASE + 0x0138U)
++#define	SAFE_GRP1CR0	(LIFEC_SAFE_BASE + 0x013CU)
++#define	SAFE_GRP0CR1	(LIFEC_SAFE_BASE + 0x0140U)
++#define	SAFE_GRP1CR1	(LIFEC_SAFE_BASE + 0x0144U)
++#define	SAFE_GRP0CR2	(LIFEC_SAFE_BASE + 0x0148U)
++#define	SAFE_GRP1CR2	(LIFEC_SAFE_BASE + 0x014CU)
++#define	SAFE_GRP0CR3	(LIFEC_SAFE_BASE + 0x0150U)
++#define	SAFE_GRP1CR3	(LIFEC_SAFE_BASE + 0x0154U)
++#define	SAFE_GRP0COND0	(LIFEC_SAFE_BASE + 0x0158U)
++#define	SAFE_GRP1COND0	(LIFEC_SAFE_BASE + 0x015CU)
++#define	SAFE_GRP0COND1	(LIFEC_SAFE_BASE + 0x0160U)
++#define	SAFE_GRP1COND1	(LIFEC_SAFE_BASE + 0x0164U)
++#define	SAFE_GRP0COND2	(LIFEC_SAFE_BASE + 0x0168U)
++#define	SAFE_GRP1COND2	(LIFEC_SAFE_BASE + 0x016CU)
++#define	SAFE_GRP0COND3	(LIFEC_SAFE_BASE + 0x0170U)
++#define	SAFE_GRP1COND3	(LIFEC_SAFE_BASE + 0x0174U)
++#define	SAFE_GRP0COND4	(LIFEC_SAFE_BASE + 0x0178U)
++#define	SAFE_GRP1COND4	(LIFEC_SAFE_BASE + 0x017CU)
++#define	SAFE_GRP0COND5	(LIFEC_SAFE_BASE + 0x0180U)
++#define	SAFE_GRP1COND5	(LIFEC_SAFE_BASE + 0x0184U)
++#define	SAFE_GRP0COND6	(LIFEC_SAFE_BASE + 0x0188U)
++#define	SAFE_GRP1COND6	(LIFEC_SAFE_BASE + 0x018CU)
++#define	SAFE_GRP0COND7	(LIFEC_SAFE_BASE + 0x0190U)
++#define	SAFE_GRP1COND7	(LIFEC_SAFE_BASE + 0x0194U)
++#define	SAFE_GRP0COND8	(LIFEC_SAFE_BASE + 0x0198U)
++#define	SAFE_GRP1COND8	(LIFEC_SAFE_BASE + 0x019CU)
++#define	SAFE_GRP0COND9	(LIFEC_SAFE_BASE + 0x01A0U)
++#define	SAFE_GRP1COND9	(LIFEC_SAFE_BASE + 0x01A4U)
++#define	SAFE_GRP0COND10	(LIFEC_SAFE_BASE + 0x01A8U)
++#define	SAFE_GRP1COND10	(LIFEC_SAFE_BASE + 0x01ACU)
++#define	SAFE_GRP0COND11	(LIFEC_SAFE_BASE + 0x01B0U)
++#define	SAFE_GRP1COND11	(LIFEC_SAFE_BASE + 0x01B4U)
++#define	SAFE_GRP0COND12	(LIFEC_SAFE_BASE + 0x01B8U)
++#define	SAFE_GRP1COND12	(LIFEC_SAFE_BASE + 0x01BCU)
++#define	SAFE_GRP0COND13	(LIFEC_SAFE_BASE + 0x01C0U)
++#define	SAFE_GRP1COND13	(LIFEC_SAFE_BASE + 0x01C4U)
++#define	SAFE_GRP0COND14	(LIFEC_SAFE_BASE + 0x01C8U)
++#define	SAFE_GRP1COND14	(LIFEC_SAFE_BASE + 0x01CCU)
++#define	SAFE_GRP0COND15	(LIFEC_SAFE_BASE + 0x01D0U)
++#define	SAFE_GRP1COND15	(LIFEC_SAFE_BASE + 0x01D4U)
++#define	SAFE_READONLY0	(LIFEC_SAFE_BASE + 0x01D8U)
++#define	SAFE_READONLY1	(LIFEC_SAFE_BASE + 0x01DCU)
++#define	SAFE_READONLY2	(LIFEC_SAFE_BASE + 0x01E0U)
++#define	SAFE_READONLY3	(LIFEC_SAFE_BASE + 0x01E4U)
++#define	SAFE_READONLY4	(LIFEC_SAFE_BASE + 0x01E8U)
++#define	SAFE_READONLY5	(LIFEC_SAFE_BASE + 0x01ECU)
++#define	SAFE_READONLY6	(LIFEC_SAFE_BASE + 0x01F0U)
++#define	SAFE_READONLY7	(LIFEC_SAFE_BASE + 0x01F4U)
++#define	SAFE_READONLY8	(LIFEC_SAFE_BASE + 0x01F8U)
++#define	SAFE_READONLY9	(LIFEC_SAFE_BASE + 0x01FCU)
++#define	SAFE_READONLY10	(LIFEC_SAFE_BASE + 0x0200U)
++#define	SAFE_READONLY11	(LIFEC_SAFE_BASE + 0x0204U)
++#define	SAFE_READONLY12	(LIFEC_SAFE_BASE + 0x0208U)
++#define	SAFE_READONLY13	(LIFEC_SAFE_BASE + 0x020CU)
++#define	SAFE_READONLY14	(LIFEC_SAFE_BASE + 0x0210U)
++#define	SAFE_READONLY15	(LIFEC_SAFE_BASE + 0x0214U)
++
++#endif /* LIFEC_REGISTERS_H */
+diff --git a/plat/renesas/rzg/include/rzg_def.h b/plat/renesas/rzg/include/rzg_def.h
+new file mode 100644
+index 0000000..278efbf
+--- /dev/null
++++ b/plat/renesas/rzg/include/rzg_def.h
+@@ -0,0 +1,298 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef RZG_DEF_H
++#define RZG_DEF_H
++
++#include <common/tbbr/tbbr_img_def.h>
++#include <lib/utils_def.h>
++
++#define RZG_PRIMARY_CPU		0x0
++#define RZG_TRUSTED_SRAM_BASE		0x44000000
++#define RZG_TRUSTED_SRAM_SIZE		0x0003E000
++#define RZG_SHARED_MEM_BASE		(RZG_TRUSTED_SRAM_BASE + \
++					RZG_TRUSTED_SRAM_SIZE)
++#define RZG_SHARED_MEM_SIZE		U(0x00001000)
++#define FLASH0_BASE			U(0x08000000)
++#define FLASH0_SIZE			U(0x04000000)
++#define FLASH_MEMORY_SIZE		U(0x04000000)	/* hyper flash */
++#define FLASH_TRANS_SIZE_UNIT		U(0x00000100)
++#define DEVICE_RZG_BASE			U(0xE6000000)
++#define DEVICE_RZG_SIZE			U(0x00300000)
++#define DEVICE_RZG_BASE2		U(0xE6360000)
++#define DEVICE_RZG_SIZE2		U(0x19CA0000)
++#define DEVICE_SRAM_BASE		U(0xE6300000)
++#define DEVICE_SRAM_SIZE		U(0x00002000)
++#define DEVICE_SRAM_STACK_BASE		(DEVICE_SRAM_BASE + DEVICE_SRAM_SIZE)
++#define DEVICE_SRAM_STACK_SIZE		U(0x00001000)
++#define DRAM_LIMIT			ULL(0x0000010000000000)
++#define DRAM1_BASE			U(0x40000000)
++#define DRAM1_SIZE			U(0x80000000)
++#define DRAM1_NS_BASE			(DRAM1_BASE + U(0x10000000))
++#define DRAM1_NS_SIZE			(DRAM1_SIZE - DRAM1_NS_BASE)
++#define	DRAM_40BIT_BASE			ULL(0x0400000000)
++#define	DRAM_40BIT_SIZE			ULL(0x0400000000)
++#define	DRAM_PROTECTED_BASE		ULL(0x43F00000)
++#define	DRAM_40BIT_PROTECTED_BASE	ULL(0x0403F00000)
++#define	DRAM_PROTECTED_SIZE		ULL(0x03F00000)
++#define	RZG_BL31_CRASH_BASE		U(0x4403F000)
++#define	RZG_BL31_CRASH_SIZE		U(0x00001000)
++/* Entrypoint mailboxes */
++#define MBOX_BASE			RZG_SHARED_MEM_BASE
++#define MBOX_SIZE			0x200
++/* Base address where parameters to BL31 are stored */
++#define PARAMS_BASE			(MBOX_BASE + MBOX_SIZE)
++#define BOOT_KIND_BASE			(RZG_SHARED_MEM_BASE + \
++					RZG_SHARED_MEM_SIZE - 0x100)
++/* The number of regions like RO(code), coherent and data required by
++ * different BL stages which need to be mapped in the MMU */
++#if USE_COHERENT_MEM
++#define RZG_BL_REGIONS			(3)
++#else
++#define RZG_BL_REGIONS			(2)
++#endif
++/* The RZG_MAX_MMAP_REGIONS depend on the number of entries in rzg_mmap[]
++ * defined for each BL stage in rzg_common.c. */
++#if IMAGE_BL2
++#define RZG_MMAP_ENTRIES		(9)
++#endif
++#if IMAGE_BL31
++#define RZG_MMAP_ENTRIES		(9)
++#endif
++#if IMAGE_BL2
++#define REG1_BASE			U(0xE6400000)
++#define REG1_SIZE			U(0x04C00000)
++#define ROM0_BASE			U(0xEB100000)
++#define ROM0_SIZE			U(0x00028000)
++#define REG2_BASE			U(0xEC000000)
++#define REG2_SIZE			U(0x14000000)
++#endif
++/* BL33  */
++#define NS_IMAGE_OFFSET			(DRAM1_BASE + U(0x09000000))
++/* BL31 */
++#define	RZG_DEVICE_BASE		DEVICE_RZG_BASE
++#define	RZG_DEVICE_SIZE		(0x1A000000)
++#define	RZG_LOG_RES_SIZE		(512/8)
++#define	RZG_LOG_HEADER_SIZE		(16)
++#define	RZG_LOG_OTHER_SIZE		(RZG_LOG_HEADER_SIZE + \
++					RZG_LOG_RES_SIZE)
++#define	RZG_BL31_LOG_MAX		(RZG_BL31_LOG_SIZE - \
++					RZG_LOG_OTHER_SIZE)
++#define	RZG_CRASH_STACK		RZG_BL31_CRASH_BASE
++#define	AARCH64_SPACE_BASE		ULL(0x00000000000)
++#define	AARCH64_SPACE_SIZE		ULL(0x10000000000)
++/* CCI related constants */
++#define CCI500_BASE				U(0xF1200000)
++#define CCI500_CLUSTER0_SL_IFACE_IX		(2)
++#define CCI500_CLUSTER1_SL_IFACE_IX		(3)
++#define CCI500_CLUSTER0_SL_IFACE_IX_FOR_G2M	(1)
++#define CCI500_CLUSTER1_SL_IFACE_IX_FOR_G2M	(2)
++#define	RZG_CCI_BASE				CCI500_BASE
++/* GIC */
++#define RZG_GICD_BASE			U(0xF1010000)
++#define RZG_GICR_BASE			U(0xF1010000)
++#define RZG_GICC_BASE			U(0xF1020000)
++#define RZG_GICH_BASE			U(0xF1040000)
++#define RZG_GICV_BASE			U(0xF1060000)
++#define ARM_IRQ_SEC_PHY_TIMER		U(29)
++#define ARM_IRQ_SEC_SGI_0		U(8)
++#define ARM_IRQ_SEC_SGI_1		U(9)
++#define ARM_IRQ_SEC_SGI_2		U(10)
++#define ARM_IRQ_SEC_SGI_3		U(11)
++#define ARM_IRQ_SEC_SGI_4		U(12)
++#define ARM_IRQ_SEC_SGI_5		U(13)
++#define ARM_IRQ_SEC_SGI_6		U(14)
++#define ARM_IRQ_SEC_SGI_7		U(15)
++#define	ARM_IRQ_SEC_RPC			U(70)
++#define	ARM_IRQ_SEC_TIMER		U(166)
++#define	ARM_IRQ_SEC_TIMER_UP		U(171)
++#define	ARM_IRQ_SEC_WDT			U(173)
++#define	ARM_IRQ_SEC_CRYPT		U(102)
++#define	ARM_IRQ_SEC_CRYPT_SecPKA	U(97)
++#define	ARM_IRQ_SEC_CRYPT_PubPKA	U(98)
++/* Timer control */
++#define	RZG_CNTC_BASE		U(0xE6080000)
++/* Reset */
++#define	RZG_CPGWPR		U(0xE6150900)	/* CPG write protect    */
++#define	RZG_MODEMR		U(0xE6160060)	/* Mode pin             */
++#define	RZG_CA57RESCNT		U(0xE6160040)	/* Reset control A57    */
++#define	RZG_CA53RESCNT		U(0xE6160044)	/* Reset control A53    */
++#define	RZG_SRESCR		U(0xE6160110)	/* Soft Power On Reset  */
++#define	RZG_CA53WUPCR		U(0xE6151010)	/* Wake-up control A53  */
++#define	RZG_CA57WUPCR		U(0xE6152010)	/* Wake-up control A57  */
++#define	RZG_CA53PSTR		U(0xE6151040)	/* Power status A53     */
++#define	RZG_CA57PSTR		U(0xE6152040)	/* Power status A57     */
++#define	RZG_CA53CPU0CR		U(0xE6151100)	/* CPU control  A53     */
++#define	RZG_CA57CPU0CR		U(0xE6152100)	/* CPU control  A57     */
++#define	RZG_CA53CPUCMCR		U(0xE6151184)	/* Common power A53     */
++#define	RZG_CA57CPUCMCR		U(0xE6152184)	/* Common power A57     */
++#define	RZG_WUPMSKCA57		U(0xE6180014)	/* Wake-up mask A57     */
++#define	RZG_WUPMSKCA53		U(0xE6180018)	/* Wake-up mask A53     */
++/* SYSC	*/
++#define	RZG_PWRSR3		U(0xE6180140)	/* Power stat A53-SCU   */
++#define	RZG_PWRSR5		U(0xE61801C0)	/* Power stat A57-SCU   */
++#define	RZG_SYSCIER		U(0xE618000C)	/* Interrupt enable     */
++#define	RZG_SYSCIMR		U(0xE6180010)	/* Interrupt mask       */
++#define	RZG_SYSCSR		U(0xE6180000)	/* SYSC status          */
++#define	RZG_PWRONCR3		U(0xE618014C)	/* Power resume A53-SCU */
++#define	RZG_PWRONCR5		U(0xE61801CC)	/* Power resume A57-SCU */
++#define	RZG_PWROFFCR3		U(0xE6180144)	/* Power shutof A53-SCU */
++#define	RZG_PWROFFCR5		U(0xE61801C4)	/* Power shutof A57-SCU */
++#define	RZG_PWRER3		U(0xE6180154)	/* shutoff/resume error */
++#define	RZG_PWRER5		U(0xE61801D4)	/* shutoff/resume error */
++#define	RZG_SYSCISR		U(0xE6180004)	/* Interrupt status     */
++#define	RZG_SYSCISCR		U(0xE6180008)	/* Interrupt stat clear */
++/* Product register */
++#define	RZG_PRR			U(0xFFF00044)
++#define RZG_G2M_CUT_VER11	U(0x00000010)	/* G2M Ver.1.1/Ver.1.2 */
++#define RZG_MAJOR_MASK		U(0x000000F0)
++#define RZG_MINOR_MASK		U(0x0000000F)
++#define PRR_PRODUCT_SHIFT	U(8)
++#define RZG_MAJOR_SHIFT		U(4)
++#define RZG_MINOR_SHIFT		U(0)
++#define RZG_MAJOR_OFFSET		U(1)
++#define RZG_G2M_MINOR_OFFSET		U(2)
++#define PRR_PRODUCT_G2M_CUT11		(PRR_PRODUCT_G2M | U(0x10))
++#define PRR				0xFFF00044U
++#define PRR_PRODUCT_MASK		0x00007F00U
++#define PRR_CUT_MASK			0x000000FFU
++#define PRR_PRODUCT_G2H			0x00004F00U	/* RZ/G2H */
++#define PRR_PRODUCT_G2M			0x00005200U	/* RZ/G2M */
++#define PRR_PRODUCT_G2N			0x00005500U	/* RZ/G2N */
++#define PRR_PRODUCT_G2E			0x00005700U	/* RZ/G2E */
++#define PRR_PRODUCT_10			0x00U		/* Ver.1.0 */
++#define PRR_PRODUCT_11			0x01U		/* Ver.1.1 */
++#define PRR_PRODUCT_20			0x10U		/* Ver.2.0 */
++#define PRR_PRODUCT_21			0x11U		/* Ver.2.1 */
++#define PRR_PRODUCT_30			0x20U		/* Ver.3.0 */
++#define RZG_CPU_MASK_CA57		U(0x80000000)
++#define RZG_CPU_MASK_CA53		U(0x04000000)
++#define RZG_CPU_HAVE_CA57		U(0x00000000)
++#define RZG_CPU_HAVE_CA53		U(0x00000000)
++#define RZG_SSCG_MASK			U(0x1000)	/* MD12 */
++#define RZG_SSCG_ENABLE		U(0x1000)
++/* MD pin information */
++#define MODEMR_BOOT_CPU_MASK		U(0x000000C0)
++#define MODEMR_BOOT_CPU_CR7		U(0x000000C0)
++#define MODEMR_BOOT_CPU_CA57		U(0x00000000)
++#define MODEMR_BOOT_CPU_CA53		U(0x00000040)
++#define MODEMR_BOOT_DEV_MASK		U(0x0000001E)
++#define MODEMR_BOOT_DEV_HYPERFLASH160	U(0x00000004)
++#define MODEMR_BOOT_DEV_HYPERFLASH80	U(0x00000006)
++#define MODEMR_BOOT_DEV_QSPI_FLASH40	U(0x00000008)
++#define MODEMR_BOOT_DEV_QSPI_FLASH80	U(0x0000000C)
++#define MODEMR_BOOT_DEV_EMMC_25X1	U(0x0000000A)
++#define MODEMR_BOOT_DEV_EMMC_50X8	U(0x0000001A)
++#define MODEMR_BOOT_PLL_MASK		U(0x00006000)
++#define MODEMR_BOOT_PLL_SHIFT		U(13)
++/* Memory mapped Generic timer interfaces */
++#define ARM_SYS_CNTCTL_BASE		RZG_CNTC_BASE
++/* MODEMR PLL masks and bitfield values */
++#define	CHECK_MD13_MD14			U(0x6000)
++#define	MD14_MD13_TYPE_0		U(0x0000)	/* MD14=0 MD13=0 */
++#define	MD14_MD13_TYPE_1		U(0x2000)	/* MD14=0 MD13=1 */
++#define	MD14_MD13_TYPE_2		U(0x4000)	/* MD14=1 MD13=0 */
++#define	MD14_MD13_TYPE_3		U(0x6000)	/* MD14=1 MD13=1 */
++/* Frequency of EXTAL(Hz) */
++#define	EXTAL_MD14_MD13_TYPE_0		U(8333300)	/* MD14=0 MD13=0 */
++#define	EXTAL_MD14_MD13_TYPE_1		U(10000000)	/* MD14=0 MD13=1 */
++#define	EXTAL_MD14_MD13_TYPE_2		U(12500000)	/* MD14=1 MD13=0 */
++#define	EXTAL_MD14_MD13_TYPE_3		U(16666600)	/* MD14=1 MD13=1 */
++#define	EXTAL_HIHOPE			U(8320000)	/* HiHope RZ/G2H/M/N */
++#define EXTAL_EK874			U(24000000)	/* EK874 */
++/* CPG write protect registers 	*/
++#define	CPGWPR_PASSWORD			(0x5A5AFFFFU)
++#define	CPGWPCR_PASSWORD		(0xA5A50000U)
++/* CA5x Debug Resource control registers */
++#define	CPG_CA57DBGRCR			(CPG_BASE + 0x2180U)
++#define	CPG_CA53DBGRCR			(CPG_BASE + 0x1180U)
++#define	DBGCPUPREN			((uint32_t)1U << 19U)
++#define	CPG_PLL0CR			(CPG_BASE + 0x00D8U)
++#define	CPG_PLL2CR			(CPG_BASE + 0x002CU)
++#define	CPG_PLL4CR			(CPG_BASE + 0x01F4U)
++#define CPG_CPGWPCR			(CPG_BASE + 0x0904U)
++/* RST Registers */
++#define	RST_BASE			(0xE6160000U)
++#define	RST_WDTRSTCR			(RST_BASE + 0x0054U)
++#define RST_MODEMR			(RST_BASE + 0x0060U)
++#define	WDTRSTCR_PASSWORD		(0xA55A0000U)
++#define	WDTRSTCR_RWDT_RSTMSK		((uint32_t)1U << 0U)
++/* MFIS Registers */
++#define	MFISWPCNTR_PASSWORD		(0xACCE0000U)
++#define	MFISWPCNTR			(0xE6260900U)
++/* IPMMU registers */
++#define IPMMU_MM_BASE			(0xE67B0000U)
++#define IPMMUMM_IMSCTLR			(IPMMU_MM_BASE + 0x0500U)
++#define IPMMUMM_IMAUXCTLR		(IPMMU_MM_BASE + 0x0504U)
++#define IPMMUMM_IMSCTLR_ENABLE		(0xC0000000U)
++#define IPMMUMM_IMAUXCTLR_NMERGE40_BIT	(0x01000000U)
++#define IMSCTLR_DISCACHE		(0xE0000000U)
++#define IPMMU_VP0_BASE			(0xFE990000U)
++#define IPMMUVP0_IMSCTLR		(IPMMU_VP0_BASE + 0x0500U)
++#define IPMMU_VI0_BASE			(0xFEBD0000U)
++#define IPMMUVI0_IMSCTLR		(IPMMU_VI0_BASE + 0x0500U)
++#define IPMMU_VI1_BASE			(0xFEBE0000U)
++#define IPMMUVI1_IMSCTLR		(IPMMU_VI1_BASE + 0x0500U)
++#define IPMMU_PV0_BASE			(0xFD800000U)
++#define IPMMUPV0_IMSCTLR		(IPMMU_PV0_BASE + 0x0500U)
++#define IPMMU_PV1_BASE			(0xFD950000U)
++#define IPMMUPV1_IMSCTLR		(IPMMU_PV1_BASE + 0x0500U)
++#define IPMMU_PV2_BASE			(0xFD960000U)
++#define IPMMUPV2_IMSCTLR		(IPMMU_PV2_BASE + 0x0500U)
++#define IPMMU_PV3_BASE			(0xFD970000U)
++#define IPMMUPV3_IMSCTLR		(IPMMU_PV3_BASE + 0x0500U)
++#define IPMMU_HC_BASE			(0xE6570000U)
++#define IPMMUHC_IMSCTLR			(IPMMU_HC_BASE + 0x0500U)
++#define IPMMU_RT_BASE			(0xFFC80000U)
++#define IPMMURT_IMSCTLR			(IPMMU_RT_BASE + 0x0500U)
++#define IPMMU_MP_BASE			(0xEC670000U)
++#define IPMMUMP_IMSCTLR			(IPMMU_MP_BASE + 0x0500U)
++#define IPMMU_DS0_BASE			(0xE6740000U)
++#define IPMMUDS0_IMSCTLR		(IPMMU_DS0_BASE + 0x0500U)
++#define IPMMU_DS1_BASE			(0xE7740000U)
++#define IPMMUDS1_IMSCTLR		(IPMMU_DS1_BASE + 0x0500U)
++/* ARMREG registers */
++#define	P_ARMREG_SEC_CTRL		(0xE62711F0U)
++#define	P_ARMREG_SEC_CTRL_PROT		(0x00000001U)
++/* MIDR */
++#define MIDR_CA57			(0x0D07U << MIDR_PN_SHIFT)
++#define MIDR_CA53			(0x0D03U << MIDR_PN_SHIFT)
++/* for SuspendToRAM */
++#define GPIO_BASE			(0xE6050000U)
++#define GPIO_INDT1			(GPIO_BASE + 0x100CU)
++#define GPIO_INDT3			(GPIO_BASE + 0x300CU)
++#define GPIO_INDT6			(GPIO_BASE + 0x540CU)
++#define GPIO_OUTDT1			(GPIO_BASE + 0x1008U)
++#define GPIO_OUTDT3			(GPIO_BASE + 0x3008U)
++#define GPIO_OUTDT6			(GPIO_BASE + 0x5408U)
++#define RZG_COLD_BOOT			(0x00U)
++#define RZG_WARM_BOOT			(0x01U)
++#if PMIC_ROHM_BD9571 && RZG_SYSTEM_RESET_KEEPON_DDR
++#define	KEEP10_MAGIC		(0x55U)
++#endif
++/* lossy registers */
++#define LOSSY_PARAMS_BASE 		(0x47FD7000U)
++#define	AXI_DCMPAREACRA0		(0xE6784100U)
++#define	AXI_DCMPAREACRB0		(0xE6784104U)
++#define LOSSY_ENABLE			(0x80000000U)
++#define LOSSY_DISABLE			(0x00000000U)
++#define LOSSY_FMT_YUVPLANAR		(0x00000000U)
++#define LOSSY_FMT_YUV422INTLV		(0x20000000U)
++#define LOSSY_FMT_ARGB8888		(0x40000000U)
++#define	LOSSY_ST_ADDR0			(0x54000000U)
++#define	LOSSY_END_ADDR0			(0x57000000U)
++#define	LOSSY_FMT0			LOSSY_FMT_YUVPLANAR
++#define	LOSSY_ENA_DIS0			LOSSY_ENABLE
++#define	LOSSY_ST_ADDR1			0x0U
++#define	LOSSY_END_ADDR1			0x0U
++#define	LOSSY_FMT1			LOSSY_FMT_ARGB8888
++#define	LOSSY_ENA_DIS1			LOSSY_DISABLE
++#define	LOSSY_ST_ADDR2			0x0U
++#define	LOSSY_END_ADDR2			0x0U
++#define	LOSSY_FMT2			LOSSY_FMT_YUV422INTLV
++#define	LOSSY_ENA_DIS2			LOSSY_DISABLE
++
++#endif /* RZG_DEF_H */
+diff --git a/plat/renesas/rzg/include/rzg_private.h b/plat/renesas/rzg/include/rzg_private.h
+new file mode 100644
+index 0000000..f9bb56f
+--- /dev/null
++++ b/plat/renesas/rzg/include/rzg_private.h
+@@ -0,0 +1,107 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef RZG_PRIVATE_H
++#define RZG_PRIVATE_H
++
++#include <platform_def.h>
++
++#include <common/bl_common.h>
++#include <lib/bakery_lock.h>
++#include <lib/el3_runtime/cpu_data.h>
++
++typedef volatile struct mailbox {
++	unsigned long value __aligned(CACHE_WRITEBACK_GRANULE);
++} mailbox_t;
++
++/*
++ * This structure represents the superset of information that is passed to
++ * BL31 e.g. while passing control to it from BL2 which is bl31_params
++ * and bl31_plat_params and its elements
++ */
++typedef struct bl2_to_bl31_params_mem {
++	image_info_t bl32_image_info;
++	image_info_t bl33_image_info;
++	entry_point_info_t bl33_ep_info;
++	entry_point_info_t bl32_ep_info;
++} bl2_to_bl31_params_mem_t;
++
++#if USE_COHERENT_MEM
++#define RZG_INSTANTIATE_LOCK	DEFINE_BAKERY_LOCK(rzg_lock);
++#define rzg_lock_init()	bakery_lock_init(&rzg_lock)
++#define rzg_lock_get()		bakery_lock_get(&rzg_lock)
++#define rzg_lock_release()	bakery_lock_release(&rzg_lock)
++#else
++/*
++ * Constants to specify how many bakery locks this platform implements. These
++ * are used if the platform chooses not to use coherent memory for bakery lock
++ * data structures.
++ */
++#define RZG_MAX_BAKERIES	2
++#define RZG_PWRC_BAKERY_ID	0
++
++/*
++ * Definition of structure which holds platform specific per-cpu data. Currently
++ * it holds only the bakery lock information for each cpu. Constants to
++ * specify how many bakeries this platform implements and bakery ids are
++ * specified in rzg_def.h
++ */
++typedef struct rzg_cpu_data {
++	bakery_info_t pcpu_bakery_info[RZG_MAX_BAKERIES];
++} rzg_cpu_data_t;
++
++#define RZG_CPU_DATA_LOCK_OFFSET	\
++	__builtin_offsetof(rzg_cpu_data_t, pcpu_bakery_info)
++/*
++ * Helper macros for bakery lock api when using the above rzg_cpu_data_t for
++ * bakery lock data structures. It assumes that the bakery_info is at the
++ * beginning of the platform specific per-cpu data.
++ */
++#define rzg_lock_init(_lock_arg)
++
++#define rzg_lock_get(_lock_arg) 					\
++	bakery_lock_get(_lock_arg, 					\
++		CPU_DATA_PLAT_PCPU_OFFSET + RZG_CPU_DATA_LOCK_OFFSET)
++
++#define rzg_lock_release(_lock_arg)					\
++	bakery_lock_release(_lock_arg,	    				\
++		CPU_DATA_PLAT_PCPU_OFFSET + RZG_CPU_DATA_LOCK_OFFSET)
++/* Ensure that the size of the RZG specific per-cpu data structure and the size
++ * of the memory allocated in generic per-cpu data for the platform are the same
++ */
++CASSERT(PLAT_PCPU_DATA_SIZE == sizeof(rzg_cpu_data_t),
++	rzg_pcpu_data_size_mismatch);
++#endif
++/*
++ * Function and variable prototypes
++ */
++void rzg_configure_mmu_el3(unsigned long total_base,
++			    unsigned long total_size,
++			    unsigned long ro_start, unsigned long ro_limit
++#if USE_COHERENT_MEM
++			    , unsigned long coh_start, unsigned long coh_limit
++#endif
++    );
++
++void rzg_setup_topology(void);
++void rzg_cci_disable(void);
++void rzg_cci_enable(void);
++void rzg_cci_init(void);
++
++void plat_invalidate_icache(void);
++void plat_cci_disable(void);
++void plat_cci_enable(void);
++void plat_cci_init(void);
++
++void mstpcr_write(uint32_t mstpcr, uint32_t mstpsr, uint32_t target_bit);
++void cpg_write(uintptr_t regadr, uint32_t regval);
++
++void rzg_console_boot_init(void);
++void rzg_console_boot_end(void);
++void rzg_console_runtime_init(void);
++void rzg_console_runtime_end(void);
++
++#endif /* RZG_PRIVATE_H */
+diff --git a/plat/renesas/rzg/include/rzg_version.h b/plat/renesas/rzg/include/rzg_version.h
+new file mode 100644
+index 0000000..9fa98aa
+--- /dev/null
++++ b/plat/renesas/rzg/include/rzg_version.h
+@@ -0,0 +1,17 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef RZG_VERSION_H
++#define RZG_VERSION_H
++
++#include <arch_helpers.h>
++
++#define VERSION_OF_RENESAS		"2.0.6"
++#define VERSION_OF_RENESAS_MAXLEN	128
++
++extern const uint8_t version_of_renesas[VERSION_OF_RENESAS_MAXLEN];
++
++#endif /* RZG_VERSION_H */
+diff --git a/plat/renesas/rzg/plat_image_load.c b/plat/renesas/rzg/plat_image_load.c
+new file mode 100644
+index 0000000..9d814a6
+--- /dev/null
++++ b/plat/renesas/rzg/plat_image_load.c
+@@ -0,0 +1,38 @@
++/*
++ * Copyright (c) 2018, ARM Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/bl_common.h>
++#include <common/desc_image_load.h>
++#include <plat/common/platform.h>
++
++extern void bl2_plat_flush_bl31_params(void);
++
++/*******************************************************************************
++ * This function flushes the data structures so that they are visible
++ * in memory for the next BL image.
++ ******************************************************************************/
++void plat_flush_next_bl_params(void)
++{
++#if IMAGE_BL2
++	bl2_plat_flush_bl31_params();
++#endif
++}
++
++/*******************************************************************************
++ * This function returns the list of loadable images.
++ ******************************************************************************/
++bl_load_info_t *plat_get_bl_image_load_info(void)
++{
++	return get_bl_load_info_from_mem_params_desc();
++}
++
++/*******************************************************************************
++ * This function returns the list of executable images.
++ ******************************************************************************/
++bl_params_t *plat_get_next_bl_params(void)
++{
++	return get_next_bl_params_from_mem_params_desc();
++}
+diff --git a/plat/renesas/rzg/plat_pm.c b/plat/renesas/rzg/plat_pm.c
+new file mode 100644
+index 0000000..e16fb62
+--- /dev/null
++++ b/plat/renesas/rzg/plat_pm.c
+@@ -0,0 +1,299 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <errno.h>
++
++#include <platform_def.h>
++
++#include <arch_helpers.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <drivers/arm/cci.h>
++#include <drivers/arm/gicv2.h>
++#include <lib/bakery_lock.h>
++#include <lib/mmio.h>
++#include <lib/psci/psci.h>
++#include <plat/common/platform.h>
++
++#include "iic_dvfs.h"
++#include "pwrc.h"
++#include "rzg_def.h"
++#include "rzg_private.h"
++
++#define DVFS_SET_VID_0V		(0x00)
++#define P_ALL_OFF		(0x80)
++#define KEEPON_DDR1C		(0x08)
++#define KEEPON_DDR0C		(0x04)
++#define KEEPON_DDR1		(0x02)
++#define KEEPON_DDR0		(0x01)
++
++#define SYSTEM_PWR_STATE(s)	((s)->pwr_domain_state[PLAT_MAX_PWR_LVL])
++#define CLUSTER_PWR_STATE(s)	((s)->pwr_domain_state[MPIDR_AFFLVL1])
++#define CORE_PWR_STATE(s)	((s)->pwr_domain_state[MPIDR_AFFLVL0])
++
++extern void rzg_pwrc_restore_generic_timer(uint64_t *stack);
++extern void plat_rzg_gic_driver_init(void);
++extern void plat_rzg_gic_init(void);
++extern u_register_t rzg_boot_mpidr;
++
++static uintptr_t rzg_sec_entrypoint;
++
++static void rzg_program_mailbox(uint64_t mpidr, uint64_t address)
++{
++	mailbox_t *rzg_mboxes = (mailbox_t *) MBOX_BASE;
++	uint64_t linear_id = plat_core_pos_by_mpidr(mpidr);
++	unsigned long range;
++
++	rzg_mboxes[linear_id].value = address;
++	range = (unsigned long)&rzg_mboxes[linear_id];
++
++	flush_dcache_range(range, sizeof(range));
++}
++
++static void rzg_cpu_standby(plat_local_state_t cpu_state)
++{
++	u_register_t scr_el3 = read_scr_el3();
++
++	write_scr_el3(scr_el3 | SCR_IRQ_BIT);
++	dsb();
++	wfi();
++	write_scr_el3(scr_el3);
++}
++
++static int rzg_pwr_domain_on(u_register_t mpidr)
++{
++	rzg_program_mailbox(mpidr, rzg_sec_entrypoint);
++	rzg_pwrc_cpuon(mpidr);
++
++	return PSCI_E_SUCCESS;
++}
++
++static void rzg_pwr_domain_on_finish(const psci_power_state_t *target_state)
++{
++	uint32_t cluster_type = rzg_pwrc_get_cluster();
++	unsigned long mpidr = read_mpidr_el1();
++
++	if (CLUSTER_PWR_STATE(target_state) == PLAT_MAX_OFF_STATE)
++		if (cluster_type == RZG_CLUSTER_A53A57)
++			plat_cci_enable();
++
++	rzg_pwrc_disable_interrupt_wakeup(mpidr);
++	rzg_program_mailbox(mpidr, 0);
++
++	gicv2_cpuif_enable();
++	gicv2_pcpu_distif_init();
++}
++
++static void rzg_pwr_domain_off(const psci_power_state_t *target_state)
++{
++	uint32_t cluster_type = rzg_pwrc_get_cluster();
++	unsigned long mpidr = read_mpidr_el1();
++
++	gicv2_cpuif_disable();
++	rzg_pwrc_cpuoff(mpidr);
++
++	if (CLUSTER_PWR_STATE(target_state) == PLAT_MAX_OFF_STATE) {
++		if (cluster_type == RZG_CLUSTER_A53A57)
++			plat_cci_disable();
++
++		rzg_pwrc_clusteroff(mpidr);
++	}
++}
++
++static void rzg_pwr_domain_suspend(const psci_power_state_t *target_state)
++{
++	uint32_t cluster_type = rzg_pwrc_get_cluster();
++	unsigned long mpidr = read_mpidr_el1();
++
++	if (CORE_PWR_STATE(target_state) != PLAT_MAX_OFF_STATE)
++		return;
++
++	rzg_program_mailbox(mpidr, rzg_sec_entrypoint);
++	rzg_pwrc_enable_interrupt_wakeup(mpidr);
++	gicv2_cpuif_disable();
++	rzg_pwrc_cpuoff(mpidr);
++
++	if (CLUSTER_PWR_STATE(target_state) == PLAT_MAX_OFF_STATE) {
++		if (cluster_type == RZG_CLUSTER_A53A57)
++			plat_cci_disable();
++
++		rzg_pwrc_clusteroff(mpidr);
++	}
++#if RZG_SYSTEM_SUSPEND
++	if (SYSTEM_PWR_STATE(target_state) == PLAT_MAX_OFF_STATE)
++		rzg_pwrc_suspend_to_ram();
++#endif
++}
++
++static void rzg_pwr_domain_suspend_finish(const psci_power_state_t
++					   *target_state)
++{
++	uint32_t cluster_type = rzg_pwrc_get_cluster();
++
++	if (SYSTEM_PWR_STATE(target_state) != PLAT_MAX_OFF_STATE)
++		goto finish;
++
++	plat_rzg_gic_driver_init();
++	plat_rzg_gic_init();
++
++	if (cluster_type == RZG_CLUSTER_A53A57)
++		plat_cci_init();
++
++	rzg_pwrc_restore_timer_state();
++	rzg_pwrc_setup();
++	rzg_pwrc_code_copy_to_system_ram();
++
++#if RZG_SYSTEM_SUSPEND
++	rzg_pwrc_init_suspend_to_ram();
++#endif
++finish:
++	rzg_pwr_domain_on_finish(target_state);
++}
++
++static void __dead2 rzg_system_off(void)
++{
++#if PMIC_ROHM_BD9571
++#if PMIC_LEVEL_MODE
++	if (rzg_iic_dvfs_send(PMIC, DVFS_SET_VID, DVFS_SET_VID_0V))
++		ERROR("BL3-1:Failed the SYSTEM-OFF.\n");
++#else
++	if (rzg_iic_dvfs_send(PMIC, BKUP_MODE_CNT, P_ALL_OFF))
++		ERROR("BL3-1:Failed the SYSTEM-RESET.\n");
++#endif
++#else
++	uint64_t cpu = read_mpidr_el1() & 0x0000ffff;
++	int32_t rtn_on;
++
++	rtn_on = rzg_pwrc_cpu_on_check(cpu);
++
++	if (cpu == rzg_boot_mpidr)
++		panic();
++
++	if (rtn_on)
++		panic();
++
++	rzg_pwrc_cpuoff(cpu);
++	rzg_pwrc_clusteroff(cpu);
++
++#endif /* PMIC_ROHM_BD9571 */
++	wfi();
++	ERROR("RZG System Off: operation not handled.\n");
++	panic();
++}
++
++static void __dead2 rzg_system_reset(void)
++{
++#if PMIC_ROHM_BD9571
++#if PMIC_LEVEL_MODE
++#if RZG_SYSTEM_RESET_KEEPON_DDR
++	uint8_t mode;
++	int32_t error;
++
++	error = rzg_iic_dvfs_send(PMIC, REG_KEEP10, KEEP10_MAGIC);
++	if (error) {
++		ERROR("Failed send KEEP10 magic ret=%d \n", error);
++		goto done;
++	}
++
++	error = rzg_iic_dvfs_receive(PMIC, BKUP_MODE_CNT, &mode);
++	if (error) {
++		ERROR("Failed recieve BKUP_Mode_Cnt ret=%d \n", error);
++		goto done;
++	}
++
++	mode |= KEEPON_DDR1C | KEEPON_DDR0C | KEEPON_DDR1 | KEEPON_DDR0;
++	error = rzg_iic_dvfs_send(PMIC, BKUP_MODE_CNT, mode);
++	if (error) {
++		ERROR("Failed send KEEPON_DDRx ret=%d \n", error);
++		goto done;
++	}
++
++	rzg_pwrc_set_suspend_to_ram();
++done:
++#else
++	if (rzg_iic_dvfs_send(PMIC, BKUP_MODE_CNT, P_ALL_OFF))
++		ERROR("BL3-1:Failed the SYSTEM-RESET.\n");
++#endif
++#endif
++#else
++	rzg_pwrc_system_reset();
++#endif
++	wfi();
++
++	ERROR("RZG System Reset: operation not handled.\n");
++	panic();
++}
++
++static int rzg_validate_power_state(unsigned int power_state,
++				    psci_power_state_t *req_state)
++{
++	unsigned int pwr_lvl = psci_get_pstate_pwrlvl(power_state);
++	unsigned int pstate = psci_get_pstate_type(power_state);
++	uint32_t i;
++
++	if (pstate == PSTATE_TYPE_STANDBY) {
++		if (pwr_lvl != MPIDR_AFFLVL0)
++			return PSCI_E_INVALID_PARAMS;
++
++		req_state->pwr_domain_state[MPIDR_AFFLVL0] = PLAT_MAX_RET_STATE;
++	} else {
++		for (i = MPIDR_AFFLVL0; i <= pwr_lvl; i++)
++			req_state->pwr_domain_state[i] = PLAT_MAX_OFF_STATE;
++	}
++
++	if (psci_get_pstate_id(power_state))
++		return PSCI_E_INVALID_PARAMS;
++
++	return PSCI_E_SUCCESS;
++}
++
++#if RZG_SYSTEM_SUSPEND
++static void rzg_get_sys_suspend_power_state(psci_power_state_t *req_state)
++{
++	unsigned long mpidr = read_mpidr_el1() & 0x0000ffffU;
++	int i;
++
++	if (mpidr != rzg_boot_mpidr)
++		goto deny;
++
++	for (i = MPIDR_AFFLVL0; i <= PLAT_MAX_PWR_LVL; i++)
++		req_state->pwr_domain_state[i] = PLAT_MAX_OFF_STATE;
++
++	return;
++deny:
++	/* deny system suspend entry */
++	req_state->pwr_domain_state[PLAT_MAX_PWR_LVL] = PSCI_LOCAL_STATE_RUN;
++	for (i = MPIDR_AFFLVL0; i < PLAT_MAX_PWR_LVL; i++)
++		req_state->pwr_domain_state[i] = PLAT_MAX_RET_STATE;
++}
++#endif
++
++static const plat_psci_ops_t rzg_plat_psci_ops = {
++	.cpu_standby			= rzg_cpu_standby,
++	.pwr_domain_on			= rzg_pwr_domain_on,
++	.pwr_domain_off			= rzg_pwr_domain_off,
++	.pwr_domain_suspend		= rzg_pwr_domain_suspend,
++	.pwr_domain_on_finish		= rzg_pwr_domain_on_finish,
++	.pwr_domain_suspend_finish	= rzg_pwr_domain_suspend_finish,
++	.system_off			= rzg_system_off,
++	.system_reset			= rzg_system_reset,
++	.validate_power_state		= rzg_validate_power_state,
++#if RZG_SYSTEM_SUSPEND
++	.get_sys_suspend_power_state	= rzg_get_sys_suspend_power_state,
++#endif
++};
++
++int plat_setup_psci_ops(uintptr_t sec_entrypoint, const plat_psci_ops_t **psci_ops)
++{
++	*psci_ops = &rzg_plat_psci_ops;
++	rzg_sec_entrypoint = sec_entrypoint;
++
++#if RZG_SYSTEM_SUSPEND
++	rzg_pwrc_init_suspend_to_ram();
++#endif
++
++	return 0;
++}
+diff --git a/plat/renesas/rzg/plat_storage.c b/plat/renesas/rzg/plat_storage.c
+new file mode 100644
+index 0000000..4c17dc6
+--- /dev/null
++++ b/plat/renesas/rzg/plat_storage.c
+@@ -0,0 +1,252 @@
++/*
++ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <string.h>
++
++#include <platform_def.h>
++
++#include <common/debug.h>
++#include <drivers/io/io_driver.h>
++#include <drivers/io/io_storage.h>
++#include <drivers/io/io_semihosting.h>
++
++#include "io_common.h"
++#include "io_rzg.h"
++#include "io_memdrv.h"
++#include "io_emmcdrv.h"
++#include "io_private.h"
++
++static uintptr_t emmcdrv_dev_handle;
++static uintptr_t memdrv_dev_handle;
++static uintptr_t rzg_dev_handle;
++
++static uintptr_t boot_io_drv_id;
++
++static const io_block_spec_t rzg_block_spec = {
++	.offset = FLASH0_BASE,
++	.length = FLASH0_SIZE
++};
++
++static const io_block_spec_t bl2_file_spec = {
++	.offset = BL2_IMAGE_ID,
++};
++
++static const io_block_spec_t bl31_file_spec = {
++	.offset = BL31_IMAGE_ID,
++};
++
++static const io_block_spec_t bl32_file_spec = {
++	.offset = BL32_IMAGE_ID,
++};
++
++static const io_block_spec_t bl33_file_spec = {
++	.offset = BL33_IMAGE_ID,
++};
++
++static const io_block_spec_t bl332_file_spec = {
++	.offset = BL332_IMAGE_ID,
++};
++
++static const io_block_spec_t bl333_file_spec = {
++	.offset = BL333_IMAGE_ID,
++};
++
++static const io_block_spec_t bl334_file_spec = {
++	.offset = BL334_IMAGE_ID,
++};
++
++static const io_block_spec_t bl335_file_spec = {
++	.offset = BL335_IMAGE_ID,
++};
++
++static const io_block_spec_t bl336_file_spec = {
++	.offset = BL336_IMAGE_ID,
++};
++
++static const io_block_spec_t bl337_file_spec = {
++	.offset = BL337_IMAGE_ID,
++};
++
++static const io_block_spec_t bl338_file_spec = {
++	.offset = BL338_IMAGE_ID,
++};
++
++
++static int32_t open_emmcdrv(const uintptr_t spec);
++static int32_t open_memmap(const uintptr_t spec);
++static int32_t open_rzg(const uintptr_t spec);
++
++struct plat_io_policy {
++	uintptr_t *dev_handle;
++	uintptr_t image_spec;
++	 int32_t(*check) (const uintptr_t spec);
++};
++
++static const struct plat_io_policy policies[] = {
++	[FIP_IMAGE_ID] = {
++			  &memdrv_dev_handle,
++			  (uintptr_t) &rzg_block_spec,
++			  &open_memmap},
++	[BL2_IMAGE_ID] = {
++			  &rzg_dev_handle,
++			  (uintptr_t) &bl2_file_spec,
++			  &open_rzg},
++	[BL31_IMAGE_ID] = {
++			   &rzg_dev_handle,
++			   (uintptr_t) &bl31_file_spec,
++			   &open_rzg},
++	[BL32_IMAGE_ID] = {
++			   &rzg_dev_handle,
++			   (uintptr_t) &bl32_file_spec,
++			   &open_rzg},
++	[BL33_IMAGE_ID] = {
++			   &rzg_dev_handle,
++			   (uintptr_t) &bl33_file_spec,
++			   &open_rzg},
++	[BL332_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl332_file_spec,
++			    &open_rzg},
++	[BL333_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl333_file_spec,
++			    &open_rzg},
++	[BL334_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl334_file_spec,
++			    &open_rzg},
++	[BL335_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl335_file_spec,
++			    &open_rzg},
++	[BL336_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl336_file_spec,
++			    &open_rzg},
++	[BL337_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl337_file_spec,
++			    &open_rzg},
++	[BL338_IMAGE_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &bl338_file_spec,
++			    &open_rzg},
++			{
++			    0, 0, 0
++			}
++};
++
++static io_drv_spec_t io_drv_spec_memdrv = {
++	FLASH0_BASE,
++	FLASH0_SIZE,
++	0,
++};
++
++static io_drv_spec_t io_drv_spec_emmcdrv = {
++	0,
++	0,
++	0,
++};
++
++static struct plat_io_policy drv_policies[]
++    __attribute__ ((section(".data"))) = {
++	/* FLASH_DEV_ID */
++	{
++	&memdrv_dev_handle,
++		    (uintptr_t) &io_drv_spec_memdrv, &open_memmap,},
++	    /* EMMC_DEV_ID */
++	{
++	&emmcdrv_dev_handle,
++		    (uintptr_t) &io_drv_spec_emmcdrv, &open_emmcdrv,}
++};
++
++static int32_t open_rzg(const uintptr_t spec)
++{
++	return io_dev_init(rzg_dev_handle, boot_io_drv_id);
++}
++
++static int32_t open_memmap(const uintptr_t spec)
++{
++	uintptr_t handle;
++	int32_t result;
++
++	result = io_dev_init(memdrv_dev_handle, 0);
++	if (result != IO_SUCCESS)
++		return result;
++
++	result = io_open(memdrv_dev_handle, spec, &handle);
++	if (result == IO_SUCCESS)
++		io_close(handle);
++
++	return result;
++}
++
++static int32_t open_emmcdrv(const uintptr_t spec)
++{
++	return io_dev_init(emmcdrv_dev_handle, 0);
++}
++
++void rzg_io_setup(void)
++{
++	const io_dev_connector_t *memmap;
++	const io_dev_connector_t *rzg;
++
++	boot_io_drv_id = FLASH_DEV_ID;
++
++	rzg_register_io_dev(&rzg);
++	rzg_register_io_dev_memdrv(&memmap);
++	io_dev_open(rzg, 0, &rzg_dev_handle);
++	io_dev_open(memmap, 0, &memdrv_dev_handle);
++}
++
++void rzg_io_emmc_setup(void)
++{
++	const io_dev_connector_t *rzg;
++	const io_dev_connector_t *emmc;
++
++	boot_io_drv_id = EMMC_DEV_ID;
++
++	rzg_register_io_dev(&rzg);
++	rzg_register_io_dev_emmcdrv(&emmc);
++	io_dev_open(rzg, 0, &rzg_dev_handle);
++	io_dev_open(emmc, 0, &emmcdrv_dev_handle);
++}
++
++int plat_get_image_source(unsigned int image_id, uintptr_t *dev_handle,
++			  uintptr_t *image_spec)
++{
++	const struct plat_io_policy *policy;
++	int result;
++
++	policy = &policies[image_id];
++
++	result = policy->check(policy->image_spec);
++	if (result != IO_SUCCESS)
++		return result;
++
++	*image_spec = policy->image_spec;
++	*dev_handle = *(policy->dev_handle);
++
++	return IO_SUCCESS;
++}
++
++int32_t plat_get_drv_source(uint32_t io_drv_id, uintptr_t *dev_handle,
++			    uintptr_t *image_spec)
++{
++	const struct plat_io_policy *policy;
++	int32_t result;
++
++	policy = &drv_policies[io_drv_id];
++
++	result = policy->check(policy->image_spec);
++	if (result != IO_SUCCESS)
++		return result;
++
++	*image_spec = policy->image_spec;
++	*dev_handle = *(policy->dev_handle);
++
++	return IO_SUCCESS;
++}
+diff --git a/plat/renesas/rzg/plat_topology.c b/plat/renesas/rzg/plat_topology.c
+new file mode 100644
+index 0000000..17e6448
+--- /dev/null
++++ b/plat/renesas/rzg/plat_topology.c
+@@ -0,0 +1,46 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <platform_def.h>
++
++#include <common/debug.h>
++#include <lib/psci/psci.h>
++
++static const unsigned char rzg_power_domain_tree_desc[] = {
++	1,
++	PLATFORM_CLUSTER_COUNT,
++	PLATFORM_CLUSTER0_CORE_COUNT,
++	PLATFORM_CLUSTER1_CORE_COUNT
++};
++
++const unsigned char *plat_get_power_domain_tree_desc(void)
++{
++	return rzg_power_domain_tree_desc;
++}
++
++int plat_core_pos_by_mpidr(u_register_t mpidr)
++{
++	unsigned int cluster_id, cpu_id;
++
++	mpidr &= MPIDR_AFFINITY_MASK;
++
++	if (mpidr & ~(MPIDR_CLUSTER_MASK | MPIDR_CPU_MASK))
++		return -1;
++
++	cluster_id = (mpidr >> MPIDR_AFF1_SHIFT) & MPIDR_AFFLVL_MASK;
++	cpu_id = (mpidr >> MPIDR_AFF0_SHIFT) & MPIDR_AFFLVL_MASK;
++
++	if (cluster_id >= PLATFORM_CLUSTER_COUNT)
++		return -1;
++
++	if (cluster_id == 0 && cpu_id >= PLATFORM_CLUSTER0_CORE_COUNT)
++		return -1;
++
++	if (cluster_id == 1 && cpu_id >= PLATFORM_CLUSTER1_CORE_COUNT)
++		return -1;
++
++	return (cpu_id + cluster_id * PLATFORM_CLUSTER0_CORE_COUNT);
++}
+diff --git a/plat/renesas/rzg/platform.mk b/plat/renesas/rzg/platform.mk
+new file mode 100644
+index 0000000..ea1855f
+--- /dev/null
++++ b/plat/renesas/rzg/platform.mk
+@@ -0,0 +1,394 @@
++#
++# Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++
++PROGRAMMABLE_RESET_ADDRESS      := 0
++COLD_BOOT_SINGLE_CPU            := 1
++ARM_CCI_PRODUCT_ID              := 500
++TRUSTED_BOARD_BOOT              := 1
++RESET_TO_BL31                   := 1
++GENERATE_COT                    := 1
++BL2_AT_EL3                      := 1
++ENABLE_SVE_FOR_NS               := 0
++MULTI_CONSOLE_API               := 1
++
++CRASH_REPORTING                 := 1
++HANDLE_EA_EL3_FIRST             := 1
++
++$(eval $(call add_define,PLAT_EXTRA_LD_SCRIPT))
++
++ifeq (${SPD},none)
++  SPD_NONE:=1
++  $(eval $(call add_define,SPD_NONE))
++endif
++
++# LSI setting common define
++RZG_G2H	:=0
++RZG_G2M	:=1
++RZG_G2N	:=2
++RZG_G2E	:=3
++RZG_AUTO:=99
++$(eval $(call add_define,RZG_G2M))
++$(eval $(call add_define,RZG_G2N))
++$(eval $(call add_define,RZG_G2E))
++$(eval $(call add_define,RZG_G2H))
++$(eval $(call add_define,RZG_AUTO))
++RZG_CUT_10:=0
++RZG_CUT_11:=1
++RZG_CUT_13:=3
++RZG_CUT_20:=10
++RZG_CUT_30:=20
++$(eval $(call add_define,RZG_CUT_10))
++$(eval $(call add_define,RZG_CUT_11))
++$(eval $(call add_define,RZG_CUT_13))
++$(eval $(call add_define,RZG_CUT_20))
++$(eval $(call add_define,RZG_CUT_30))
++
++ifndef LSI
++  $(error "Error: Unknown LSI. Please use LSI=<LSI name> to specify the LSI")
++else
++  ifeq (${LSI},AUTO)
++    RZG_LSI:=${RZG_AUTO}
++  else ifeq (${LSI},G2H)
++    RZG_LSI:=${RZG_G2H}
++    ifndef LSI_CUT
++      # enable compatible function.
++      RZG_LSI_CUT_COMPAT := 1
++      $(eval $(call add_define,RZG_LSI_CUT_COMPAT))
++    else
++      # disable compatible function.
++      ifeq (${LSI_CUT},30)
++        RZG_LSI_CUT:=20
++      else
++        $(error "Error: ${LSI_CUT} is not supported.")
++      endif
++      $(eval $(call add_define,RZG_LSI_CUT))
++    endif
++  else ifeq (${LSI},G2M)
++    RZG_LSI:=${RZG_G2M}
++    ifndef LSI_CUT
++      # enable compatible function.
++      RZG_LSI_CUT_COMPAT := 1
++      $(eval $(call add_define,RZG_LSI_CUT_COMPAT))
++    else
++      # disable compatible function.
++      ifeq (${LSI_CUT},11)
++        RZG_LSI_CUT:=1
++      else ifeq (${LSI_CUT},13)
++        RZG_LSI_CUT:=3
++      else ifeq (${LSI_CUT},30)
++        RZG_LSI_CUT:=20
++      else
++        $(error "Error: ${LSI_CUT} is not supported.")
++      endif
++      $(eval $(call add_define,RZG_LSI_CUT))
++    endif
++  else ifeq (${LSI},G2N)
++    RZG_LSI:=${RZG_G2N}
++    ifndef LSI_CUT
++      # enable compatible function.
++      RZG_LSI_CUT_COMPAT := 1
++      $(eval $(call add_define,RZG_LSI_CUT_COMPAT))
++    else
++      # disable compatible function.
++      ifeq (${LSI_CUT},11)
++        RZG_LSI_CUT:=1
++      else
++        $(error "Error: ${LSI_CUT} is not supported.")
++      endif
++      $(eval $(call add_define,RZG_LSI_CUT))
++    endif
++  else ifeq (${LSI},G2E)
++    RZG_LSI:=${RZG_G2E}
++    ifndef LSI_CUT
++      # enable compatible function.
++      RZG_LSI_CUT_COMPAT := 1
++      $(eval $(call add_define,RZG_LSI_CUT_COMPAT))
++    else
++      # disable compatible function.
++      ifeq (${LSI_CUT},10)
++        RZG_LSI_CUT:=0
++      else ifeq (${LSI_CUT},11)
++        RZG_LSI_CUT:=1
++      else
++        $(error "Error: ${LSI_CUT} is not supported.")
++      endif
++      $(eval $(call add_define,RZG_LSI_CUT))
++    endif
++  else
++    $(error "Error: ${LSI} is not supported.")
++  endif
++  $(eval $(call add_define,RZG_LSI))
++endif
++
++# lock RPC HYPERFLASH access by default
++# unlock to repogram the ATF firmware from u-boot
++ifndef RZG_RPC_HYPERFLASH_LOCKED
++RZG_RPC_HYPERFLASH_LOCKED := 1
++endif
++$(eval $(call add_define,RZG_RPC_HYPERFLASH_LOCKED))
++
++# Process RZG2_SECURE_BOOT flag
++ifndef RZG2_SECURE_BOOT
++RZG2_SECURE_BOOT := 0
++endif
++$(eval $(call add_define,RZG2_SECURE_BOOT))
++
++# Process RZG_QOS_TYPE flag
++ifndef RZG_QOS_TYPE
++RZG_QOS_TYPE := 0
++endif
++$(eval $(call add_define,RZG_QOS_TYPE))
++
++# Process RZG_DRAM_SPLIT flag
++ifndef RZG_DRAM_SPLIT
++RZG_DRAM_SPLIT := 0
++endif
++$(eval $(call add_define,RZG_DRAM_SPLIT))
++
++# Process RZG_BL33_EXECUTION_EL flag
++ifndef RZG_BL33_EXECUTION_EL
++RZG_BL33_EXECUTION_EL := 0
++endif
++$(eval $(call add_define,RZG_BL33_EXECUTION_EL))
++
++# Process RZG_LOSSY_ENABLE flag
++ifndef RZG_LOSSY_ENABLE
++RZG_LOSSY_ENABLE := 0
++endif
++$(eval $(call add_define,RZG_LOSSY_ENABLE))
++
++# Process LIFEC_DBSC_PROTECT_ENABLE flag
++ifndef LIFEC_DBSC_PROTECT_ENABLE
++LIFEC_DBSC_PROTECT_ENABLE := 1
++endif
++$(eval $(call add_define,LIFEC_DBSC_PROTECT_ENABLE))
++
++# Process PMIC_ROHM_BD9571 flag
++ifndef PMIC_ROHM_BD9571
++PMIC_ROHM_BD9571 := 0
++endif
++$(eval $(call add_define,PMIC_ROHM_BD9571))
++
++# Process PMIC_LEVEL_MODE flag
++ifndef PMIC_LEVEL_MODE
++PMIC_LEVEL_MODE := 0
++endif
++$(eval $(call add_define,PMIC_LEVEL_MODE))
++
++# Process RZG_REF_INT flag
++ifndef RZG_REF_INT
++RZG_REF_INT := 0
++endif
++$(eval $(call add_define,RZG_REF_INT))
++
++# Process RZG_REWT_TRAINING flag
++ifndef RZG_REWT_TRAINING
++RZG_REWT_TRAINING := 1
++endif
++$(eval $(call add_define,RZG_REWT_TRAINING))
++
++# Process RZG_SYSTEM_SUSPEND flag
++ifndef RZG_SYSTEM_SUSPEND
++RZG_SYSTEM_SUSPEND := 0
++endif
++$(eval $(call add_define,RZG_SYSTEM_SUSPEND))
++
++# SYSTEM_SUSPEND requires power control of PMIC etc.
++# When executing SYSTEM_SUSPEND other than HiHope RZ/G2N,
++# processing equivalent to that implemented in PMIC_ROHM_BD9571 is necessary.
++ifeq (${RZG_SYSTEM_SUSPEND},1)
++  ifeq (${PMIC_ROHM_BD9571},0)
++    $(error "Error: When you want RZG_SYSTEM_SUSPEND to be enable, please also set PMIC_ROHM_BD9571 to enable.")
++  endif
++endif
++
++# Process RZG_DRAM_LPDDR4_MEMCONF flag
++ifndef RZG_DRAM_LPDDR4_MEMCONF
++RZG_DRAM_LPDDR4_MEMCONF :=1
++endif
++$(eval $(call add_define,RZG_DRAM_LPDDR4_MEMCONF))
++
++# Process RZG_DRAM_DDR3L_MEMCONF flag
++ifndef RZG_DRAM_DDR3L_MEMCONF
++RZG_DRAM_DDR3L_MEMCONF :=1
++endif
++$(eval $(call add_define,RZG_DRAM_DDR3L_MEMCONF))
++
++# Process RZG_DRAM_DDR3L_MEMDUAL flag
++ifndef RZG_DRAM_DDR3L_MEMDUAL
++RZG_DRAM_DDR3L_MEMDUAL :=1
++endif
++$(eval $(call add_define,RZG_DRAM_DDR3L_MEMDUAL))
++
++# Process RZG_BL33_ARG0 flag
++ifdef RZG_BL33_ARG0
++$(eval $(call add_define,RZG_BL33_ARG0))
++endif
++
++#Process RZG_BL2_DCACHE flag
++ifndef RZG_BL2_DCACHE
++RZG_BL2_DCACHE := 0
++endif
++$(eval $(call add_define,RZG_BL2_DCACHE))
++
++# Process RZG_DRAM_CHANNEL flag
++ifndef RZG_DRAM_CHANNEL
++RZG_DRAM_CHANNEL :=15
++endif
++$(eval $(call add_define,RZG_DRAM_CHANNEL))
++
++#Process RZG_SYSTEM_RESET_KEEPON_DDR flag
++ifndef RZG_SYSTEM_RESET_KEEPON_DDR
++RZG_SYSTEM_RESET_KEEPON_DDR := 0
++endif
++$(eval $(call add_define,RZG_SYSTEM_RESET_KEEPON_DDR))
++
++# RZG_SYSTEM_RESET_KEEPON_DDR requires power control of PMIC etc.
++# When executing SYSTEM_SUSPEND other than HiHope RZ/G2N Platform,
++# processing equivalent to that implemented in PMIC_ROHM_BD9571 is necessary.
++# Also, it is necessary to enable RZG_SYSTEM_SUSPEND.
++ifeq (${RZG_SYSTEM_RESET_KEEPON_DDR},1)
++  ifeq (${PMIC_ROHM_BD9571},0)
++    $(error "Error: When you want RZG_SYSTEM_RESET_KEEPON_DDR to be enable, please also set PMIC_ROHM_BD9571 to enable.")
++  endif
++  ifeq (${RZG_SYSTEM_SUSPEND},0)
++    $(error "Error: When you want RZG_SYSTEM_RESET_KEEPON_DDR to be enable, please also set RZG_SYSTEM_SUSPEND to enable.")
++  endif
++endif
++
++# Enable workarounds for selected Cortex-A53 erratas.
++ERRATA_A53_835769  := 1
++ifdef ERRATA_A53_843419
++ERRATA_A53_843419  := 1
++else
++OLD_BINUTILS := $(shell ${LD} --fix-cortex-a53-843419 2>&1 >/dev/null | grep 'unrecognized option' >/dev/null; echo $$?)
++ifeq ($(OLD_BINUTILS),0)
++# Fix ld error 'unrecognized option' with old binutils
++TF_LDFLAGS_aarch64    += --fix-cortex-a53
++else
++TF_LDFLAGS_aarch64    += --fix-cortex-a53-843419
++endif
++endif
++ERRATA_A53_855873  := 1
++
++# Enable workarounds for selected Cortex-A57 erratas.
++ERRATA_A57_859972  := 1
++ERRATA_A57_813419  := 1
++
++include drivers/renesas/rzg/ddr/ddr.mk
++include drivers/renesas/rzg/qos/qos.mk
++include drivers/renesas/rzg/pfc/pfc.mk
++include lib/libfdt/libfdt.mk
++
++PLAT_INCLUDES	:=	-Idrivers/renesas/rzg/ddr		\
++			-Idrivers/renesas/rzg/qos		\
++			-Idrivers/renesas/rzg/iic_dvfs		\
++			-Idrivers/renesas/rzg/board		\
++			-Idrivers/renesas/rzg/delay		\
++			-Idrivers/renesas/rzg/rom		\
++			-Idrivers/renesas/rzg/scif		\
++			-Idrivers/renesas/rzg/emmc		\
++			-Idrivers/renesas/rzg/pwrc		\
++			-Idrivers/renesas/rzg/io		\
++			-Iplat/renesas/rzg			\
++			-Iplat/renesas/rzg/include		\
++			-Iplat/renesas/rzg/include/registers
++
++PLAT_BL_COMMON_SOURCES	:=	drivers/renesas/rzg/iic_dvfs/iic_dvfs.c \
++				plat/renesas/rzg/rzg_common.c
++
++RZG_GIC_SOURCES		:=	drivers/arm/gic/common/gic_common.c	\
++				drivers/arm/gic/v2/gicv2_main.c		\
++				drivers/arm/gic/v2/gicv2_helpers.c	\
++				plat/common/plat_gicv2.c
++
++BL2_SOURCES	+=	${RZG_GIC_SOURCES}				\
++			lib/cpus/aarch64/cortex_a53.S			\
++			lib/cpus/aarch64/cortex_a57.S			\
++			${LIBFDT_SRCS}					\
++			common/desc_image_load.c			\
++			plat/renesas/rzg/aarch64/platform_common.c	\
++			plat/renesas/rzg/aarch64/plat_helpers.S		\
++			plat/renesas/rzg/bl2_interrupt_error.c		\
++			plat/renesas/rzg/bl2_secure_setting.c		\
++			plat/renesas/rzg/bl2_plat_setup.c		\
++			plat/renesas/rzg/plat_storage.c			\
++			plat/renesas/rzg/bl2_plat_mem_params_desc.c	\
++			plat/renesas/rzg/plat_image_load.c		\
++			plat/renesas/rzg/bl2_cpg_init.c			\
++			drivers/renesas/rzg/console/rzg_printf.c	\
++			drivers/renesas/rzg/scif/scif.S			\
++			drivers/renesas/rzg/common.c			\
++			drivers/renesas/rzg/io/io_emmcdrv.c		\
++			drivers/renesas/rzg/io/io_memdrv.c		\
++			drivers/renesas/rzg/io/io_rzg.c			\
++			drivers/renesas/rzg/auth/auth_mod.c		\
++			drivers/renesas/rzg/rpc/rpc_driver.c		\
++			drivers/renesas/rzg/dma/dma_driver.c		\
++			drivers/renesas/rzg/delay/micro_delay.c		\
++			drivers/renesas/rzg/emmc/emmc_interrupt.c	\
++			drivers/renesas/rzg/emmc/emmc_utility.c		\
++			drivers/renesas/rzg/emmc/emmc_mount.c		\
++			drivers/renesas/rzg/emmc/emmc_init.c		\
++			drivers/renesas/rzg/emmc/emmc_read.c		\
++			drivers/renesas/rzg/emmc/emmc_cmd.c		\
++			drivers/renesas/rzg/watchdog/swdt.c		\
++			drivers/renesas/rzg/rom/rom_api.c		\
++			drivers/renesas/rzg/board/board.c		\
++			drivers/io/io_storage.c
++
++BL31_SOURCES	+=	${RZG_GIC_SOURCES}				\
++			lib/cpus/aarch64/cortex_a53.S			\
++			lib/cpus/aarch64/cortex_a57.S			\
++			plat/common/plat_psci_common.c			\
++			plat/renesas/rzg/plat_topology.c		\
++			plat/renesas/rzg/aarch64/plat_helpers.S		\
++			plat/renesas/rzg/aarch64/platform_common.c	\
++			plat/renesas/rzg/bl31_plat_setup.c		\
++			plat/renesas/rzg/plat_pm.c			\
++			drivers/renesas/rzg/console/rzg_console.S	\
++			drivers/renesas/rzg/console/rzg_printf.c	\
++			drivers/renesas/rzg/delay/micro_delay.c		\
++			drivers/renesas/rzg/pwrc/call_sram.S		\
++			drivers/renesas/rzg/pwrc/pwrc.c			\
++			drivers/renesas/rzg/common.c			\
++			drivers/arm/cci/cci.c
++
++include lib/xlat_tables_v2/xlat_tables.mk
++include drivers/auth/mbedtls/mbedtls_crypto.mk
++PLAT_BL_COMMON_SOURCES	+=	${XLAT_TABLES_LIB_SRCS}
++
++# build the layout images for the bootrom and the necessary srecords
++rzg: rzg_layout_create rzg_srecord
++distclean realclean clean: clean_layout_tool clean_srecord
++
++# layout images
++LAYOUT_TOOLPATH ?= tools/renesas/rzg_layout_create
++
++clean_layout_tool:
++	@echo "clean layout tool"
++	${Q}${MAKE} -C ${LAYOUT_TOOLPATH} clean
++
++.PHONY: rzg_layout_create
++rzg_layout_create:
++	@echo "generating layout srecs"
++	${Q}${MAKE} CPPFLAGS="-D=AARCH64" ARCH=$(ARCH) --no-print-directory -C ${LAYOUT_TOOLPATH}
++
++# srecords
++SREC_PATH	= ${BUILD_PLAT}
++BL2_ELF_SRC	= ${SREC_PATH}/bl2/bl2.elf
++BL31_ELF_SRC	= ${SREC_PATH}/bl31/bl31.elf
++
++clean_srecord:
++	@echo "clean bl2 and bl31 srecs"
++	rm -f ${SREC_PATH}/bl2.srec ${SREC_PATH}/bl31.srec
++
++.PHONY: rzg_srecord
++rzg_srecord: $(BL2_ELF_SRC) $(BL31_ELF_SRC)
++	@echo "generating srec: ${SREC_PATH}/bl2.srec"
++	$(Q)$(OC) -O srec --srec-forceS3 ${BL2_ELF_SRC}  ${SREC_PATH}/bl2.srec
++	@echo "generating srec: ${SREC_PATH}/bl31.srec"
++	$(Q)$(OC) -O srec --srec-forceS3 ${BL31_ELF_SRC} ${SREC_PATH}/bl31.srec
+diff --git a/tools/renesas/rzg_layout_create/makefile b/tools/renesas/rzg_layout_create/makefile
+new file mode 100644
+index 0000000..cef6d53
+--- /dev/null
++++ b/tools/renesas/rzg_layout_create/makefile
+@@ -0,0 +1,116 @@
++#
++# Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++
++###################################################
++# makefile
++###################################################
++
++#output file name
++FILE_NAME_SA0   = bootparam_sa0
++FILE_NAME_SA6   = cert_header_sa6
++
++OUTPUT_FILE_SA0 = $(FILE_NAME_SA0).elf
++OUTPUT_FILE_SA6 = $(FILE_NAME_SA6).elf
++
++#object file name
++OBJ_FILE_SA0 =	sa0.o
++OBJ_FILE_SA6 =	sa6.o
++
++#linker script name
++MEMORY_DEF_SA0 = sa0.ld.S
++MEMORY_DEF_SA6 = sa6.ld.S
++
++###################################################
++# Convenience function for adding build definitions
++# $(eval $(call add_define,FOO)) will have:
++# -DFOO if $(FOO) is empty; -DFOO=$(FOO) otherwise
++define add_define
++DEFINES			+=	-D$(1)$(if $(value $(1)),=$(value $(1)),)
++endef
++
++# Process RZG_SA0_SIZE flag
++ifndef RZG_SA0_SIZE
++RZG_SA0_SIZE := 1
++else
++ifeq (${RZG_SA0_SIZE},0)
++RZG_SA0_SIZE := 0
++else
++RZG_SA0_SIZE := 1
++endif
++endif
++$(eval $(call add_define,RZG_SA0_SIZE))
++
++# Process RZG_SA6_TYPE flag
++ifndef RZG_SA6_TYPE
++RZG_SA6_TYPE := 0
++else
++ifeq (${RZG_SA6_TYPE},0)
++RZG_SA6_TYPE := 0
++else
++RZG_SA6_TYPE := 1
++endif
++endif
++$(eval $(call add_define,RZG_SA6_TYPE))
++
++RZG_VMA_ADJUST_ADDR := 0xE6320000
++$(eval $(call add_define,RZG_VMA_ADJUST_ADDR))
++
++
++###################################################
++
++#c compiler
++CC = $(CROSS_COMPILE)gcc
++CFLAGS += ${DEFINES}
++CFLAGS += -I../../../include/lib/libc -I../../../include/lib/libc/$(ARCH)
++
++#Linker
++LD = $(CROSS_COMPILE)ld
++
++#objcopy
++objcopy = $(CROSS_COMPILE)objcopy
++
++#clean
++CL = rm -f
++
++###################################################
++.SUFFIXES : .s .c .o
++
++###################################################
++# command
++
++.PHONY: all
++all: $(OUTPUT_FILE_SA0) $(OUTPUT_FILE_SA6)
++###################################################
++# Linker
++###################################################
++$(OUTPUT_FILE_SA0) : $(MEMORY_DEF_SA0) $(OBJ_FILE_SA0)
++	$(LD) $(OBJ_FILE_SA0)		 	\
++	-T $(MEMORY_DEF_SA0)			\
++	-o $(OUTPUT_FILE_SA0)			\
++	-Map $(FILE_NAME_SA0).map 		\
++
++	$(objcopy) -O srec --adjust-vma=$(RZG_VMA_ADJUST_ADDR) --srec-forceS3  $(OUTPUT_FILE_SA0) $(FILE_NAME_SA0).srec
++	$(objcopy) -O binary --adjust-vma=$(RZG_VMA_ADJUST_ADDR) --srec-forceS3  $(OUTPUT_FILE_SA0) $(FILE_NAME_SA0).bin
++
++$(OUTPUT_FILE_SA6) : $(MEMORY_DEF_SA6) $(OBJ_FILE_SA6)
++	$(LD) $(OBJ_FILE_SA6)		 	\
++	-T $(MEMORY_DEF_SA6)			\
++	-o $(OUTPUT_FILE_SA6)			\
++	-Map $(FILE_NAME_SA6).map 		\
++
++	$(objcopy) -O srec --adjust-vma=$(RZG_VMA_ADJUST_ADDR) --srec-forceS3  $(OUTPUT_FILE_SA6) $(FILE_NAME_SA6).srec
++	$(objcopy) -O binary --adjust-vma=$(RZG_VMA_ADJUST_ADDR) --srec-forceS3  $(OUTPUT_FILE_SA6) $(FILE_NAME_SA6).bin
++
++###################################################
++# Compile
++###################################################
++
++%.o:../%.c
++	$(CC) -c -I $< -o $@
++
++.PHONY: clean
++clean:
++	$(CL)  *.bin *.map *.srec *.elf *.o
+diff --git a/tools/renesas/rzg_layout_create/sa0.c b/tools/renesas/rzg_layout_create/sa0.c
+new file mode 100644
+index 0000000..90923dd
+--- /dev/null
++++ b/tools/renesas/rzg_layout_create/sa0.c
+@@ -0,0 +1,30 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#define RZG_SA0_SIZE_SMALL	(0)	/* for G2E */
++#define RZG_SA0_SIZE_NORMAL	(1)	/* for G2H/M/N */
++
++#define BL2_ADDRESS	(0xE6304000)	/* BL2 start address */
++
++#if (RZG_SA0_SIZE == RZG_SA0_SIZE_SMALL)
++#define BL2_SIZE	(80*1024/4)	/* BL2 size is 80KB(0x00005000) */
++#else  /* (RZG_SA0_SIZE == RZG_SA0_SIZE_SMALL) */
++#define BL2_SIZE	(170*1024/4)	/* BL2 size is 170KB(0x0000AA00) */
++#endif /* (RZG_SA0_SIZE == RZG_SA0_SIZE_SMALL) */
++
++/* SA0 */
++/* 0x00000000 */
++const unsigned int __attribute__ ((section (".sa0_bootrom"))) bootrom_paramA = 0x00000100;
++/* 0x00000080 (Map Type 3 for eMMC Boot)*/
++/* 0x000001D4 */
++const unsigned int __attribute__ ((section (".sa0_bl2dst_addr3"))) bl2dst_addr3 = BL2_ADDRESS;
++/* 0x000002E4 */
++const unsigned int __attribute__ ((section (".sa0_bl2dst_size3"))) bl2dst_size3 = BL2_SIZE;
++/* 0x00000C00 (Map Type 1 for HyperFlash/QSPI Flash Boot)*/
++/* 0x00000D54 */
++const unsigned int __attribute__ ((section (".sa0_bl2dst_addr1"))) bl2dst_addr1 = BL2_ADDRESS;
++/* 0x00000E64 */
++const unsigned int __attribute__ ((section (".sa0_bl2dst_size1"))) bl2dst_size1 = BL2_SIZE;
+diff --git a/tools/renesas/rzg_layout_create/sa0.ld.S b/tools/renesas/rzg_layout_create/sa0.ld.S
+new file mode 100644
+index 0000000..23e2b23
+--- /dev/null
++++ b/tools/renesas/rzg_layout_create/sa0.ld.S
+@@ -0,0 +1,28 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++SECTIONS
++{
++	. = 0x00000000;
++	.rodata : {
++		KEEP(*(.sa0_bootrom))
++		/* Map Type 3 for eMMC Boot */
++                /* A-side IPL content cert "Start Address" */
++		. = 0x000001D4;		/* H'00000080 + H'00000154 */
++		KEEP(*(.sa0_bl2dst_addr3))
++                /* A-side IPL content cert "Size" */
++		. = 0x000002E4;		/* H'00000080 + H'00000264 */
++		KEEP(*(.sa0_bl2dst_size3))
++		/* Map Type 1 for HyperFlash/QSPI Flash Boot */
++		/* A-side IPL content cert "Start Address" */
++		. = 0x00000D54;		/* H'00000C00 + H'00000154 */
++		KEEP(*(.sa0_bl2dst_addr1))
++		/* A-side IPL content cert "Size" */
++		. = 0x00000E64;		/* H'00000C00 + H'00000264 */
++		KEEP(*(.sa0_bl2dst_size1))
++	}
++
++}
+diff --git a/tools/renesas/rzg_layout_create/sa6.c b/tools/renesas/rzg_layout_create/sa6.c
+new file mode 100644
+index 0000000..2d6c5c6
+--- /dev/null
++++ b/tools/renesas/rzg_layout_create/sa6.c
+@@ -0,0 +1,185 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stdint.h>
++
++#define RZG_SA6_TYPE_HYPERFLASH	(0)
++#define RZG_SA6_TYPE_EMMC		(1)
++
++#if (RZG_SA6_TYPE == RZG_SA6_TYPE_HYPERFLASH)
++
++/* Number of content cert for Non-secure Target Program(BL33x) */
++#define RZG_IMAGE_NUM			(0x00000001U)
++/* Source address on flash for BL31 */
++#define RZG_BL31SRC_ADDRESS		(0x001C0000U)
++/* Reserved */
++#define RZG_BL31_PARTITION		(0x00000000U)
++/* Source address on flash for BL32 */
++#define RZG_BL32SRC_ADDRESS		(0x00200000U)
++/* Reserved */
++#define RZG_BL32_PARTITION		(0x00000000U)
++/* Source address on flash for BL33 */
++#define RZG_BL33SRC_ADDRESS		(0x00300000U)
++/* Reserved */
++#define RZG_BL33_PARTITION		(0x00000000U)
++#define RZG_BL332SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL332_PARTITION		(0x00000000U)
++#define RZG_BL333SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL333_PARTITION		(0x00000000U)
++#define RZG_BL334SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL334_PARTITION		(0x00000000U)
++#define RZG_BL335SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL335_PARTITION		(0x00000000U)
++#define RZG_BL336SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL336_PARTITION		(0x00000000U)
++#define RZG_BL337SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL337_PARTITION		(0x00000000U)
++#define RZG_BL338SRC_ADDRESS		(0x00000000U)
++/* Reserved */
++#define RZG_BL338_PARTITION		(0x00000000U)
++
++#else /* RZG_SA6_TYPE == RZG_SA6_TYPE_HYPERFLASH */
++
++/* Number of content cert for Non-secure Target Program(BL33x) */
++#define RZG_IMAGE_NUM			(0x00000001U)
++/* Source address on eMMC for BL31 */
++#define RZG_BL31SRC_ADDRESS		(0x00040000U)
++/* Source partition on eMMC for BL31 */
++#define RZG_BL31_PARTITION		(0x00000001U)
++/* Source address on eMMC for BL32 */
++#define RZG_BL32SRC_ADDRESS		(0x00200000U)
++/* Source partition on eMMC for BL32 */
++#define RZG_BL32_PARTITION		(0x00000001U)
++/* Source address on eMMC for BL33 */
++#define RZG_BL33SRC_ADDRESS		(0x00000000U)
++/* Source partition on eMMC for BL33 */
++#define RZG_BL33_PARTITION		(0x00000002U)
++/* Reserved */
++#define RZG_BL332SRC_ADDRESS		(0x00000000U)
++#define RZG_BL332_PARTITION		(0x00000000U)
++/* Reserved */
++#define RZG_BL333SRC_ADDRESS		(0x00000000U)
++#define RZG_BL333_PARTITION		(0x00000000U)
++/* Reserved */
++#define RZG_BL334SRC_ADDRESS		(0x00000000U)
++#define RZG_BL334_PARTITION		(0x00000000U)
++/* Reserved */
++#define RZG_BL335SRC_ADDRESS		(0x00000000U)
++#define RZG_BL335_PARTITION		(0x00000000U)
++/* Reserved */
++#define RZG_BL336SRC_ADDRESS		(0x00000000U)
++#define RZG_BL336_PARTITION		(0x00000000U)
++/* Reserved */
++#define RZG_BL337SRC_ADDRESS		(0x00000000U)
++#define RZG_BL337_PARTITION		(0x00000000U)
++/* Reserved */
++#define RZG_BL338SRC_ADDRESS		(0x00000000U)
++#define RZG_BL338_PARTITION		(0x00000000U)
++
++#endif /* RZG_SA6_TYPE == RZG_SA6_TYPE_HYPERFLASH */
++
++/* Destination address for BL31 */
++#define RZG_BL31DST_ADDRESS		(0x44000000U)
++#define RZG_BL31DST_ADDRESSH		(0x00000000U)
++/* Destination size for BL31 */
++#define RZG_BL31DST_SIZE		(0x00004000U)
++/* Destination address for BL32 */
++#define RZG_BL32DST_ADDRESS		(0x44100000U)
++#define RZG_BL32DST_ADDRESSH		(0x00000000U)
++/* Destination size for BL32 */
++#define RZG_BL32DST_SIZE		(0x00040000U)
++/* Destination address for BL33 */
++#define RZG_BL33DST_ADDRESS		(0x50000000U)
++#define RZG_BL33DST_ADDRESSH		(0x00000000U)
++/* Destination size for BL33 */
++#define RZG_BL33DST_SIZE		(0x00040000U)
++/* Reserved */
++#define RZG_BL332DST_ADDRESS		(0x00000000U)
++#define RZG_BL332DST_ADDRESSH		(0x00000000U)
++#define RZG_BL332DST_SIZE		(0x00000000U)
++/* Reserved */
++#define RZG_BL333DST_ADDRESS		(0x00000000U)
++#define RZG_BL333DST_ADDRESSH		(0x00000000U)
++#define RZG_BL333DST_SIZE		(0x00000000U)
++/* Reserved */
++#define RZG_BL334DST_ADDRESS		(0x00000000U)
++#define RZG_BL334DST_ADDRESSH		(0x00000000U)
++#define RZG_BL334DST_SIZE		(0x00000000U)
++/* Reserved */
++#define RZG_BL335DST_ADDRESS		(0x00000000U)
++#define RZG_BL335DST_ADDRESSH		(0x00000000U)
++#define RZG_BL335DST_SIZE		(0x00000000U)
++/* Reserved */
++#define RZG_BL336DST_ADDRESS		(0x00000000U)
++#define RZG_BL336DST_ADDRESSH		(0x00000000U)
++#define RZG_BL336DST_SIZE		(0x00000000U)
++/* Reserved */
++#define RZG_BL337DST_ADDRESS		(0x00000000U)
++#define RZG_BL337DST_ADDRESSH		(0x00000000U)
++#define RZG_BL337DST_SIZE		(0x00000000U)
++/* Reserved */
++#define RZG_BL338DST_ADDRESS		(0x00000000U)
++#define RZG_BL338DST_ADDRESSH		(0x00000000U)
++#define RZG_BL338DST_SIZE		(0x00000000U)
++
++/* SA6 */
++const uint64_t __attribute__ ((section (".sa6_image_num")))	image_num	= RZG_IMAGE_NUM;
++const uint64_t __attribute__ ((section (".sa6_bl31src_addr")))	bl31src_addr	= RZG_BL31SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl31partition")))	bl31partition	= RZG_BL31_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl32src_addr")))	bl32src_addr	= RZG_BL32SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl32partition")))	bl32partition	= RZG_BL32_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl33src_addr")))	bl33src_addr	= RZG_BL33SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl33partition")))	bl33partition	= RZG_BL33_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl332src_addr")))	bl332src_addr	= RZG_BL332SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl332partition")))bl332partition	= RZG_BL332_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl333src_addr")))	bl333src_addr	= RZG_BL333SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl333partition")))bl333partition	= RZG_BL333_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl334src_addr")))	bl334src_addr	= RZG_BL334SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl334partition")))bl334partition	= RZG_BL334_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl335src_addr")))	bl335src_addr	= RZG_BL335SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl335partition")))bl335partition	= RZG_BL335_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl336src_addr")))	bl336src_addr	= RZG_BL336SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl336partition")))bl336partition	= RZG_BL336_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl337src_addr")))	bl337src_addr	= RZG_BL337SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl337partition")))bl337partition	= RZG_BL337_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_bl338src_addr")))	bl338src_addr	= RZG_BL338SRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_bl338partition")))bl338partition	= RZG_BL338_PARTITION;
++const uint32_t __attribute__ ((section (".sa6_bl31dst_addr")))	bl31dst_addr	= RZG_BL31DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl31dst_addrh")))	bl31dst_addrh	= RZG_BL31DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl31dst_size")))	bl31dst_size	= RZG_BL31DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl32dst_addr")))	bl32dst_addr	= RZG_BL32DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl32dst_addrh")))	bl32dst_addrh	= RZG_BL32DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl32dst_size")))	bl32dst_size	= RZG_BL32DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl33dst_addr")))	bl33dst_addr	= RZG_BL33DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl33dst_addrh")))	bl33dst_addrh	= RZG_BL33DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl33dst_size")))	bl33dst_size	= RZG_BL33DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl332dst_addr")))	bl332dst_addr	= RZG_BL332DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl332dst_addrh")))bl332dst_addrh	= RZG_BL332DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl332dst_size"))) bl332dst_size	= RZG_BL332DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl333dst_addr")))	bl333dst_addr	= RZG_BL333DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl333dst_addrh")))bl333dst_addrh	= RZG_BL333DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl333dst_size")))	bl333dst_size	= RZG_BL333DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl334dst_addr")))	bl334dst_addr	= RZG_BL334DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl334dst_addrh")))bl334dst_addrh	= RZG_BL334DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl334dst_size")))	bl334dst_size	= RZG_BL334DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl335dst_addr")))	bl335dst_addr	= RZG_BL335DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl335dst_addrh")))bl335dst_addrh	= RZG_BL335DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl335dst_size")))	bl335dst_size	= RZG_BL335DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl336dst_addr")))	bl336dst_addr	= RZG_BL336DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl336dst_addrh")))bl336dst_addrh	= RZG_BL336DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl336dst_size")))	bl336dst_size	= RZG_BL336DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl337dst_addr")))	bl337dst_addr	= RZG_BL337DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl337dst_addrh")))bl337dst_addrh	= RZG_BL337DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl337dst_size")))	bl337dst_size	= RZG_BL337DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_bl338dst_addr")))	bl338dst_addr	= RZG_BL338DST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_bl338dst_addrh")))bl338dst_addrh	= RZG_BL338DST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_bl338dst_size")))	bl338dst_size	= RZG_BL338DST_SIZE;
+diff --git a/tools/renesas/rzg_layout_create/sa6.ld.S b/tools/renesas/rzg_layout_create/sa6.ld.S
+new file mode 100644
+index 0000000..29bbbac
+--- /dev/null
++++ b/tools/renesas/rzg_layout_create/sa6.ld.S
+@@ -0,0 +1,121 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++SECTIONS
++{
++	. = 0x00000000;
++	.image_num : {
++		KEEP(*(.sa6_image_num))
++		. = 0x00000008;
++	}
++
++	.src_addr : {
++		KEEP(*(.sa6_bl31src_addr))
++		. = 0x00000008;
++		KEEP(*(.sa6_bl31partition))
++		. = 0x00000010;
++		KEEP(*(.sa6_bl32src_addr))
++		. = 0x00000018;
++		KEEP(*(.sa6_bl32partition))
++		. = 0x00000020;
++		KEEP(*(.sa6_bl33src_addr))
++		. = 0x00000028;
++		KEEP(*(.sa6_bl33partition))
++		. = 0x00000030;
++		KEEP(*(.sa6_bl332src_addr))
++		. = 0x00000038;
++		KEEP(*(.sa6_bl332partition))
++		. = 0x00000040;
++		KEEP(*(.sa6_bl333src_addr))
++		. = 0x00000048;
++		KEEP(*(.sa6_bl333partition))
++		. = 0x00000050;
++		KEEP(*(.sa6_bl334src_addr))
++		. = 0x00000058;
++		KEEP(*(.sa6_bl334partition))
++		. = 0x00000060;
++		KEEP(*(.sa6_bl335src_addr))
++		. = 0x00000068;
++		KEEP(*(.sa6_bl335partition))
++		. = 0x00000070;
++		KEEP(*(.sa6_bl336src_addr))
++		. = 0x00000078;
++		KEEP(*(.sa6_bl336partition))
++		. = 0x00000080;
++		KEEP(*(.sa6_bl337src_addr))
++		. = 0x00000088;
++		KEEP(*(.sa6_bl337partition))
++		. = 0x00000090;
++		KEEP(*(.sa6_bl338src_addr))
++		. = 0x00000098;
++		KEEP(*(.sa6_bl338partition))
++	}
++
++	. = 0x00000554;
++
++	.dst_addr : {
++		KEEP(*(.sa6_bl31dst_addr))
++		. = 0x00000004;
++		KEEP(*(.sa6_bl31dst_addrh))
++		. = 0x00000110;
++		KEEP(*(.sa6_bl31dst_size))
++		. = 0x00000800;
++		KEEP(*(.sa6_bl32dst_addr))
++		. = 0x00000804;
++		KEEP(*(.sa6_bl32dst_addrh))
++		. = 0x00000910;
++		KEEP(*(.sa6_bl32dst_size))
++		. = 0x00001000;
++		KEEP(*(.sa6_bl33dst_addr))
++		. = 0x00001004;
++		KEEP(*(.sa6_bl33dst_addrh))
++		. = 0x00001110;
++		KEEP(*(.sa6_bl33dst_size))
++		. = 0x00001800;
++		KEEP(*(.sa6_bl332dst_addr))
++		. = 0x00001804;
++		KEEP(*(.sa6_bl332dst_addrh))
++		. = 0x00001910;
++		KEEP(*(.sa6_bl332dst_size))
++		. = 0x00002000;
++		KEEP(*(.sa6_bl333dst_addr))
++		. = 0x00002004;
++		KEEP(*(.sa6_bl333dst_addrh))
++		. = 0x00002110;
++		KEEP(*(.sa6_bl333dst_size))
++		. = 0x00002800;
++		KEEP(*(.sa6_bl334dst_addr))
++		. = 0x00002804;
++		KEEP(*(.sa6_bl334dst_addrh))
++		. = 0x00002910;
++		KEEP(*(.sa6_bl334dst_size))
++		. = 0x00003000;
++		KEEP(*(.sa6_bl335dst_addr))
++		. = 0x00003004;
++		KEEP(*(.sa6_bl335dst_addrh))
++		. = 0x00003110;
++		KEEP(*(.sa6_bl335dst_size))
++		. = 0x00003800;
++		KEEP(*(.sa6_bl336dst_addr))
++		. = 0x00003804;
++		KEEP(*(.sa6_bl336dst_addrh))
++		. = 0x00003910;
++		KEEP(*(.sa6_bl336dst_size))
++		. = 0x00004000;
++		KEEP(*(.sa6_bl337dst_addr))
++		. = 0x00004004;
++		KEEP(*(.sa6_bl337dst_addrh))
++		. = 0x00004110;
++		KEEP(*(.sa6_bl337dst_size))
++		. = 0x00004800;
++		KEEP(*(.sa6_bl338dst_addr))
++		. = 0x00004804;
++		KEEP(*(.sa6_bl338dst_addrh))
++		. = 0x00004910;
++		KEEP(*(.sa6_bl338dst_size))
++	}
++
++}
+-- 
+2.7.4
+
