@@ -25,7 +25,6 @@ IMAGE_INSTALL_append = " \
     obexftp \
     bluez-alsa \
     rt-tests \
-    ltp \
     openssl \
     vin-init \
 "
