@@ -27,43 +27,46 @@ SRCREV = "e2c509a39c6cc4dda8734e6509cdbe6e3603cdfc"
 SRCREV_mbedtls = "04a049bda1ceca48060b57bc4bcf5203ce591421"
 
 SRC_URI += " \
-	file://0001-Add-support-RZ-G2-platform.patch \
-	file://0002-plat-rcar-timer-bl2_swdt-increase-WDT-count-when-ECC.patch \
-	file://0003-renesas-rzg-add-support-for-Hihope-RZG2H-board.patch \
-	file://0004-renesas-rzg-add-support-HiHope-Rev3-and-4-Board.patch \
-	file://0005-renesas-rzg-add-support-Silinux-EK874-rev3-board.patch \
-	file://0006-plat-renesas-bl2_fusa-hihope-rzg2m-do-not-enable-ECC.patch \
-	file://0007-plat-renesas-bl2_fusa-Add-mem-initialization-b-f-and.patch \
-	file://0008-plat-renesas-rzg-Change-value-condition-of-RZG_DRAM_.patch \
-	file://0009-plat-renesas-rzg-bl2_fusa-Add-ECC-support-for-RZ-G2H.patch \
-	file://0010-Fix-ld-error-unrecognized-option-with-old-binutils.patch \
-	file://0011-plat-rzg-bl2_fusa-Modify-ECC-setting-for-RZG2N-RZG2M.patch \
-	file://0012-plat-renesas-rzg-bl2_fusa-Optimize-source-code.patch \
-	file://0013-plat-renesas-rzg-Add-support-ECC-Full-Single-setting.patch \
-	file://0014-rzg-ddr-Update-lpddr4-to-rev-0.40.patch \
-	file://0015-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
+	file://0001-rzg-initial-commit-for-the-RZG-gen2-boards.patch \
+	file://0002-rzg-drivers-add-staging-drivers.patch \
+	file://0003-rzg-drivers-authentication.patch \
+	file://0004-rzg-drivers-add-board-identification.patch \
+	file://0005-rzg-drivers-add-delay-driver.patch \
+	file://0006-rzg2-drivers-add-dma-support.patch \
+	file://0007-rzg-drivers-add-emmc-support.patch \
+	file://0008-rzg-drivers-add-i2c-for-dvfs.patch \
+	file://0009-rzg-drivers-add-io-drivers-for-emmc-mem.patch \
+	file://0010-rzg-drivers-add-console-and-serial-controller-interf.patch \
+	file://0011-plat-rzg-add-common-file.patch \
+	file://0012-rzg-drivers-add-power-controller-driver.patch \
+	file://0013-rzg-drivers-add-rom-api.patch \
+	file://0014-rzg-drivers-SPI-multi-I-O-bus-controller.patch \
+	file://0015-rzg-drivers-add-watchdog-support.patch \
+	file://0016-plat-renesas-rzg-Add-ECC-support-for-RZ-G2-platform.patch \
+	file://0017-driver-rzg-swdt-increase-WDT-count-when-ECC-enabled.patch \
+	file://0018-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
 "
 
 PV = "v2.4+git"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
-ATFW_OPT_LOSSY = "${@base_conditional("USE_MULTIMEDIA", "1", "RCAR_LOSSY_ENABLE=1", "", d)}"
-ATFW_OPT_r8a774c0 = "LSI=G2E RCAR_SA0_SIZE=0 RCAR_AVS_SETTING_ENABLE=0 RZG_EK874=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 RCAR_DRAM_DDR3L_MEMCONF=1 RCAR_DRAM_DDR3L_MEMDUAL=1 SPD="none""
-ATFW_OPT_r8a774a1 = "LSI=G2M RCAR_DRAM_SPLIT=2 RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2M=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 RCAR_SECURE_BOOT=0 SPD="none""
-ATFW_OPT_r8a774b1 = "LSI=G2N RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2N=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 SPD="none""
-ATFW_OPT_r8a774e1 = "LSI=G2H RCAR_DRAM_SPLIT=2 RCAR_DRAM_LPDDR4_MEMCONF=1 RCAR_DRAM_CHANNEL=5 RCAR_AVS_SETTING_ENABLE=0 RZG_HIHOPE_RZG2H=1 PMIC_ROHM_BD9571=0 RCAR_SYSTEM_SUSPEND=0 SPD="none""
+ATFW_OPT_LOSSY = "${@base_conditional("USE_MULTIMEDIA", "1", "RZG_LOSSY_ENABLE=1", "", d)}"
+ATFW_OPT_r8a774c0 = "LSI=G2E RZG_SA0_SIZE=0 RZG_DRAM_DDR3L_MEMCONF=1 RZG_DRAM_DDR3L_MEMDUAL=1 SPD="none""
+ATFW_OPT_r8a774a1 = "LSI=G2M RZG_DRAM_SPLIT=2 SPD="none""
+ATFW_OPT_r8a774b1 = "LSI=G2N SPD="none""
+ATFW_OPT_r8a774e1 = "LSI=G2H RZG_DRAM_SPLIT=2 RZG_DRAM_LPDDR4_MEMCONF=1 RZG_DRAM_CHANNEL=5 SPD="none""
 
 ATFW_OPT_append_r8a774c0 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_ECC=1 ", "",d)}"
 
-ATFW_OPT_append_r8a774a1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RCAR_DRAM_SPLIT=0 RZG_DRAM_ECC=1 ", " ${ATFW_OPT_LOSSY} ",d)}"
+ATFW_OPT_append_r8a774a1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_SPLIT=0 RZG_DRAM_ECC=1 ", " ${ATFW_OPT_LOSSY} ",d)}"
 
 ATFW_OPT_append_r8a774b1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_ECC=1 ", " ${ATFW_OPT_LOSSY} ",d)}"
 
-ATFW_OPT_append_r8a774e1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RCAR_DRAM_SPLIT=0 RZG_DRAM_ECC=1 ", " ${ATFW_OPT_LOSSY} ",d)}"
+ATFW_OPT_append_r8a774e1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RZG_DRAM_SPLIT=0 RZG_DRAM_ECC=1 ", " ${ATFW_OPT_LOSSY} ",d)}"
 
 ATFW_OPT_append += " RZG_DRAM_ECC_FULL=${ECC_FULL} "
-ATFW_OPT_append += " RCAR_RPC_HYPERFLASH_LOCKED=0 MBEDTLS_DIR=../mbedtls "
+ATFW_OPT_append += " RZG_RPC_HYPERFLASH_LOCKED=0 MBEDTLS_DIR=../mbedtls "
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"

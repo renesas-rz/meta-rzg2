@@ -1,0 +1,3151 @@
+From 654c4c94e77204cfb4364ed9e8cf6eda79d96914 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 27 Oct 2020 11:47:52 +0700
+Subject: [PATCH 07/18] rzg: drivers: add emmc support
+
+This commit add emmc support for rzg gen2 platform.
+Refer from commit "rcar_gen3: drivers: emmc".
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/renesas/rzg/emmc/emmc_cmd.c       | 492 ++++++++++++++++++++++
+ drivers/renesas/rzg/emmc/emmc_config.h    |  40 ++
+ drivers/renesas/rzg/emmc/emmc_def.h       |  78 ++++
+ drivers/renesas/rzg/emmc/emmc_hal.h       | 318 ++++++++++++++
+ drivers/renesas/rzg/emmc/emmc_init.c      | 165 ++++++++
+ drivers/renesas/rzg/emmc/emmc_interrupt.c | 195 +++++++++
+ drivers/renesas/rzg/emmc/emmc_mount.c     | 675 ++++++++++++++++++++++++++++++
+ drivers/renesas/rzg/emmc/emmc_read.c      | 129 ++++++
+ drivers/renesas/rzg/emmc/emmc_registers.h | 256 +++++++++++
+ drivers/renesas/rzg/emmc/emmc_std.h       | 474 +++++++++++++++++++++
+ drivers/renesas/rzg/emmc/emmc_utility.c   | 226 ++++++++++
+ 11 files changed, 3048 insertions(+)
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_cmd.c
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_config.h
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_def.h
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_hal.h
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_init.c
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_interrupt.c
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_mount.c
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_read.c
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_registers.h
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_std.h
+ create mode 100644 drivers/renesas/rzg/emmc/emmc_utility.c
+
+diff --git a/drivers/renesas/rzg/emmc/emmc_cmd.c b/drivers/renesas/rzg/emmc/emmc_cmd.c
+new file mode 100644
+index 0000000..76a83df
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_cmd.c
+@@ -0,0 +1,492 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/debug.h>
++
++#include "emmc_config.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++#include "emmc_registers.h"
++#include "emmc_def.h"
++#include "micro_delay.h"
++
++static void emmc_little_to_big(uint8_t *p, uint32_t value)
++{
++	if (p == NULL)
++		return;
++
++	p[0] = (uint8_t) (value >> 24);
++	p[1] = (uint8_t) (value >> 16);
++	p[2] = (uint8_t) (value >> 8);
++	p[3] = (uint8_t) value;
++}
++
++static void emmc_softreset(void)
++{
++	int32_t loop = 10000;
++	int32_t retry = 1000;
++
++	/* flag clear */
++	mmc_drv_obj.during_cmd_processing = FALSE;
++	mmc_drv_obj.during_transfer = FALSE;
++	mmc_drv_obj.during_dma_transfer = FALSE;
++	mmc_drv_obj.state_machine_blocking = FALSE;
++	mmc_drv_obj.force_terminate = FALSE;
++	mmc_drv_obj.dma_error_flag = FALSE;
++
++	/* during operation ? */
++	if ((GETR_32(SD_INFO2) & SD_INFO2_CBSY) == 0)
++		goto reset;
++
++	/* wait CMDSEQ = 0 */
++	while (loop > 0) {
++		if ((GETR_32(SD_INFO2) & SD_INFO2_CBSY) == 0)
++			break;	/* ready */
++
++		loop--;
++		if ((loop == 0) && (retry > 0)) {
++			rzg_micro_delay(1000U);	/* wait 1ms */
++			loop = 10000;
++			retry--;
++		}
++	}
++
++reset:
++	/* reset */
++	SETR_32(SOFT_RST, (GETR_32(SOFT_RST) & (~SOFT_RST_SDRST)));
++	SETR_32(SOFT_RST, (GETR_32(SOFT_RST) | SOFT_RST_SDRST));
++
++	/* initialize */
++	SETR_32(SD_INFO1, 0x00000000U);
++	SETR_32(SD_INFO2, SD_INFO2_CLEAR);
++	SETR_32(SD_INFO1_MASK, 0x00000000U);	/* all interrupt disable */
++	SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);	/* all interrupt disable */
++
++}
++
++static void emmc_read_response(uint32_t *response)
++{
++	uint8_t *p;
++
++	if (response == NULL)
++		return;
++
++	/* read response */
++	if (mmc_drv_obj.response_length != EMMC_MAX_RESPONSE_LENGTH) {
++		*response = GETR_32(SD_RSP10);	/* [39:8] */
++		return;
++	}
++
++	/* CSD or CID */
++	p = (uint8_t *) (response);
++	emmc_little_to_big(p, ((GETR_32(SD_RSP76) << 8)
++			| (GETR_32(SD_RSP54) >> 24)));	/* [127:96]     */
++	emmc_little_to_big(p + 4, ((GETR_32(SD_RSP54) << 8)
++			| (GETR_32(SD_RSP32) >> 24)));	/* [95:64]      */
++	emmc_little_to_big(p + 8, ((GETR_32(SD_RSP32) << 8)
++			| (GETR_32(SD_RSP10) >> 24)));	/* [63:32]      */
++	emmc_little_to_big(p + 12, (GETR_32(SD_RSP10) << 8));
++}
++
++static EMMC_ERROR_CODE emmc_response_check(uint32_t *response,
++					   uint32_t error_mask)
++{
++
++	HAL_MEMCARD_RESPONSE_TYPE response_type =
++	    (HAL_MEMCARD_RESPONSE_TYPE) (mmc_drv_obj.cmd_info.
++					 cmd & HAL_MEMCARD_RESPONSE_TYPE_MASK);
++
++	if (response == NULL)
++		return EMMC_ERR_PARAM;
++
++	if (response_type == HAL_MEMCARD_RESPONSE_NONE)
++		return EMMC_SUCCESS;
++
++
++	if (response_type <= HAL_MEMCARD_RESPONSE_R1b) {
++		/* R1 or R1b */
++		mmc_drv_obj.current_state =
++		    (EMMC_R1_STATE) ((*response & EMMC_R1_STATE_MASK) >>
++				     EMMC_R1_STATE_SHIFT);
++		if ((*response & error_mask) != 0) {
++			if ((0x80 & *response) != 0) {
++				ERROR("BL2: emmc SWITCH_ERROR\n");
++			}
++			return EMMC_ERR_CARD_STATUS_BIT;
++		}
++		return EMMC_SUCCESS;;
++	}
++
++	if (response_type == HAL_MEMCARD_RESPONSE_R4) {
++		if ((*response & EMMC_R4_STATUS) != 0)
++			return EMMC_ERR_CARD_STATUS_BIT;
++	}
++
++	return EMMC_SUCCESS;
++}
++
++static void emmc_WaitCmd2Cmd_8Cycle(void)
++{
++	uint32_t dataL, wait = 0;
++
++	dataL = GETR_32(SD_CLK_CTRL);
++	dataL &= 0x000000FF;
++
++	switch (dataL) {
++	case 0xFF:
++	case 0x00:
++	case 0x01:
++	case 0x02:
++	case 0x04:
++	case 0x08:
++	case 0x10:
++	case 0x20:
++		wait = 10U;
++		break;
++	case 0x40:
++		wait = 20U;
++		break;
++	case 0x80:
++		wait = 30U;
++		break;
++	}
++
++	rzg_micro_delay(wait);
++}
++
++static void cmdErrSdInfo2Log(void)
++{
++	ERROR("BL2: emmc ERR SD_INFO2 = 0x%x\n", mmc_drv_obj.error_info.info2);
++}
++
++static void emmc_data_transfer_dma(void)
++{
++	mmc_drv_obj.during_dma_transfer = TRUE;
++	mmc_drv_obj.dma_error_flag = FALSE;
++
++	SETR_32(SD_INFO1_MASK, 0x00000000U);
++	SETR_32(SD_INFO2_MASK, (SD_INFO2_ALL_ERR | SD_INFO2_CLEAR));
++
++	/* DMAC setting */
++	if (mmc_drv_obj.cmd_info.dir == HAL_MEMCARD_WRITE) {
++		/* transfer complete interrupt enable */
++		SETR_32(DM_CM_INFO1_MASK,
++			(DM_CM_INFO_MASK_CLEAR | DM_CM_INFO_CH0_ENABLE));
++		SETR_32(DM_CM_INFO2_MASK,
++			(DM_CM_INFO_MASK_CLEAR | DM_CM_INFO_CH0_ENABLE));
++		/* BUFF --> FIFO */
++		SETR_32(DM_CM_DTRAN_MODE, (DM_CM_DTRAN_MODE_CH0 |
++					   DM_CM_DTRAN_MODE_BIT_WIDTH));
++	} else {
++		/* transfer complete interrupt enable */
++		SETR_32(DM_CM_INFO1_MASK,
++			(DM_CM_INFO_MASK_CLEAR | DM_CM_INFO_CH1_ENABLE));
++		SETR_32(DM_CM_INFO2_MASK,
++			(DM_CM_INFO_MASK_CLEAR | DM_CM_INFO_CH1_ENABLE));
++		/* FIFO --> BUFF */
++		SETR_32(DM_CM_DTRAN_MODE, (DM_CM_DTRAN_MODE_CH1
++					   | DM_CM_DTRAN_MODE_BIT_WIDTH));
++	}
++	SETR_32(DM_DTRAN_ADDR, (((uintptr_t) mmc_drv_obj.buff_address_virtual &
++				 DM_DTRAN_ADDR_WRITE_MASK)));
++
++	SETR_32(DM_CM_DTRAN_CTRL, DM_CM_DTRAN_CTRL_START);
++}
++
++EMMC_ERROR_CODE emmc_exec_cmd(uint32_t error_mask, uint32_t *response)
++{
++	EMMC_ERROR_CODE rtn_code = EMMC_SUCCESS;
++	HAL_MEMCARD_RESPONSE_TYPE response_type;
++	HAL_MEMCARD_COMMAND_TYPE cmd_type;
++	EMMC_INT_STATE state;
++	uint32_t err_not_care_flag = FALSE;
++
++	/* parameter check */
++	if (response == NULL) {
++		emmc_write_error_info(EMMC_FUNCNO_EXEC_CMD, EMMC_ERR_PARAM);
++		return EMMC_ERR_PARAM;
++	}
++
++	/* state check */
++	if (mmc_drv_obj.clock_enable != TRUE) {
++		emmc_write_error_info(EMMC_FUNCNO_EXEC_CMD, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	if (mmc_drv_obj.state_machine_blocking == TRUE) {
++		emmc_write_error_info(EMMC_FUNCNO_EXEC_CMD, EMMC_ERR);
++		return EMMC_ERR;
++	}
++
++	state = ESTATE_BEGIN;
++	response_type =
++	    (HAL_MEMCARD_RESPONSE_TYPE) (mmc_drv_obj.cmd_info.
++					 cmd & HAL_MEMCARD_RESPONSE_TYPE_MASK);
++	cmd_type =
++	    (HAL_MEMCARD_COMMAND_TYPE) (mmc_drv_obj.cmd_info.
++					cmd & HAL_MEMCARD_COMMAND_TYPE_MASK);
++
++	/* state machine */
++	while ((mmc_drv_obj.force_terminate != TRUE) && (state != ESTATE_END)) {
++		/* The interrupt factor flag is observed. */
++		emmc_interrupt();
++
++		/* wait interrupt */
++		if (mmc_drv_obj.state_machine_blocking == TRUE)
++			continue;
++
++		switch (state) {
++		case ESTATE_BEGIN:
++			/* Busy check */
++			if ((mmc_drv_obj.error_info.info2 & SD_INFO2_CBSY) != 0) {
++				emmc_write_error_info(EMMC_FUNCNO_EXEC_CMD,
++						      EMMC_ERR_CARD_BUSY);
++				return EMMC_ERR_CARD_BUSY;
++			}
++
++			/* clear register */
++			SETR_32(SD_INFO1, 0x00000000U);
++			SETR_32(SD_INFO2, SD_INFO2_CLEAR);
++			SETR_32(SD_INFO1_MASK, SD_INFO1_INFO0);
++			SETR_32(SD_INFO2_MASK,
++				(SD_INFO2_ALL_ERR | SD_INFO2_CLEAR));
++
++			state = ESTATE_ISSUE_CMD;
++			/* through */
++
++		case ESTATE_ISSUE_CMD:
++			/* ARG */
++			SETR_32(SD_ARG, mmc_drv_obj.cmd_info.arg);
++			/* issue cmd */
++			SETR_32(SD_CMD, mmc_drv_obj.cmd_info.hw);
++			/* Set driver flag */
++			mmc_drv_obj.during_cmd_processing = TRUE;
++			mmc_drv_obj.state_machine_blocking = TRUE;
++
++			if (response_type == HAL_MEMCARD_RESPONSE_NONE) {
++				state = ESTATE_NON_RESP_CMD;
++			} else {
++				state = ESTATE_RCV_RESP;
++			}
++
++			break;
++
++		case ESTATE_NON_RESP_CMD:
++			/* interrupt disable */
++			SETR_32(SD_INFO1_MASK, 0x00000000U);
++			SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);
++
++			/* check interrupt */
++			if ((mmc_drv_obj.int_event2 & SD_INFO2_ALL_ERR) != 0) {
++				/* error interrupt */
++				cmdErrSdInfo2Log();
++				rtn_code = EMMC_ERR_INFO2;
++				state = ESTATE_ERROR;
++			} else if ((mmc_drv_obj.int_event1 & SD_INFO1_INFO0) ==
++				   0) {
++				/* not receive expected interrupt */
++				rtn_code = EMMC_ERR_RESPONSE;
++				state = ESTATE_ERROR;
++			} else {
++				emmc_WaitCmd2Cmd_8Cycle();
++				state = ESTATE_END;
++			}
++			break;
++
++		case ESTATE_RCV_RESP:
++			/* interrupt disable */
++			SETR_32(SD_INFO1_MASK, 0x00000000U);
++			SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);
++
++			/* check interrupt */
++			if ((mmc_drv_obj.int_event2 & SD_INFO2_ALL_ERR) != 0) {
++				if ((mmc_drv_obj.get_partition_access_flag ==
++				     TRUE)
++				    && ((mmc_drv_obj.int_event2 & SD_INFO2_ERR6)
++					!= 0U)) {
++					err_not_care_flag = TRUE;
++					rtn_code = EMMC_ERR_CMD_TIMEOUT;
++				} else {
++					/* error interrupt */
++					cmdErrSdInfo2Log();
++					rtn_code = EMMC_ERR_INFO2;
++				}
++				state = ESTATE_ERROR;
++				break;
++			} else if ((mmc_drv_obj.int_event1 & SD_INFO1_INFO0) ==
++				   0) {
++				/* not receive expected interrupt */
++				rtn_code = EMMC_ERR_RESPONSE;
++				state = ESTATE_ERROR;
++				break;
++			}
++
++			/* read response */
++			emmc_read_response(response);
++
++			/* check response */
++			rtn_code = emmc_response_check(response, error_mask);
++			if (rtn_code != EMMC_SUCCESS) {
++				state = ESTATE_ERROR;
++				break;
++			}
++
++			if (response_type == HAL_MEMCARD_RESPONSE_R1b) {
++				/* R1b */
++				SETR_32(SD_INFO2_MASK,
++					(SD_INFO2_ALL_ERR | SD_INFO2_CLEAR));
++				state = ESTATE_RCV_RESPONSE_BUSY;
++			} else {
++				state = ESTATE_CHECK_RESPONSE_COMPLETE;
++			}
++			break;
++
++		case ESTATE_RCV_RESPONSE_BUSY:
++			/* check interrupt */
++			if ((mmc_drv_obj.int_event2 & SD_INFO2_ALL_ERR) != 0) {
++				/* error interrupt */
++				cmdErrSdInfo2Log();
++				rtn_code = EMMC_ERR_INFO2;
++				state = ESTATE_ERROR;
++				break;
++			}
++			/* DAT0 not Busy */
++			if ((SD_INFO2_DAT0 & mmc_drv_obj.error_info.info2) != 0) {
++				state = ESTATE_CHECK_RESPONSE_COMPLETE;
++				break;
++			}
++			break;
++
++		case ESTATE_CHECK_RESPONSE_COMPLETE:
++			if (cmd_type >= HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE) {
++				state = ESTATE_DATA_TRANSFER;
++			} else {
++				emmc_WaitCmd2Cmd_8Cycle();
++				state = ESTATE_END;
++			}
++			break;
++
++		case ESTATE_DATA_TRANSFER:
++			/* ADTC command  */
++			mmc_drv_obj.during_transfer = TRUE;
++			mmc_drv_obj.state_machine_blocking = TRUE;
++
++			if (mmc_drv_obj.transfer_mode == HAL_MEMCARD_DMA) {
++				/* DMA */
++				emmc_data_transfer_dma();
++			} else {
++				/* PIO */
++				/* interrupt enable (FIFO read/write enable) */
++				if (mmc_drv_obj.cmd_info.dir ==
++				    HAL_MEMCARD_WRITE) {
++					SETR_32(SD_INFO2_MASK,
++						(SD_INFO2_BWE | SD_INFO2_ALL_ERR
++						 | SD_INFO2_CLEAR));
++				} else {
++					SETR_32(SD_INFO2_MASK,
++						(SD_INFO2_BRE | SD_INFO2_ALL_ERR
++						 | SD_INFO2_CLEAR));
++				}
++			}
++			state = ESTATE_DATA_TRANSFER_COMPLETE;
++			break;
++
++		case ESTATE_DATA_TRANSFER_COMPLETE:
++			/* check interrupt */
++			if ((mmc_drv_obj.int_event2 & SD_INFO2_ALL_ERR) != 0) {
++				/* error interrupt */
++				cmdErrSdInfo2Log();
++				rtn_code = EMMC_ERR_INFO2;
++				state = ESTATE_TRANSFER_ERROR;
++				break;
++			}
++
++			/* DMAC error ? */
++			if (mmc_drv_obj.dma_error_flag == TRUE) {
++				/* Error occurred in DMAC driver. */
++				rtn_code = EMMC_ERR_FROM_DMAC_TRANSFER;
++				state = ESTATE_TRANSFER_ERROR;
++			} else if (mmc_drv_obj.during_dma_transfer == TRUE) {
++				/* DMAC not finished. unknown error */
++				rtn_code = EMMC_ERR;
++				state = ESTATE_TRANSFER_ERROR;
++			} else {
++				SETR_32(SD_INFO1_MASK, SD_INFO1_INFO2);
++				SETR_32(SD_INFO2_MASK,
++					(SD_INFO2_ALL_ERR | SD_INFO2_CLEAR));
++
++				mmc_drv_obj.state_machine_blocking = TRUE;
++
++				state = ESTATE_ACCESS_END;
++			}
++			break;
++
++		case ESTATE_ACCESS_END:
++
++			/* clear flag */
++			if (HAL_MEMCARD_DMA == mmc_drv_obj.transfer_mode) {
++				SETR_32(CC_EXT_MODE, CC_EXT_MODE_CLEAR);	/* W (CC_EXT_MODE, H'0000_1010) SD_BUF DMA transfer disabled */
++				SETR_32(SD_STOP, 0x00000000U);
++				mmc_drv_obj.during_dma_transfer = FALSE;
++			}
++
++			SETR_32(SD_INFO1_MASK, 0x00000000U);
++			SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);
++			SETR_32(SD_INFO1, 0x00000000U);
++			SETR_32(SD_INFO2, SD_INFO2_CLEAR);
++
++			if ((mmc_drv_obj.int_event1 & SD_INFO1_INFO2) != 0) {
++				emmc_WaitCmd2Cmd_8Cycle();
++				state = ESTATE_END;
++			} else {
++				state = ESTATE_ERROR;
++			}
++			break;
++
++		case ESTATE_TRANSFER_ERROR:
++			/* The error occurred in the Data transfer.  */
++			if (HAL_MEMCARD_DMA == mmc_drv_obj.transfer_mode) {
++				SETR_32(CC_EXT_MODE, CC_EXT_MODE_CLEAR);	/* W (CC_EXT_MODE, H'0000_1010) SD_BUF DMA transfer disabled */
++				SETR_32(SD_STOP, 0x00000000U);
++				mmc_drv_obj.during_dma_transfer = FALSE;
++			}
++			/* through */
++
++		case ESTATE_ERROR:
++			if (err_not_care_flag == TRUE) {
++				mmc_drv_obj.during_cmd_processing = FALSE;
++			} else {
++				emmc_softreset();
++				emmc_write_error_info(EMMC_FUNCNO_EXEC_CMD,
++						      rtn_code);
++			}
++			return rtn_code;
++
++		default:
++			state = ESTATE_END;
++			break;
++		}		/* switch (state) */
++	}			/*  while ( (mmc_drv_obj.force_terminate != TRUE) && (state != ESTATE_END) ) */
++
++	/* force terminate */
++	if (mmc_drv_obj.force_terminate == TRUE) {
++		/* timeout timer is expired. Or, PIO data transfer error. */
++		/* Timeout occurred in the DMA transfer. */
++		if (mmc_drv_obj.during_dma_transfer == TRUE) {
++			mmc_drv_obj.during_dma_transfer = FALSE;
++		}
++		ERROR("BL2: emmc exec_cmd:EMMC_ERR_FORCE_TERMINATE\n");
++		emmc_softreset();
++
++		return EMMC_ERR_FORCE_TERMINATE;	/* error information has already been written. */
++	}
++
++	/* success */
++	mmc_drv_obj.during_cmd_processing = FALSE;
++	mmc_drv_obj.during_transfer = FALSE;
++
++	return EMMC_SUCCESS;
++}
+diff --git a/drivers/renesas/rzg/emmc/emmc_config.h b/drivers/renesas/rzg/emmc/emmc_config.h
+new file mode 100644
+index 0000000..43e0303
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_config.h
+@@ -0,0 +1,40 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/**
++ * @file  emmc_config.h
++ * @brief Configuration file
++ *
++ */
++
++#ifndef EMMC_CONFIG_H
++#define EMMC_CONFIG_H
++
++/* ************************ HEADER (INCLUDE) SECTION *********************** */
++
++/* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
++
++/** @brief MMC driver config
++ */
++#define EMMC_RCA                1UL	/* RCA  */
++#define EMMC_RW_DATA_TIMEOUT    0x40UL	/* 314ms (freq = 400KHz, timeout Counter = 0x04(SDCLK * 2^17)  */
++#define EMMC_RETRY_COUNT        0	/* how many times to try after fail. Don't change. */
++#define EMMC_CMD_MAX            60UL	/* Don't change. */
++
++/** @brief etc
++ */
++#define LOADIMAGE_FLAGS_DMA_ENABLE              0x00000001UL
++
++/* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
++
++/* ********************** DECLARATION OF EXTERNAL DATA ********************* */
++
++/* ************************** FUNCTION PROTOTYPES ************************** */
++
++/* ********************************* CODE ********************************** */
++
++#endif /* EMMC_CONFIG_H */
++/* ******************************** END ************************************ */
+diff --git a/drivers/renesas/rzg/emmc/emmc_def.h b/drivers/renesas/rzg/emmc/emmc_def.h
+new file mode 100644
+index 0000000..5214348
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_def.h
+@@ -0,0 +1,78 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/**
++ * @file  emmc_def.h
++ * @brief eMMC boot is expecting this header file
++ *
++ */
++
++#ifndef EMMC_DEF_H
++#define EMMC_DEF_H
++
++#include "emmc_std.h"
++
++/* ************************ HEADER (INCLUDE) SECTION *********************** */
++
++/* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
++#define EMMC_POWER_ON		(1U)
++
++/* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
++
++/* ********************** DECLARATION OF EXTERNAL DATA ********************* */
++extern st_mmc_base mmc_drv_obj;
++
++/* ************************** FUNCTION PROTOTYPES ************************** */
++
++/** @brief for assembler program
++ */
++uint32_t _rom_emmc_finalize(void);
++
++/** @brief eMMC driver API
++ */
++EMMC_ERROR_CODE rzg_emmc_init(void);
++EMMC_ERROR_CODE emmc_terminate(void);
++EMMC_ERROR_CODE rzg_emmc_memcard_power(uint8_t mode);
++EMMC_ERROR_CODE rzg_emmc_mount(void);
++EMMC_ERROR_CODE emmc_set_request_mmc_clock(uint32_t *freq);
++EMMC_ERROR_CODE emmc_send_idle_cmd(uint32_t arg);
++EMMC_ERROR_CODE emmc_select_partition(EMMC_PARTITION_ID id);
++EMMC_ERROR_CODE emmc_read_sector(uint32_t *buff_address_virtual,
++				 uint32_t sector_number, uint32_t count,
++				 uint32_t feature_flags);
++EMMC_ERROR_CODE emmc_write_sector(uint32_t *buff_address_virtual,
++				  uint32_t sector_number, uint32_t count,
++				  uint32_t feature_flags);
++EMMC_ERROR_CODE emmc_erase_sector(uint32_t *start_address,
++				  uint32_t *end_address);
++uint32_t emmc_bit_field(uint8_t *data, uint32_t top, uint32_t bottom);
++
++/** @brief interrupt service
++ */
++uint32_t emmc_interrupt(void);
++
++/** @brief DMA
++ */
++
++/** @brief send command API
++ */
++EMMC_ERROR_CODE emmc_exec_cmd(uint32_t error_mask, uint32_t *response);
++void emmc_make_nontrans_cmd(HAL_MEMCARD_COMMAND cmd, uint32_t arg);
++void emmc_make_trans_cmd(HAL_MEMCARD_COMMAND cmd, uint32_t arg,
++			 uint32_t *buff_address_virtual, uint32_t len,
++			 HAL_MEMCARD_OPERATION dir,
++			 HAL_MEMCARD_DATA_TRANSFER_MODE transfer_mode);
++EMMC_ERROR_CODE emmc_set_ext_csd(uint32_t arg);
++
++/** @brief for error information
++ */
++void emmc_write_error_info(uint16_t func_no, EMMC_ERROR_CODE error_code);
++void emmc_write_error_info_func_no(uint16_t func_no);
++
++/* ********************************* CODE ********************************** */
++
++#endif /* EMMC_DEF_H */
++/* ******************************** END ************************************ */
+diff --git a/drivers/renesas/rzg/emmc/emmc_hal.h b/drivers/renesas/rzg/emmc/emmc_hal.h
+new file mode 100644
+index 0000000..4054f02
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_hal.h
+@@ -0,0 +1,318 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/**
++ * @file  emmc_hal.h
++ * @brief emmc boot driver is expecting this header file
++ *
++ */
++
++#ifndef EMMC_HAL_H
++#define EMMC_HAL_H
++/* ************************ HEADER (INCLUDE) SECTION *********************** */
++#include <stdint.h>
++/* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
++
++/** @brief memory card error/status types
++ */
++#define HAL_MEMCARD_OUT_OF_RANGE            0x80000000L
++#define HAL_MEMCARD_ADDRESS_ERROR           0x40000000L
++#define HAL_MEMCARD_BLOCK_LEN_ERROR         0x20000000L
++#define HAL_MEMCARD_ERASE_SEQ_ERROR         0x10000000L
++#define HAL_MEMCARD_ERASE_PARAM             0x08000000L
++#define HAL_MEMCARD_WP_VIOLATION            0x04000000L
++#define HAL_MEMCARD_CARD_IS_LOCKED          0x02000000L
++#define HAL_MEMCARD_LOCK_UNLOCK_FAILED      0x01000000L
++#define HAL_MEMCARD_COM_CRC_ERROR           0x00800000L
++#define HAL_MEMCARD_ILEGAL_COMMAND          0x00400000L
++#define HAL_MEMCARD_CARD_ECC_FAILED         0x00200000L
++#define HAL_MEMCARD_CC_ERROR                0x00100000L
++#define HAL_MEMCARD_ERROR                   0x00080000L
++#define HAL_MEMCARD_UNDERRUN                0x00040000L
++#define HAL_MEMCARD_OVERRUN                 0x00020000L
++#define HAL_MEMCARD_CIDCSD_OVERWRITE        0x00010000L
++#define HAL_MEMCARD_WP_ERASE_SKIP           0x00008000L
++#define HAL_MEMCARD_CARD_ECC_DISABLED       0x00004000L
++#define HAL_MEMCARD_ERASE_RESET             0x00002000L
++#define HAL_MEMCARD_CARD_STATE              0x00001E00L
++#define HAL_MEMCARD_CARD_READY_FOR_DATA     0x00000100L
++#define HAL_MEMCARD_APP_CMD                 0x00000020L
++#define HAL_MEMCARD_SWITCH_ERROR            0x00000080L
++#define HAL_MEMCARD_AKE_SEQ_ERROR           0x00000008L
++#define HAL_MEMCARD_NO_ERRORS               0x00000000L
++
++/** @brief Memory card response types
++ */
++#define HAL_MEMCARD_COMMAND_INDEX_MASK      0x0003f
++
++/* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
++
++/** @brief Type of the return value.
++ */
++typedef enum {
++	HAL_MEMCARD_FAIL = 0U,
++	HAL_MEMCARD_OK = 1U,
++	HAL_MEMCARD_DMA_ALLOC_FAIL = 2U,     /**< DMA channel allocation failed */
++	HAL_MEMCARD_DMA_TRANSFER_FAIL = 3U,  /**< DMA transfer failed */
++	HAL_MEMCARD_CARD_STATUS_ERROR = 4U,  /**< A non-masked error bit was set in the card status */
++	HAL_MEMCARD_CMD_TIMEOUT = 5U,	     /**< Command timeout occurred */
++	HAL_MEMCARD_DATA_TIMEOUT = 6U,	     /**< Data timeout occurred */
++	HAL_MEMCARD_CMD_CRC_ERROR = 7U,	     /**< Command CRC error occurred */
++	HAL_MEMCARD_DATA_CRC_ERROR = 8U	     /**< Data CRC error occurred */
++} HAL_MEMCARD_RETURN;
++
++/** @brief memory access operation
++ */
++typedef enum {
++	HAL_MEMCARD_READ = 0U,	 /**< read */
++	HAL_MEMCARD_WRITE = 1U	 /**< write */
++} HAL_MEMCARD_OPERATION;
++
++/** @brief Type of data width on memorycard bus
++ */
++typedef enum {
++	HAL_MEMCARD_DATA_WIDTH_1_BIT = 0U,
++	HAL_MEMCARD_DATA_WIDTH_4_BIT = 1U,
++	HAL_MEMCARD_DATA_WIDTH_8_BIT = 2U
++} HAL_MEMCARD_DATA_WIDTH; /**< data (bus) width types */
++
++/** @brief Presence of the memory card
++ */
++typedef enum {
++	HAL_MEMCARD_CARD_IS_IN = 0U,
++	HAL_MEMCARD_CARD_IS_OUT = 1U
++} HAL_MEMCARD_PRESENCE_STATUS;	/* presence status of the memory card */
++
++/** @brief mode of data transfer
++ */
++typedef enum {
++	HAL_MEMCARD_DMA = 0U,
++	HAL_MEMCARD_NOT_DMA = 1U
++} HAL_MEMCARD_DATA_TRANSFER_MODE;
++
++/** @brief Memory card response types.
++ */
++typedef enum hal_memcard_response_type {
++	HAL_MEMCARD_RESPONSE_NONE = 0x00000U,
++	HAL_MEMCARD_RESPONSE_R1 = 0x00100U,
++	HAL_MEMCARD_RESPONSE_R1b = 0x00200U,
++	HAL_MEMCARD_RESPONSE_R2 = 0x00300U,
++	HAL_MEMCARD_RESPONSE_R3 = 0x00400U,
++	HAL_MEMCARD_RESPONSE_R4 = 0x00500U,
++	HAL_MEMCARD_RESPONSE_R5 = 0x00600U,
++	HAL_MEMCARD_RESPONSE_R6 = 0x00700U,
++	HAL_MEMCARD_RESPONSE_R7 = 0x00800U,
++	HAL_MEMCARD_RESPONSE_TYPE_MASK = 0x00f00U
++} HAL_MEMCARD_RESPONSE_TYPE;
++
++/** @brief Memory card command types.
++ */
++typedef enum hal_memcard_command_type {
++	HAL_MEMCARD_COMMAND_TYPE_BC = 0x00000U,
++	HAL_MEMCARD_COMMAND_TYPE_BCR = 0x01000U,
++	HAL_MEMCARD_COMMAND_TYPE_AC = 0x02000U,
++	HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE = 0x03000U,
++	HAL_MEMCARD_COMMAND_TYPE_ADTC_READ = 0x04000U,
++	HAL_MEMCARD_COMMAND_TYPE_MASK = 0x07000U
++} HAL_MEMCARD_COMMAND_TYPE;
++
++/** @brief Type of memory card
++ */
++typedef enum hal_memcard_command_card_type {
++	HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON = 0x00000U,
++	HAL_MEMCARD_COMMAND_CARD_TYPE_MMC = 0x08000U,
++	HAL_MEMCARD_COMMAND_CARD_TYPE_SD = 0x10000U,
++	HAL_MEMCARD_COMMAND_CARD_TYPE_MASK = 0x18000U
++} HAL_MEMCARD_COMMAND_CARD_TYPE;
++
++/** @brief Memory card application command.
++ */
++typedef enum hal_memcard_command_app_norm {
++	HAL_MEMCARD_COMMAND_NORMAL = 0x00000U,
++	HAL_MEMCARD_COMMAND_APP = 0x20000U,
++	HAL_MEMCARD_COMMAND_APP_NORM_MASK = 0x20000U
++} HAL_MEMCARD_COMMAND_APP_NORM;
++
++/** @brief Memory card command codes.
++ */
++typedef enum {
++/* class 0 and class 1 */
++	CMD0_GO_IDLE_STATE = 0 | HAL_MEMCARD_RESPONSE_NONE | HAL_MEMCARD_COMMAND_TYPE_BC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD0 */
++	CMD1_SEND_OP_COND = 1 | HAL_MEMCARD_RESPONSE_R3 | HAL_MEMCARD_COMMAND_TYPE_BCR | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD1 */
++	CMD2_ALL_SEND_CID_MMC = 2 | HAL_MEMCARD_RESPONSE_R2 | HAL_MEMCARD_COMMAND_TYPE_BCR | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD2 */
++	CMD2_ALL_SEND_CID_SD =
++	    2 | HAL_MEMCARD_RESPONSE_R2 | HAL_MEMCARD_COMMAND_TYPE_BCR |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,
++	CMD3_SET_RELATIVE_ADDR = 3 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD3 */
++	CMD3_SEND_RELATIVE_ADDR =
++	    3 | HAL_MEMCARD_RESPONSE_R6 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,
++	CMD4_SET_DSR = 4 | HAL_MEMCARD_RESPONSE_NONE | HAL_MEMCARD_COMMAND_TYPE_BC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD4 */
++	CMD5_SLEEP_AWAKE = 5 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD5 */
++	CMD6_SWITCH = 6 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD6 */
++	CMD6_SWITCH_FUNC =
++	    6 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,
++	ACMD6_SET_BUS_WIDTH =
++	    6 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++	CMD7_SELECT_CARD = 7 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD7 */
++	CMD7_SELECT_CARD_PROG = 7 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD7(from Disconnected State to Programming State) */
++	CMD7_DESELECT_CARD =
++	    7 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,
++	CMD8_SEND_EXT_CSD = 8 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD8 */
++	CMD8_SEND_IF_COND =
++	    8 | HAL_MEMCARD_RESPONSE_R7 | HAL_MEMCARD_COMMAND_TYPE_BCR |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,
++	CMD9_SEND_CSD = 9 | HAL_MEMCARD_RESPONSE_R2 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD9 */
++	CMD10_SEND_CID = 10 | HAL_MEMCARD_RESPONSE_R2 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD10 */
++	CMD11_READ_DAT_UNTIL_STOP = 11 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD11 */
++	CMD12_STOP_TRANSMISSION = 12 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD12 */
++	CMD12_STOP_TRANSMISSION_WRITE = 12 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD12(R1b : write case) */
++	CMD13_SEND_STATUS = 13 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD13 */
++	ACMD13_SD_STATUS =
++	    13 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++	CMD14_BUSTEST_R = 14 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD14 */
++	CMD15_GO_INACTIVE_STATE = 15 | HAL_MEMCARD_RESPONSE_NONE | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD15 */
++
++/* class 2 */
++	CMD16_SET_BLOCKLEN = 16 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD16 */
++	CMD17_READ_SINGLE_BLOCK = 17 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD17 */
++	CMD18_READ_MULTIPLE_BLOCK = 18 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD18 */
++	CMD19_BUS_TEST_W = 19 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD19 */
++
++/* class 3 */
++	CMD20_WRITE_DAT_UNTIL_STOP = 20 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD20 */
++	CMD21 = 21,		/* CMD21 */
++	CMD22 = 22,		/* CMD22 */
++	ACMD22_SEND_NUM_WR_BLOCKS =
++	    22 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++
++/* class 4 */
++	CMD23_SET_BLOCK_COUNT = 23 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD23 */
++	ACMD23_SET_WR_BLK_ERASE_COUNT =
++	    23 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++	CMD24_WRITE_BLOCK = 24 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD24 */
++	CMD25_WRITE_MULTIPLE_BLOCK = 25 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD25 */
++	CMD26_PROGRAM_CID = 26 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD26 */
++	CMD27_PROGRAM_CSD = 27 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD27 */
++
++/* class 6 */
++	CMD28_SET_WRITE_PROT = 28 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD28 */
++	CMD29_CLR_WRITE_PROT = 29 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD29 */
++	CMD30_SEND_WRITE_PROT = 30 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD30 */
++	CMD30_SEND_WRITE_PROT_TYPE = 31 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD31 */
++
++/* class 5 */
++	CMD32_ERASE_WR_BLK_START = 32 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD32 */
++	CMD33_ERASE_WR_BLK_END = 33 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD33 */
++	CMD34 = 34,		/* CMD34 */
++	CMD35_ERASE_GROUP_START = 35 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD35 */
++	CMD36_ERASE_GROUP_END = 36 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD36 */
++	CMD37 = 37,		/* CMD37 */
++	CMD38_ERASE = 38 | HAL_MEMCARD_RESPONSE_R1b | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD38 */
++
++/* class 9 */
++	CMD39_FASTIO = 39 | HAL_MEMCARD_RESPONSE_R4 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD39 */
++	CMD40_GO_IRQSTATE = 40 | HAL_MEMCARD_RESPONSE_R5 | HAL_MEMCARD_COMMAND_TYPE_BCR | HAL_MEMCARD_COMMAND_CARD_TYPE_MMC | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD40 */
++	CMD41 = 41,		/* CMD41 */
++	ACMD41_SD_SEND_OP_COND =
++	    41 | HAL_MEMCARD_RESPONSE_R3 | HAL_MEMCARD_COMMAND_TYPE_BCR |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++
++/* class 7 */
++	CMD42_LOCK_UNLOCK = 42 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD42 */
++	ACMD42_SET_CLR_CARD_DETECT =
++	    42 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++	CMD43 = 43,		/* CMD43 */
++	CMD44 = 44,		/* CMD44 */
++	CMD45 = 45,		/* CMD45 */
++	CMD46 = 46,		/* CMD46 */
++	CMD47 = 47,		/* CMD47 */
++	CMD48 = 48,		/* CMD48 */
++	CMD49 = 49,		/* CMD49 */
++	CMD50 = 50,		/* CMD50 */
++	CMD51 = 51,		/* CMD51 */
++	ACMD51_SEND_SCR =
++	    51 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_READ |
++	    HAL_MEMCARD_COMMAND_CARD_TYPE_SD | HAL_MEMCARD_COMMAND_APP,
++	CMD52 = 52,		/* CMD52 */
++	CMD53 = 53,		/* CMD53 */
++	CMD54 = 54,		/* CMD54 */
++
++/* class 8 */
++	CMD55_APP_CMD = 55 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_AC | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD55 */
++	CMD56_GEN_CMD = 56 | HAL_MEMCARD_RESPONSE_R1 | HAL_MEMCARD_COMMAND_TYPE_ADTC_WRITE | HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON | HAL_MEMCARD_COMMAND_NORMAL,	/* CMD56 */
++	CMD57 = 57,		/* CMD57 */
++	CMD58 = 58,		/* CMD58 */
++	CMD59 = 59,		/* CMD59 */
++	CMD60 = 60,		/* CMD60 */
++	CMD61 = 61,		/* CMD61 */
++	CMD62 = 62,		/* CMD62 */
++	CMD63 = 63		/* CMD63 */
++} HAL_MEMCARD_COMMAND;
++
++/** @brief Configuration structure from HAL layer.
++ *
++ * If some field is not available it should be filled with 0xFF.
++ * The API version is 32-bit unsigned integer telling the version of the API. The integer is divided to four sections which each can be treated as a 8-bit unsigned number:
++ * Bits 31-24 make the most significant part of the version number. This number starts from 1 i.e. the second version of the API will be 0x02xxxxxx. This number changes only, if the API itself changes so much that it is not compatible anymore with older releases.
++ * Bits 23-16 API minor version number. For example API version 2.1 would be 0x0201xxxx.
++ * Bits 15-8 are the number of the year when release is done. The 0 is year 2000, 1 is year 2001 and so on
++ * Bits 7- are the week number when release is done. First full week of the year is 1
++ *
++ * @note Example: let's assume that release 2.1 is done on week 10 year 2008 the version will get the value 0x0201080A
++ */
++typedef struct {
++    /**
++    * Version of the chipset API implementation
++    *
++    * bits [31:24] API specification major version number.<br>
++    * bits [23:16] API specification minor version number.<br>
++    * bits [15:8] API implemention year. (2000 = 0, 2001 = 1, ...)<br>
++    * bits [7:0] API implemention week.<br>
++    * Example: API specification version 4.0, implementation w46 2008 => 0x0400082E
++    */
++	uint32_t api_version;
++
++    /** maximum block count which can be transferred at once */
++	uint32_t max_block_count;
++
++    /** maximum clock frequence in Hz supported by HW */
++	uint32_t max_clock_freq;
++
++    /** maximum data bus width supported by HW */
++	uint16_t max_data_width;
++
++    /** Is high-speed mode supported by HW (yes=1, no=0) */
++	uint8_t hs_mode_supported;
++
++    /** Is memory card removable (yes=1, no=0) */
++	uint8_t card_removable;
++
++} HAL_MEMCARD_HW_CONF;
++
++/** @brief Configuration structure to HAL layer.
++ */
++typedef struct {
++    /** how many times to try after fail, for instance sending command */
++	uint32_t retries_after_fail;
++} HAL_MEMCARD_INIT_CONF;
++
++/* ********************** DECLARATION OF EXTERNAL DATA ********************* */
++
++/* ************************** FUNCTION PROTOTYPES ************************** */
++
++/* ********************************* CODE ********************************** */
++
++#endif /* EMMC_HAL_H */
++
++/* ******************************** END ************************************ */
+diff --git a/drivers/renesas/rzg/emmc/emmc_init.c b/drivers/renesas/rzg/emmc/emmc_init.c
+new file mode 100644
+index 0000000..a7b6f78
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_init.c
+@@ -0,0 +1,165 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stddef.h>
++
++#include <lib/mmio.h>
++
++#include "emmc_config.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++#include "emmc_registers.h"
++#include "emmc_def.h"
++#include "rzg_private.h"
++
++st_mmc_base mmc_drv_obj;
++
++EMMC_ERROR_CODE rzg_emmc_memcard_power(uint8_t mode)
++{
++
++	if (mode == TRUE) {
++		/* power on (Vcc&Vccq is always power on) */
++		mmc_drv_obj.card_power_enable = TRUE;
++	} else {
++		/* power off (Vcc&Vccq is always power on) */
++		mmc_drv_obj.card_power_enable = FALSE;
++		mmc_drv_obj.mount = FALSE;
++		mmc_drv_obj.selected = FALSE;
++	}
++
++	return EMMC_SUCCESS;
++}
++static __inline void emmc_set_retry_count(uint32_t retry)
++{
++	mmc_drv_obj.retries_after_fail = retry;
++}
++
++static __inline void emmc_set_data_timeout(uint32_t data_timeout)
++{
++	mmc_drv_obj.data_timeout = data_timeout;
++}
++
++static void emmc_memset(uint8_t *buff, uint8_t data, uint32_t cnt)
++{
++	if (buff == NULL) {
++		return;
++	}
++
++	while (cnt > 0) {
++		*buff++ = data;
++		cnt--;
++	}
++}
++
++static void emmc_driver_config(void)
++{
++	emmc_set_retry_count(EMMC_RETRY_COUNT);
++	emmc_set_data_timeout(EMMC_RW_DATA_TIMEOUT);
++}
++
++static void emmc_drv_init(void)
++{
++	emmc_memset((uint8_t *) (&mmc_drv_obj), 0, sizeof(st_mmc_base));
++	mmc_drv_obj.card_present = HAL_MEMCARD_CARD_IS_IN;
++	mmc_drv_obj.data_timeout = EMMC_RW_DATA_TIMEOUT;
++	mmc_drv_obj.bus_width = HAL_MEMCARD_DATA_WIDTH_1_BIT;
++}
++
++static EMMC_ERROR_CODE emmc_dev_finalize(void)
++{
++	EMMC_ERROR_CODE result;
++	uint32_t dataL;
++
++	/* MMC power off
++	 * the power supply of eMMC device is always turning on.
++	 * RST_n : Hi --> Low level.
++	 */
++	result = rzg_emmc_memcard_power(FALSE);
++
++	/* host controller reset */
++	SETR_32(SD_INFO1, 0x00000000U);		/* all interrupt clear */
++	SETR_32(SD_INFO2, SD_INFO2_CLEAR);	/* all interrupt clear */
++	SETR_32(SD_INFO1_MASK, 0x00000000U);	/* all interrupt disable */
++	SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);	/* all interrupt disable */
++	SETR_32(SD_CLK_CTRL, 0x00000000U);	/* MMC clock stop */
++
++	dataL = mmio_read_32(CPG_SMSTPCR3);
++	if ((dataL & CPG_MSTP_MMC) == 0U) {
++		dataL |= (CPG_MSTP_MMC);
++		mmio_write_32(CPG_CPGWPR, (~dataL));
++		mmio_write_32(CPG_SMSTPCR3, dataL);
++	}
++
++	return result;
++}
++
++static EMMC_ERROR_CODE emmc_dev_init(void)
++{
++	/* Enable clock supply to eMMC. */
++	mstpcr_write(CPG_SMSTPCR3, CPG_MSTPSR3, CPG_MSTP_MMC);
++
++	/* Set SD clock */
++	mmio_write_32(CPG_CPGWPR, ~((uint32_t) (BIT9 | BIT0)));	/* SD phy 200MHz */
++
++	/* Stop SDnH clock & SDn=200MHz */
++	mmio_write_32(CPG_SDxCKCR, (BIT9 | BIT0));
++
++	/* MMCIF initialize */
++	SETR_32(SD_INFO1, 0x00000000U);		/* all interrupt clear */
++	SETR_32(SD_INFO2, SD_INFO2_CLEAR);	/* all interrupt clear */
++	SETR_32(SD_INFO1_MASK, 0x00000000U);	/* all interrupt disable */
++	SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);	/* all interrupt disable */
++
++	SETR_32(HOST_MODE, 0x00000000U);	/* SD_BUF access width = 64-bit */
++	SETR_32(SD_OPTION, 0x0000C0EEU);	/* Bus width = 1bit, timeout=MAX */
++	SETR_32(SD_CLK_CTRL, 0x00000000U);	/* Automatic Control=Disable, Clock Output=Disable */
++
++	return EMMC_SUCCESS;
++}
++
++static EMMC_ERROR_CODE emmc_reset_controller(void)
++{
++	EMMC_ERROR_CODE retult;
++
++	/* initialize mmc driver */
++	emmc_drv_init();
++
++	/* initialize H/W */
++	retult = emmc_dev_init();
++	if (EMMC_SUCCESS != retult) {
++		return retult;
++	}
++
++	mmc_drv_obj.initialize = TRUE;
++
++	return retult;
++
++}
++
++EMMC_ERROR_CODE emmc_terminate(void)
++{
++	EMMC_ERROR_CODE result;
++
++	result = emmc_dev_finalize();
++
++	emmc_memset((uint8_t *) (&mmc_drv_obj), 0, sizeof(st_mmc_base));
++
++	return result;
++}
++
++EMMC_ERROR_CODE rzg_emmc_init(void)
++{
++	EMMC_ERROR_CODE retult;
++
++	retult = emmc_reset_controller();
++	if (EMMC_SUCCESS != retult) {
++		return retult;
++	}
++
++	emmc_driver_config();
++
++	return EMMC_SUCCESS;
++}
+diff --git a/drivers/renesas/rzg/emmc/emmc_interrupt.c b/drivers/renesas/rzg/emmc/emmc_interrupt.c
+new file mode 100644
+index 0000000..7b45cb8
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_interrupt.c
+@@ -0,0 +1,195 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights
++ * reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stddef.h>
++
++#include <lib/mmio.h>
++
++#include "emmc_config.h"
++#include "emmc_def.h"
++#include "emmc_hal.h"
++#include "emmc_registers.h"
++#include "emmc_std.h"
++#include "rzg_def.h"
++
++static EMMC_ERROR_CODE emmc_trans_sector(uint32_t *buff_address_virtual);
++
++uint32_t emmc_interrupt(void)
++{
++	EMMC_ERROR_CODE result;
++	uint32_t end_bit = BIT20;
++
++	/* SD_INFO */
++	mmc_drv_obj.error_info.info1 = GETR_32(SD_INFO1);
++	mmc_drv_obj.error_info.info2 = GETR_32(SD_INFO2);
++
++	/* SD_INFO EVENT */
++	mmc_drv_obj.int_event1 =
++	    mmc_drv_obj.error_info.info1 & GETR_32(SD_INFO1_MASK);
++	mmc_drv_obj.int_event2 =
++	    mmc_drv_obj.error_info.info2 & GETR_32(SD_INFO2_MASK);
++
++	/* ERR_STS */
++	mmc_drv_obj.error_info.status1 = GETR_32(SD_ERR_STS1);
++	mmc_drv_obj.error_info.status2 = GETR_32(SD_ERR_STS2);
++
++	/* DM_CM_INFO */
++	mmc_drv_obj.error_info.dm_info1 = GETR_32(DM_CM_INFO1);
++	mmc_drv_obj.error_info.dm_info2 = GETR_32(DM_CM_INFO2);
++
++	/* DM_CM_INFO EVENT */
++	mmc_drv_obj.dm_event1 =
++	    mmc_drv_obj.error_info.dm_info1 & GETR_32(DM_CM_INFO1_MASK);
++	mmc_drv_obj.dm_event2 =
++	    mmc_drv_obj.error_info.dm_info2 & GETR_32(DM_CM_INFO2_MASK);
++
++	/* ERR SD_INFO2 */
++	if ((SD_INFO2_ALL_ERR & mmc_drv_obj.int_event2) != 0) {
++		SETR_32(SD_INFO1_MASK, 0x00000000U);	/* interrupt disable */
++		SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);	/* interrupt disable */
++		SETR_32(SD_INFO1, 0x00000000U);	/* interrupt clear */
++		SETR_32(SD_INFO2, SD_INFO2_CLEAR);	/* interrupt clear */
++		mmc_drv_obj.state_machine_blocking = FALSE;
++	}
++
++	/* PIO Transfer */
++	/* BWE/BRE */
++	else if (((SD_INFO2_BWE | SD_INFO2_BRE) & mmc_drv_obj.int_event2)) {
++		/* BWE */
++		if (SD_INFO2_BWE & mmc_drv_obj.int_event2) {
++			SETR_32(SD_INFO2, (GETR_32(SD_INFO2) & ~SD_INFO2_BWE));
++		}
++		/* BRE */
++		else {
++			SETR_32(SD_INFO2, (GETR_32(SD_INFO2) & ~SD_INFO2_BRE));
++		}
++
++		result = emmc_trans_sector(mmc_drv_obj.buff_address_virtual);
++		mmc_drv_obj.buff_address_virtual += EMMC_BLOCK_LENGTH;
++		mmc_drv_obj.remain_size -= EMMC_BLOCK_LENGTH;
++
++		if (result != EMMC_SUCCESS) {
++			/* data transfer error */
++			emmc_write_error_info(EMMC_FUNCNO_NONE, result);
++
++			/* Panic */
++			SETR_32(SD_INFO1_MASK, 0x00000000U);
++			SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR);
++			SETR_32(SD_INFO1, 0x00000000U);
++			/* interrupt clear */
++			SETR_32(SD_INFO2, SD_INFO2_CLEAR);
++			mmc_drv_obj.force_terminate = TRUE;
++		} else {
++			mmc_drv_obj.during_transfer = FALSE;
++		}
++		mmc_drv_obj.state_machine_blocking = FALSE;
++	}
++
++	/* DMA_TRANSFER */
++	/* DM_CM_INFO1: DMA-ch0 transfer complete or error occurred */
++	else if ((BIT16 & mmc_drv_obj.dm_event1) != 0) {
++		SETR_32(DM_CM_INFO1, 0x00000000U);
++		SETR_32(DM_CM_INFO2, 0x00000000U);
++		/* interrupt clear */
++		SETR_32(SD_INFO2, (GETR_32(SD_INFO2) & ~SD_INFO2_BWE));
++		/* DM_CM_INFO2:  DMA-ch0 error occured */
++		if ((BIT16 & mmc_drv_obj.dm_event2) != 0) {
++			mmc_drv_obj.dma_error_flag = TRUE;
++		} else {
++			mmc_drv_obj.during_dma_transfer = FALSE;
++			mmc_drv_obj.during_transfer = FALSE;
++		}
++		/* wait next interrupt */
++		mmc_drv_obj.state_machine_blocking = FALSE;
++	}
++	/* DM_CM_INFO1: DMA-ch1 transfer complete or error occured */
++	else if ((end_bit & mmc_drv_obj.dm_event1) != 0U) {
++		SETR_32(DM_CM_INFO1, 0x00000000U);
++		SETR_32(DM_CM_INFO2, 0x00000000U);
++		/* interrupt clear */
++		SETR_32(SD_INFO2, (GETR_32(SD_INFO2) & ~SD_INFO2_BRE));
++		/* DM_CM_INFO2: DMA-ch1 error occured */
++		if ((BIT17 & mmc_drv_obj.dm_event2) != 0) {
++			mmc_drv_obj.dma_error_flag = TRUE;
++		} else {
++			mmc_drv_obj.during_dma_transfer = FALSE;
++			mmc_drv_obj.during_transfer = FALSE;
++		}
++		/* wait next interrupt */
++		mmc_drv_obj.state_machine_blocking = FALSE;
++	}
++
++	/* Response end  */
++	else if ((SD_INFO1_INFO0 & mmc_drv_obj.int_event1) != 0) {
++		/* interrupt clear */
++		SETR_32(SD_INFO1, (GETR_32(SD_INFO1) & ~SD_INFO1_INFO0));
++		mmc_drv_obj.state_machine_blocking = FALSE;
++	}
++	/* Access end  */
++	else if ((SD_INFO1_INFO2 & mmc_drv_obj.int_event1) != 0) {
++		/* interrupt clear */
++		SETR_32(SD_INFO1, (GETR_32(SD_INFO1) & ~SD_INFO1_INFO2));
++		mmc_drv_obj.state_machine_blocking = FALSE;
++	} else {
++		/* nothing to do. */
++	}
++
++	return (uint32_t) 0;
++}
++
++static EMMC_ERROR_CODE emmc_trans_sector(uint32_t *buff_address_virtual)
++{
++	uint32_t length, i;
++	uint64_t *bufPtrLL;
++
++	if (buff_address_virtual == NULL) {
++		return EMMC_ERR_PARAM;
++	}
++
++	if ((mmc_drv_obj.during_transfer != TRUE)
++	    || (mmc_drv_obj.remain_size == 0)) {
++		return EMMC_ERR_STATE;
++	}
++
++	bufPtrLL = (uint64_t *) buff_address_virtual;
++	length = mmc_drv_obj.remain_size;
++
++	/* data transefer */
++	for (i = 0; i < (length >> 3); i++) {
++		/* Write */
++		if (mmc_drv_obj.cmd_info.dir == HAL_MEMCARD_WRITE) {
++			SETR_64(SD_BUF0, *bufPtrLL);	/* buffer --> FIFO */
++		}
++		/* Read */
++		else {
++			/* Checks when the read data reaches SD_SIZE. */
++			/* The BRE bit is cleared at emmc_interrupt function. */
++			if (((i %
++			      (uint32_t) (EMMC_BLOCK_LENGTH >>
++					  EMMC_BUF_SIZE_SHIFT)) == 0U)
++			    && (i != 0U)) {
++				/* BRE check */
++				while (((GETR_32(SD_INFO2)) & SD_INFO2_BRE) ==
++				       0U) {
++					/* ERROR check */
++					if (((GETR_32(SD_INFO2)) &
++					     SD_INFO2_ALL_ERR) != 0U) {
++						return EMMC_ERR_TRANSFER;
++					}
++				}
++				/* BRE clear */
++				SETR_32(SD_INFO2,
++					(uint32_t) (GETR_32(SD_INFO2) &
++						    ~SD_INFO2_BRE));
++			}
++			*bufPtrLL = GETR_64(SD_BUF0);	/* FIFO --> buffer */
++		}
++		bufPtrLL++;
++	}
++
++	return EMMC_SUCCESS;
++}
+diff --git a/drivers/renesas/rzg/emmc/emmc_mount.c b/drivers/renesas/rzg/emmc/emmc_mount.c
+new file mode 100644
+index 0000000..97b916c
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_mount.c
+@@ -0,0 +1,675 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/debug.h>
++#include <lib/mmio.h>
++
++#include "emmc_config.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++#include "emmc_registers.h"
++#include "emmc_def.h"
++#include "micro_delay.h"
++#include "rzg_def.h"
++
++static EMMC_ERROR_CODE emmc_clock_ctrl(uint8_t mode);
++static EMMC_ERROR_CODE emmc_card_init(void);
++static EMMC_ERROR_CODE emmc_high_speed(void);
++static EMMC_ERROR_CODE emmc_bus_width(uint32_t width);
++static uint32_t emmc_set_timeout_register_value(uint32_t freq);
++static void set_sd_clk(uint32_t clkDiv);
++static uint32_t emmc_calc_tran_speed(uint32_t *freq);
++static void emmc_get_partition_access(void);
++static void emmc_set_bootpartition(void);
++
++static void emmc_set_bootpartition(void)
++{
++	uint32_t reg;
++
++	reg = mmio_read_32(RZG_PRR) & (PRR_PRODUCT_MASK | PRR_CUT_MASK);
++	if (reg == PRR_PRODUCT_G2M_CUT11) {
++		mmc_drv_obj.boot_partition_en = mmc_drv_obj.partition_access;
++	} else {
++		if ((mmio_read_32(MFISBTSTSR) & MFISBTSTSR_BOOT_PARTITION) !=
++		    0U) {
++			mmc_drv_obj.boot_partition_en = PARTITION_ID_BOOT_2;
++		} else {
++			mmc_drv_obj.boot_partition_en = PARTITION_ID_BOOT_1;
++		}
++	}
++}
++
++static EMMC_ERROR_CODE emmc_card_init(void)
++{
++	int32_t retry;
++	uint32_t freq = MMC_400KHZ;	/* 390KHz */
++	EMMC_ERROR_CODE result;
++	uint32_t resultCalc;
++
++	/* state check */
++	if ((mmc_drv_obj.initialize != TRUE)
++	    || (mmc_drv_obj.card_power_enable != TRUE)
++	    || ((GETR_32(SD_INFO2) & SD_INFO2_CBSY) != 0)
++	    ) {
++		emmc_write_error_info(EMMC_FUNCNO_CARD_INIT, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	/* clock on (force change) */
++	mmc_drv_obj.current_freq = 0;
++	mmc_drv_obj.max_freq = MMC_20MHZ;
++	result = emmc_set_request_mmc_clock(&freq);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return EMMC_ERR;
++	}
++
++	rzg_micro_delay(1000U);	/* wait 1ms */
++
++	/* Get current access partition */
++	emmc_get_partition_access();
++
++	/* CMD0, arg=0x00000000 */
++	result = emmc_send_idle_cmd(0x00000000);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	rzg_micro_delay(200U);	/* wait 74clock 390kHz(189.74us) */
++
++	/* CMD1 */
++	emmc_make_nontrans_cmd(CMD1_SEND_OP_COND, EMMC_HOST_OCR_VALUE);
++	for (retry = 300; retry > 0; retry--) {
++		result =
++		    emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++		if (result != EMMC_SUCCESS) {
++			emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++			return result;
++		}
++
++		if ((mmc_drv_obj.r3_ocr & EMMC_OCR_STATUS_BIT) != 0) {
++			break;	/* card is ready. exit loop */
++		}
++		rzg_micro_delay(1000U);	/* wait 1ms */
++	}
++
++	if (retry == 0) {
++		emmc_write_error_info(EMMC_FUNCNO_CARD_INIT, EMMC_ERR_TIMEOUT);
++		return EMMC_ERR_TIMEOUT;
++	}
++
++	switch (mmc_drv_obj.r3_ocr & EMMC_OCR_ACCESS_MODE_MASK) {
++	case EMMC_OCR_ACCESS_MODE_SECT:
++		mmc_drv_obj.access_mode = TRUE;	/* sector mode */
++		break;
++	default:
++		/* unknown value */
++		emmc_write_error_info(EMMC_FUNCNO_CARD_INIT, EMMC_ERR);
++		return EMMC_ERR;
++	}
++
++	/* CMD2 */
++	emmc_make_nontrans_cmd(CMD2_ALL_SEND_CID_MMC, 0x00000000);
++	mmc_drv_obj.response = (uint32_t *) (&mmc_drv_obj.cid_data[0]);	/* use CID special buffer */
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	/* CMD3 */
++	emmc_make_nontrans_cmd(CMD3_SET_RELATIVE_ADDR, EMMC_RCA << 16);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	/* CMD9 (CSD) */
++	emmc_make_nontrans_cmd(CMD9_SEND_CSD, EMMC_RCA << 16);
++	mmc_drv_obj.response = (uint32_t *) (&mmc_drv_obj.csd_data[0]);	/* use CSD special buffer */
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	/* card version check */
++	if (EMMC_CSD_SPEC_VARS() < 4) {
++		emmc_write_error_info(EMMC_FUNCNO_CARD_INIT,
++				      EMMC_ERR_ILLEGAL_CARD);
++		return EMMC_ERR_ILLEGAL_CARD;
++	}
++
++	/* CMD7 (select card) */
++	emmc_make_nontrans_cmd(CMD7_SELECT_CARD, EMMC_RCA << 16);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	mmc_drv_obj.selected = TRUE;
++
++	/* card speed check */
++	resultCalc = emmc_calc_tran_speed(&freq);	/* Card spec is calculated from TRAN_SPEED(CSD).  */
++	if (resultCalc == 0) {
++		emmc_write_error_info(EMMC_FUNCNO_CARD_INIT,
++				      EMMC_ERR_ILLEGAL_CARD);
++		return EMMC_ERR_ILLEGAL_CARD;
++	}
++	mmc_drv_obj.max_freq = freq;	/* max frequency (card spec) */
++
++	result = emmc_set_request_mmc_clock(&freq);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return EMMC_ERR;
++	}
++
++	/* set read/write timeout */
++	mmc_drv_obj.data_timeout = emmc_set_timeout_register_value(freq);
++	SETR_32(SD_OPTION,
++		((GETR_32(SD_OPTION) & ~(SD_OPTION_TIMEOUT_CNT_MASK)) |
++		 mmc_drv_obj.data_timeout));
++
++	/* SET_BLOCKLEN(512byte) */
++	/* CMD16 */
++	emmc_make_nontrans_cmd(CMD16_SET_BLOCKLEN, EMMC_BLOCK_LENGTH);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	/* Transfer Data Length */
++	SETR_32(SD_SIZE, EMMC_BLOCK_LENGTH);
++
++	/* CMD8 (EXT_CSD) */
++	emmc_make_trans_cmd(CMD8_SEND_EXT_CSD, 0x00000000,
++			    (uint32_t *) (&mmc_drv_obj.ext_csd_data[0]),
++			    EMMC_MAX_EXT_CSD_LENGTH, HAL_MEMCARD_READ,
++			    HAL_MEMCARD_NOT_DMA);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		/* CMD12 is not send.
++		 * If BUS initialization is failed, user must be execute Bus initialization again.
++		 * Bus initialization is start CMD0(soft reset command).
++		 */
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		return result;
++	}
++
++	/* Set boot partition */
++	emmc_set_bootpartition();
++
++	return EMMC_SUCCESS;
++}
++
++static EMMC_ERROR_CODE emmc_high_speed(void)
++{
++	uint32_t freq;	      /**< High speed mode clock frequency */
++	EMMC_ERROR_CODE result;
++	uint8_t cardType;
++
++	/* state check */
++	if (mmc_drv_obj.selected != TRUE) {
++		emmc_write_error_info(EMMC_FUNCNO_HIGH_SPEED, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	/* max frequency */
++	cardType = (uint8_t) mmc_drv_obj.ext_csd_data[EMMC_EXT_CSD_CARD_TYPE];
++	if ((cardType & EMMC_EXT_CSD_CARD_TYPE_52MHZ) != 0)
++		freq = MMC_52MHZ;
++	else if ((cardType & EMMC_EXT_CSD_CARD_TYPE_26MHZ) != 0)
++		freq = MMC_26MHZ;
++	else
++		freq = MMC_20MHZ;
++
++	/* Hi-Speed-mode selction */
++	if ((MMC_52MHZ == freq) || (MMC_26MHZ == freq)) {
++		/* CMD6 */
++		emmc_make_nontrans_cmd(CMD6_SWITCH, EMMC_SWITCH_HS_TIMING);
++		result =
++		    emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++		if (result != EMMC_SUCCESS) {
++			emmc_write_error_info_func_no(EMMC_FUNCNO_HIGH_SPEED);
++			return result;
++		}
++
++		mmc_drv_obj.hs_timing = TIMING_HIGH_SPEED;	/* High-Speed */
++	}
++
++	/* set mmc clock */
++	mmc_drv_obj.max_freq = freq;
++	result = emmc_set_request_mmc_clock(&freq);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_HIGH_SPEED);
++		return EMMC_ERR;
++	}
++
++	/* set read/write timeout */
++	mmc_drv_obj.data_timeout = emmc_set_timeout_register_value(freq);
++	SETR_32(SD_OPTION,
++		((GETR_32(SD_OPTION) & ~(SD_OPTION_TIMEOUT_CNT_MASK)) |
++		 mmc_drv_obj.data_timeout));
++
++	/* CMD13 */
++	emmc_make_nontrans_cmd(CMD13_SEND_STATUS, EMMC_RCA << 16);
++	result =
++	    emmc_exec_cmd(EMMC_R1_ERROR_MASK_WITHOUT_CRC, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_HIGH_SPEED);
++		return result;
++	}
++
++	return EMMC_SUCCESS;
++}
++
++static EMMC_ERROR_CODE emmc_clock_ctrl(uint8_t mode)
++{
++	uint32_t value;
++
++	/* busy check */
++	if ((GETR_32(SD_INFO2) & SD_INFO2_CBSY) != 0) {
++		emmc_write_error_info(EMMC_FUNCNO_SET_CLOCK,
++				      EMMC_ERR_CARD_BUSY);
++		return EMMC_ERR;
++	}
++
++	if (mode == TRUE) {
++		/* clock ON */
++		value =
++		    ((GETR_32(SD_CLK_CTRL) | MMC_SD_CLK_START) &
++		     SD_CLK_WRITE_MASK);
++		SETR_32(SD_CLK_CTRL, value);	/* on  */
++		mmc_drv_obj.clock_enable = TRUE;
++	} else {
++		/* clock OFF */
++		value =
++		    ((GETR_32(SD_CLK_CTRL) & MMC_SD_CLK_STOP) &
++		     SD_CLK_WRITE_MASK);
++		SETR_32(SD_CLK_CTRL, value);	/* off */
++		mmc_drv_obj.clock_enable = FALSE;
++	}
++
++	return EMMC_SUCCESS;
++}
++
++static EMMC_ERROR_CODE emmc_bus_width(uint32_t width)
++{
++	EMMC_ERROR_CODE result = EMMC_ERR;
++
++	/* parameter check */
++	if ((width != 8) && (width != 4) && (width != 1)) {
++		emmc_write_error_info(EMMC_FUNCNO_BUS_WIDTH, EMMC_ERR_PARAM);
++		return EMMC_ERR_PARAM;
++	}
++
++	/* state check */
++	if (mmc_drv_obj.selected != TRUE) {
++		emmc_write_error_info(EMMC_FUNCNO_BUS_WIDTH, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	mmc_drv_obj.bus_width = (HAL_MEMCARD_DATA_WIDTH) (width >> 2);	/* 2 = 8bit, 1 = 4bit, 0 =1bit */
++
++	/* CMD6 */
++	emmc_make_nontrans_cmd(CMD6_SWITCH,
++			       (EMMC_SWITCH_BUS_WIDTH_1 |
++				(mmc_drv_obj.bus_width << 8)));
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		/* occurred error */
++		mmc_drv_obj.bus_width = HAL_MEMCARD_DATA_WIDTH_1_BIT;
++		goto EXIT;
++	}
++
++	switch (mmc_drv_obj.bus_width) {
++	case HAL_MEMCARD_DATA_WIDTH_1_BIT:
++		SETR_32(SD_OPTION,
++			((GETR_32(SD_OPTION) & ~(BIT15 | BIT13)) | BIT15));
++		break;
++	case HAL_MEMCARD_DATA_WIDTH_4_BIT:
++		SETR_32(SD_OPTION, (GETR_32(SD_OPTION) & ~(BIT15 | BIT13)));
++		break;
++	case HAL_MEMCARD_DATA_WIDTH_8_BIT:
++		SETR_32(SD_OPTION,
++			((GETR_32(SD_OPTION) & ~(BIT15 | BIT13)) | BIT13));
++		break;
++	default:
++		goto EXIT;
++	}
++
++	/* CMD13 */
++	emmc_make_nontrans_cmd(CMD13_SEND_STATUS, EMMC_RCA << 16);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		goto EXIT;
++	}
++
++	/* CMD8 (EXT_CSD) */
++	emmc_make_trans_cmd(CMD8_SEND_EXT_CSD, 0x00000000,
++			    (uint32_t *) (&mmc_drv_obj.ext_csd_data[0]),
++			    EMMC_MAX_EXT_CSD_LENGTH, HAL_MEMCARD_READ,
++			    HAL_MEMCARD_NOT_DMA);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		goto EXIT;
++	}
++
++	return EMMC_SUCCESS;
++
++EXIT:
++
++	emmc_write_error_info(EMMC_FUNCNO_BUS_WIDTH, result);
++	ERROR("BL2: emmc bus_width error end\n");
++	return result;
++}
++
++EMMC_ERROR_CODE emmc_select_partition(EMMC_PARTITION_ID id)
++{
++	EMMC_ERROR_CODE result;
++	uint32_t arg;
++	uint32_t partition_config;
++
++	/* state check */
++	if (mmc_drv_obj.mount != TRUE) {
++		emmc_write_error_info(EMMC_FUNCNO_NONE, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	/* id = PARTITION_ACCESS(Bit[2:0]) */
++	if ((id & ~PARTITION_ID_MASK) != 0) {
++		emmc_write_error_info(EMMC_FUNCNO_NONE, EMMC_ERR_PARAM);
++		return EMMC_ERR_PARAM;
++	}
++
++	/* EXT_CSD[179] value */
++	partition_config =
++	    (uint32_t) mmc_drv_obj.ext_csd_data[EMMC_EXT_CSD_PARTITION_CONFIG];
++	if ((partition_config & PARTITION_ID_MASK) == id) {
++		result = EMMC_SUCCESS;
++	} else {
++
++		partition_config =
++		    (uint32_t) ((partition_config & ~PARTITION_ID_MASK) | id);
++		arg = EMMC_SWITCH_PARTITION_CONFIG | (partition_config << 8);
++
++		result = emmc_set_ext_csd(arg);
++	}
++
++	return result;
++}
++
++static void set_sd_clk(uint32_t clkDiv)
++{
++	uint32_t dataL;
++
++	dataL = (GETR_32(SD_CLK_CTRL) & (~SD_CLK_CTRL_CLKDIV_MASK));
++
++	switch (clkDiv) {
++	case 1:
++		dataL |= 0x000000FFU;
++		break;		/* 1/1   */
++	case 2:
++		dataL |= 0x00000000U;
++		break;		/* 1/2   */
++	case 4:
++		dataL |= 0x00000001U;
++		break;		/* 1/4   */
++	case 8:
++		dataL |= 0x00000002U;
++		break;		/* 1/8   */
++	case 16:
++		dataL |= 0x00000004U;
++		break;		/* 1/16  */
++	case 32:
++		dataL |= 0x00000008U;
++		break;		/* 1/32  */
++	case 64:
++		dataL |= 0x00000010U;
++		break;		/* 1/64  */
++	case 128:
++		dataL |= 0x00000020U;
++		break;		/* 1/128 */
++	case 256:
++		dataL |= 0x00000040U;
++		break;		/* 1/256 */
++	case 512:
++		dataL |= 0x00000080U;
++		break;		/* 1/512 */
++	}
++
++	SETR_32(SD_CLK_CTRL, dataL);
++	mmc_drv_obj.current_freq = (uint32_t) clkDiv;
++}
++
++static void emmc_get_partition_access(void)
++{
++	uint32_t reg;
++	EMMC_ERROR_CODE result;
++
++	reg = mmio_read_32(RZG_PRR) & (PRR_PRODUCT_MASK | PRR_CUT_MASK);
++	if (reg == PRR_PRODUCT_G2M_CUT11) {
++		SETR_32(SD_OPTION, 0x000060EEU);	/* 8 bits width */
++		/* CMD8 (EXT_CSD) */
++		emmc_make_trans_cmd(CMD8_SEND_EXT_CSD, 0x00000000U,
++				    (uint32_t *) (&mmc_drv_obj.ext_csd_data[0]),
++				    EMMC_MAX_EXT_CSD_LENGTH,
++				    HAL_MEMCARD_READ, HAL_MEMCARD_NOT_DMA);
++		mmc_drv_obj.get_partition_access_flag = TRUE;
++		result =
++		    emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++		mmc_drv_obj.get_partition_access_flag = FALSE;
++		if (result == EMMC_SUCCESS) {
++			mmc_drv_obj.partition_access =
++			    (EMMC_PARTITION_ID) (mmc_drv_obj.ext_csd_data[179]
++						 & PARTITION_ID_MASK);
++		} else if (result == EMMC_ERR_CMD_TIMEOUT) {
++			mmc_drv_obj.partition_access = PARTITION_ID_BOOT_1;
++		} else {
++			emmc_write_error_info(EMMC_FUNCNO_GET_PERTITION_ACCESS,
++					      result);
++			panic();
++		}
++		SETR_32(SD_OPTION, 0x0000C0EEU);	/* Initialize */
++	}
++}
++
++static uint32_t emmc_calc_tran_speed(uint32_t *freq)
++{
++	const uint32_t unit[8] = { 10000, 100000, 1000000, 10000000,
++				0, 0, 0, 0 };   /**< frequency unit (1/10) */
++	const uint32_t mult[16] = { 0, 10, 12, 13, 15, 20, 26, 30, 35, 40, 45,
++				52, 55, 60, 70, 80 };
++
++	uint32_t maxFreq;
++	uint32_t result;
++	uint32_t tran_speed = EMMC_CSD_TRAN_SPEED();
++
++	/* tran_speed = 0x32
++	 * unit[tran_speed&0x7] = uint[0x2] = 1000000
++	 * mult[(tran_speed&0x78)>>3] = mult[0x30>>3] = mult[6] = 26
++	 * 1000000 * 26 = 26000000 (26MHz)
++	 */
++
++	result = 1;
++	maxFreq =
++	    unit[tran_speed & EMMC_TRANSPEED_FREQ_UNIT_MASK] *
++	    mult[(tran_speed & EMMC_TRANSPEED_MULT_MASK) >>
++		 EMMC_TRANSPEED_MULT_SHIFT];
++
++	if (maxFreq == 0) {
++		result = 0;
++	} else if (MMC_FREQ_52MHZ <= maxFreq)
++		*freq = MMC_52MHZ;
++	else if (MMC_FREQ_26MHZ <= maxFreq)
++		*freq = MMC_26MHZ;
++	else if (MMC_FREQ_20MHZ <= maxFreq)
++		*freq = MMC_20MHZ;
++	else
++		*freq = MMC_400KHZ;
++
++	return result;
++}
++
++static uint32_t emmc_set_timeout_register_value(uint32_t freq)
++{
++	uint32_t timeoutCnt;	/* SD_OPTION   - Timeout Counter  */
++
++	switch (freq) {
++	case 1U:
++		timeoutCnt = 0xE0U;
++		break;		/* SDCLK * 2^27 */
++	case 2U:
++		timeoutCnt = 0xE0U;
++		break;		/* SDCLK * 2^27 */
++	case 4U:
++		timeoutCnt = 0xD0U;
++		break;		/* SDCLK * 2^26 */
++	case 8U:
++		timeoutCnt = 0xC0U;
++		break;		/* SDCLK * 2^25 */
++	case 16U:
++		timeoutCnt = 0xB0U;
++		break;		/* SDCLK * 2^24 */
++	case 32U:
++		timeoutCnt = 0xA0U;
++		break;		/* SDCLK * 2^23 */
++	case 64U:
++		timeoutCnt = 0x90U;
++		break;		/* SDCLK * 2^22 */
++	case 128U:
++		timeoutCnt = 0x80U;
++		break;		/* SDCLK * 2^21 */
++	case 256U:
++		timeoutCnt = 0x70U;
++		break;		/* SDCLK * 2^20 */
++	case 512U:
++		timeoutCnt = 0x70U;
++		break;		/* SDCLK * 2^20 */
++	default:
++		timeoutCnt = 0xE0U;
++		break;		/* SDCLK * 2^27 */
++	}
++
++	return timeoutCnt;
++}
++
++EMMC_ERROR_CODE emmc_set_ext_csd(uint32_t arg)
++{
++	EMMC_ERROR_CODE result;
++
++	/* CMD6 */
++	emmc_make_nontrans_cmd(CMD6_SWITCH, arg);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++
++	/* CMD13 */
++	emmc_make_nontrans_cmd(CMD13_SEND_STATUS, EMMC_RCA << 16);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++
++	/* CMD8 (EXT_CSD) */
++	emmc_make_trans_cmd(CMD8_SEND_EXT_CSD, 0x00000000,
++			    (uint32_t *) (&mmc_drv_obj.ext_csd_data[0]),
++			    EMMC_MAX_EXT_CSD_LENGTH, HAL_MEMCARD_READ,
++			    HAL_MEMCARD_NOT_DMA);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++	return EMMC_SUCCESS;
++}
++
++EMMC_ERROR_CODE emmc_set_request_mmc_clock(uint32_t *freq)
++{
++	/* parameter check */
++	if (freq == NULL) {
++		emmc_write_error_info(EMMC_FUNCNO_SET_CLOCK, EMMC_ERR_PARAM);
++		return EMMC_ERR_PARAM;
++	}
++
++	/* state check */
++	if ((mmc_drv_obj.initialize != TRUE)
++	    || (mmc_drv_obj.card_power_enable != TRUE)) {
++		emmc_write_error_info(EMMC_FUNCNO_SET_CLOCK, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	/* clock is already running in the desired frequency. */
++	if ((mmc_drv_obj.clock_enable == TRUE)
++	    && (mmc_drv_obj.current_freq == *freq)) {
++		return EMMC_SUCCESS;
++	}
++
++	/* busy check */
++	if ((GETR_32(SD_INFO2) & SD_INFO2_CBSY) != 0) {
++		emmc_write_error_info(EMMC_FUNCNO_SET_CLOCK,
++				      EMMC_ERR_CARD_BUSY);
++		return EMMC_ERR;
++	}
++
++	set_sd_clk(*freq);
++	mmc_drv_obj.clock_enable = FALSE;
++
++	return emmc_clock_ctrl(TRUE);	/* clock on */
++}
++
++EMMC_ERROR_CODE rzg_emmc_mount(void)
++{
++	EMMC_ERROR_CODE result;
++
++	/* state check */
++	if ((mmc_drv_obj.initialize != TRUE)
++	    || (mmc_drv_obj.card_power_enable != TRUE)
++	    || ((GETR_32(SD_INFO2) & SD_INFO2_CBSY) != 0)
++	    ) {
++		emmc_write_error_info(EMMC_FUNCNO_MOUNT, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	/* initialize card (IDLE state --> Transfer state) */
++	result = emmc_card_init();
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_CARD_INIT);
++		if (emmc_clock_ctrl(FALSE) != EMMC_SUCCESS) {
++			/* nothing to do. */
++		}
++		return result;
++	}
++
++	/* Switching high speed mode */
++	result = emmc_high_speed();
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_HIGH_SPEED);
++		if (emmc_clock_ctrl(FALSE) != EMMC_SUCCESS) {
++			/* nothing to do. */
++		}
++		return result;
++	}
++
++	/* Changing the data bus width */
++	result = emmc_bus_width(8);
++	if (result != EMMC_SUCCESS) {
++		emmc_write_error_info_func_no(EMMC_FUNCNO_BUS_WIDTH);
++		if (emmc_clock_ctrl(FALSE) != EMMC_SUCCESS) {
++			/* nothing to do. */
++		}
++		return result;
++	}
++
++	/* mount complete */
++	mmc_drv_obj.mount = TRUE;
++
++	return EMMC_SUCCESS;
++}
+diff --git a/drivers/renesas/rzg/emmc/emmc_read.c b/drivers/renesas/rzg/emmc/emmc_read.c
+new file mode 100644
+index 0000000..49f4129
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_read.c
+@@ -0,0 +1,129 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <arch_helpers.h>
++
++#include "emmc_config.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++#include "emmc_registers.h"
++#include "emmc_def.h"
++
++#define MIN_EMMC(a, b)        (((a) < (b)) ? (a) : (b))
++#define EMMC_RW_SECTOR_COUNT_MAX        0x0000ffffU
++
++static EMMC_ERROR_CODE emmc_multiple_block_read (uint32_t *buff_address_virtual,
++		uint32_t sector_number, uint32_t count,
++		HAL_MEMCARD_DATA_TRANSFER_MODE transfer_mode)
++{
++	EMMC_ERROR_CODE result;
++
++	/* parameter check */
++	if ((count > EMMC_RW_SECTOR_COUNT_MAX)
++	    || (count == 0)
++	    || ((transfer_mode != HAL_MEMCARD_DMA)
++		&& (transfer_mode != HAL_MEMCARD_NOT_DMA))
++	    ) {
++		emmc_write_error_info(EMMC_FUNCNO_READ_SECTOR, EMMC_ERR_PARAM);
++		return EMMC_ERR_PARAM;
++	}
++
++	/* CMD23 */
++	emmc_make_nontrans_cmd(CMD23_SET_BLOCK_COUNT, count);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++	SETR_32(SD_SECCNT, count);
++	SETR_32(SD_STOP, 0x00000100);
++	SETR_32(CC_EXT_MODE, (CC_EXT_MODE_CLEAR | CC_EXT_MODE_DMASDRW_ENABLE));	/* SD_BUF Read/Write DMA Transfer enable */
++
++	/* CMD18 */
++	emmc_make_trans_cmd(CMD18_READ_MULTIPLE_BLOCK, sector_number,
++			    buff_address_virtual,
++			    count << EMMC_SECTOR_SIZE_SHIFT, HAL_MEMCARD_READ,
++			    transfer_mode);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;	/* CMD18 error code */
++	}
++
++	/* CMD13 */
++	emmc_make_nontrans_cmd(CMD13_SEND_STATUS, EMMC_RCA << 16);
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++#if RZG_BL2_DCACHE == 1
++	if (transfer_mode == HAL_MEMCARD_NOT_DMA) {
++		flush_dcache_range((uint64_t) buff_address_virtual,
++				   ((size_t) count << EMMC_SECTOR_SIZE_SHIFT));
++	}
++#endif /* RZG_BL2_DCACHE == 1 */
++
++	/* ready status check */
++	if ((mmc_drv_obj.r1_card_status & EMMC_R1_READY) == 0) {
++		emmc_write_error_info(EMMC_FUNCNO_READ_SECTOR,
++				      EMMC_ERR_CARD_BUSY);
++		return EMMC_ERR_CARD_BUSY;
++	}
++
++	/* state check */
++	if (mmc_drv_obj.current_state != EMMC_R1_STATE_TRAN) {
++		emmc_write_error_info(EMMC_FUNCNO_READ_SECTOR,
++				      EMMC_ERR_CARD_STATE);
++		return EMMC_ERR_CARD_STATE;
++	}
++
++	return EMMC_SUCCESS;
++}
++
++EMMC_ERROR_CODE emmc_read_sector(uint32_t *buff_address_virtual,
++				 uint32_t sector_number,
++				 uint32_t count, uint32_t feature_flags)
++{
++	uint32_t trans_count;
++	uint32_t remain;
++	EMMC_ERROR_CODE result;
++	HAL_MEMCARD_DATA_TRANSFER_MODE transfer_mode;
++
++	/* parameter check */
++	if (count == 0) {
++		emmc_write_error_info(EMMC_FUNCNO_READ_SECTOR, EMMC_ERR_PARAM);
++		return EMMC_ERR_PARAM;
++	}
++
++	/* state check */
++	if (mmc_drv_obj.mount != TRUE) {
++		emmc_write_error_info(EMMC_FUNCNO_READ_SECTOR, EMMC_ERR_STATE);
++		return EMMC_ERR_STATE;
++	}
++
++	/* DMA? */
++	if ((feature_flags & LOADIMAGE_FLAGS_DMA_ENABLE) != 0) {
++		transfer_mode = HAL_MEMCARD_DMA;
++	} else {
++		transfer_mode = HAL_MEMCARD_NOT_DMA;
++	}
++
++	remain = count;
++	while (remain != 0) {
++		trans_count = MIN_EMMC(remain, EMMC_RW_SECTOR_COUNT_MAX);
++		result =
++		    emmc_multiple_block_read(buff_address_virtual,
++					     sector_number, trans_count,
++					     transfer_mode);
++		if (result != EMMC_SUCCESS) {
++			return result;
++		}
++
++		buff_address_virtual += (EMMC_BLOCK_LENGTH_DW * trans_count);
++		sector_number += trans_count;
++		remain -= trans_count;
++	}
++
++	return EMMC_SUCCESS;
++}
+diff --git a/drivers/renesas/rzg/emmc/emmc_registers.h b/drivers/renesas/rzg/emmc/emmc_registers.h
+new file mode 100644
+index 0000000..eb9f74f
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_registers.h
+@@ -0,0 +1,256 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/**
++ * @file  emmc_registers.h
++ * @brief emmc boot driver is expecting this header file. HS-MMC module header file.
++ *
++ */
++
++#ifndef EMMC_REGISTERS_H
++#define EMMC_REGISTERS_H
++
++/* ************************ HEADER (INCLUDE) SECTION *********************** */
++
++/* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
++
++/* MMC channel select */
++#define MMC_CH0		(0U)	/* SDHI2/MMC0 */
++#define MMC_CH1		(1U)	/* SDHI3/MMC1 */
++
++#define USE_MMC_CH	(MMC_CH1)
++
++#define		BIT0	(0x00000001U)
++#define		BIT1	(0x00000002U)
++#define		BIT2	(0x00000004U)
++#define		BIT3	(0x00000008U)
++#define		BIT4	(0x00000010U)
++#define		BIT5	(0x00000020U)
++#define		BIT6	(0x00000040U)
++#define		BIT7	(0x00000080U)
++#define		BIT8	(0x00000100U)
++#define		BIT9	(0x00000200U)
++#define		BIT10	(0x00000400U)
++#define		BIT11	(0x00000800U)
++#define		BIT12	(0x00001000U)
++#define		BIT13	(0x00002000U)
++#define		BIT14	(0x00004000U)
++#define		BIT15	(0x00008000U)
++#define		BIT16	(0x00010000U)
++#define		BIT17	(0x00020000U)
++#define		BIT18	(0x00040000U)
++#define		BIT19	(0x00080000U)
++#define		BIT20	(0x00100000U)
++#define		BIT21	(0x00200000U)
++#define		BIT22	(0x00400000U)
++#define		BIT23	(0x00800000U)
++#define		BIT24	(0x01000000U)
++#define		BIT25	(0x02000000U)
++#define		BIT26	(0x04000000U)
++#define		BIT27	(0x08000000U)
++#define		BIT28	(0x10000000U)
++#define		BIT29	(0x20000000U)
++#define		BIT30	(0x40000000U)
++#define		BIT31	(0x80000000U)
++
++/** @brief Clock Pulse Generator (CPG) registers
++ */
++#define	CPG_BASE		(0xE6150000U)
++
++#define	CPG_MSTPSR3		(CPG_BASE+0x0048U)	/* Module stop status register 3 */
++
++#define	CPG_SMSTPCR3		(CPG_BASE+0x013CU)	/* System module stop control register 3 */
++
++#define	CPG_SD2CKCR		(CPG_BASE+0x0268U)	/* SDHI2 clock frequency control register */
++#define CPG_SD3CKCR		(CPG_BASE+0x026CU)	/* SDHI3 clock frequency control register */
++
++#define	CPG_CPGWPR		(CPG_BASE+0x0900U)	/* CPG Write Protect Register */
++
++#if USE_MMC_CH == MMC_CH0
++#define	CPG_SDxCKCR		(CPG_SD2CKCR)	/* SDHI2/MMC0 */
++#else /* USE_MMC_CH == MMC_CH0 */
++#define	CPG_SDxCKCR		(CPG_SD3CKCR)	/* SDHI3/MMC1 */
++#endif /* USE_MMC_CH == MMC_CH0 */
++
++/** Boot Status register
++ */
++#define  MFISBTSTSR			(0xE6260604U)
++
++#define  MFISBTSTSR_BOOT_PARTITION	(0x00000010U)
++
++/** brief eMMC registers
++ */
++#define	MMC0_SD_BASE		(0xEE140000U)
++#define MMC1_SD_BASE		(0xEE160000U)
++
++#if USE_MMC_CH == MMC_CH0
++#define	MMC_SD_BASE		(MMC0_SD_BASE)
++#else /* USE_MMC_CH == MMC_CH0 */
++#define	MMC_SD_BASE		(MMC1_SD_BASE)
++#endif /* USE_MMC_CH == MMC_CH0 */
++
++#define SD_CMD			(MMC_SD_BASE + 0x0000U)
++#define SD_PORTSEL		(MMC_SD_BASE + 0x0008U)
++#define SD_ARG			(MMC_SD_BASE + 0x0010U)
++#define SD_ARG1			(MMC_SD_BASE + 0x0018U)
++#define SD_STOP			(MMC_SD_BASE + 0x0020U)
++#define SD_SECCNT		(MMC_SD_BASE + 0x0028U)
++#define SD_RSP10		(MMC_SD_BASE + 0x0030U)
++#define SD_RSP1			(MMC_SD_BASE + 0x0038U)
++#define SD_RSP32		(MMC_SD_BASE + 0x0040U)
++#define SD_RSP3			(MMC_SD_BASE + 0x0048U)
++#define SD_RSP54		(MMC_SD_BASE + 0x0050U)
++#define SD_RSP5			(MMC_SD_BASE + 0x0058U)
++#define SD_RSP76		(MMC_SD_BASE + 0x0060U)
++#define SD_RSP7			(MMC_SD_BASE + 0x0068U)
++#define SD_INFO1		(MMC_SD_BASE + 0x0070U)
++#define SD_INFO2		(MMC_SD_BASE + 0x0078U)
++#define SD_INFO1_MASK		(MMC_SD_BASE + 0x0080U)
++#define SD_INFO2_MASK		(MMC_SD_BASE + 0x0088U)
++#define SD_CLK_CTRL		(MMC_SD_BASE + 0x0090U)
++#define SD_SIZE			(MMC_SD_BASE + 0x0098U)
++#define SD_OPTION		(MMC_SD_BASE + 0x00A0U)
++#define SD_ERR_STS1		(MMC_SD_BASE + 0x00B0U)
++#define SD_ERR_STS2		(MMC_SD_BASE + 0x00B8U)
++#define SD_BUF0			(MMC_SD_BASE + 0x00C0U)
++#define SDIO_MODE		(MMC_SD_BASE + 0x00D0U)
++#define SDIO_INFO1		(MMC_SD_BASE + 0x00D8U)
++#define SDIO_INFO1_MASK		(MMC_SD_BASE + 0x00E0U)
++#define CC_EXT_MODE		(MMC_SD_BASE + 0x0360U)
++#define SOFT_RST		(MMC_SD_BASE + 0x0380U)
++#define VERSION			(MMC_SD_BASE + 0x0388U)
++#define HOST_MODE		(MMC_SD_BASE + 0x0390U)
++#define DM_CM_DTRAN_MODE	(MMC_SD_BASE + 0x0820U)
++#define DM_CM_DTRAN_CTRL	(MMC_SD_BASE + 0x0828U)
++#define DM_CM_RST		(MMC_SD_BASE + 0x0830U)
++#define DM_CM_INFO1		(MMC_SD_BASE + 0x0840U)
++#define DM_CM_INFO1_MASK	(MMC_SD_BASE + 0x0848U)
++#define DM_CM_INFO2		(MMC_SD_BASE + 0x0850U)
++#define DM_CM_INFO2_MASK	(MMC_SD_BASE + 0x0858U)
++#define DM_DTRAN_ADDR		(MMC_SD_BASE + 0x0880U)
++
++/** @brief SD_INFO1 Registers
++ */
++#define SD_INFO1_HPIRES				0x00010000UL	/* Response Reception Completion        */
++#define SD_INFO1_INFO10				0x00000400UL	/* Indicates the SDDAT3 state           */
++#define SD_INFO1_INFO9				0x00000200UL	/* SDDAT3 Card Insertion                        */
++#define SD_INFO1_INFO8				0x00000100UL	/* SDDAT3 Card Removal                          */
++#define SD_INFO1_INFO7				0x00000080UL	/* Write Protect                                        */
++#define SD_INFO1_INFO5				0x00000020UL	/* Indicates the ISDCD state            */
++#define SD_INFO1_INFO4				0x00000010UL	/* ISDCD Card Insertion                         */
++#define SD_INFO1_INFO3				0x00000008UL	/* ISDCD Card Removal                           */
++#define SD_INFO1_INFO2				0x00000004UL	/* Access end                                           */
++#define SD_INFO1_INFO0				0x00000001UL	/* Response end                                         */
++
++/** @brief SD_INFO2 Registers
++ */
++#define SD_INFO2_ILA				0x00008000UL	/* Illegal Access Error                 */
++#define SD_INFO2_CBSY				0x00004000UL	/* Command Type Register Busy   */
++#define SD_INFO2_SCLKDIVEN			0x00002000UL
++#define SD_INFO2_BWE				0x00000200UL	/* SD_BUF Write Enable                  */
++#define SD_INFO2_BRE				0x00000100UL	/* SD_BUF Read Enable                   */
++#define SD_INFO2_DAT0				0x00000080UL	/* SDDAT0                                               */
++#define SD_INFO2_ERR6				0x00000040UL	/* Response Timeout                             */
++#define SD_INFO2_ERR5				0x00000020UL	/* SD_BUF Illegal Read Access   */
++#define SD_INFO2_ERR4				0x00000010UL	/* SD_BUF Illegal Write Access  */
++#define SD_INFO2_ERR3				0x00000008UL	/* Data Timeout                                 */
++#define SD_INFO2_ERR2				0x00000004UL	/* END Error                                    */
++#define SD_INFO2_ERR1				0x00000002UL	/* CRC Error                                    */
++#define SD_INFO2_ERR0				0x00000001UL	/* CMD Error                                    */
++#define SD_INFO2_ALL_ERR			0x0000807FUL
++#define SD_INFO2_CLEAR				0x00000800UL	/* BIT11 The write value should always be 1. HWM_0003 */
++
++/** @brief SOFT_RST
++ */
++#define SOFT_RST_SDRST				0x00000001UL
++
++/** @brief SD_CLK_CTRL
++ */
++#define SD_CLK_CTRL_SDCLKOFFEN		0x00000200UL
++#define SD_CLK_CTRL_SCLKEN			0x00000100UL
++#define SD_CLK_CTRL_CLKDIV_MASK     0x000000FFUL
++#define SD_CLOCK_ENABLE             0x00000100UL
++#define SD_CLOCK_DISABLE            0x00000000UL
++#define SD_CLK_WRITE_MASK           0x000003FFUL
++#define SD_CLK_CLKDIV_CLEAR_MASK    0xFFFFFF0FUL
++
++/** @brief SD_OPTION
++ */
++#define SD_OPTION_TIMEOUT_CNT_MASK	0x000000F0UL
++
++/** @brief MMC Clock Frequency
++ * 200MHz * 1/x = output clock
++ */
++#define MMC_CLK_OFF			0UL	/* Clock output is disabled                                                             */
++#define MMC_400KHZ			512UL	/* 200MHz * 1/512 = 390 KHz                             */
++#define MMC_20MHZ			16UL	/* 200MHz * 1/16   = 12.5 MHz Normal speed mode         */
++#define MMC_26MHZ			8UL	/* 200MHz * 1/8   = 25 MHz High speed mode 26Mhz        */
++#define MMC_52MHZ			4UL	/* 200MHz * 1/4   = 50 MHz High speed mode 52Mhz        */
++#define MMC_100MHZ			2UL	/* 200MHz * 1/2   = 100 MHz                             */
++#define MMC_200MHZ			1UL	/* 200MHz * 1/1   = 200 MHz                             */
++
++#define MMC_FREQ_52MHZ		52000000UL
++#define MMC_FREQ_26MHZ		26000000UL
++#define MMC_FREQ_20MHZ		20000000UL
++
++/** @brief MMC Clock DIV
++ */
++#define MMC_SD_CLK_START	0x00000100UL	/* CLOCK On             */
++#define MMC_SD_CLK_STOP		(~0x00000100UL)	/* CLOCK stop   */
++#define MMC_SD_CLK_DIV1		0x000000FFUL	/* 1/1          */
++#define MMC_SD_CLK_DIV2		0x00000000UL	/* 1/2          */
++#define MMC_SD_CLK_DIV4		0x00000001UL	/* 1/4          */
++#define MMC_SD_CLK_DIV8		0x00000002UL	/* 1/8          */
++#define MMC_SD_CLK_DIV16	0x00000004UL	/* 1/16         */
++#define MMC_SD_CLK_DIV32	0x00000008UL	/* 1/32         */
++#define MMC_SD_CLK_DIV64	0x00000010UL	/* 1/64         */
++#define MMC_SD_CLK_DIV128	0x00000020UL	/* 1/128        */
++#define MMC_SD_CLK_DIV256	0x00000040UL	/* 1/256        */
++#define MMC_SD_CLK_DIV512	0x00000080UL	/* 1/512        */
++
++/** @brief DM_CM_DTRAN_MODE
++ */
++#define DM_CM_DTRAN_MODE_CH0		0x00000000UL	/* CH0(downstream)      */
++#define DM_CM_DTRAN_MODE_CH1		0x00010000UL	/* CH1(upstream)        */
++#define DM_CM_DTRAN_MODE_BIT_WIDTH	0x00000030UL
++
++/** @brief CC_EXT_MODE
++ */
++#define CC_EXT_MODE_DMASDRW_ENABLE	0x00000002UL	/* SD_BUF Read/Write DMA Transfer */
++#define CC_EXT_MODE_CLEAR			0x00001010UL	/* BIT 12 & 4 always 1. */
++
++/** @brief DM_CM_INFO_MASK
++ */
++#define DM_CM_INFO_MASK_CLEAR		0xFFFCFFFEUL
++#define DM_CM_INFO_CH0_ENABLE		0x00010001UL
++#define DM_CM_INFO_CH1_ENABLE		0x00020001UL
++
++/** @brief DM_DTRAN_ADDR
++ */
++#define DM_DTRAN_ADDR_WRITE_MASK	0xFFFFFFF8UL
++
++/** @brief DM_CM_DTRAN_CTRL
++ */
++#define DM_CM_DTRAN_CTRL_START		0x00000001UL
++
++/** @brief SYSC Registers
++ */
++#if USE_MMC_CH == MMC_CH0
++#define CPG_MSTP_MMC		(BIT12)	/* SDHI2/MMC0 */
++#else /* USE_MMC_CH == MMC_CH0 */
++#define CPG_MSTP_MMC		(BIT11)	/* SDHI3/MMC1 */
++#endif /* USE_MMC_CH == MMC_CH0 */
++
++/* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
++
++/* ********************** DECLARATION OF EXTERNAL DATA ********************* */
++
++/* ************************** FUNCTION PROTOTYPES ************************** */
++
++/* ********************************* CODE ********************************** */
++
++#endif /* EMMC_REGISTERS_H */
++/* ******************************** END ************************************ */
+diff --git a/drivers/renesas/rzg/emmc/emmc_std.h b/drivers/renesas/rzg/emmc/emmc_std.h
+new file mode 100644
+index 0000000..dbe9d9b
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_std.h
+@@ -0,0 +1,474 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/**
++ * @file  emmc_std.h
++ * @brief eMMC boot is expecting this header file
++ *
++ */
++
++#ifndef EMMC_STD_H
++#define EMMC_STD_H
++
++#include "emmc_hal.h"
++
++/* ************************ HEADER (INCLUDE) SECTION *********************** */
++
++/* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
++#ifndef FALSE
++#define FALSE	0U
++#endif
++#ifndef TRUE
++#define TRUE	1U
++#endif
++
++/** @brief 64bit registers
++ **/
++#define SETR_64(r, v)                   (*(volatile uint64_t *)(r) = (v))
++#define GETR_64(r)                      (*(volatile uint64_t *)(r))
++
++/** @brief 32bit registers
++ **/
++#define SETR_32(r, v)                   (*(volatile uint32_t *)(r) = (v))
++#define GETR_32(r)                      (*(volatile uint32_t *)(r))
++
++/** @brief 16bit registers
++ */
++#define SETR_16(r, v)                   (*(volatile uint16_t *)(r) = (v))
++#define GETR_16(r)                      (*(volatile uint16_t *)(r))
++
++/** @brief 8bit registers
++ */
++#define SETR_8(r, v)                    (*(volatile uint8_t *)(r) = (v))
++#define GETR_8(r)                       (*(volatile uint8_t *)(r))
++
++/** @brief CSD register Macros
++ */
++#define EMMC_GET_CID(x, y) (emmc_bit_field(mmc_drv_obj.cid_data, (x), (y)))
++
++#define EMMC_CID_MID()			(EMMC_GET_CID(127, 120))
++#define EMMC_CID_CBX()			(EMMC_GET_CID(113, 112))
++#define EMMC_CID_OID()			(EMMC_GET_CID(111, 104))
++#define EMMC_CID_PNM1()			(EMMC_GET_CID(103, 88))
++#define EMMC_CID_PNM2()			(EMMC_GET_CID(87, 56))
++#define EMMC_CID_PRV()			(EMMC_GET_CID(55, 48))
++#define EMMC_CID_PSN()			(EMMC_GET_CID(47, 16))
++#define EMMC_CID_MDT()			(EMMC_GET_CID(15, 8))
++#define EMMC_CID_CRC()			(EMMC_GET_CID(7, 1))
++
++/** @brief CSD register Macros
++ */
++#define EMMC_GET_CSD(x, y) (emmc_bit_field(mmc_drv_obj.csd_data, (x), (y)))
++
++#define EMMC_CSD_CSD_STRUCTURE()        (EMMC_GET_CSD(127, 126))
++#define EMMC_CSD_SPEC_VARS()            (EMMC_GET_CSD(125, 122))
++#define EMMC_CSD_TAAC()                 (EMMC_GET_CSD(119, 112))
++#define EMMC_CSD_NSAC()                 (EMMC_GET_CSD(111, 104))
++#define EMMC_CSD_TRAN_SPEED()           (EMMC_GET_CSD(103, 96))
++#define EMMC_CSD_CCC()                  (EMMC_GET_CSD(95, 84))
++#define EMMC_CSD_READ_BL_LEN()          (EMMC_GET_CSD(83, 80))
++#define EMMC_CSD_READ_BL_PARTIAL()      (EMMC_GET_CSD(79, 79))
++#define EMMC_CSD_WRITE_BLK_MISALIGN()   (EMMC_GET_CSD(78, 78))
++#define EMMC_CSD_READ_BLK_MISALIGN()    (EMMC_GET_CSD(77, 77))
++#define EMMC_CSD_DSR_IMP()              (EMMC_GET_CSD(76, 76))
++#define EMMC_CSD_C_SIZE()               (EMMC_GET_CSD(73, 62))
++#define EMMC_CSD_VDD_R_CURR_MIN()       (EMMC_GET_CSD(61, 59))
++#define EMMC_CSD_VDD_R_CURR_MAX()       (EMMC_GET_CSD(58, 56))
++#define EMMC_CSD_VDD_W_CURR_MIN()       (EMMC_GET_CSD(55, 53))
++#define EMMC_CSD_VDD_W_CURR_MAX()       (EMMC_GET_CSD(52, 50))
++#define EMMC_CSD_C_SIZE_MULT()          (EMMC_GET_CSD(49, 47))
++#define EMMC_CSD_ERASE_GRP_SIZE()       (EMMC_GET_CSD(46, 42))
++#define EMMC_CSD_ERASE_GRP_MULT()       (EMMC_GET_CSD(41, 37))
++#define EMMC_CSD_WP_GRP_SIZE()          (EMMC_GET_CSD(36, 32))
++#define EMMC_CSD_WP_GRP_ENABLE()        (EMMC_GET_CSD(31, 31))
++#define EMMC_CSD_DEFALT_ECC()           (EMMC_GET_CSD(30, 29))
++#define EMMC_CSD_R2W_FACTOR()           (EMMC_GET_CSD(28, 26))
++#define EMMC_CSD_WRITE_BL_LEN()         (EMMC_GET_CSD(25, 22))
++#define EMMC_CSD_WRITE_BL_PARTIAL()     (EMMC_GET_CSD(21, 21))
++#define EMMC_CSD_CONTENT_PROT_APP()     (EMMC_GET_CSD(16, 16))
++#define EMMC_CSD_FILE_FORMAT_GRP()      (EMMC_GET_CSD(15, 15))
++#define EMMC_CSD_COPY()                 (EMMC_GET_CSD(14, 14))
++#define EMMC_CSD_PERM_WRITE_PROTECT()   (EMMC_GET_CSD(13, 13))
++#define EMMC_CSD_TMP_WRITE_PROTECT()    (EMMC_GET_CSD(12, 12))
++#define EMMC_CSD_FILE_FORMAT()          (EMMC_GET_CSD(11, 10))
++#define EMMC_CSD_ECC()                  (EMMC_GET_CSD(9, 8))
++#define EMMC_CSD_CRC()                  (EMMC_GET_CSD(7, 1))
++
++/** @brief for sector access
++ */
++#define EMMC_4B_BOUNDARY_CHECK_MASK         0x00000003
++#define EMMC_SECTOR_SIZE_SHIFT              9U	/* 512 = 2^9 */
++#define EMMC_SECTOR_SIZE                    512
++#define EMMC_BLOCK_LENGTH                   512
++#define EMMC_BLOCK_LENGTH_DW                128
++#define EMMC_BUF_SIZE_SHIFT                 3U	/* 8byte = 2^3 */
++
++/** @brief eMMC specification clock
++ */
++#define EMMC_CLOCK_SPEC_400K                400000UL	 /**< initialize clock 400KHz */
++#define EMMC_CLOCK_SPEC_20M                 20000000UL	 /**< normal speed 20MHz */
++#define EMMC_CLOCK_SPEC_26M                 26000000UL	 /**< high speed 26MHz */
++#define EMMC_CLOCK_SPEC_52M                 52000000UL	 /**< high speed 52MHz */
++#define EMMC_CLOCK_SPEC_100M                100000000UL	 /**< high speed 100MHz */
++
++/** @brief EMMC driver error code. (extended HAL_MEMCARD_RETURN)
++ */
++typedef enum {
++	EMMC_ERR = 0,				/**< unknown error */
++	EMMC_SUCCESS,				/**< OK */
++	EMMC_ERR_FROM_DMAC,			/**< DMAC allocation error */
++	EMMC_ERR_FROM_DMAC_TRANSFER,		/**< DMAC transfer error */
++	EMMC_ERR_CARD_STATUS_BIT,		/**< card status error. Non-masked error bit was set in the card status */
++	EMMC_ERR_CMD_TIMEOUT,			/**< command timeout error */
++	EMMC_ERR_DATA_TIMEOUT,			/**< data timeout error */
++	EMMC_ERR_CMD_CRC,			/**< command CRC error */
++	EMMC_ERR_DATA_CRC,			/**< data CRC error */
++	EMMC_ERR_PARAM,				/**< parameter error */
++	EMMC_ERR_RESPONSE,			/**< response error */
++	EMMC_ERR_RESPONSE_BUSY,			/**< response busy error */
++	EMMC_ERR_TRANSFER,			/**< data transfer error */
++	EMMC_ERR_READ_SECTOR,			/**< read sector error */
++	EMMC_ERR_WRITE_SECTOR,			/**< write sector error */
++	EMMC_ERR_STATE,				/**< state error */
++	EMMC_ERR_TIMEOUT,			/**< timeout error */
++	EMMC_ERR_ILLEGAL_CARD,			/**< illegal card */
++	EMMC_ERR_CARD_BUSY,			/**< Busy state */
++	EMMC_ERR_CARD_STATE,			/**< card state error */
++	EMMC_ERR_SET_TRACE,			/**< trace information error */
++	EMMC_ERR_FROM_TIMER,			/**< Timer error */
++	EMMC_ERR_FORCE_TERMINATE,		/**< Force terminate */
++	EMMC_ERR_CARD_POWER,			/**< card power fail */
++	EMMC_ERR_ERASE_SECTOR,			/**< erase sector error */
++	EMMC_ERR_INFO2				    /**< exec cmd error info2 */
++} EMMC_ERROR_CODE;
++
++/** @brief Function number */
++#define EMMC_FUNCNO_NONE						0U
++#define EMMC_FUNCNO_DRIVER_INIT						1U
++#define EMMC_FUNCNO_CARD_POWER_ON					2U
++#define EMMC_FUNCNO_MOUNT						3U
++#define EMMC_FUNCNO_CARD_INIT						4U
++#define EMMC_FUNCNO_HIGH_SPEED						5U
++#define EMMC_FUNCNO_BUS_WIDTH						6U
++#define EMMC_FUNCNO_MULTI_BOOT_SELECT_PARTITION				7U
++#define EMMC_FUNCNO_MULTI_BOOT_READ_SECTOR				8U
++#define EMMC_FUNCNO_TRANS_DATA_READ_SECTOR				9U
++#define EMMC_FUNCNO_UBOOT_IMAGE_SELECT_PARTITION			10U
++#define EMMC_FUNCNO_UBOOT_IMAGE_READ_SECTOR				11U
++#define EMMC_FUNCNO_SET_CLOCK						12U
++#define EMMC_FUNCNO_EXEC_CMD						13U
++#define EMMC_FUNCNO_READ_SECTOR						14U
++#define EMMC_FUNCNO_WRITE_SECTOR					15U
++#define EMMC_FUNCNO_ERASE_SECTOR					16U
++#define EMMC_FUNCNO_GET_PERTITION_ACCESS				17U
++/** @brief Response
++ */
++/** R1 */
++#define EMMC_R1_ERROR_MASK                      0xFDBFE080U	/* Type 'E' bit and bit14(must be 0). ignore bit22 */
++#define EMMC_R1_ERROR_MASK_WITHOUT_CRC          (0xFD3FE080U)	/* Ignore bit23 (Not check CRC error) */
++#define EMMC_R1_STATE_MASK                      0x00001E00U	/* [12:9] */
++#define EMMC_R1_READY                           0x00000100U	/* bit8 */
++#define EMMC_R1_STATE_SHIFT                     9
++
++/** R4 */
++#define EMMC_R4_RCA_MASK                        0xFFFF0000UL
++#define EMMC_R4_STATUS                          0x00008000UL
++
++/** CSD */
++#define EMMC_TRANSPEED_FREQ_UNIT_MASK           0x07	/* bit[2:0] */
++#define EMMC_TRANSPEED_FREQ_UNIT_SHIFT          0
++#define EMMC_TRANSPEED_MULT_MASK                0x78	/* bit[6:3] */
++#define EMMC_TRANSPEED_MULT_SHIFT               3
++
++/** OCR */
++#define EMMC_HOST_OCR_VALUE                     0x40FF8080
++#define EMMC_OCR_STATUS_BIT                     0x80000000L	/* Card power up status bit */
++#define EMMC_OCR_ACCESS_MODE_MASK               0x60000000L	/* bit[30:29] */
++#define EMMC_OCR_ACCESS_MODE_SECT               0x40000000L
++#define EMMC_OCR_ACCESS_MODE_BYTE               0x00000000L
++
++/** EXT_CSD */
++#define EMMC_EXT_CSD_S_CMD_SET                      504
++#define EMMC_EXT_CSD_INI_TIMEOUT_AP                 241
++#define EMMC_EXT_CSD_PWR_CL_DDR_52_360              239
++#define EMMC_EXT_CSD_PWR_CL_DDR_52_195              238
++#define EMMC_EXT_CSD_MIN_PERF_DDR_W_8_52            235
++#define EMMC_EXT_CSD_MIN_PERF_DDR_R_8_52            234
++#define EMMC_EXT_CSD_TRIM_MULT                      232
++#define EMMC_EXT_CSD_SEC_FEATURE_SUPPORT            231
++#define EMMC_EXT_CSD_SEC_ERASE_MULT                 229
++#define EMMC_EXT_CSD_BOOT_INFO                      228
++#define EMMC_EXT_CSD_BOOT_SIZE_MULTI                226
++#define EMMC_EXT_CSD_ACC_SIZE                       225
++#define EMMC_EXT_CSD_HC_ERASE_GRP_SIZE              224
++#define EMMC_EXT_CSD_ERASE_TIMEOUT_MULT             223
++#define EMMC_EXT_CSD_PEL_WR_SEC_C                   222
++#define EMMC_EXT_CSD_HC_WP_GRP_SIZE                 221
++#define EMMC_EXT_CSD_S_C_VCC                        220
++#define EMMC_EXT_CSD_S_C_VCCQ                       219
++#define EMMC_EXT_CSD_S_A_TIMEOUT                    217
++#define EMMC_EXT_CSD_SEC_COUNT                      215
++#define EMMC_EXT_CSD_MIN_PERF_W_8_52                210
++#define EMMC_EXT_CSD_MIN_PERF_R_8_52                209
++#define EMMC_EXT_CSD_MIN_PERF_W_8_26_4_52           208
++#define EMMC_EXT_CSD_MIN_PERF_R_8_26_4_52           207
++#define EMMC_EXT_CSD_MIN_PERF_W_4_26                206
++#define EMMC_EXT_CSD_MIN_PERF_R_4_26                205
++#define EMMC_EXT_CSD_PWR_CL_26_360                  203
++#define EMMC_EXT_CSD_PWR_CL_52_360                  202
++#define EMMC_EXT_CSD_PWR_CL_26_195                  201
++#define EMMC_EXT_CSD_PWR_CL_52_195                  200
++#define EMMC_EXT_CSD_CARD_TYPE                      196
++#define EMMC_EXT_CSD_CSD_STRUCTURE                  194
++#define EMMC_EXT_CSD_EXT_CSD_REV                    192
++#define EMMC_EXT_CSD_CMD_SET                        191
++#define EMMC_EXT_CSD_CMD_SET_REV                    189
++#define EMMC_EXT_CSD_POWER_CLASS                    187
++#define EMMC_EXT_CSD_HS_TIMING                      185
++#define EMMC_EXT_CSD_BUS_WIDTH                      183
++#define EMMC_EXT_CSD_ERASED_MEM_CONT                181
++#define EMMC_EXT_CSD_PARTITION_CONFIG               179
++#define EMMC_EXT_CSD_BOOT_CONFIG_PROT               178
++#define EMMC_EXT_CSD_BOOT_BUS_WIDTH                 177
++#define EMMC_EXT_CSD_ERASE_GROUP_DEF                175
++#define EMMC_EXT_CSD_BOOT_WP                        173
++#define EMMC_EXT_CSD_USER_WP                        171
++#define EMMC_EXT_CSD_FW_CONFIG                      169
++#define EMMC_EXT_CSD_RPMB_SIZE_MULT                 168
++#define EMMC_EXT_CSD_RST_n_FUNCTION                 162
++#define EMMC_EXT_CSD_PARTITIONING_SUPPORT           160
++#define EMMC_EXT_CSD_MAX_ENH_SIZE_MULT              159
++#define EMMC_EXT_CSD_PARTITIONS_ATTRIBUTE           156
++#define EMMC_EXT_CSD_PARTITION_SETTING_COMPLETED    155
++#define EMMC_EXT_CSD_GP_SIZE_MULT                   154
++#define EMMC_EXT_CSD_ENH_SIZE_MULT                  142
++#define EMMC_EXT_CSD_ENH_START_ADDR                 139
++#define EMMC_EXT_CSD_SEC_BAD_BLK_MGMNT              134
++
++#define EMMC_EXT_CSD_CARD_TYPE_26MHZ                0x01
++#define EMMC_EXT_CSD_CARD_TYPE_52MHZ                0x02
++#define EMMC_EXT_CSD_CARD_TYPE_DDR_52MHZ_12V        0x04
++#define EMMC_EXT_CSD_CARD_TYPE_DDR_52MHZ_18V        0x08
++#define EMMC_EXT_CSD_CARD_TYPE_52MHZ_MASK           0x0e
++
++/** SWITCH (CMD6) argument */
++#define	EXTCSD_ACCESS_BYTE	(BIT25|BIT24)
++#define	EXTCSD_SET_BITS		BIT24
++
++#define	HS_TIMING_ADD		(185<<16)	/* H'b9 */
++#define	HS_TIMING_1			(1<<8)
++#define	HS_TIMING_HS200		(2<<8)
++#define	HS_TIMING_HS400		(3<<8)
++
++#define	BUS_WIDTH_ADD		(183<<16)	/* H'b7 */
++#define	BUS_WIDTH_1			(0<<8)
++#define	BUS_WIDTH_4			(1<<8)
++#define	BUS_WIDTH_8			(2<<8)
++#define	BUS_WIDTH_4DDR		(5<<8)
++#define	BUS_WIDTH_8DDR		(6<<8)
++
++#define EMMC_SWITCH_HS_TIMING           (EXTCSD_ACCESS_BYTE|HS_TIMING_ADD|HS_TIMING_1)		/**< H'03b90100 */
++#define	EMMC_SWITCH_HS_TIMING_OFF	    (EXTCSD_ACCESS_BYTE|HS_TIMING_ADD)					/**< H'03b90000 */
++
++#define EMMC_SWITCH_BUS_WIDTH_1         (EXTCSD_ACCESS_BYTE|BUS_WIDTH_ADD|BUS_WIDTH_1)		/**< H'03b70000 */
++#define EMMC_SWITCH_BUS_WIDTH_4         (EXTCSD_ACCESS_BYTE|BUS_WIDTH_ADD|BUS_WIDTH_4)		/**< H'03b70100 */
++#define EMMC_SWITCH_BUS_WIDTH_8         (EXTCSD_ACCESS_BYTE|BUS_WIDTH_ADD|BUS_WIDTH_8)		/**< H'03b70200 */
++#define	EMMC_SWITCH_BUS_WIDTH_4DDR      (EXTCSD_ACCESS_BYTE|BUS_WIDTH_ADD|BUS_WIDTH_4DDR)	/**< H'03b70500 */
++#define	EMMC_SWITCH_BUS_WIDTH_8DDR      (EXTCSD_ACCESS_BYTE|BUS_WIDTH_ADD|BUS_WIDTH_8DDR)	/**< H'03b70600 */
++#define EMMC_SWITCH_PARTITION_CONFIG    0x03B30000UL	/**< Partition config = 0x00 */
++
++#define TIMING_HIGH_SPEED					1UL
++#define EMMC_BOOT_PARTITION_EN_MASK	0x38U
++#define EMMC_BOOT_PARTITION_EN_SHIFT	3U
++
++/** Bus width */
++#define EMMC_BUSWIDTH_1BIT              CE_CMD_SET_DATW_1BIT
++#define EMMC_BUSWIDTH_4BIT              CE_CMD_SET_DATW_4BIT
++#define EMMC_BUSWIDTH_8BIT              CE_CMD_SET_DATW_8BIT
++
++/** for st_mmc_base */
++#define EMMC_MAX_RESPONSE_LENGTH        17
++#define EMMC_MAX_CID_LENGTH             16
++#define EMMC_MAX_CSD_LENGTH             16
++#define EMMC_MAX_EXT_CSD_LENGTH         512U
++#define EMMC_RES_REG_ALIGNED            4U
++#define EMMC_BUF_REG_ALIGNED            8U
++
++/** @brief for TAAC mask
++ */
++#define TAAC_TIME_UNIT_MASK         (0x07)
++#define TAAC_MULTIPLIER_FACTOR_MASK (0x0F)
++
++/* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
++
++/** @brief Partition id
++ */
++typedef enum {
++	PARTITION_ID_USER = 0x0,    /**< User Area */
++	PARTITION_ID_BOOT_1 = 0x1,  /**< boot partition 1 */
++	PARTITION_ID_BOOT_2 = 0x2,  /**< boot partition 2 */
++	PARTITION_ID_RPMB = 0x3,    /**< Replay Protected Memory Block */
++	PARTITION_ID_GP_1 = 0x4,    /**< General Purpose partition 1 */
++	PARTITION_ID_GP_2 = 0x5,    /**< General Purpose partition 2 */
++	PARTITION_ID_GP_3 = 0x6,    /**< General Purpose partition 3 */
++	PARTITION_ID_GP_4 = 0x7,    /**< General Purpose partition 4 */
++	PARTITION_ID_MASK = 0x7	    /**< [2:0] */
++} EMMC_PARTITION_ID;
++
++/** @brief card state in R1 response [12:9]
++ */
++typedef enum {
++	EMMC_R1_STATE_IDLE = 0,
++	EMMC_R1_STATE_READY,
++	EMMC_R1_STATE_IDENT,
++	EMMC_R1_STATE_STBY,
++	EMMC_R1_STATE_TRAN,
++	EMMC_R1_STATE_DATA,
++	EMMC_R1_STATE_RCV,
++	EMMC_R1_STATE_PRG,
++	EMMC_R1_STATE_DIS,
++	EMMC_R1_STATE_BTST,
++	EMMC_R1_STATE_SLEP
++} EMMC_R1_STATE;
++
++typedef enum {
++	ESTATE_BEGIN = 0,
++	ESTATE_ISSUE_CMD,
++	ESTATE_NON_RESP_CMD,
++	ESTATE_RCV_RESP,
++	ESTATE_RCV_RESPONSE_BUSY,
++	ESTATE_CHECK_RESPONSE_COMPLETE,
++	ESTATE_DATA_TRANSFER,
++	ESTATE_DATA_TRANSFER_COMPLETE,
++	ESTATE_ACCESS_END,
++	ESTATE_TRANSFER_ERROR,
++	ESTATE_ERROR,
++	ESTATE_END
++} EMMC_INT_STATE;
++
++/** @brief eMMC boot driver error information
++ */
++typedef struct {
++	uint16_t num;		  /**< error no */
++	uint16_t code;		  /**< error code */
++	volatile uint32_t info1;  /**< SD_INFO1 register value. (hardware dependence) */
++	volatile uint32_t info2;  /**< SD_INFO2 register value. (hardware dependence) */
++	volatile uint32_t status1;/**< SD_ERR_STS1 register value. (hardware dependence) */
++	volatile uint32_t status2;/**< SD_ERR_STS2 register value. (hardware dependence) */
++	volatile uint32_t dm_info1;/**< DM_CM_INFO1 register value. (hardware dependence) */
++	volatile uint32_t dm_info2;/**< DM_CM_INFO2 register value. (hardware dependence) */
++} st_error_info;
++
++/** @brief Command information
++ */
++typedef struct {
++	HAL_MEMCARD_COMMAND cmd;	/**< Command information */
++	uint32_t arg;			  /**< argument */
++	HAL_MEMCARD_OPERATION dir;	/**< direction */
++	uint32_t hw;			  /**< H/W dependence. SD_CMD register value. */
++} st_command_info;
++
++/** @brief MMC driver base
++ */
++typedef struct {
++	st_error_info error_info;	/**< error information */
++	st_command_info cmd_info;	/**< command information */
++
++	/* for data transfer */
++	uint32_t *buff_address_virtual;	   /**< Dest or Src buff */
++	uint32_t *buff_address_physical;   /**< Dest or Src buff */
++	HAL_MEMCARD_DATA_WIDTH bus_width;
++					/**< bus width */
++	uint32_t trans_size;		  /**< transfer size for this command */
++	uint32_t remain_size;		  /**< remain size for this command */
++	uint32_t response_length;	  /**< response length for this command */
++	uint32_t sector_size;		   /**< sector_size */
++
++	/* clock */
++	uint32_t base_clock;		  /**< MMC host controller clock */
++	uint32_t max_freq;		  /**< Max frequency (Card Spec)[Hz]. It changes dynamically by CSD and EXT_CSD. */
++	uint32_t request_freq;		  /**< request freq [Hz] (400K, 26MHz, 52MHz, etc) */
++	uint32_t current_freq;		  /**< current MMC clock[Hz] (the closest frequency supported by HW) */
++
++	/* state flag */
++	HAL_MEMCARD_PRESENCE_STATUS card_present;
++						/**< presence status of the memory card */
++	uint32_t card_power_enable;		  /**< True : Power ON */
++	uint32_t clock_enable;			  /**< True : Clock ON */
++	uint32_t initialize;			  /**< True : initialize complete. */
++	uint32_t access_mode;			  /**< True : sector access, FALSE : byte access */
++	uint32_t mount;				  /**< True : mount complete. */
++	uint32_t selected;			  /**< True : selected card. */
++	HAL_MEMCARD_DATA_TRANSFER_MODE transfer_mode;
++						    /**< 0: DMA, 1:PIO */
++	uint32_t image_num;			  /**< loaded ISSW image No. ISSW have copy image. */
++	EMMC_R1_STATE current_state;		/**< card state */
++	volatile uint32_t during_cmd_processing;  /**< True : during command processing */
++	volatile uint32_t during_transfer;	  /**< True : during transfer */
++	volatile uint32_t during_dma_transfer;	  /**< True : during transfer (DMA)*/
++	volatile uint32_t dma_error_flag;	  /**< True : occurred DMAC error */
++	volatile uint32_t force_terminate;	  /**< force terminate flag */
++	volatile uint32_t state_machine_blocking; /**< state machine blocking flag : True or False */
++	volatile uint32_t get_partition_access_flag;
++						  /**< True : get partition access processing */
++
++	EMMC_PARTITION_ID boot_partition_en;	/**< Boot partition */
++	EMMC_PARTITION_ID partition_access;	/**< Current access partition */
++
++	/* timeout */
++	uint32_t hs_timing;			/**< high speed */
++
++	/* timeout */
++	uint32_t data_timeout;			  /**< read and write data timeout.*/
++
++	/* retry */
++	uint32_t retries_after_fail;  /**< how many times to try after fail, for instance sending command */
++
++	/* interrupt */
++	volatile uint32_t int_event1; /**< interrupt SD_INFO1 Event */
++	volatile uint32_t int_event2;	  /**< interrupt SD_INFO2 Event */
++	volatile uint32_t dm_event1;  /**< interrupt DM_CM_INFO1 Event */
++	volatile uint32_t dm_event2;	  /**< interrupt DM_CM_INFO2 Event */
++
++	/* response */
++	uint32_t *response;	      /**< pointer to buffer for executing command. */
++	uint32_t r1_card_status;      /**< R1 response data */
++	uint32_t r3_ocr;	      /**< R3 response data */
++	uint32_t r4_resp;	      /**< R4 response data */
++	uint32_t r5_resp;	      /**< R5 response data */
++
++	uint32_t low_clock_mode_enable;
++				      /**< True : clock mode is low. (MMC clock = Max26MHz) */
++	uint32_t reserved2;
++	uint32_t reserved3;
++	uint32_t reserved4;
++
++	/* CSD registers (4byte align) */
++	uint8_t csd_data[EMMC_MAX_CSD_LENGTH]		      /**< CSD */
++	    __attribute__ ((aligned(EMMC_RES_REG_ALIGNED)));
++	/* CID registers (4byte align) */
++	uint8_t cid_data[EMMC_MAX_CID_LENGTH]		      /**< CID */
++	    __attribute__ ((aligned(EMMC_RES_REG_ALIGNED)));
++	/* EXT CSD registers (8byte align) */
++	uint8_t ext_csd_data[EMMC_MAX_EXT_CSD_LENGTH]	      /**< EXT_CSD */
++	    __attribute__ ((aligned(EMMC_BUF_REG_ALIGNED)));
++	/* Response registers (4byte align) */
++	uint8_t response_data[EMMC_MAX_RESPONSE_LENGTH]	      /**< other response */
++	    __attribute__ ((aligned(EMMC_RES_REG_ALIGNED)));
++} st_mmc_base;
++
++typedef int (*func) (void);
++
++/* ********************** DECLARATION OF EXTERNAL DATA ********************* */
++
++/* ************************** FUNCTION PROTOTYPES ************************** */
++uint32_t emmc_get_csd_time(void);
++
++#define MMC_DEBUG
++/* ********************************* CODE ********************************** */
++
++/* ******************************** END ************************************ */
++#endif /* EMMC_STD_H */
+diff --git a/drivers/renesas/rzg/emmc/emmc_utility.c b/drivers/renesas/rzg/emmc/emmc_utility.c
+new file mode 100644
+index 0000000..1636dc5
+--- /dev/null
++++ b/drivers/renesas/rzg/emmc/emmc_utility.c
+@@ -0,0 +1,226 @@
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/debug.h>
++
++#include "emmc_config.h"
++#include "emmc_hal.h"
++#include "emmc_std.h"
++#include "emmc_registers.h"
++#include "emmc_def.h"
++
++static const uint32_t cmd_reg_hw[EMMC_CMD_MAX + 1] = {
++	0x00000000,		/* CMD0 */
++	0x00000701,		/* CMD1 */
++	0x00000002,		/* CMD2 */
++	0x00000003,		/* CMD3 */
++	0x00000004,		/* CMD4 */
++	0x00000505,		/* CMD5 */
++	0x00000406,		/* CMD6 */
++	0x00000007,		/* CMD7 */
++	0x00001C08,		/* CMD8 */
++	0x00000009,		/* CMD9 */
++	0x0000000A,		/* CMD10 */
++	0x00000000,		/* reserved */
++	0x0000000C,		/* CMD12 */
++	0x0000000D,		/* CMD13 */
++	0x00001C0E,		/* CMD14 */
++	0x0000000F,		/* CMD15 */
++	0x00000010,		/* CMD16 */
++	0x00000011,		/* CMD17 */
++	0x00007C12,		/* CMD18 */
++	0x00000C13,		/* CMD19 */
++	0x00000000,
++	0x00001C15,		/* CMD21 */
++	0x00000000,
++	0x00000017,		/* CMD23 */
++	0x00000018,		/* CMD24 */
++	0x00006C19,		/* CMD25 */
++	0x00000C1A,		/* CMD26 */
++	0x0000001B,		/* CMD27 */
++	0x0000001C,		/* CMD28 */
++	0x0000001D,		/* CMD29 */
++	0x0000001E,		/* CMD30 */
++	0x00001C1F,		/* CMD31 */
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000423,		/* CMD35 */
++	0x00000424,		/* CMD36 */
++	0x00000000,
++	0x00000026,		/* CMD38 */
++	0x00000427,		/* CMD39 */
++	0x00000428,		/* CMD40(send cmd) */
++	0x00000000,
++	0x0000002A,		/* CMD42 */
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000C31,
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00007C35,
++	0x00006C36,
++	0x00000037,		/* CMD55 */
++	0x00000038,		/* CMD56(Read) */
++	0x00000000,
++	0x00000000,
++	0x00000000,
++	0x00000000
++};
++
++uint32_t emmc_bit_field(uint8_t *data, uint32_t top, uint32_t bottom)
++{
++	uint32_t value;
++
++	uint32_t index_top = (uint32_t) (15 - (top >> 3));
++	uint32_t index_bottom = (uint32_t) (15 - (bottom >> 3));
++
++	if (index_top == index_bottom) {
++		value = data[index_top];
++	} else if ((index_top + 1) == index_bottom) {
++		value =
++		    (uint32_t) ((data[index_top] << 8) | data[index_bottom]);
++	} else if ((index_top + 2) == index_bottom) {
++		value =
++		    (uint32_t) ((data[index_top] << 16) |
++				(data[index_top + 1] << 8) | data[index_top +
++								  2]);
++	} else {
++		value =
++		    (uint32_t) ((data[index_top] << 24) |
++				(data[index_top + 1] << 16) |
++				(data[index_top + 2] << 8) | data[index_top +
++								  3]);
++	}
++
++	value = ((value >> (bottom & 0x07)) & ((1 << (top - bottom + 1)) - 1));
++
++	return value;
++}
++
++void emmc_write_error_info(uint16_t func_no, EMMC_ERROR_CODE error_code)
++{
++
++	mmc_drv_obj.error_info.num = func_no;
++	mmc_drv_obj.error_info.code = (uint16_t) error_code;
++
++	ERROR("BL2: emmc err:func_no=0x%x code=0x%x\n", func_no, error_code);
++}
++
++void emmc_write_error_info_func_no(uint16_t func_no)
++{
++
++	mmc_drv_obj.error_info.num = func_no;
++
++	ERROR("BL2: emmc err:func_no=0x%x\n", func_no);
++}
++
++void emmc_make_nontrans_cmd(HAL_MEMCARD_COMMAND cmd, uint32_t arg)
++{
++	/* command information */
++	mmc_drv_obj.cmd_info.cmd = cmd;
++	mmc_drv_obj.cmd_info.arg = arg;
++	mmc_drv_obj.cmd_info.dir = HAL_MEMCARD_READ;
++	mmc_drv_obj.cmd_info.hw =
++	    cmd_reg_hw[cmd & HAL_MEMCARD_COMMAND_INDEX_MASK];
++
++	/* clear data transfer information */
++	mmc_drv_obj.trans_size = 0;
++	mmc_drv_obj.remain_size = 0;
++	mmc_drv_obj.buff_address_virtual = NULL;
++	mmc_drv_obj.buff_address_physical = NULL;
++
++	/* response information */
++	mmc_drv_obj.response_length = 6;
++
++	switch (mmc_drv_obj.cmd_info.cmd & HAL_MEMCARD_RESPONSE_TYPE_MASK) {
++	case HAL_MEMCARD_RESPONSE_NONE:
++		mmc_drv_obj.response = (uint32_t *) mmc_drv_obj.response_data;
++		mmc_drv_obj.response_length = 0;
++		break;
++	case HAL_MEMCARD_RESPONSE_R1:
++		mmc_drv_obj.response = &mmc_drv_obj.r1_card_status;
++		break;
++	case HAL_MEMCARD_RESPONSE_R1b:
++		mmc_drv_obj.cmd_info.hw |= BIT10;	/* bit10 = R1 busy bit */
++		mmc_drv_obj.response = &mmc_drv_obj.r1_card_status;
++		break;
++	case HAL_MEMCARD_RESPONSE_R2:
++		mmc_drv_obj.response = (uint32_t *) mmc_drv_obj.response_data;
++		mmc_drv_obj.response_length = 17;
++		break;
++	case HAL_MEMCARD_RESPONSE_R3:
++		mmc_drv_obj.response = &mmc_drv_obj.r3_ocr;
++		break;
++	case HAL_MEMCARD_RESPONSE_R4:
++		mmc_drv_obj.response = &mmc_drv_obj.r4_resp;
++		break;
++	case HAL_MEMCARD_RESPONSE_R5:
++		mmc_drv_obj.response = &mmc_drv_obj.r5_resp;
++		break;
++	default:
++		mmc_drv_obj.response = (uint32_t *) mmc_drv_obj.response_data;
++		break;
++	}
++}
++
++void emmc_make_trans_cmd(HAL_MEMCARD_COMMAND cmd, uint32_t arg,
++			 uint32_t *buff_address_virtual,
++			 uint32_t len,
++			 HAL_MEMCARD_OPERATION dir,
++			 HAL_MEMCARD_DATA_TRANSFER_MODE transfer_mode)
++{
++	emmc_make_nontrans_cmd(cmd, arg);	/* update common information */
++
++	/* for data transfer command */
++	mmc_drv_obj.cmd_info.dir = dir;
++	mmc_drv_obj.buff_address_virtual = buff_address_virtual;
++	mmc_drv_obj.buff_address_physical = buff_address_virtual;
++	mmc_drv_obj.trans_size = len;
++	mmc_drv_obj.remain_size = len;
++	mmc_drv_obj.transfer_mode = transfer_mode;
++}
++
++EMMC_ERROR_CODE emmc_send_idle_cmd(uint32_t arg)
++{
++	EMMC_ERROR_CODE result;
++	uint32_t freq;
++
++	/* initialize state */
++	mmc_drv_obj.mount = FALSE;
++	mmc_drv_obj.selected = FALSE;
++	mmc_drv_obj.during_transfer = FALSE;
++	mmc_drv_obj.during_cmd_processing = FALSE;
++	mmc_drv_obj.during_dma_transfer = FALSE;
++	mmc_drv_obj.dma_error_flag = FALSE;
++	mmc_drv_obj.force_terminate = FALSE;
++	mmc_drv_obj.state_machine_blocking = FALSE;
++
++	mmc_drv_obj.bus_width = HAL_MEMCARD_DATA_WIDTH_1_BIT;
++	mmc_drv_obj.max_freq = MMC_20MHZ;	/* 20MHz */
++	mmc_drv_obj.current_state = EMMC_R1_STATE_IDLE;
++
++	/* CMD0 (MMC clock is current frequency. if Data transfer mode, 20MHz or higher.) */
++	emmc_make_nontrans_cmd(CMD0_GO_IDLE_STATE, arg);	/* CMD0 */
++	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++
++	/* change MMC clock(400KHz) */
++	freq = MMC_400KHZ;
++	result = emmc_set_request_mmc_clock(&freq);
++	if (result != EMMC_SUCCESS) {
++		return result;
++	}
++
++	return EMMC_SUCCESS;
++}
+-- 
+2.7.4
+

@@ -3,7 +3,7 @@ require include/provisioning.inc
 SEC_MODULE_LIBDIR = "${HOME}/private/secure/lib/"
 
 SRC_URI_append += " \
-	${@base_conditional("SECURE_BOOT", "1", "file://0001-rzg-add-support-SECURE-BOOT-for-RZ-G2-Platform.patch", "",d)} \
+	${@base_conditional("SECURE_BOOT", "1", "file://0001-plat-rzg-add-support-SECURE-BOOT-for-RZ-G2-Platform.patch", "",d)} \
 "
 
 ATFW_OPT_append += " \
