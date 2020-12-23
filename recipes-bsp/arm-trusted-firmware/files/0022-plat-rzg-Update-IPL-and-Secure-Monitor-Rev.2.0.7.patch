@@ -1,0 +1,31 @@
+From b7411e970b8d4f5c4c045315e40d643e8c148254 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 23 Dec 2020 09:50:49 +0700
+Subject: [PATCH 22/22] plat: rzg: Update IPL and Secure Monitor Rev.2.0.7
+
+This commit refers from:
+- Commit: <221a58e31f85dd19c8485eee37b68d23b472d658>
+- Branch: rcar_gen3
+- Repository: https://github.com/renesas-rcar/arm-trusted-firmware/
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ plat/renesas/rzg/include/rzg_version.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plat/renesas/rzg/include/rzg_version.h b/plat/renesas/rzg/include/rzg_version.h
+index 9fa98aa..7bd5d07 100644
+--- a/plat/renesas/rzg/include/rzg_version.h
++++ b/plat/renesas/rzg/include/rzg_version.h
+@@ -9,7 +9,7 @@
+ 
+ #include <arch_helpers.h>
+ 
+-#define VERSION_OF_RENESAS		"2.0.6"
++#define VERSION_OF_RENESAS		"2.0.7"
+ #define VERSION_OF_RENESAS_MAXLEN	128
+ 
+ extern const uint8_t version_of_renesas[VERSION_OF_RENESAS_MAXLEN];
+-- 
+2.7.4
+
