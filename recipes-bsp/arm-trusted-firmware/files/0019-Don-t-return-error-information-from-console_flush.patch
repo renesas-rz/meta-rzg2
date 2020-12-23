@@ -1,0 +1,88 @@
+From 563676d3ebb239ad9a205b6f1405a6fb389e9ea2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 23 Dec 2020 09:31:40 +0700
+Subject: [PATCH 19/20] Don't return error information from console_flush
+
+Refer from commits
+<831b0e9824e6c7cb07308830c12977acb79156c7>
+which supported for RCar gen3.
+Apply it for rzg platform.
+
+And from crash_console_flush.
+
+We ignore the error information return by console_flush in _every_
+place where we call it, and casting the return type to void does not
+work around the MISRA violation that this causes. Instead, we collect
+the error information from the driver (to avoid changing that API), and
+don't return it to the caller.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/renesas/rzg/console/rzg_console.S | 7 ++-----
+ drivers/renesas/rzg/scif/scif.S           | 7 ++-----
+ plat/renesas/rzg/aarch64/plat_helpers.S   | 2 +-
+ 3 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/renesas/rzg/console/rzg_console.S b/drivers/renesas/rzg/console/rzg_console.S
+index 0cd2f97..16f975f 100644
+--- a/drivers/renesas/rzg/console/rzg_console.S
++++ b/drivers/renesas/rzg/console/rzg_console.S
+@@ -82,15 +82,12 @@ func console_rzg_putc
+ endfunc console_rzg_putc
+ 
+ 	/* ---------------------------------------------
+-	 * int console_rzg_flush(void)
++	 * void console_rzg_flush(void)
+ 	 * Function to force a write of all buffered
+-	 * data that hasn't been output. It returns 0
+-	 * upon successful completion, otherwise it
+-	 * returns -1.
++	 * data that hasn't been output. It returns void
+ 	 * Clobber list : x0, x1
+ 	 * ---------------------------------------------
+ 	 */
+ func console_rzg_flush
+-	mov	w0, #0
+ 	ret
+ endfunc console_rzg_flush
+diff --git a/drivers/renesas/rzg/scif/scif.S b/drivers/renesas/rzg/scif/scif.S
+index fe74f43..53edcf1 100644
+--- a/drivers/renesas/rzg/scif/scif.S
++++ b/drivers/renesas/rzg/scif/scif.S
+@@ -279,11 +279,9 @@ func console_rzg_putc
+ endfunc console_rzg_putc
+ 
+ 	/* ---------------------------------------------
+-	 * int console_rzg_flush(void)
++	 * void console_rzg_flush(void)
+ 	 * Function to force a write of all buffered
+-	 * data that hasn't been output. It returns 0
+-	 * upon successful completion, otherwise it
+-	 * returns -1.
++	 * data that hasn't been output. It returns void
+ 	 * Clobber list : x0, x1
+ 	 * ---------------------------------------------
+ 	 */
+@@ -301,6 +299,5 @@ func console_rzg_flush
+ 	and	w1, w1, #~(SCSCR_TE_EN + SCSCR_RE_EN)
+ 	strh	w1, [x0, #SCIF_SCSCR]
+ 
+-	mov	w0, #0
+ 	ret
+ endfunc console_rzg_flush
+diff --git a/plat/renesas/rzg/aarch64/plat_helpers.S b/plat/renesas/rzg/aarch64/plat_helpers.S
+index 2177e7e..8a5d557 100644
+--- a/plat/renesas/rzg/aarch64/plat_helpers.S
++++ b/plat/renesas/rzg/aarch64/plat_helpers.S
+@@ -295,7 +295,7 @@ func plat_crash_console_putc
+ endfunc plat_crash_console_putc
+ 
+ 	/* ---------------------------------------------
+-	 * int plat_crash_console_flush()
++	 * void plat_crash_console_flush()
+ 	 * ---------------------------------------------
+ 	 */
+ func plat_crash_console_flush
+-- 
+2.7.4
+

@@ -45,6 +45,8 @@ SRC_URI += " \
 	file://0016-plat-renesas-rzg-Add-ECC-support-for-RZ-G2-platform.patch \
 	file://0017-driver-rzg-swdt-increase-WDT-count-when-ECC-enabled.patch \
 	file://0018-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
+	file://0019-Don-t-return-error-information-from-console_flush.patch \
+	file://0020-rzg-drivers-console-Treat-log-as-device-memory.patch \
 "
 
 PV = "v2.4+git"
