@@ -1,0 +1,29 @@
+From fc6ec660bb91bf2fda742b4fb3fe0b45edcb80d6 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Mon, 11 May 2020 14:42:36 +0700
+Subject: [PATCH 206/355] mmc: renesas_sdhi: Correct r8a774a1 SoC revision
+
+This patch correct revision of r8a774a1 to support
+mode HS400 for LSI v1.x.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_core.c b/drivers/mmc/host/renesas_sdhi_core.c
+index cad0fb3..051e1a5 100644
+--- a/drivers/mmc/host/renesas_sdhi_core.c
++++ b/drivers/mmc/host/renesas_sdhi_core.c
+@@ -565,7 +565,7 @@ static const struct renesas_sdhi_quirks sdhi_quirks_4tap = {
+ };
+ 
+ static const struct soc_device_attribute sdhi_quirks_match[]  = {
+-	{ .soc_id = "r8a774a1", .revision = "ES1.[012]",
++	{ .soc_id = "r8a774a1", .revision = "ES1.*",
+ 				.data = &sdhi_quirks_4tap },
+ 	{ .soc_id = "r8a7795",  .data = &sdhi_quirks_4tap },
+ 	{ .soc_id = "r8a7796",  .data = &sdhi_quirks_4tap },
+-- 
+2.7.4
+

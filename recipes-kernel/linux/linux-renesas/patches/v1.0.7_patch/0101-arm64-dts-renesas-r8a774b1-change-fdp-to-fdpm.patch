@@ -1,0 +1,53 @@
+From a4886e33ffe19773411f4c9b692b29e45cae00fb Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 30 Mar 2020 11:57:46 +0700
+Subject: [PATCH 101/355] arm64: dts: renesas: r8a774b1: change fdp to fdpm
+
+This commit changes device node for fdp used by fdpm.
+Also remove fcpf device nodes support for fdp because it is
+already supported in FDP Manager.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index 9a6464a..b86c95a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -2063,22 +2063,16 @@
+ 			resets = <&cpg 112>;
+ 		};
+ 
+-		fdp1@fe940000 {
+-			compatible = "renesas,fdp1";
+-			reg = <0 0xfe940000 0 0x2400>;
++		fdp0: fdpm@fe940000 {
++			compatible = "renesas,fdpm";
++			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
+ 			interrupts = <GIC_SPI 262 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 119>;
++			clocks = <&cpg CPG_MOD 119>, <&cpg CPG_MOD 615>;
++			clock-names = "fdp", "fcp";
+ 			power-domains = <&sysc R8A774B1_PD_A3VP>;
+-			resets = <&cpg 119>;
+-			renesas,fcp = <&fcpf0>;
+-		};
+-
+-		fcpf0: fcp@fe950000 {
+-			compatible = "renesas,fcpf";
+-			reg = <0 0xfe950000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 615>;
+-			power-domains = <&sysc R8A774B1_PD_A3VP>;
+-			resets = <&cpg 615>;
++			resets = <&cpg 119>, <&cpg 615>;
++			reset-names = "fdp", "fcp";
++			renesas,#ch = <0>;
+ 		};
+ 
+ 		vsp@fe960000 {
+-- 
+2.7.4
+

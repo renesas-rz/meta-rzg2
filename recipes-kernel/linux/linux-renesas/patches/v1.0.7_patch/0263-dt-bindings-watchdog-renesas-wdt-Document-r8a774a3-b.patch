@@ -1,0 +1,31 @@
+From fb1652e8b64d0a79a0e428e709a2e4b7e070c365 Mon Sep 17 00:00:00 2001
+From: Duy Bao Dang <duy.dang.yb@renesas.com>
+Date: Tue, 28 Jul 2020 11:00:01 +0700
+Subject: [PATCH 263/355] dt-bindings: watchdog: renesas,wdt: Document r8a774a3
+ bindings
+
+This patch adds compatible string for for RZ/G2M v3.0 (R8A774A3) SoC
+and update SoC name for RZ/G2M v1.3 (R8A774A1) SoC
+
+Signed-off-by: Duy Bao Dang <duy.dang.yb@renesas.com>
+---
+ Documentation/devicetree/bindings/watchdog/renesas,wdt.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt b/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt
+index e673059..9fd315f 100644
+--- a/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt
++++ b/Documentation/devicetree/bindings/watchdog/renesas,wdt.txt
+@@ -7,7 +7,8 @@ Required properties:
+ 	       Examples with soctypes are:
+ 		 - "renesas,r8a7743-wdt" (RZ/G1M)
+ 		 - "renesas,r8a7745-wdt" (RZ/G1E)
+-		 - "renesas,r8a774a1-wdt" (RZ/G2M)
++		 - "renesas,r8a774a1-wdt" (RZ/G2M v1.3)
++		 - "renesas,r8a774a3-wdt" (RZ/G2M v3.0)
+ 		 - "renesas,r8a774b1-wdt" (RZ/G2N)
+ 		 - "renesas,r8a774c0-wdt" (RZ/G2E)
+ 		 - "renesas,r8a774e1-wdt" (RZ/G2H)
+-- 
+2.7.4
+

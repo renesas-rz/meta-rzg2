@@ -1,0 +1,36 @@
+From 31cb545897b473021deee6c736b3277251b06e8d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 10 Mar 2020 11:06:41 +0700
+Subject: [PATCH 162/355] mmc: renesas_sdhi_core: Disable check SCC error in
+ some modes
+
+There is no need to check SCC error in some modes which excludes:
+- HS400 4TAP.
+- High speed mode.
+- UHS-SDR50 mode.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/mmc/host/renesas_sdhi_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/mmc/host/renesas_sdhi_core.c b/drivers/mmc/host/renesas_sdhi_core.c
+index 0a20e72..cad0fb3 100644
+--- a/drivers/mmc/host/renesas_sdhi_core.c
++++ b/drivers/mmc/host/renesas_sdhi_core.c
+@@ -452,6 +452,12 @@ static bool renesas_sdhi_check_scc_error(struct tmio_mmc_host *host)
+ {
+ 	struct renesas_sdhi *priv = host_to_priv(host);
+ 
++	if (!(host->mmc->ios.timing == MMC_TIMING_UHS_SDR104) &&
++	    !(host->mmc->ios.timing == MMC_TIMING_MMC_HS200) &&
++	    !(host->mmc->ios.timing == MMC_TIMING_MMC_HS400 &&
++	    !(priv->quirks && priv->quirks->hs400_4taps)))
++		return false;
++
+ 	/* Check SCC error */
+ 	if (sd_scc_read32(host, priv, SH_MOBILE_SDHI_SCC_RVSCNTL) &
+ 	    SH_MOBILE_SDHI_SCC_RVSCNTL_RVSEN &&
+-- 
+2.7.4
+

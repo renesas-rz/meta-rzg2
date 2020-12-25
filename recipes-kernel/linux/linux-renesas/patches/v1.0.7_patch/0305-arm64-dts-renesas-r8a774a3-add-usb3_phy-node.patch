@@ -1,0 +1,37 @@
+From ae19107258b447a3f46d70bc6078c899269875f3 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Tue, 28 Jul 2020 14:36:06 +0700
+Subject: [PATCH 305/355] arm64: dts: renesas: r8a774a3: add usb3_phy node
+
+This patch adds usb3_phy node for R8A774A3 SoC.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 8834e16..27ee26c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -899,9 +899,16 @@
+ 		};
+ 
+ 		usb3_phy0: usb-phy@e65ee000 {
++			compatible = "renesas,r8a774a3-usb3-phy",
++				     "renesas,rcar-gen3-usb3-phy";
+ 			reg = <0 0xe65ee000 0 0x90>;
++			clocks = <&cpg CPG_MOD 328>, <&usb3s0_clk>,
++				 <&usb_extal_clk>;
++			clock-names = "usb3-if", "usb3s_clk", "usb_extal";
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 328>;
+ 			#phy-cells = <0>;
+-			/* placeholder */
++			status = "disabled";
+ 		};
+ 
+ 		dmac0: dma-controller@e6700000 {
+-- 
+2.7.4
+

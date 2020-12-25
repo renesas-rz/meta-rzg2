@@ -1,0 +1,83 @@
+From 3bf6798c293494a32edead91bdca456d73e79bee Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 14:45:50 +0700
+Subject: [PATCH 046/355] arm64: dts: renesas: r8a774a1: Add VCP4 device nodes
+
+Adds VCP4 device nodes (fcpci, fcpcs, ivdp1c, vcplf, vdpb)
+used by UVCS driver
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi | 55 +++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+index 9198fde..75eae87 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a1.dtsi
+@@ -2215,6 +2215,61 @@
+ 			status = "disabled";
+ 		};
+ 
++		fcpci0: vcp4@fe8df000 {
++			compatible = "renesas,vcp4-fcpci0";
++			reg = <0 0xfe8df000 0 0x200>;
++			clocks = <&cpg CPG_MOD 617>;
++			power-domains = <&sysc R8A774A1_PD_A3VC>;
++			resets = <&cpg 617>;
++			renesas,#ch = <1>;
++		};
++
++		fcpcs: vcp4@fe90f000 {
++			compatible = "renesas,vcp4-fcpcs";
++			reg = <0 0xfe90f000 0 0x200>;
++			clocks = <&cpg CPG_MOD 619>;
++			power-domains = <&sysc R8A774A1_PD_A3VC>;
++			resets = <&cpg 619>;
++			renesas,#ch = <0>;
++		};
++
++		ivdp1c: vcp4@fe8d0000 {
++			compatible = "renesas,vcp4-ivdp1c";
++			reg = <0 0xfe8d0000 0 0x200>, <0 0xfe8d0200 0 0x200>;
++			interrupts = <GIC_SPI 380 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 381 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 128>;
++			power-domains = <&sysc R8A774A1_PD_A2VC0>;
++			resets = <&cpg 128>;
++			renesas,#ch = <2>;
++			renesas,#fcp_ch = <1>;
++		};
++
++		vcplf: vcp4@fe910000 {
++			compatible = "renesas,vcp4-vcplf";
++			reg = <0 0xfe910000 0 0x200>, <0 0xfe910200 0 0x200>;
++			interrupts = <GIC_SPI 260 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 261 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 130>;
++			power-domains = <&sysc R8A774A1_PD_A2VC1>;
++			resets = <&cpg 130>;
++			renesas,#ch = <0>;
++			renesas,#fcp_ch = <0>;
++		};
++
++		vdpb: vcp4@fe900000 {
++			compatible = "renesas,vcp4-vdpb";
++			reg = <0 0xfe900000 0 0x200>, <0 0xfe900200 0 0x200>;
++			interrupts = <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 131>;
++			power-domains = <&sysc R8A774A1_PD_A2VC0>;
++			resets = <&cpg 131>;
++			renesas,#ch = <1>;
++			renesas,#fcp_ch = <0>;
++		};
++
+ 		fdp0: fdpm@fe940000 {
+ 			compatible = "renesas,fdpm";
+ 			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
+-- 
+2.7.4
+

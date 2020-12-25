@@ -1,0 +1,189 @@
+From ae5e8aa384be312c456c11565f336edad9828416 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 14:52:33 +0700
+Subject: [PATCH 337/355] clk: renesas: Replace PLL3 multiplication setting
+
+This commit replaces PLL3 multiplication setting for DDR clock
+frequency for RZ/G2M/N/H:
+- After changes, new PLL3 multiplication setting:
+	MD19    MD17    : DDR clock frequency
+	-------------------------------
+	0       0       : DDR3200
+	0       1       : DDR2800
+	1       0       : Prohibited setting
+	1       1       : DDR1600
+
+- Before changes, old PLL3 multiplication setting:
+	MD19    MD17    : DDR clock frequency
+	-------------------------------
+	0       0       : DDR3200
+	0       1       : DDR2133
+	1       0       : Prohibited setting
+	1       1       : DDR1600
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/r8a774a1-cpg-mssr.c | 16 ++++++++--------
+ drivers/clk/renesas/r8a774b1-cpg-mssr.c | 16 ++++++++--------
+ drivers/clk/renesas/r8a774e1-cpg-mssr.c | 16 ++++++++--------
+ 3 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/clk/renesas/r8a774a1-cpg-mssr.c b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+index d7514309..ffda661 100644
+--- a/drivers/clk/renesas/r8a774a1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774a1-cpg-mssr.c
+@@ -257,19 +257,19 @@ static const unsigned int r8a774a1_crit_mod_clks[] __initconst = {
+  * 14 13 19 17	(MHz)
+  *-------------------------------------------------------------------------
+  * 0  0  0  0	16.66 x 1	x180	x192	x144	x192	x144	/16
+- * 0  0  0  1	16.66 x 1	x180	x192	x144	x128	x144	/16
++ * 0  0  0  1	16.66 x 1	x180	x192	x144	x168	x144	/16
+  * 0  0  1  0	Prohibited setting
+  * 0  0  1  1	16.66 x 1	x180	x192	x144	x192	x144	/16
+  * 0  1  0  0	20    x 1	x150	x160	x120	x160	x120	/19
+- * 0  1  0  1	20    x 1	x150	x160	x120	x106	x120	/19
++ * 0  1  0  1	20    x 1	x150	x160	x120	x140	x120	/19
+  * 0  1  1  0	Prohibited setting
+  * 0  1  1  1	20    x 1	x150	x160	x120	x160	x120	/19
+  * 1  0  0  0	25    x 1	x120	x128	x96	x128	x96	/24
+- * 1  0  0  1	25    x 1	x120	x128	x96	x84	x96	/24
++ * 1  0  0  1	25    x 1	x120	x128	x96	x112	x96	/24
+  * 1  0  1  0	Prohibited setting
+  * 1  0  1  1	25    x 1	x120	x128	x96	x128	x96	/24
+  * 1  1  0  0	33.33 / 2	x180	x192	x144	x192	x144	/32
+- * 1  1  0  1	33.33 / 2	x180	x192	x144	x128	x144	/32
++ * 1  1  0  1	33.33 / 2	x180	x192	x144	x168	x144	/32
+  * 1  1  1  0	Prohibited setting
+  * 1  1  1  1	33.33 / 2	x180	x192	x144	x192	x144	/32
+  */
+@@ -281,19 +281,19 @@ static const unsigned int r8a774a1_crit_mod_clks[] __initconst = {
+ static const struct rcar_gen3_cpg_pll_config cpg_pll_configs[16] __initconst = {
+ 	/* EXTAL div	PLL1 mult/div	PLL3 mult/div	OSC prediv */
+ 	{ 1,		192,	1,	192,	1,	16,	},
+-	{ 1,		192,	1,	128,	1,	16,	},
++	{ 1,		192,	1,	168,	1,	16,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		192,	1,	192,	1,	16,	},
+ 	{ 1,		160,	1,	160,	1,	19,	},
+-	{ 1,		160,	1,	106,	1,	19,	},
++	{ 1,		160,	1,	140,	1,	19,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		160,	1,	160,	1,	19,	},
+ 	{ 1,		128,	1,	128,	1,	24,	},
+-	{ 1,		128,	1,	84,	1,	24,	},
++	{ 1,		128,	1,	112,	1,	24,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		128,	1,	128,	1,	24,	},
+ 	{ 2,		192,	1,	192,	1,	32,	},
+-	{ 2,		192,	1,	128,	1,	32,	},
++	{ 2,		192,	1,	168,	1,	32,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 2,		192,	1,	192,	1,	32,	},
+ };
+diff --git a/drivers/clk/renesas/r8a774b1-cpg-mssr.c b/drivers/clk/renesas/r8a774b1-cpg-mssr.c
+index 63fdfc2..e5a5499 100644
+--- a/drivers/clk/renesas/r8a774b1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774b1-cpg-mssr.c
+@@ -250,19 +250,19 @@ static const unsigned int r8a774b1_crit_mod_clks[] __initconst = {
+  * 14 13 19 17	(MHz)
+  *-----------------------------------------------------------------
+  * 0  0  0  0	16.66 x 1	x180	x192	x192	x144	/16
+- * 0  0  0  1	16.66 x 1	x180	x192	x128	x144	/16
++ * 0  0  0  1	16.66 x 1	x180	x192	x168	x144	/16
+  * 0  0  1  0	Prohibited setting
+  * 0  0  1  1	16.66 x 1	x180	x192	x192	x144	/16
+  * 0  1  0  0	20    x 1	x150	x160	x160	x120	/19
+- * 0  1  0  1	20    x 1	x150	x160	x106	x120	/19
++ * 0  1  0  1	20    x 1	x150	x160	x140	x120	/19
+  * 0  1  1  0	Prohibited setting
+  * 0  1  1  1	20    x 1	x150	x160	x160	x120	/19
+  * 1  0  0  0	25    x 1	x120	x128	x128	x96	/24
+- * 1  0  0  1	25    x 1	x120	x128	x84	x96	/24
++ * 1  0  0  1	25    x 1	x120	x128	x112	x96	/24
+  * 1  0  1  0	Prohibited setting
+  * 1  0  1  1	25    x 1	x120	x128	x128	x96	/24
+  * 1  1  0  0	33.33 / 2	x180	x192	x192	x144	/32
+- * 1  1  0  1	33.33 / 2	x180	x192	x128	x144	/32
++ * 1  1  0  1	33.33 / 2	x180	x192	x168	x144	/32
+  * 1  1  1  0	Prohibited setting
+  * 1  1  1  1	33.33 / 2	x180	x192	x192	x144	/32
+  */
+@@ -274,19 +274,19 @@ static const unsigned int r8a774b1_crit_mod_clks[] __initconst = {
+ static const struct rcar_gen3_cpg_pll_config cpg_pll_configs[16] __initconst = {
+ 	/* EXTAL div	PLL1 mult/div	PLL3 mult/div	OSC prediv */
+ 	{ 1,		192,	1,	192,	1,	16,	},
+-	{ 1,		192,	1,	128,	1,	16,	},
++	{ 1,		192,	1,	168,	1,	16,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		192,	1,	192,	1,	16,	},
+ 	{ 1,		160,	1,	160,	1,	19,	},
+-	{ 1,		160,	1,	106,	1,	19,	},
++	{ 1,		160,	1,	140,	1,	19,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		160,	1,	160,	1,	19,	},
+ 	{ 1,		128,	1,	128,	1,	24,	},
+-	{ 1,		128,	1,	84,	1,	24,	},
++	{ 1,		128,	1,	112,	1,	24,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		128,	1,	128,	1,	24,	},
+ 	{ 2,		192,	1,	192,	1,	32,	},
+-	{ 2,		192,	1,	128,	1,	32,	},
++	{ 2,		192,	1,	168,	1,	32,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 2,		192,	1,	192,	1,	32,	},
+ };
+diff --git a/drivers/clk/renesas/r8a774e1-cpg-mssr.c b/drivers/clk/renesas/r8a774e1-cpg-mssr.c
+index b96c486..249acff 100644
+--- a/drivers/clk/renesas/r8a774e1-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774e1-cpg-mssr.c
+@@ -267,19 +267,19 @@ static const unsigned int r8a774e1_crit_mod_clks[] __initconst = {
+  * 14 13 19 17	(MHz)
+  *-------------------------------------------------------------------------
+  * 0  0  0  0	16.66 x 1	x180	x192	x144	x192	x144	/16
+- * 0  0  0  1	16.66 x 1	x180	x192	x144	x128	x144	/16
++ * 0  0  0  1	16.66 x 1	x180	x192	x144	x168	x144	/16
+  * 0  0  1  0	Prohibited setting
+  * 0  0  1  1	16.66 x 1	x180	x192	x144	x192	x144	/16
+  * 0  1  0  0	20    x 1	x150	x160	x120	x160	x120	/19
+- * 0  1  0  1	20    x 1	x150	x160	x120	x106	x120	/19
++ * 0  1  0  1	20    x 1	x150	x160	x120	x140	x120	/19
+  * 0  1  1  0	Prohibited setting
+  * 0  1  1  1	20    x 1	x150	x160	x120	x160	x120	/19
+  * 1  0  0  0	25    x 1	x120	x128	x96	x128	x96	/24
+- * 1  0  0  1	25    x 1	x120	x128	x96	x84	x96	/24
++ * 1  0  0  1	25    x 1	x120	x128	x96	x112	x96	/24
+  * 1  0  1  0	Prohibited setting
+  * 1  0  1  1	25    x 1	x120	x128	x96	x128	x96	/24
+  * 1  1  0  0	33.33 / 2	x180	x192	x144	x192	x144	/32
+- * 1  1  0  1	33.33 / 2	x180	x192	x144	x128	x144	/32
++ * 1  1  0  1	33.33 / 2	x180	x192	x144	x168	x144	/32
+  * 1  1  1  0	Prohibited setting
+  * 1  1  1  1	33.33 / 2	x180	x192	x144	x192	x144	/32
+  */
+@@ -291,19 +291,19 @@ static const unsigned int r8a774e1_crit_mod_clks[] __initconst = {
+ static const struct rcar_gen3_cpg_pll_config cpg_pll_configs[16] __initconst = {
+ 	/* EXTAL div	PLL1 mult/div	PLL3 mult/div	OSC prediv */
+ 	{ 1,		192,	1,	192,	1,	16,	},
+-	{ 1,		192,	1,	128,	1,	16,	},
++	{ 1,		192,	1,	168,	1,	16,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		192,	1,	192,	1,	16,	},
+ 	{ 1,		160,	1,	160,	1,	19,	},
+-	{ 1,		160,	1,	106,	1,	19,	},
++	{ 1,		160,	1,	140,	1,	19,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		160,	1,	160,	1,	19,	},
+ 	{ 1,		128,	1,	128,	1,	24,	},
+-	{ 1,		128,	1,	84,	1,	24,	},
++	{ 1,		128,	1,	112,	1,	24,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 1,		128,	1,	128,	1,	24,	},
+ 	{ 2,		192,	1,	192,	1,	32,	},
+-	{ 2,		192,	1,	128,	1,	32,	},
++	{ 2,		192,	1,	168,	1,	32,	},
+ 	{ 0, /* Prohibited setting */				},
+ 	{ 2,		192,	1,	192,	1,	32,	},
+ };
+-- 
+2.7.4
+

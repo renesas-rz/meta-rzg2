@@ -11,7 +11,7 @@ COMPATIBLE_MACHINE = "ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h"
 KERNEL_URL = " \
     git://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git"
 BRANCH = "linux-4.19.y-cip"
-SRCREV = "03cdb749e6350f0403badbf7931e420ea7514f56"
+SRCREV = "53ba31d44bf6ff0a915b472797ec1af07b663751"
 
 SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
@@ -46,7 +46,7 @@ SRC_URI_append_r8a774e1 += "\
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
-LINUX_VERSION ?= "4.19.140"
+LINUX_VERSION ?= "4.19.160-cip39"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 PR = "r1"

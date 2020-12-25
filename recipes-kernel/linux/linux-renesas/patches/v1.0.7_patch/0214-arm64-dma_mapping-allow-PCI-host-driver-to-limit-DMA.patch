@@ -1,0 +1,60 @@
+From 38ce9033a3f7e6840c6ab46cc41fc16e0e7c818b Mon Sep 17 00:00:00 2001
+From: "Loc Phuoc Pham.Lam" <loc.lam.px@renesas.com>
+Date: Wed, 27 May 2020 11:25:35 +0700
+Subject: [PATCH 214/355] arm64: dma_mapping: allow PCI host driver to limit
+ DMA mask
+
+It is possible that PCI device supports 64-bit DMA addressing, and thus
+it's driver sets device's dma_mask to DMA_BIT_MASK(64), however PCI host
+bridge has limitations on inbound transactions addressing. Example of
+such setup is NVME SSD device connected to RCAR PCIe controller.
+
+Previously there was attempt to handle this via bus notifier: after
+driver is attached to PCI device, bridge driver gets notifier callback,
+and resets dma_mask from there. However, this is racy: PCI device driver
+could already allocate buffers and/or start i/o in probe routine.
+In NVME case, i/o is started in workqueue context, and this race gives
+"sometimes works, sometimes not" effect.
+
+Proper solution should make driver's dma_set_mask() call to fail if host
+bridge can't support mask being set.
+
+This patch makes __swiotlb_dma_supported() to check mask being set for
+PCI device against dma_mask of struct device corresponding to PCI host
+bridge (one with name "pciXXXX:YY"), if that dma_mask is set.
+
+This is the least destructive approach: currently dma_mask of that device
+object is not used anyhow, thus all existing setups will work as before,
+and modification is required only in actually affected components -
+driver of particular PCI host bridge, and dma_map_ops of particular
+platform.
+
+Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+---
+ arch/arm64/mm/dma-mapping.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/arm64/mm/dma-mapping.c b/arch/arm64/mm/dma-mapping.c
+index d3a5bb1..fb14727 100644
+--- a/arch/arm64/mm/dma-mapping.c
++++ b/arch/arm64/mm/dma-mapping.c
+@@ -316,6 +316,15 @@ static int __swiotlb_get_sgtable(struct device *dev, struct sg_table *sgt,
+ 
+ static int __swiotlb_dma_supported(struct device *hwdev, u64 mask)
+ {
++#ifdef CONFIG_PCI
++	if (dev_is_pci(hwdev)) {
++		struct pci_dev *pdev = to_pci_dev(hwdev);
++		struct pci_host_bridge *br = pci_find_host_bridge(pdev->bus);
++
++		if (br->dev.dma_mask && (*br->dev.dma_mask) && (mask & (*br->dev.dma_mask)) != mask)
++			return 0;
++	}
++#endif
+ 	if (swiotlb)
+ 		return swiotlb_dma_supported(hwdev, mask);
+ 	return 1;
+-- 
+2.7.4
+

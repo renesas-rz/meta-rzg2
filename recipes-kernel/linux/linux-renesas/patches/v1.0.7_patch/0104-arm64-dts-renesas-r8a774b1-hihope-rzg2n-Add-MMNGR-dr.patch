@@ -1,0 +1,33 @@
+From a5192117456269c58aa3b2ac397ab6e0b880071a Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Fri, 6 Sep 2019 18:41:38 +0700
+Subject: [PATCH 104/355] arm64: dts: renesas: r8a774b1-hihope-rzg2n: Add MMNGR
+ driver support
+
+This patch adds MMNGR driver support for the R8A774B1 SoC
+on the Hihope-rzg2n board.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index 72c906f..80413f0 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -50,6 +50,11 @@
+ 			reg = <0x00000000 0x70000000 0x0 0x10000000>;
+ 		};
+ 	};
++
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>, <&lossy_decompress>;
++	};
+ };
+ 
+ &du {
+-- 
+2.7.4
+

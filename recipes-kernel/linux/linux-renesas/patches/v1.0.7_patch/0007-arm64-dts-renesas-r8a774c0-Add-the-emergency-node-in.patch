@@ -1,0 +1,36 @@
+From 6f146fc4cab3a4dd8abf95393f1a298f3261de60 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 10:24:56 +0700
+Subject: [PATCH 007/355] arm64: dts:renesas: r8a774c0: Add the emergency node
+ in thermal-zones
+
+This patch adds the emergency node in thermal zones to support
+for R8A774C0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index adfcf64..15aabd5 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -1944,6 +1944,14 @@
+ 	};
+ 
+ 	thermal-zones {
++		emergency {
++			polling-delay = <1000>;
++			on-temperature = <110000>;
++			off-temperature = <95000>;
++			target_cpus = <&a53_1>;
++			status = "disabled";
++		};
++
+ 		cpu-thermal {
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <0>;
+-- 
+2.7.4
+

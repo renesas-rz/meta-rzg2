@@ -1,0 +1,30 @@
+From 19a29e77382bac98c30658d7f17a1f3eaee6ebe8 Mon Sep 17 00:00:00 2001
+From: tienle <tien.le.xw@renesas.com>
+Date: Thu, 16 Jul 2020 13:49:32 +0700
+Subject: [PATCH 287/355] thermal: rcar_gen3_thermal: Add r8a774a3 support
+
+Add r8a774a3 specific compatible string.
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+---
+ drivers/thermal/rcar_gen3_thermal.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/thermal/rcar_gen3_thermal.c b/drivers/thermal/rcar_gen3_thermal.c
+index 92cd677..11bc458 100644
+--- a/drivers/thermal/rcar_gen3_thermal.c
++++ b/drivers/thermal/rcar_gen3_thermal.c
+@@ -320,6 +320,10 @@ static const struct of_device_id rcar_gen3_thermal_dt_ids[] = {
+ 		.data = &rcar_gen3_ths_tj_1_m3_w,
+ 	},
+ 	{
++		.compatible = "renesas,r8a774a3-thermal",
++		.data = &rcar_gen3_ths_tj_1_m3_w,
++	},
++	{
+ 		.compatible = "renesas,r8a774b1-thermal",
+ 		.data = &rcar_gen3_ths_tj_1,
+ 	},
+-- 
+2.7.4
+

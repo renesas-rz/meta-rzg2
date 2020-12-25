@@ -1,0 +1,42 @@
+From 7b871ac23599dcf00ada58f067b41baeaa1eef96 Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Fri, 17 Jul 2020 13:44:40 +0700
+Subject: [PATCH 229/355] media: ov5645: fix streaming on/off sequence based on
+ OV5640 driver
+
+This commit is created to fix streaming on/off sequence based on OV5640
+driver to ensure camera will coax into LP-11 State when powering up.
+
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/i2c/ov5645.c | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/drivers/media/i2c/ov5645.c b/drivers/media/i2c/ov5645.c
+index 9648a6c..45e4902 100644
+--- a/drivers/media/i2c/ov5645.c
++++ b/drivers/media/i2c/ov5645.c
+@@ -1087,20 +1087,10 @@ static int ov5645_s_stream(struct v4l2_subdev *subdev, int enable)
+ 		ret = ov5645_write_reg(ov5645, OV5645_IO_MIPI_CTRL00, 0x45);
+ 		if (ret < 0)
+ 			return ret;
+-
+-		ret = ov5645_write_reg(ov5645, OV5645_SYSTEM_CTRL0,
+-				       OV5645_SYSTEM_CTRL0_START);
+-		if (ret < 0)
+-			return ret;
+ 	} else {
+ 		ret = ov5645_write_reg(ov5645, OV5645_IO_MIPI_CTRL00, 0x40);
+ 		if (ret < 0)
+ 			return ret;
+-
+-		ret = ov5645_write_reg(ov5645, OV5645_SYSTEM_CTRL0,
+-				       OV5645_SYSTEM_CTRL0_STOP);
+-		if (ret < 0)
+-			return ret;
+ 	}
+ 
+ 	return 0;
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From e87ce9dcc09a624f3199ed42ef10fcf8115756b1 Mon Sep 17 00:00:00 2001
+From: tienle <tien.le.xw@renesas.com>
+Date: Thu, 16 Jul 2020 13:34:12 +0700
+Subject: [PATCH 286/355] dt-bindings: thermal: rcar_gen3_thermal: Document
+ r8a774a3
+
+This patch adds compatible string for R8A774A3 and update SoC name for
+R8A774A1
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+---
+ Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+index 52db03a..ebb3e8e 100644
+--- a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
++++ b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+@@ -7,7 +7,8 @@ inside the LSI.
+ Required properties:
+ - compatible		: "renesas,<soctype>-thermal",
+ 			  Examples with soctypes are:
+-			    - "renesas,r8a774a1-thermal" (RZ/G2M)
++			    - "renesas,r8a774a1-thermal" (RZ/G2M v1.3)
++			    - "renesas,r8a774a3-thermal" (RZ/G2M v3.0)
+ 			    - "renesas,r8a774b1-thermal" (RZ/G2N)
+ 			    - "renesas,r8a774e1-thermal" (RZ/G2H)
+ 			    - "renesas,r8a7795-thermal" (R-Car H3)
+-- 
+2.7.4
+

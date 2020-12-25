@@ -1,0 +1,39 @@
+From 9f2e9e5fe807e62b15679b4be72f8c6d79bf162b Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Jul 2020 14:54:37 +0700
+Subject: [PATCH 232/355] soc: renesas: Add Renesas R8A774A3 config option
+
+Add configuration option for the RZ/G2M v3.0 (R8A774A3) SoC.
+Also update name of configuration for the RZ/G2M v1.3 (R8A774A1) SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/Kconfig.platforms | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
+index c15129a..31dbbad 100644
+--- a/arch/arm64/Kconfig.platforms
++++ b/arch/arm64/Kconfig.platforms
+@@ -191,10 +191,16 @@ config ARCH_RENESAS
+ 	  This enables support for the ARMv8 based Renesas SoCs.
+ 
+ config ARCH_R8A774A1
+-	bool "Renesas RZ/G2M SoC Platform"
++	bool "Renesas RZ/G2M v1.3 SoC Platform"
+ 	depends on ARCH_RENESAS
+ 	help
+-	  This enables support for the Renesas RZ/G2M SoC.
++	  This enables support for the Renesas RZ/G2M v1.3 SoC.
++
++config ARCH_R8A774A3
++	bool "Renesas RZ/G2M v3.0 SoC Platform"
++	depends on ARCH_RENESAS
++	help
++	  This enables support for the Renesas RZ/G2M v3.0 SoC.
+ 
+ config ARCH_R8A774B1
+ 	bool "Renesas RZ/G2N SoC Platform"
+-- 
+2.7.4
+

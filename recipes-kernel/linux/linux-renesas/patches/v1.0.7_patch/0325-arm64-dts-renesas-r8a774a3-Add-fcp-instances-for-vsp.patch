@@ -1,0 +1,53 @@
+From 479be48abbe658151c82fe36ae89d277af78b959 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 14:21:36 +0700
+Subject: [PATCH 325/355] arm64: dts: renesas: r8a774a3: Add fcp instances for
+ vspd
+
+The FCPs handle the interface between various IP cores and memory. Add
+ the instances related to the FDPs and VSP2s.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index aebec97..81769db 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -2218,18 +2218,27 @@
+ 		};
+ 
+ 		fcpvd0: fcp@fea27000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea27000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 603>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 603>;
+ 		};
+ 
+ 		fcpvd1: fcp@fea2f000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea2f000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 602>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 602>;
+ 		};
+ 
+ 		fcpvd2: fcp@fea37000 {
++			compatible = "renesas,fcpv";
+ 			reg = <0 0xfea37000 0 0x200>;
+-			/* placeholder */
++			clocks = <&cpg CPG_MOD 601>;
++			power-domains = <&sysc R8A774A3_PD_ALWAYS_ON>;
++			resets = <&cpg 601>;
+ 		};
+ 
+ 		vsp@fe960000 {
+-- 
+2.7.4
+

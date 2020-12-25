@@ -1,0 +1,42 @@
+From b6a3a37674454256949b71fbb8e75abbb7f6403e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 8 Apr 2020 11:50:15 +0700
+Subject: [PATCH 173/355] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Add
+ reserved memory region
+
+This patch adds reserved memory region for default CMA area:
+	- 512 MB : 0x0058000000 -> 0x0078000000
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 12f9242..054908b 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -23,6 +23,20 @@
+ 		device_type = "memory";
+ 		reg = <0x5 0x00000000 0x0 0x80000000>;
+ 	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		/* global autoconfigured region for contiguous allocations */
++		linux,cma@58000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x58000000 0x0 0x20000000>;
++			linux,cma-default;
++		};
++	};
+ };
+ 
+ &du {
+-- 
+2.7.4
+

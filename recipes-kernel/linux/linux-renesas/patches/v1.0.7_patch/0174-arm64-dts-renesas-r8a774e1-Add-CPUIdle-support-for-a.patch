@@ -1,0 +1,115 @@
+From 8c30ee15a324231a1a19410529306dad1eda1928 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 10:01:50 +0700
+Subject: [PATCH 174/355] arm64: dts: renesas: r8a774e1: Add CPUIdle support
+ for all CPU cores
+
+This patch adds CPUIdle (Core shutdown) support for r8a774e1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 32 +++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 0cc15c8..23c73eb 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -136,6 +136,7 @@
+ 			dynamic-power-coefficient = <854>;
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
++			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			capacity-dmips-mhz = <1024>;
+ 			#cooling-cells = <2>;
+ 		};
+@@ -149,6 +150,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
++			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			capacity-dmips-mhz = <1024>;
+ 			#cooling-cells = <2>;
+ 		};
+@@ -162,6 +164,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
++			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			capacity-dmips-mhz = <1024>;
+ 			#cooling-cells = <2>;
+ 		};
+@@ -175,6 +178,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
++			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			capacity-dmips-mhz = <1024>;
+ 			#cooling-cells = <2>;
+ 		};
+@@ -190,6 +194,7 @@
+ 			dynamic-power-coefficient = <277>;
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			capacity-dmips-mhz = <535>;
+ 		};
+ 
+@@ -202,6 +207,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			capacity-dmips-mhz = <535>;
+ 		};
+ 
+@@ -214,6 +220,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			capacity-dmips-mhz = <535>;
+ 		};
+ 
+@@ -226,6 +233,7 @@
+ 			enable-method = "psci";
+ 			clocks = <&cpg CPG_CORE R8A774E1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			capacity-dmips-mhz = <535>;
+ 		};
+ 
+@@ -242,6 +250,30 @@
+ 			cache-unified;
+ 			cache-level = <2>;
+ 		};
++
++		idle-states {
++			entry-method = "psci";
++
++			CPU_SLEEP_0: cpu-sleep-0 {
++				compatible = "arm,idle-state";
++				arm,psci-suspend-param = <0x0010000>;
++				local-timer-stop;
++				entry-latency-us = <400>;
++				exit-latency-us = <500>;
++				min-residency-us = <4000>;
++				status = "okay";
++			};
++
++			CPU_SLEEP_1: cpu-sleep-1 {
++				compatible = "arm,idle-state";
++				arm,psci-suspend-param = <0x0010000>;
++				local-timer-stop;
++				entry-latency-us = <700>;
++				exit-latency-us = <700>;
++				min-residency-us = <5000>;
++				status = "okay";
++			};
++		};
+ 	};
+ 
+ 	extal_clk: extal {
+-- 
+2.7.4
+
