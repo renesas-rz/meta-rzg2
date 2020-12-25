@@ -1,0 +1,28 @@
+From ae8a9cbe11c4c2a4b2f92d8af6459d946a42205d Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 11:18:38 +0700
+Subject: [PATCH 190/357] ata: sata_rcar: Add r8a774e1 support
+
+Update the binding docs for Renesas RZ/G2H.
+
+Signed-off-by: Dat Nguyen <dat.nguyen.ra@rensas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/ata/sata_rcar.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/ata/sata_rcar.txt b/Documentation/devicetree/bindings/ata/sata_rcar.txt
+index a2fbdc9..c994bb3 100644
+--- a/Documentation/devicetree/bindings/ata/sata_rcar.txt
++++ b/Documentation/devicetree/bindings/ata/sata_rcar.txt
+@@ -3,6 +3,7 @@
+ Required properties:
+ - compatible		: should contain one or more of the following:
+ 			  - "renesas,sata-r8a774b1" for RZ/G2N
++			  - "renesas,sata-r8a774e1" for RZ/G2H
+ 			  - "renesas,sata-r8a7779" for R-Car H1
+ 			  - "renesas,sata-r8a7790-es1" for R-Car H2 ES1
+ 			  - "renesas,sata-r8a7790" for R-Car H2 other than ES1
+-- 
+2.7.4
+

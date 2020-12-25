@@ -1,0 +1,31 @@
+From b8b199e9838939e4598c6439d8cd30730ad9c348 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 13:09:57 +0700
+Subject: [PATCH 213/357] arm64: dts: renesas: r8a774e1: Add QoS device node
+
+This patch adds QoS device node for the r8a774e1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 625865b..a4590dc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -502,6 +502,11 @@
+ 			reg = <0 0xe6060000 0 0x50c>;
+ 		};
+ 
++		qos@e67e0000 {
++			compatible = "renesas,qos";
++			reg = <0 0xe67e0000 0 0x10090>;
++		};
++
+ 		cmt0: timer@e60f0000 {
+ 			compatible = "renesas,r8a774e1-cmt0",
+ 				     "renesas,rcar-gen3-cmt0";
+-- 
+2.7.4
+

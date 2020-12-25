@@ -1,0 +1,40 @@
+From 9435fd58ecb733360295d21ea8eec3bfc3fade15 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 19 Nov 2019 17:29:30 +0700
+Subject: [PATCH 145/357] arm64: dts: renesas: r8a774b1-hihope-rzg2n: increase
+ global CMA to 512MB
+
+For ensure that hihope rz/g2n can handle Fullscreen of Qt Multimedia
+on 4K resolution, we must increase the default global CMA to 512MB, or
+the application will fail due to out of CMA.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index 17eaf76..4c377c8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -39,7 +39,7 @@
+ 		linux,cma@58000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+-			reg = <0x00000000 0x58000000 0x0 0x18000000>;
++			reg = <0x00000000 0x58000000 0x0 0x20000000>;
+ 			linux,cma-default;
+ 		};
+ 
+@@ -47,7 +47,7 @@
+ 		mmp_reserved: linux,multimedia@70000000 {
+ 			compatible = "shared-dma-pool";
+ 			reusable;
+-			reg = <0x00000000 0x70000000 0x0 0x10000000>;
++			reg = <0x00000000 0x78000000 0x0 0x10000000>;
+ 		};
+ 	};
+ 
+-- 
+2.7.4
+

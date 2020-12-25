@@ -1,0 +1,79 @@
+From 4a4dc31c88afcefb0fa05b7c1dc013dee95f2967 Mon Sep 17 00:00:00 2001
+From: tienle <tien.le.xw@renesas.com>
+Date: Thu, 30 Jul 2020 09:50:50 +0700
+Subject: [PATCH 294/357] arm64: dts: renesas: r8a774a3: Create thermal zone to
+ support IPA
+
+Setup a thermal zone driven by SoC temperature sensor.
+Create passive trip points and bind them to CPUFreq cooling
+device that supports power extension.
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index a7f4354..70cf65d 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -2476,6 +2476,7 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <1000>;
+ 			thermal-sensors = <&tsc 0>;
++			sustainable-power = <3874>;
+ 
+ 			trips {
+ 				sensor1_crit: sensor1-crit {
+@@ -2490,6 +2491,7 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <1000>;
+ 			thermal-sensors = <&tsc 1>;
++			sustainable-power = <3874>;
+ 
+ 			trips {
+ 				sensor2_crit: sensor2-crit {
+@@ -2504,14 +2506,40 @@
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <1000>;
+ 			thermal-sensors = <&tsc 2>;
++			sustainable-power = <3874>;
+ 
+ 			trips {
++				threshold: trip-point0 {
++					temperature = <90000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
++				target: trip-point1 {
++					temperature = <100000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
+ 				sensor3_crit: sensor3-crit {
+ 					temperature = <110000>;
+ 					hysteresis = <1000>;
+ 					type = "critical";
+ 				};
+ 			};
++
++			cooling-maps {
++				map0 {
++					trip = <&target>;
++					cooling-device = <&a57_0 0 2>;
++					contribution = <1024>;
++				};
++				map1 {
++					trip = <&target>;
++					cooling-device = <&a53_0 0 2>;
++					contribution = <1024>;
++				};
++			};
+ 		};
+ 	};
+ 
+-- 
+2.7.4
+

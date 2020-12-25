@@ -1,0 +1,32 @@
+From 32cac85a6032caaa6102ce4cd438b5ebe4e20b89 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 18 Nov 2019 13:18:48 +0700
+Subject: [PATCH 143/357] arm64: dts: renesas: hihope-common: add pfc define
+ for pwen on usb2.0 channel 1
+
+This patch add defination of USB2.0 Channel 1 PWEN to PFC, to avoid
+SoC can't use it.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 77cdf47..0649995 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -292,6 +292,10 @@
+ 			pins = "GP_6_27";
+ 			bias-pull-up;
+ 		};
++
++		pwen {
++			pins = "GP_6_26";
++		};
+ 	};
+ 
+ 	usb30_pins: usb30 {
+-- 
+2.7.4
+

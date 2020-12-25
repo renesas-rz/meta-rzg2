@@ -1,0 +1,31 @@
+From bd117c1e7c0750d93eb3e5ad9eea88f44a0d3775 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 27 Jul 2020 16:38:59 +0700
+Subject: [PATCH 258/357] dmaengine: rcar-dmac: Document R8A774A3 bindings
+
+Renesas RZ/G2M v3.0 (R8A774A3) SoC has DMA controllers compatible
+with this driver, therefore document RZ/G2M v3.0 specific bindings.
+Also update document RZ/G2M v1.3 specific bindings.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/dma/renesas,rcar-dmac.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/dma/renesas,rcar-dmac.txt b/Documentation/devicetree/bindings/dma/renesas,rcar-dmac.txt
+index 59d2ad3..246b21d 100644
+--- a/Documentation/devicetree/bindings/dma/renesas,rcar-dmac.txt
++++ b/Documentation/devicetree/bindings/dma/renesas,rcar-dmac.txt
+@@ -19,7 +19,8 @@ Required Properties:
+ 		- "renesas,dmac-r8a7743" (RZ/G1M)
+ 		- "renesas,dmac-r8a7745" (RZ/G1E)
+ 		- "renesas,dmac-r8a77470" (RZ/G1C)
+-		- "renesas,dmac-r8a774a1" (RZ/G2M)
++		- "renesas,dmac-r8a774a1" (RZ/G2M v1.3)
++		- "renesas,dmac-r8a774a3" (RZ/G2M v3.0)
+ 		- "renesas,dmac-r8a774b1" (RZ/G2N)
+ 		- "renesas,dmac-r8a774c0" (RZ/G2E)
+ 		- "renesas,dmac-r8a774e1" (RZ/G2H)
+-- 
+2.7.4
+

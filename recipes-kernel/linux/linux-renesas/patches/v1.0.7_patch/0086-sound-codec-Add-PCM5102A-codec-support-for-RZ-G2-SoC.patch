@@ -1,0 +1,42 @@
+From 6298c3957370807ce79771d6f92421894f739d39 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 16:48:38 +0700
+Subject: [PATCH 086/357] sound: codec: Add PCM5102A codec support for RZ/G2
+ SoC series
+
+This patch add PCM5012A audio codec support for RZ/G2 SoC series.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ sound/soc/codecs/Kconfig     | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 5effad4..d0e0bcb 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -262,6 +262,7 @@ CONFIG_SND=y
+ CONFIG_SND_SOC=y
+ CONFIG_SND_SOC_RCAR=y
+ CONFIG_SND_SOC_AK4613=y
++CONFIG_SND_SOC_PCM5102A=y
+ CONFIG_SND_SIMPLE_CARD=y
+ CONFIG_SND_AUDIO_GRAPH_CARD=y
+ CONFIG_SND_SIMPLE_SCU_CARD=y
+diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
+index efb095d..7c8641b 100644
+--- a/sound/soc/codecs/Kconfig
++++ b/sound/soc/codecs/Kconfig
+@@ -748,7 +748,7 @@ config SND_SOC_PCM3168A_SPI
+ 	select REGMAP_SPI
+ 
+ config SND_SOC_PCM5102A
+-	tristate
++	tristate "Texas Instruments PCM5102A CODEC"
+ 
+ config SND_SOC_PCM512x
+ 	tristate
+-- 
+2.7.4
+

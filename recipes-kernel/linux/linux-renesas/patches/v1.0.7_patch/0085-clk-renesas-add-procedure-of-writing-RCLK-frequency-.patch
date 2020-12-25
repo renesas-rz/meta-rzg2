@@ -1,0 +1,82 @@
+From 95b4d9ace0ce6fc1b4f6c3404a00af63003ed787 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 1 Aug 2019 13:12:51 +0700
+Subject: [PATCH 085/357] clk: renesas: add procedure of writing RCLK frequency
+ control register divider
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In the description about RCLK Frequency Control Register (RCKCR) in
+HW manual of RZ/G2 Series, there is a procedure of
+writing to divider bits (DIV[5:0]) to set clocksource of RCLK:
+	1. stop RCLK by setting CKSTP (bit 8th) to 1.
+	2. Wait 3 cycles by RCLK source.
+	3. Write H’2F to DIV[5:0] and 0 to CKSTP (bit 8th).
+
+This procedure is only applied for RZ/G2E because initial value of
+DIV[5:0] depends on MD13 pin:
+	- When MD13 = 0, initial value is H’2F.
+	- When MD13 = 1, initial value is H’12.
+
+So that when MD13 = 1, write H’2F immediately to DIV[5:0] with above
+writing procedure.
+
+This procedure will correct value of RCLK and OSC clock:
+	- RCLK = 31.25kHz.
+	- OSC  = 125kHz
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/clk/renesas/renesas-cpg-mssr.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/clk/renesas/renesas-cpg-mssr.c b/drivers/clk/renesas/renesas-cpg-mssr.c
+index fd8c748..ec948f1 100644
+--- a/drivers/clk/renesas/renesas-cpg-mssr.c
++++ b/drivers/clk/renesas/renesas-cpg-mssr.c
+@@ -289,6 +289,7 @@ static void __init cpg_mssr_register_core_clk(const struct cpg_core_clk *core,
+ 	case CLK_TYPE_FF:
+ 	case CLK_TYPE_DIV6P1:
+ 	case CLK_TYPE_DIV6_RO:
++
+ 		WARN_DEBUG(core->parent >= priv->num_core_clks);
+ 		parent = priv->clks[core->parent];
+ 		if (IS_ERR(parent)) {
+@@ -298,9 +299,32 @@ static void __init cpg_mssr_register_core_clk(const struct cpg_core_clk *core,
+ 
+ 		parent_name = __clk_get_name(parent);
+ 
+-		if (core->type == CLK_TYPE_DIV6_RO)
++		if (core->type == CLK_TYPE_DIV6_RO) {
++			unsigned int rckcr_div;
++
++			rckcr_div = (readl(priv->base + core->offset) & 0x3f);
++			if (rckcr_div != 0x2f) {
++				/* Stop RCLK by setting CKSTP to 1 */
++				writel(readl(priv->base + core->offset) | BIT(8)
++						, priv->base + core->offset);
++
++				/* Wait at least 3 cycles by RCLK
++				 * with RCLK = 31.25KHz
++				 */
++				udelay(105);
++
++				/* Write H’2F to DIV[5:0] and 0 to CKSTP,
++				 * keep the value of bit 15, bit 12
++				 * and write 0 to all reserved bits
++				 */
++				writel(((readl(priv->base + core->offset) &
++						(BIT(15) | BIT(12))) | 0x2f),
++						priv->base + core->offset);
++			}
++
+ 			/* Multiply with the DIV6 register value */
+ 			div *= (readl(priv->base + core->offset) & 0x3f) + 1;
++		}
+ 
+ 		if (core->type == CLK_TYPE_DIV6P1) {
+ 			clk = cpg_div6_register(core->name, 1, &parent_name,
+-- 
+2.7.4
+

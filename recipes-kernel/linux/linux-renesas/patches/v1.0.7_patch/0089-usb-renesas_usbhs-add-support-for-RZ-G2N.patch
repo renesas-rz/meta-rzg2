@@ -1,0 +1,31 @@
+From 6d9fd997b3be8f4483d5338231137f91b0563ab8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 4 Nov 2019 16:58:47 +0700
+Subject: [PATCH 089/357] usb: renesas_usbhs: add support for RZ/G2N
+
+This patch adds support for r8a774b1 SoC (RZ/G2N)
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/usb/renesas_usbhs/common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/usb/renesas_usbhs/common.c b/drivers/usb/renesas_usbhs/common.c
+index 5efd790..a61824d 100644
+--- a/drivers/usb/renesas_usbhs/common.c
++++ b/drivers/usb/renesas_usbhs/common.c
+@@ -544,6 +544,10 @@ static const struct of_device_id usbhs_of_match[] = {
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN3,
+ 	},
+ 	{
++		.compatible = "renesas,usbhs-r8a774b1",
++		.data = (void *)USBHS_TYPE_RCAR_GEN3,
++	},
++	{
+ 		.compatible = "renesas,usbhs-r8a774c0",
+ 		.data = (void *)USBHS_TYPE_RCAR_GEN3_WITH_PLL,
+ 	},
+-- 
+2.7.4
+

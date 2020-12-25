@@ -1,0 +1,30 @@
+From cdb85e90af56204d49a4810b82271e485e91269f Mon Sep 17 00:00:00 2001
+From: Ky Nguyen <ky.nguyen.uj@renesas.com>
+Date: Thu, 16 Jul 2020 18:34:25 +0700
+Subject: [PATCH 301/357] dt-bindings: pwm: pwm-rcar: Add r8a774a3 support
+
+Document RZ/G2M v3.0 (R8A774A3) SoC bindings and update for RZ/G2M v1.3
+(R8A774A1)
+
+Signed-off-by: Ky Nguyen <ky.nguyen.uj@renesas.com>
+---
+ Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+index 691cae7..2671703 100644
+--- a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
++++ b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+@@ -4,7 +4,8 @@ Required Properties:
+ - compatible: should be "renesas,pwm-rcar" and one of the following.
+  - "renesas,pwm-r8a7743": for RZ/G1M
+  - "renesas,pwm-r8a7745": for RZ/G1E
+- - "renesas,pwm-r8a774a1": for RZ/G2M
++ - "renesas,pwm-r8a774a1": for RZ/G2M v1.3
++ - "renesas,pwm-r8a774a3": for RZ/G2M v3.0
+  - "renesas,pwm-r8a774b1": for RZ/G2N
+  - "renesas,pwm-r8a774c0": for RZ/G2E
+  - "renesas,pwm-r8a774e1": for RZ/G2H
+-- 
+2.7.4
+

@@ -1,0 +1,45 @@
+From eddd6eb7facebb3ed8e61b3c6e3b27dd386851c9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 14:09:24 +0700
+Subject: [PATCH 323/357] arm64: dts: renesas: r8a774a3: add support fdp with
+ FDP Manager
+
+This commit adds device node for fdp used by FDP Manager.
+Also remove fcpf device nodes support for fdp because it is
+already supported in FDP Manager node.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 75edff3..9ac164c 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -2206,13 +2206,15 @@
+ 		};
+ 
+ 		fdp0: fdpm@fe940000 {
++			compatible = "renesas,fdpm";
+ 			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
+-			/* placeholder */
+-		};
+-
+-		fcpf0: fcp@fe950000 {
+-			reg = <0 0xfe950000 0 0x200>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 262 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 119>, <&cpg CPG_MOD 615>;
++			clock-names = "fdp", "fcp";
++			power-domains = <&sysc R8A774A3_PD_A3VC>;
++			resets = <&cpg 119>, <&cpg 615>;
++			reset-names = "fdp", "fcp";
++			renesas,#ch = <0>;
+ 		};
+ 
+ 		fcpvb0: fcp@fe96f000 {
+-- 
+2.7.4
+

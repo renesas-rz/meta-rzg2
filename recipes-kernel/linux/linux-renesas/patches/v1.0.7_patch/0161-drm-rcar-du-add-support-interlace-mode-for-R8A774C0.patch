@@ -1,0 +1,29 @@
+From 3970e9bdd032d2c2e16d3af78307cdef595d2794 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 15 Sep 2020 11:31:14 +0700
+Subject: [PATCH 161/357] drm: rcar-du: add support interlace mode for R8A774C0
+
+This patch adds support interlace mode for r8a774c0 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_drv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.c b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+index 9ab442d..8537041 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+@@ -141,7 +141,8 @@ static const struct rcar_du_device_info rcar_du_r8a774b1_info = {
+ static const struct rcar_du_device_info rcar_du_r8a774c0_info = {
+ 	.gen = 3,
+ 	.features = RCAR_DU_FEATURE_CRTC_IRQ_CLOCK
+-		  | RCAR_DU_FEATURE_VSP1_SOURCE,
++		  | RCAR_DU_FEATURE_VSP1_SOURCE
++		  | RCAR_DU_FEATURE_INTERLACED,
+ 	.channels_mask = BIT(1) | BIT(0),
+ 	.routes = {
+ 		/*
+-- 
+2.7.4
+

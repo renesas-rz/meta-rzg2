@@ -1,0 +1,115 @@
+From 9d1046ad3186641c5e8079077ff0fcded40bb65a Mon Sep 17 00:00:00 2001
+From: Koji Matsuoka <koji.matsuoka.xm@renesas.com>
+Date: Thu, 23 Aug 2018 15:34:59 +0900
+Subject: [PATCH 010/357] v4l: vsp1: Add pixel alpha blending supoprt
+
+The pixel alpha blending is supported about ARGB1555, ARGB4444,
+BGRA8888, and ARGB8888.
+And adds alpha bit selection option of ARGB1555.
+
+Signed-off-by: Koji Matsuoka <koji.matsuoka.xm@renesas.com>
+---
+ drivers/media/platform/Kconfig         | 12 +++++++++++
+ drivers/media/platform/vsp1/vsp1_rpf.c | 39 ++++++++++++++++++++++++++++------
+ 2 files changed, 45 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
+index 54fe90a..22d61e0 100644
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -433,6 +433,18 @@ config VIDEO_RENESAS_VSP1
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called vsp1.
+ 
++config VIDEO_RENESAS_VSP_ALPHA_BIT_ARGB1555
++	int "Renesas VSP alpha bit function of ARGB1555"
++	depends on VIDEO_RENESAS_VSP1
++	range 0 1
++	default 0
++	help
++	  Choose this option if you select A bit function of ARGB1555.
++	  If you set value to 0, pixel alpha blending is performed
++	  when the value of A is 0.
++	  If you set value to 1, pixel alpha blending is performed
++	  when the value of A is 1.
++
+ config VIDEO_ROCKCHIP_RGA
+ 	tristate "Rockchip Raster 2d Graphic Acceleration Unit"
+ 	depends on VIDEO_DEV && VIDEO_V4L2
+diff --git a/drivers/media/platform/vsp1/vsp1_rpf.c b/drivers/media/platform/vsp1/vsp1_rpf.c
+index f8005b6..c25f17a 100644
+--- a/drivers/media/platform/vsp1/vsp1_rpf.c
++++ b/drivers/media/platform/vsp1/vsp1_rpf.c
+@@ -2,7 +2,7 @@
+ /*
+  * vsp1_rpf.c  --  R-Car VSP1 Read Pixel Formatter
+  *
+- * Copyright (C) 2013-2014 Renesas Electronics Corporation
++ * Copyright (C) 2013-2018 Renesas Electronics Corporation
+  *
+  * Contact: Laurent Pinchart (laurent.pinchart@ideasonboard.com)
+  */
+@@ -68,6 +68,7 @@ static void rpf_configure_stream(struct vsp1_entity *entity,
+ 	unsigned int top = 0;
+ 	u32 pstride;
+ 	u32 infmt;
++	u32 alph_sel = 0;
+ 
+ 	/* Stride */
+ 	pstride = format->plane_fmt[0].bytesperline
+@@ -150,21 +151,47 @@ static void rpf_configure_stream(struct vsp1_entity *entity,
+ 	 *
+ 	 * In all cases, disable color keying.
+ 	 */
+-	vsp1_rpf_write(rpf, dlb, VI6_RPF_ALPH_SEL, VI6_RPF_ALPH_SEL_AEXT_EXT |
+-		       (fmtinfo->alpha ? VI6_RPF_ALPH_SEL_ASEL_PACKED
+-				       : VI6_RPF_ALPH_SEL_ASEL_FIXED));
++	switch (fmtinfo->fourcc) {
++	case V4L2_PIX_FMT_ARGB555:
++		if (CONFIG_VIDEO_RENESAS_VSP_ALPHA_BIT_ARGB1555 == 1)
++			alph_sel = VI6_RPF_ALPH_SEL_ASEL_SELECT |
++				   VI6_RPF_ALPH_SEL_AEXT_EXT |
++				   VI6_RPF_ALPH_SEL_ALPHA1_MASK |
++				   (rpf->alpha &
++				   VI6_RPF_ALPH_SEL_ALPHA0_MASK);
++		else
++			alph_sel = VI6_RPF_ALPH_SEL_ASEL_SELECT |
++				   VI6_RPF_ALPH_SEL_AEXT_EXT |
++				   ((rpf->alpha & 0xff) << 8) |
++				   VI6_RPF_ALPH_SEL_ALPHA0_MASK;
++		break;
++	case V4L2_PIX_FMT_ARGB444:
++		alph_sel = VI6_RPF_ALPH_SEL_AEXT_ONE;
++		break;
++	case V4L2_PIX_FMT_ABGR32:
++	case V4L2_PIX_FMT_ARGB32:
++		break;
++	default:
++		alph_sel = VI6_RPF_ALPH_SEL_AEXT_EXT |
++			   (fmtinfo->alpha ? VI6_RPF_ALPH_SEL_ASEL_PACKED
++			   : VI6_RPF_ALPH_SEL_ASEL_FIXED);
++		break;
++	}
++
++	vsp1_rpf_write(rpf, dlb, VI6_RPF_ALPH_SEL, alph_sel);
+ 
+ 	if (entity->vsp1->info->gen == 3) {
+ 		u32 mult;
+ 
+-		if (fmtinfo->alpha) {
++		if (fmtinfo->alpha &&
++		    fmtinfo->fourcc != V4L2_PIX_FMT_ARGB555) {
+ 			/*
+ 			 * When the input contains an alpha channel enable the
+ 			 * alpha multiplier. If the input is premultiplied we
+ 			 * need to multiply both the alpha channel and the pixel
+ 			 * components by the global alpha value to keep them
+ 			 * premultiplied. Otherwise multiply the alpha channel
+-			 * only.
++			 * only. The alpha multiplier is disabled in ARGB1555.
+ 			 */
+ 			bool premultiplied = format->flags
+ 					   & V4L2_PIX_FMT_FLAG_PREMUL_ALPHA;
+-- 
+2.7.4
+

@@ -1,0 +1,102 @@
+From a7a0f7d1b6a5464500bf6cf52675abc79e13c4ff Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 15 Sep 2020 17:15:19 +0700
+Subject: [PATCH 182/357] arm64: dts: renesas: move vspb and vspi from common
+ part
+
+This patch moves vspb and vspi from common part to specific Hihope
+RZ/G2M and RZ/G2N because vsp modules of G2M and G2N are different
+from G2H.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi             | 8 --------
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts | 8 ++++++++
+ arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts      | 8 ++++++++
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts | 8 ++++++++
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts      | 8 ++++++++
+ 5 files changed, 32 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 6a10267..7e9df07 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -440,11 +440,3 @@
+ &tmu4 {
+ 	status = "okay";
+ };
+-
+-&vspb {
+-	status = "okay";
+-};
+-
+-&vspi0 {
+-	status = "okay";
+-};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+index bb18f6e..77a8f29 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dts
+@@ -35,3 +35,11 @@
+ 	clock-names = "du.0", "du.1", "du.2",
+ 		      "dclkin.0", "dclkin.1", "dclkin.2";
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+index 9acb1b5..8f13494 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m.dts
+@@ -71,3 +71,11 @@
+ 	clock-names = "du.0", "du.1", "du.2",
+ 		      "dclkin.0", "dclkin.1", "dclkin.2";
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+index c69ca5c..b00c57a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-rev2.dts
+@@ -39,3 +39,11 @@
+ &sdhi3 {
+ 	mmc-hs400-1_8v;
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+index 4c377c8..76956bc 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n.dts
+@@ -75,3 +75,11 @@
+ &sdhi3 {
+ 	mmc-hs400-1_8v;
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From 1e74cc63788e5b27c2fcb3ac669582ca25854a1e Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Mon, 9 Nov 2020 10:27:31 +0700
+Subject: [PATCH 344/357] dt-bindings: can: rcar_canfd: document for r8a774a3
+ canfd
+
+Document for CANFD support for R8A774A3 (RZ/G2M v3.0) SoC.
+R8A774A1 (RZ/G2M) is changed to R8A774A1 (RZ/G2M v1.3).
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ Documentation/devicetree/bindings/net/can/rcar_canfd.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/net/can/rcar_canfd.txt b/Documentation/devicetree/bindings/net/can/rcar_canfd.txt
+index 55b9350..63f258a 100644
+--- a/Documentation/devicetree/bindings/net/can/rcar_canfd.txt
++++ b/Documentation/devicetree/bindings/net/can/rcar_canfd.txt
+@@ -4,7 +4,8 @@ Renesas R-Car CAN FD controller Device Tree Bindings
+ Required properties:
+ - compatible: Must contain one or more of the following:
+   - "renesas,rcar-gen3-canfd" for R-Car Gen3 and RZ/G2 compatible controllers.
+-  - "renesas,r8a774a1-canfd" for R8A774A1 (RZ/G2M) compatible controller.
++  - "renesas,r8a774a1-canfd" for R8A774A1 (RZ/G2M v1.3) compatible controller.
++  - "renesas,r8a774a3-canfd" for R8A774A3 (RZ/G2M v3.0) compatible controller.
+   - "renesas,r8a774b1-canfd" for R8A774B1 (RZ/G2N) compatible controller.
+   - "renesas,r8a774c0-canfd" for R8A774C0 (RZ/G2E) compatible controller.
+   - "renesas,r8a774e1-canfd" for R8A774E1 (RZ/G2H) compatible controller.
+-- 
+2.7.4
+

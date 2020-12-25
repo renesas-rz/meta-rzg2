@@ -1,0 +1,32 @@
+From fc26a9e1d4807eb70ccbd9800f35e6a928220843 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 09:39:54 +0700
+Subject: [PATCH 166/357] arm64: dts: renesas: r8a774b1-hihope-rzg2n-ex: enable
+ support pciec1
+
+This commit enables support pciec1 in HiHope RZ/G2N Rev.4 Board.
+To use PCIEC1, we must set:
+	+ Pin 7 of SW1001 on Main Board = ON
+	+ SW43 on Sub Board = OFF
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+index 60d7c8a..104817a 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774b1-hihope-rzg2n-ex.dts
+@@ -19,3 +19,8 @@
+ &sata {
+ 	status = "okay";
+ };
++
++/* Set SW43 = OFF and SW1001[7] = ON for PCIE1 port to be activated */
++&pciec1 {
++	status = "okay";
++};
+-- 
+2.7.4
+

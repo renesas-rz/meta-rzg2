@@ -1,0 +1,35 @@
+From 0e459a6c0a0d7325e1dd86bb6e0803ace10152bd Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 30 Jul 2020 10:35:07 +0700
+Subject: [PATCH 296/357] arm64: dts: renesas: r8a774a3: Add GSX node for
+ R8A774A3
+
+This patch adds GSX device node for R8A774A3 SoC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 8adf7cd..445a8e8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -1883,8 +1883,13 @@
+ 		};
+ 
+ 		gsx: gsx@fd000000 {
++			compatible = "renesas,gsx";
+ 			reg = <0 0xfd000000 0 0x40000>;
+-			/* placeholder */
++			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 112>;
++			operating-points-v2 = <&gsx_opp0>;
++			power-domains = <&sysc R8A774A3_PD_3DG_B>;
++			resets = <&cpg 112>;
+ 		};
+ 
+ 		pciec0: pcie@fe000000 {
+-- 
+2.7.4
+

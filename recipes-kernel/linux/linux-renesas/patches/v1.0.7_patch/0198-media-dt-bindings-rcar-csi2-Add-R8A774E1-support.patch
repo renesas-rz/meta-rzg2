@@ -1,0 +1,27 @@
+From f6a44b67528e31c7d28c35203b6f7573ddfe5e5a Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Apr 2020 10:31:52 +0700
+Subject: [PATCH 198/357] media: dt-bindings: rcar-csi2: Add R8A774E1 support
+
+This patch adds documentation for CSI2 of RZ/G2H.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt b/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt
+index 2525cdb..e3286fb 100644
+--- a/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt
++++ b/Documentation/devicetree/bindings/media/renesas,rcar-csi2.txt
+@@ -11,6 +11,7 @@ Mandatory properties
+    - "renesas,r8a774a1-csi2" for the R8A774A1 device.
+    - "renesas,r8a774b1-csi2" for the R8A774B1 device.
+    - "renesas,r8a774c0-csi2" for the R8A774C0 device.
++   - "renesas,r8a774e1-csi2" for the R8A774E1 device.
+    - "renesas,r8a7795-csi2" for the R8A7795 device.
+    - "renesas,r8a7796-csi2" for the R8A7796 device.
+    - "renesas,r8a77965-csi2" for the R8A77965 device.
+-- 
+2.7.4
+

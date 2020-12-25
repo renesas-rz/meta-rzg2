@@ -1,0 +1,28 @@
+From c2f2af2bcb216603b9c3fadcb98679b7bab3a443 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 28 Jul 2020 13:43:46 +0700
+Subject: [PATCH 280/357] media: dt-bindings: rcar-vin: Add R8A774A3 support
+
+Add the compatible string for RZ/G2M v3.0 (a.k.a. R8A774A3)
+to the list of SoCs supported by rcar-vin driver.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/media/rcar_vin.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/media/rcar_vin.txt b/Documentation/devicetree/bindings/media/rcar_vin.txt
+index 0f20db3..6e8cff0 100644
+--- a/Documentation/devicetree/bindings/media/rcar_vin.txt
++++ b/Documentation/devicetree/bindings/media/rcar_vin.txt
+@@ -13,6 +13,7 @@ on Gen3 and RZ/G2 platforms to a CSI-2 receiver.
+    - "renesas,vin-r8a7743" for the R8A7743 device
+    - "renesas,vin-r8a7745" for the R8A7745 device
+    - "renesas,vin-r8a774a1" for the R8A774A1 device
++   - "renesas,vin-r8a774a3" for the R8A774A3 device
+    - "renesas,vin-r8a774b1" for the R8A774B1 device
+    - "renesas,vin-r8a774c0" for the R8A774C0 device
+    - "renesas,vin-r8a774e1" for the R8A774E1 device
+-- 
+2.7.4
+
