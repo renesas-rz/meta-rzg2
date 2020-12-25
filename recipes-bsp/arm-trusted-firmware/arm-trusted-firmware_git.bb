@@ -49,6 +49,7 @@ SRC_URI += " \
 	file://0020-rzg-drivers-console-Treat-log-as-device-memory.patch \
 	file://0021-rzg-ddr-Update-DDR-setting-for-G2H-G2M-and-G2N.patch \
 	file://0022-plat-rzg-Update-IPL-and-Secure-Monitor-Rev.2.0.7.patch \
+	file://0023-rzg-g2e-add-support-for-identifying-board-revision.patch \
 "
 
 PV = "v2.4+git"
