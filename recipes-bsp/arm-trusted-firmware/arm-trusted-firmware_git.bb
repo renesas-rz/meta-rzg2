@@ -43,13 +43,14 @@ SRC_URI += " \
 	file://0014-rzg-drivers-SPI-multi-I-O-bus-controller.patch \
 	file://0015-rzg-drivers-add-watchdog-support.patch \
 	file://0016-plat-renesas-rzg-Add-ECC-support-for-RZ-G2-platform.patch \
-	file://0017-driver-rzg-swdt-increase-WDT-count-when-ECC-enabled.patch \
 	file://0018-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
 	file://0019-Don-t-return-error-information-from-console_flush.patch \
 	file://0020-rzg-drivers-console-Treat-log-as-device-memory.patch \
 	file://0021-rzg-ddr-Update-DDR-setting-for-G2H-G2M-and-G2N.patch \
 	file://0022-plat-rzg-Update-IPL-and-Secure-Monitor-Rev.2.0.7.patch \
 	file://0023-rzg-g2e-add-support-for-identifying-board-revision.patch \
+	file://0024-drivers-renesas-rzg-wdt-Create-init-counter-function.patch \
+	file://0025-plat-rzg-bl2_fusa-re-work-initialize-memory-of-FUSA-.patch \
 "
 
 PV = "v2.4+git"
