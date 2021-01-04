@@ -1,0 +1,289 @@
+From 134b1f5e264da404ab5eb6889964645c37a115ec Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 31 Dec 2020 14:34:15 +0700
+Subject: [PATCH 25/26] plat: rzg: bl2_fusa: re-work initialize memory of FUSA
+ and ECC area
+
+Previous implement can cause the missing initialize memory of FUSA/ECC
+area when changing the configuration, and make the ECC error occur.
+This time we will initialize the memory base on the configuration to
+avoid missing.
+This commit also update the printed information that useful for user
+understand instead of using value of register.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ plat/renesas/rzg/bl2_fusa.c | 211 +++++++++++++++++++++---------------
+ 1 file changed, 122 insertions(+), 89 deletions(-)
+
+diff --git a/plat/renesas/rzg/bl2_fusa.c b/plat/renesas/rzg/bl2_fusa.c
+index aad75efd8..fccac0455 100644
+--- a/plat/renesas/rzg/bl2_fusa.c
++++ b/plat/renesas/rzg/bl2_fusa.c
+@@ -14,6 +14,14 @@
+ 
+ #define FUSA_DRAM_CLEAR		1
+ 
++#define NUM_DFUSACR		8
++#define NUM_EFUSACR		8
++#define BANK_SIZE		(2048)
++#define AREA_SIZE		(BANK_SIZE / NUM_DFUSACR)
++#define EXTRA_SPLIT_SIZE	(AREA_SIZE / NUM_EFUSACR)
++#define DRAM_ADDR_BASE		(0x400000000)
++#define DRAM_XOR_ADDR		(0x200000000)
++
+ #define	DFUSAAREACR		0xE6785000	/* DRAM FuSa Area Conf */
+ #define	DECCAREACR		0xE6785040	/* DRAM ECC Area Conf */
+ #define	NUM_DAREA		16
+@@ -43,57 +51,7 @@
+ #define	ARRAY_SIZE(a)		(sizeof(a) / sizeof(a[0]))
+ #endif
+ 
+-#if (RZG_LSI == RZG_G2E)
+-#define	FUSAAREA1			0x408000000
+-#define	FUSAAREA1_TOTAL		MB(128+256+256+256+64)
+-#define	ECCAREA1			0x444000000
+-#define	ECCAREA1_TOTAL		MB(128+256+256+256+64)
+-#endif /* (RZG_LSI == RZG_G2E) */
+-
+-#if (RZG_LSI == RZG_G2N)
+-#define	FUSAAREA1		0x408000000
+-#define	FUSAAREA1_TOTAL		MB(128+256+512+512+512+64)
+-#define	ECCAREA1		0x484000000
+-#define	ECCAREA1_TOTAL		MB(128+256+512+512+512+64)
+-#endif /* (RZG_LSI == RZG_G2N) */
+-
+-#if (RZG_LSI == RZG_G2M)
+-#if (RZG_DRAM_ECC_FULL == 1)
+-#define	FUSAAREA1		0x408000000
+-#define	FUSAAREA1_TOTAL		MB(1920)
+-#define	ECCAREA1		0x608000000
+-#define	ECCAREA1_TOTAL		MB(1920)
+-#else
+-#define	FUSAAREA1		0x408000000
+-#define	FUSAAREA1_TOTAL		MB(960)
+-#define	ECCAREA1		0x444000000
+-#define	ECCAREA1_TOTAL		MB(960)
+-
+-#define	FUSAAREA2		0x600000000
+-#define	FUSAAREA2_TOTAL		MB(1024)
+-#define	ECCAREA2		0x640000000
+-#define	ECCAREA2_TOTAL		MB(1024)
+-#endif
+-#endif /* (RZG_LSI == RZG_G2M) */
+-
+-#if (RZG_LSI == RZG_G2H)
+-#if (RZG_DRAM_ECC_FULL == 1)
+-#define	FUSAAREA1		0x408000000
+-#define	FUSAAREA1_TOTAL		MB(1920)
+-#define	ECCAREA1		0x608000000
+-#define	ECCAREA1_TOTAL		MB(1920)
+-#else
+-#define	FUSAAREA1		0x408000000
+-#define	FUSAAREA1_TOTAL		MB(960)
+-#define	ECCAREA1		0x444000000
+-#define	ECCAREA1_TOTAL		MB(960)
+-
+-#define	FUSAAREA2		0x600000000
+-#define	FUSAAREA2_TOTAL		MB(1024)
+-#define	ECCAREA2		0x640000000
+-#define	ECCAREA2_TOTAL		MB(1024)
+-#endif
+-#endif /* (RZG_LSI == RZG_G2H) */
++extern void rzg_swdt_init_counter(void);
+ 
+ struct rzg2_ecc_conf {
+ 	uint32_t fusaareacr;
+@@ -249,11 +207,64 @@ static void bzero64(uintptr_t start, uint64_t size)
+ #if (RZG_LSI == RZG_G2M || RZG_LSI == RZG_G2H)
+ void bl2_ecc_dual_init()
+ {
++	int i, num_area;
++	uintptr_t addr[24];
++	uint64_t size[24];
++
++	num_area = 0;
++	for (i = 0; i < NUM_DFUSACR; i++) {
++		if (fusacr & (EFUSASEL(0) | DFUSASEL((1 << i)))) {
++			addr[num_area] = DRAM_ADDR_BASE + (i * MB(AREA_SIZE));
++			size[num_area] = MB(AREA_SIZE);
++
++			if (num_area > 0 &&
++			    (addr[num_area] ==
++			     (addr[num_area - 1] + size[num_area - 1])))
++				size[num_area - 1] += size[num_area];
++			else
++				num_area++;
++		} else if ((adsplcr0 & SPLITSEL((1 << i))) &&
++			   (adsplcr1 & SPLITSEL((1 << i)))) {
++			int j;
++
++			for (j = 0 ; j < NUM_EFUSACR; j++) {
++				if (!(fusacr & EFUSASEL((1 << j))))
++					continue;
++
++				addr[num_area] = DRAM_ADDR_BASE +
++						 (i * MB(AREA_SIZE)) +
++						 (j * MB(EXTRA_SPLIT_SIZE));
++				size[num_area] = MB(EXTRA_SPLIT_SIZE);
++
++				if (num_area > 0 &&
++				    (addr[num_area] ==
++				     (addr[num_area - 1] + size[num_area - 1])))
++					size[num_area - 1] += size[num_area];
++				else
++					num_area++;
++			}
++		}
++	}
++
++
++#if (RZG_DRAM_ECC_FULL == 1)
++	NOTICE("BL2: DRAM ECC Full Dual Channel Configured:\n");
++#else /* (RZG_DRAM_ECC_FULL == 1) */
++	NOTICE("BL2: DRAM ECC Partial mode\n");
++#endif /* (RZG_DRAM_ECC_FULL == 1) */
++	for (i = 0; i < num_area; i++) {
++		NOTICE("\tECC from 0x%lx, size = %d MB\n",
++		       addr[i] ^ DRAM_XOR_ADDR, (unsigned int)(size[i] >> 20));
+ #if ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1))
+-	/* Clear DRAM ECC Area (for check) */
+-	NOTICE("BL2: Clearing ECC area from %lx\n", ECCAREA1);
+-	bzero64(ECCAREA1, (uint64_t)ECCAREA1_TOTAL);
+-#endif /*((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1)) */
++		/* Erase memory consume too much time, it may cause
++		 * overflow watchdog, so that we will reset the watchdog
++		 * counter to have enough time.
++		 */
++		rzg_swdt_init_counter();
++		VERBOSE("\t\tClearing ECC area...\n");
++		bzero64((addr[i] ^ DRAM_XOR_ADDR), size[i]);
++#endif /* ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1)) */
++	}
+ 
+ 	mmio_write_32((uintptr_t)((uint32_t *)ADSPLCR0), adsplcr0);
+ 	mmio_write_32((uintptr_t)((uint32_t *)ADSPLCR1), adsplcr1);
+@@ -261,57 +272,78 @@ void bl2_ecc_dual_init()
+ 	mmio_write_32((uintptr_t)((uint32_t *)ADSPLCR3), adsplcr3);
+ 	mmio_write_32((uintptr_t)((uint32_t *)FUSACR),  fusacr);
+ 
+-	NOTICE("BL2: DRAM ECC Configured:\n");
+-	NOTICE("     ADSPLCR0=0x%x\n", adsplcr0);
+-	NOTICE("     ADSPLCR1=0x%x\n", adsplcr1);
+-	NOTICE("     ADSPLCR2=0x%x\n", adsplcr2);
+-	NOTICE("     ADSPLCR3=0x%x\n", adsplcr3);
+-	NOTICE("     FUSACR=0x%x\n", fusacr);
+-
++	for (i = 0; i < num_area; i++) {
++		NOTICE("\tFUSA from 0x%lx, size = %d MB\n",
++		       addr[i], (unsigned int)(size[i] >> 20));
+ #if ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1))
+-	/* Clear DRAM data area to initialize ECC area */
+-	NOTICE("BL2: Clearing DATA area from %lx\n", FUSAAREA1);
+-	bzero64(FUSAAREA1, (uint64_t)FUSAAREA1_TOTAL);
++		/* Erase memory consume too much time, it may cause
++		 * overflow watchdog, so that we will reset the watchdog
++		 * counter to have enough time.
++		 */
++		rzg_swdt_init_counter();
++		VERBOSE("\t\tClearing FUSA area...\n");
++		bzero64(addr[i], size[i]);
+ #endif /* ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 1)) */
++	}
+ }
+ #endif /* (RZG_LSI == RZG_G2M || RZG_LSI == RZG_G2H) */
+ 
+ void bl2_ecc_single_init(const struct rzg2_ecc_conf *conf, int nb_of_conf)
+ {
+-	int n;
++	int n, size_shift;
++	uintptr_t data = 0x0, ecc = 0x0;
++	uint32_t fusa_size = 0;
+ 
++#if (RZG_DRAM_ECC_FULL == 2)
++	NOTICE("BL2: DRAM ECC Full Single Channel Configured:\n");
++#else /* (RZG_DRAM_ECC_FULL == 2) */
++	NOTICE("BL2: DRAM ECC Partial mode\n");
++#endif /* (RZG_DRAM_ECC_FULL == 2) */
++	for (n = 0; n < nb_of_conf; n++, conf++) {
++		if (conf->fusaareacr & ((uint32_t) 1 << 31)) {
++			fusa_size = 1 << ((conf->fusaareacr >> 24) & 0xF);
++			data = (uintptr_t)(conf->fusaareacr & 0xFFFFFF) << 12;
++			ecc = (uintptr_t)(conf->eccareacr & 0xFFFFFF) << 12;
++			/* The ECC size of ECC single follow the ECC bit mode
++			 * ECC bit mode is 8, the ECC size equal to DATA size
++			 * ECC bit mode is 64, the ECC size is 1/8 of DATA size
++			 */
++			size_shift = (conf->eccareacr >> 31) * 3;
++
++			NOTICE("\tFUSA from 0x%lx, size = %d MB,\n",
++			       data, fusa_size);
++			NOTICE("\t ECC from 0x%lx, ECC %d bits mode\n",
++			       ecc, (size_shift == 0 ? 8 : 64));
+ #if ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 2))
+-	/* Clear DRAM ECC Area (for check) */
+-	NOTICE("BL2: Clearing ECC area from %lx\n", ECCAREA1);
+-	bzero64(ECCAREA1, (uint64_t)ECCAREA1_TOTAL);
+-#if (defined (ECCAREA2) && defined (ECCAREA2_TOTAL))
+-	NOTICE("BL2: Clearing ECC area from %lx\n", ECCAREA2);
+-	bzero64(ECCAREA2, (uint64_t)ECCAREA2_TOTAL);
+-#endif /* (defined (ECCAREA2) && defined (ECCAREA2_TOTAL)) */
++			/* Erase memory consume too much time, it may cause
++			 * overflow watchdog, so that we will reset the watchdog
++			 * counter to have enough time.
++			 */
++			rzg_swdt_init_counter();
++
++			VERBOSE("\t\tClearing ECC area...\n");
++			bzero64(ecc, MB((uint64_t)fusa_size >> size_shift));
+ #endif /* ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 2)) */
++		}
+ 
+-	for (n = 0; n < nb_of_conf; n++, conf++) {
+ 		mmio_write_32((uintptr_t)((uint32_t *)DFUSAAREACR + n),
+ 			      conf->fusaareacr);
+ 		mmio_write_32((uintptr_t)((uint32_t *)DECCAREACR + n),
+ 			      conf->eccareacr);
+-		if(conf->fusaareacr & ((uint32_t) 1 << 31)) {
+-			NOTICE("BL2: DRAM ECC area=%d, size=%d MB, \n",
+-			       n, 1 << ((conf->fusaareacr >> 24) & 0xf));
+-			NOTICE("\t FuSa=0x%x ECC=0x%x \n",
+-			       conf->fusaareacr, conf->eccareacr);
+-		}
+-	}
+ 
+ #if ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 2))
+-	/* Clear DRAM data area to initialize ECC area */
+-	NOTICE("BL2: Clearing DATA area from %lx\n", FUSAAREA1);
+-	bzero64(FUSAAREA1, (uint64_t)FUSAAREA1_TOTAL);
+-#if (defined (FUSAAREA2) && defined (FUSAAREA2_TOTAL))
+-	NOTICE("BL2: Clearing DATA area from %lx\n", FUSAAREA2);
+-	bzero64(FUSAAREA2, (uint64_t)FUSAAREA2_TOTAL);
+-#endif /* (defined (FUSAAREA2) && defined (FUSAAREA2_TOTAL)) */
++		if (conf->fusaareacr & ((uint32_t) 1 << 31)) {
++			/* Erase memory consume too much time, it may cause
++			 * overflow watchdog, so that we will reset the watchdog
++			 * counter to have enough time.
++			 */
++			rzg_swdt_init_counter();
++
++			VERBOSE("\t\tClearing FUSA area...\n");
++			bzero64(data, MB((uint64_t)fusa_size));
++		}
+ #endif /* ((FUSA_DRAM_CLEAR == 1) && (RZG_DRAM_ECC_FULL == 2)) */
++	}
+ }
+ 
+ #endif /* (RZG_DRAM_ECC == 1) */
+@@ -343,6 +375,7 @@ void bl2_ecc_init(uint32_t major, uint32_t minor)
+ #else
+ #error "Don't have ECC initialize routine(unknown)."
+ #endif
+-
++#else  /* RZG_DRAM_ECC == 1 */
++	NOTICE("BL2: DRAM don't have ECC configuration\n");
+ #endif /* RZG_DRAM_ECC == 1 */
+ }
+-- 
+2.17.1
+
