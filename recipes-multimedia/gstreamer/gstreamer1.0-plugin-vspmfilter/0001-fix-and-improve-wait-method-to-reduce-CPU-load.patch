@@ -1,0 +1,121 @@
+From 607770cc7cb5e16ce36261289c715f44a8412d41 Mon Sep 17 00:00:00 2001
+From: Hung Tran <hung.tran.jy@renesas.com>
+Date: Fri, 8 Jan 2021 16:50:28 +0700
+Subject: [PATCH] fix and improve wait method to reduce CPU load
+
+Currently vspmfilter waits for job complete by a global variable.
+This global variable will be overwritten if multiple instances of vspmfilter
+exist in a GStreamer process, and those instances cannot run correctly.
+Besides, current wait method is using a simple continous while() loop.
+This consumes considerable CPU load if VSPM is under high load and
+vspmfilter has to wait longer.
+
+Change the global variable to a private semaphore to fix and improve.
+After this change, vspmfilter can work normally when there are multiple
+instances in process. And CPU load is better, especially when many streams
+are processed at the same time (high load for VSPM).
+
+Signed-off-by: Hung Tran <hung.tran.jy@renesas.com>
+---
+ gstvspmfilter.c | 20 +++++++++++---------
+ gstvspmfilter.h |  2 ++
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/gstvspmfilter.c b/gstvspmfilter.c
+index b013107..e0053d5 100644
+--- a/gstvspmfilter.c
++++ b/gstvspmfilter.c
+@@ -3,7 +3,7 @@
+  * This file:
+  * Copyright (C) 2003 Ronald Bultje <rbultje@ronald.bitfreak.net>
+  * Copyright (C) 2010 David Schleef <ds@schleef.org>
+- * Copyright (C) 2014 Renesas Corporation
++ * Copyright (C) 2014-2020 Renesas Electronics Corporation
+  *
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Library General Public
+@@ -64,8 +64,6 @@ GType gst_vspm_filter_get_type (void);
+ 
+ static GQuark _colorspace_quark;
+ 
+-volatile unsigned char end_flag = 0;  /* wait vspm-callback flag */
+-
+ #define gst_vspm_filter_parent_class parent_class
+ G_DEFINE_TYPE (GstVspmFilter, gst_vspm_filter, GST_TYPE_VIDEO_FILTER);
+ G_DEFINE_TYPE (GstVspmFilterBufferPool, gst_vspmfilter_buffer_pool, GST_TYPE_BUFFER_POOL);
+@@ -876,6 +874,7 @@ gst_vspm_filter_finalize (GObject * obj)
+   if (space->allocator)
+     gst_object_unref(space->allocator);
+ 
++  sem_destroy (&space->smp_wait);
+   G_OBJECT_CLASS (parent_class)->finalize (obj);
+ }
+ 
+@@ -940,6 +939,8 @@ gst_vspm_filter_init (GstVspmFilter * space)
+     for (j = 0; j < GST_VIDEO_MAX_PLANES; j++)
+       vspm_out->vspm[i].dmabuf_pid[j] = -1;
+   }
++
++  sem_init (&space->smp_wait, 0, 0);
+ }
+ 
+ void
+@@ -988,10 +989,13 @@ gst_vspm_filter_get_property (GObject * object, guint property_id,
+ static void cb_func(
+   unsigned long uwJobId, long wResult, unsigned long uwUserData)
+ {
++  sem_t *p_smpwait = (sem_t *) uwUserData;
++
+   if (wResult != 0) {
+     printf("VSPM: error end. (%ld)\n", wResult);
+   }
+-  end_flag = 1;
++  /* Inform frame finish to transform function */
++  sem_post (p_smpwait);
+ }
+ 
+ static GstFlowReturn
+@@ -1244,17 +1248,15 @@ gst_vspm_filter_transform_frame (GstVideoFilter * filter,
+   vspm_ip.uhType    = VSPM_TYPE_VSP_AUTO;
+   vspm_ip.unionIpParam.ptVsp = &vsp_par;
+ 
+-  end_flag = 0;
+-  ercd = VSPM_lib_Entry(vsp_info->vspm_handle, &vsp_info->jobid, 126, &vspm_ip, 0, cb_func); 
++  ercd = VSPM_lib_Entry(vsp_info->vspm_handle, &vsp_info->jobid, 126, &vspm_ip, (unsigned long)&space->smp_wait, cb_func);
+   if (ercd) {
+     printf("VSPM_lib_Entry() Failed!! ercd=%ld\n", ercd);
+     GST_ERROR ("VSPM_lib_Entry() Failed!! ercd=%ld\n", ercd);
+     return GST_FLOW_ERROR;
+   }
+ 
+-  while(1) {
+-    if (end_flag) break;
+-  }
++  /* Wait for callback */
++  sem_wait (&space->smp_wait);
+ 
+   return GST_FLOW_OK;
+ }
+diff --git a/gstvspmfilter.h b/gstvspmfilter.h
+index e7c39f6..8fcee00 100644
+--- a/gstvspmfilter.h
++++ b/gstvspmfilter.h
+@@ -30,6 +30,7 @@
+ 
+ #include <fcntl.h>              /* low-level i/o */
+ #include <unistd.h>
++#include <semaphore.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <sys/mman.h>
+@@ -172,6 +173,7 @@ struct _GstVspmFilter {
+   Vspm_mmng_ar *vspm_out;
+   VspmbufArray *vspm_outbuf;
+   gint first_buff;
++  sem_t smp_wait;
+ };
+ 
+ struct _GstVspmFilterClass
+-- 
+1.9.1
+
