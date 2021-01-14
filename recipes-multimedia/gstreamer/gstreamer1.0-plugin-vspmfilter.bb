@@ -7,6 +7,7 @@ inherit autotools pkgconfig
 
 SRC_URI = " \
     file://vspmfilter.tar.xz \
+    file://0001-fix-and-improve-wait-method-to-reduce-CPU-load.patch \
 "
 
 S = "${WORKDIR}/vspmfilter"
