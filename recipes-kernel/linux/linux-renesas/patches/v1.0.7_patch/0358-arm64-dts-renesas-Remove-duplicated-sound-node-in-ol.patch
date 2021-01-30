@@ -1,0 +1,73 @@
+From 14b7964c6056893dc95f618a2d9fcfcf7ed57c9c Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 21 Jan 2021 13:55:02 +0700
+Subject: [PATCH 358/364] arm64: dts: renesas: Remove duplicated sound node in
+ older EK874 board versions
+
+This commit is created to remove duplicated sound nodes in
+older EK874 board versions.
+These duplicated sound nodes cause wrong parse phandles.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874-revc.dts | 16 ----------------
+ arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts | 16 ----------------
+ 2 files changed, 32 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874-revc.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874-revc.dts
+index 00a3ebc..6394fce 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874-revc.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874-revc.dts
+@@ -79,22 +79,6 @@
+ 	clock-frequency = <22579200>;
+ };
+ 
+-&sound {
+-	simple-audio-card,dai-link@1 {
+-		reg = <1>;
+-		format = "i2s";
+-		cpu {
+-			sound-dai = <&rcar_sound 1>;
+-			bitclock-master;
+-			frame-master;
+-		};
+-
+-		codec {
+-			sound-dai = <&tda19988>;
+-		};
+-	};
+-};
+-
+ &du {
+ 	ports {
+ 		port@0 {
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+index 2bdd7d3..bb87984 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-es10-cat874.dts
+@@ -79,22 +79,6 @@
+ 	clock-frequency = <22579200>;
+ };
+ 
+-&sound {
+-	simple-audio-card,dai-link@1 {
+-		reg = <1>;
+-		format = "i2s";
+-		cpu {
+-			sound-dai = <&rcar_sound 1>;
+-			bitclock-master;
+-			frame-master;
+-		};
+-
+-		codec {
+-			sound-dai = <&tda19988>;
+-		};
+-	};
+-};
+-
+ &du {
+ 	ports {
+ 		port@0 {
+-- 
+2.7.4
+

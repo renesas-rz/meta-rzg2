@@ -1,0 +1,86 @@
+From 9fbb17a1875e3274ba4485d91a8cd4b63d554654 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 17 Dec 2020 15:34:14 +0700
+Subject: [PATCH 359/364] watchdog: renesas_wdt: Correct watchdog device boot
+ status
+
+Since Watchdog Timer in U-boot is supported, watchdog
+ device boot status variable cannot be set to the
+ correct value if enabled Watchdog in U-boot.
+
+Adding rwdt_get_overflow_status() function to get
+ the wdt_overflow variable passed from U-boot.
+
+In rwdt_probe() function, watchdog device boot
+ status will be corrected based on the value of
+ rwdt_overflow.
+
+If not enabling Watchdog in U-boot, watchdog device
+ boot status will be returned to the default setting.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/watchdog/renesas_wdt.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/watchdog/renesas_wdt.c b/drivers/watchdog/renesas_wdt.c
+index 2496397..b2fad1c 100644
+--- a/drivers/watchdog/renesas_wdt.c
++++ b/drivers/watchdog/renesas_wdt.c
+@@ -42,6 +42,7 @@
+ #define DIV_BY_CLKS_PER_SEC(p, d) ((d) * clk_divs[(p)->cks] / (p)->clk_rate)
+ 
+ static const unsigned int clk_divs[] = { 1, 4, 16, 32, 64, 128, 1024, 4096 };
++static s8 rwdt_overflow = -1;
+ 
+ static bool nowayout = WATCHDOG_NOWAYOUT;
+ module_param(nowayout, bool, 0);
+@@ -138,6 +139,18 @@ static int rwdt_restart(struct watchdog_device *wdev, unsigned long action,
+ 	return 0;
+ }
+ 
++static int __init rwdt_get_overflow_status(char *str)
++{
++	int ret;
++
++	ret = kstrtos8(str, 0, &rwdt_overflow);
++
++	if (ret < 0)
++		return ret;
++	return 0;
++}
++__setup("wdt_overflow=", rwdt_get_overflow_status);
++
+ static const struct watchdog_info rwdt_ident = {
+ 	.options = WDIOF_MAGICCLOSE | WDIOF_KEEPALIVEPING | WDIOF_SETTIMEOUT |
+ 		WDIOF_CARDRESET,
+@@ -218,8 +231,25 @@ static int rwdt_probe(struct platform_device *pdev)
+ 	pm_runtime_enable(dev);
+ 	pm_runtime_get_sync(dev);
+ 	priv->clk_rate = clk_get_rate(clk);
+-	priv->wdev.bootstatus = (readb_relaxed(priv->base + RWTCSRA) &
++
++	/*
++	 * Correct the value of wdev.bootstatus based on the
++	 * value of wdt_overflow variable passed from U-boot
++	 * to Kernel.
++	 */
++
++	switch (rwdt_overflow) {
++	case 0:
++	case 1:
++		priv->wdev.bootstatus = (rwdt_overflow) ?
++				WDIOF_CARDRESET : 0;
++		break;
++	default:
++		priv->wdev.bootstatus = (readb_relaxed(priv->base + RWTCSRA) &
+ 				RWTCSRA_WOVF) ? WDIOF_CARDRESET : 0;
++		break;
++	}
++
+ 	pm_runtime_put(dev);
+ 
+ 	if (!priv->clk_rate) {
+-- 
+2.7.4
+
