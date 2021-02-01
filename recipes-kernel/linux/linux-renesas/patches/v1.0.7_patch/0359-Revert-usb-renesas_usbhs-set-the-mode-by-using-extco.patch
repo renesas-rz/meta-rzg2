@@ -1,0 +1,67 @@
+From 675a5e6042751219c2fd5acdebeb3e0435804b48 Mon Sep 17 00:00:00 2001
+From: Hoa Huynh <hoa.huynh.ud@renesas.com>
+Date: Wed, 13 Jan 2021 13:51:08 +0700
+Subject: [PATCH 359/362] Revert "usb: renesas_usbhs: set the mode by using
+ extcon state for non-otg channel"
+
+This reverts commit cd14247d5c14b9b20bb3d3dfcaa899ca22c8dccc.
+
+EK874 rev.D can use OTG mode in fact. So, the commit doesn't need anymore.
+
+Reference:
+Git repo: https://github.com/renesas-rcar/linux-bsp.git
+Branch: v4.14.75-ltsi/rcar-3.9.9
+Commit: <52cb5055255c19baf145450e106d87f749e21e23>
+
+Signed-off-by: Hoa Huynh <hoa.huynh.ud@renesas.com>
+---
+ drivers/usb/renesas_usbhs/rcar3.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/drivers/usb/renesas_usbhs/rcar3.c b/drivers/usb/renesas_usbhs/rcar3.c
+index b9a8453..6f94692 100644
+--- a/drivers/usb/renesas_usbhs/rcar3.c
++++ b/drivers/usb/renesas_usbhs/rcar3.c
+@@ -27,7 +27,6 @@
+  * Remarks: bit[31:11] and bit[9:6] should be 0
+  */
+ #define UGCTRL2_RESERVED_3	0x00000001	/* bit[3:0] should be B'0001 */
+-#define UGCTRL2_USB0SEL_EHCI	0x00000010
+ #define UGCTRL2_USB0SEL_HSUSB	0x00000020
+ #define UGCTRL2_USB0SEL_OTG	0x00000030
+ #define UGCTRL2_VBUSSEL		0x00000400
+@@ -50,14 +49,6 @@ static void usbhs_rcar3_set_ugctrl2(struct usbhs_priv *priv, u32 val)
+ 	usbhs_write32(priv, UGCTRL2, val | UGCTRL2_RESERVED_3);
+ }
+ 
+-static void usbhs_rcar3_set_usbsel(struct usbhs_priv *priv, bool ehci)
+-{
+-	if (ehci)
+-		usbhs_rcar3_set_ugctrl2(priv, UGCTRL2_USB0SEL_EHCI);
+-	else
+-		usbhs_rcar3_set_ugctrl2(priv, UGCTRL2_USB0SEL_HSUSB);
+-}
+-
+ static int usbhs_rcar3_power_ctrl(struct platform_device *pdev,
+ 				void __iomem *base, int enable)
+ {
+@@ -83,15 +74,10 @@ static int usbhs_rcar3_power_and_pll_ctrl(struct platform_device *pdev,
+ 	struct usbhs_priv *priv = usbhs_pdev_to_priv(pdev);
+ 	u32 val;
+ 	int timeout = 1000;
+-	bool is_host = false;
+ 
+ 	if (enable) {
+ 		usbhs_write32(priv, UGCTRL, 0);	/* release PLLRESET */
+-		if (priv->edev)
+-			is_host = extcon_get_state(priv->edev, EXTCON_USB_HOST);
+-
+-		usbhs_rcar3_set_usbsel(priv, is_host);
+-
++		usbhs_rcar3_set_ugctrl2(priv, UGCTRL2_USB0SEL_HSUSB);
+ 		usbhs_bset(priv, LPSTS, LPSTS_SUSPM, LPSTS_SUSPM);
+ 		do {
+ 			val = usbhs_read32(priv, UGSTS);
+-- 
+2.7.4
+

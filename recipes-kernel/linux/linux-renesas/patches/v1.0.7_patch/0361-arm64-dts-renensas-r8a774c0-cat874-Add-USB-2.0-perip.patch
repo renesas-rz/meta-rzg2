@@ -1,0 +1,66 @@
+From 8013dc83ce0a54610856378ff6a94d6a22536136 Mon Sep 17 00:00:00 2001
+From: Hoa Huynh <hoa.huynh.ud@renesas.com>
+Date: Wed, 6 Jan 2021 13:59:45 +0700
+Subject: [PATCH 361/362] arm64: dts: renensas: r8a774c0-cat874: Add USB 2.0
+ peripheral for ek874 rev.D
+
+This patch adds usb 2.0 peripheral for EK874 rev.D and rev.E.
+
+Signed-off-by: Hoa Huynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 28 +++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 7e73191..4246ae9 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -18,6 +18,17 @@
+ 			label = "LED2";
+ 		};
+ 	};
++
++	vbus0_usb2: regulator-vbus0-usb2 {
++		compatible = "regulator-fixed";
++
++		regulator-name = "USB20_VBUS_CN";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++
++		gpio = <&gpio6 5 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
+ };
+ 
+ &sdhi1 {
+@@ -52,6 +63,11 @@
+ 		function = "sdhi3";
+ 		power-source = <1800>;
+ 	};
++
++	usb0_pins: usb {
++		groups = "usb0_b", "usb0_id";
++		function = "usb0";
++	};
+ };
+ 
+ &hscif2 {
+@@ -59,3 +75,15 @@
+ 		enable-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+ 	};
+ };
++
++&usb2_phy0 {
++	pinctrl-0 = <&usb0_pins>;
++	pinctrl-names = "default";
++	vbus-supply = <&vbus0_usb2>;
++	status = "okay";
++};
++
++&hsusb {
++	dr_mode = "otg";
++	status = "okay";
++};
+-- 
+2.7.4
+

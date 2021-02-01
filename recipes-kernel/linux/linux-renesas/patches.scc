@@ -353,3 +353,10 @@ patch patches/v1.0.7_patch/0352-arm64-dts-renesas-r8a774a3-hihope-rzg2m-Enable-v
 patch patches/v1.0.7_patch/0353-arm64-dts-renesas-r8a774e1-add-aliases-for-I2C-and-I.patch
 patch patches/v1.0.7_patch/0354-arm64-dts-renesas-cat874-common-Add-reg_1p8v-and-reg.patch
 patch patches/v1.0.7_patch/0355-arm64-dts-renensas-r8a774c0-cat874-Add-eMMC-for-ek87.patch
+patch patches/v1.0.7_patch/0356-arm64-dts-renesas-Remove-duplicated-sound-node-in-ol.patch
+patch patches/v1.0.7_patch/0357-watchdog-renesas_wdt-Correct-watchdog-device-boot-st.patch
+patch patches/v1.0.7_patch/0358-watchdog-Kconfig-support-built-in-only-for-Renesas-w.patch
+patch patches/v1.0.7_patch/0359-Revert-usb-renesas_usbhs-set-the-mode-by-using-extco.patch
+patch patches/v1.0.7_patch/0360-usb-renesas_usbhs-rcar3-Use-OTG-mode-for-EK874-rev.D.patch
+patch patches/v1.0.7_patch/0361-arm64-dts-renensas-r8a774c0-cat874-Add-USB-2.0-perip.patch
+patch patches/v1.0.7_patch/0362-arm64-dts-renensas-r8a774c0-cat874-Add-USB-3.0-pin-f.patch
