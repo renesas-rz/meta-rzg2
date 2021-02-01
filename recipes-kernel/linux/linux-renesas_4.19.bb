@@ -2,7 +2,6 @@ DESCRIPTION = "Linux kernel for the RZG2 based board"
 
 require recipes-kernel/linux/linux-yocto.inc
 require include/cas-control.inc
-require include/ecc-control.inc
 require include/docker-control.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
@@ -17,32 +16,6 @@ SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
 SRC_URI_append += "\
   file://patches.scc \
-"
-
-SRC_URI_append_r8a774c0 += "\
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-arm64-dts-cat874-reduce-mem-to-960M-when-enable-DRAM.patch ", "")} \
-"
-
-SRC_URI_append_r8a774a1 += "\
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0003-arm64-dts-hihope-rzg2m-Re-order-CMA-area-and-remove-.patch ", "")} \
-  ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-ARM64-DTS-hihope-rzg2m-disable-DRAM-channel-1-for-EC.patch \
-					 file://patches/option_patch/0002-arm64-dts-r8a774a3-hihope-rzg2m-ecc-dual-Reduce-memo.patch \
-					 file://patches/option_patch/0004-arm64-dts-hihope-rzg2m-enable-IPMMU-for-GSX.patch ", "")} \
-  ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774a3-hihope-rzg2m-Reduce-memor.patch ", "")} \
-"
-
-SRC_URI_append_r8a774b1 += "\
-  ${@base_ifelse("${ECC_FULL}" != "0", " file://patches/option_patch/0001-ARM64-DTS-r8a774b1-hihope-rzg2n-reduce-mem-when-enab.patch \
-					 file://patches/option_patch/0002-arm64-dts-r8a774b1-hihope-rzg2n-rev2-Re-order-CMA-ar.patch ", "")} \
-"
-
-SRC_URI_append_r8a774e1 += "\
-  ${@base_ifelse("${USE_ECC}" == "1",  " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Update-DRAM2.patch ", "")} \
-  ${@base_ifelse("${ECC_FULL}" == "1", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Disable-DRAM.patch \
-					 file://patches/option_patch/0002-arm64-dts-r8a774e1-hihope-rzg2h-Re-order-CMA-area-an.patch \
-					 file://patches/option_patch/0003-arm64-dts-r8a774e1-hihope-rzg2h-enable-IPMMU-for-GSX.patch ", "")} \
-  ${@base_ifelse("${ECC_FULL}" == "2", " file://patches/option_patch/0001-arm64-dts-renesas-r8a774e1-hihope-rzg2h-Reduce-memor.patch \
-					 file://patches/option_patch/0002-arm64-dts-renesas-r8a774e1-hihope-rzg2h-remove-lossy.patch ", "")} \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
