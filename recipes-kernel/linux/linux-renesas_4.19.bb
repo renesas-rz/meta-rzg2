@@ -9,17 +9,19 @@ COMPATIBLE_MACHINE = "ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h"
 
 KERNEL_URL = " \
     git://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git"
-BRANCH = "linux-4.19.y-cip-rt"
-SRCREV = "fe6e4a43439eedd3351ba9aff3eaa38dc14e9034"
+BRANCH = "${@base_conditional("IS_RT_BSP", "1", "linux-4.19.y-cip-rt", "linux-4.19.y-cip",d)}"
+SRCREV = "${@base_conditional("IS_RT_BSP", "1", "fe6e4a43439eedd3351ba9aff3eaa38dc14e9034", "53ba31d44bf6ff0a915b472797ec1af07b663751",d)}"
 
 SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
 SRC_URI_append += "\
   file://patches.scc \
+  ${@base_conditional("IS_RT_BSP", "1", "file://patches/v1.0.7_patch/rt_patches/0347-arm64-defconfig-enable-PREEMPT_RT-config.patch", "",d)} \
+  ${@base_conditional("IS_RT_BSP", "1", "file://patches/v1.0.7_patch/rt_patches/0348-gpio-gpio-rcar-prevent-to-force-the-interrupt-handle.patch", "",d)} \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
-LINUX_VERSION ?= "4.19.160-cip39-rt17"
+LINUX_VERSION ?= "${@base_conditional("IS_RT_BSP", "1", "4.19.160-cip39-rt17", "4.19.160-cip39",d)}"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 PR = "r1"

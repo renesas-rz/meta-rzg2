@@ -24,7 +24,6 @@ IMAGE_INSTALL_append = " \
     bt-fw \
     obexftp \
     bluez-alsa \
-    rt-tests \
     openssl \
     vin-init \
 "
@@ -41,4 +40,9 @@ IMAGE_INSTALL_append = " \
     lttng-tools \
     lttng-ust \
     tcf-agent \
+"
+
+# Additional tools for support testing Realtime characteristic in system
+IMAGE_INSTALL_append = " \
+    ${@base_conditional("IS_RT_BSP", "1", " rt-tests ", " ",d)} \
 "

@@ -344,8 +344,6 @@ patch patches/v1.0.7_patch/0343-arm64-dts-renesas-hihope-rzg2-ex.dtsi-enable-can
 patch patches/v1.0.7_patch/0344-dt-bindings-can-rcar_canfd-document-for-r8a774a3-can.patch
 patch patches/v1.0.7_patch/0345-arm64-dts-renesas-hihope-common-Enable-Audio-support.patch
 patch patches/v1.0.7_patch/0346-arm64-dts-renesas-r8a774a3-hihope-rzg2m-Disable-HDMI.patch
-patch patches/v1.0.7_patch/0347-arm64-defconfig-enable-PREEMPT_RT-config.patch
-patch patches/v1.0.7_patch/0348-gpio-gpio-rcar-prevent-to-force-the-interrupt-handle.patch
 patch patches/v1.0.7_patch/0349-arm64-dts-renesas-cat874-common-add-new-file-includi.patch
 patch patches/v1.0.7_patch/0350-arm64-dts-renesas-r8a774c0-reconstruct-G2E-device-fi.patch
 patch patches/v1.0.7_patch/0351-clk-renesas-r8a774e1-Add-ZG-clock.patch
