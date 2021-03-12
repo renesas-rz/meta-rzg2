@@ -5,11 +5,11 @@ require include/provisioning.inc
 DEPENDS += "bc-native dtc-native"
 
 UBOOT_URL = "git://github.com/renesas-rz/renesas-u-boot-cip.git"
-BRANCH = "v2018.09/rzg2"
+BRANCH = "v2020.10/rzg2"
 
 SRC_URI = "${UBOOT_URL};branch=${BRANCH}"
-SRCREV = "a5d350acb9a0580a2bf53b9e07a9262257597eb6"
-PV = "v2018.09+git${SRCPV}"
+SRCREV = "03b8878bc82c3903a7152ebb3beae91db5cd176b"
+PV = "v2020.10+git${SRCPV}"
 
 UBOOT_SREC_SUFFIX = "srec"
 UBOOT_SREC ?= "u-boot-elf.${UBOOT_SREC_SUFFIX}"
