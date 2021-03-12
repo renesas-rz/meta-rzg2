@@ -8,7 +8,7 @@ FLASH_WRITER_URL = "git://github.com/renesas-rz/rzg2_flash_writer.git"
 BRANCH = "master"
 
 SRC_URI = "${FLASH_WRITER_URL};branch=${BRANCH}"
-SRCREV = "757e29806159dc239064ea33a65012511518e635"
+SRCREV = "c7acdfd26226e625683835dd05a81d2b266d7147"
 
 SRC_URI_append = " \
 	${@base_conditional("SECURE_BOOT", "1", "file://0001-Add-Secure-Boot-Injection.patch", "",d)} \
