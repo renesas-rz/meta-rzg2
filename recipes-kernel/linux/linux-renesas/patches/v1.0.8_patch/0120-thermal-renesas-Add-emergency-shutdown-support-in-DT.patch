@@ -1,0 +1,65 @@
+From af9a6eecd942906584e24fed45a62bbde940b4eb Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 9 Sep 2019 10:53:52 +0700
+Subject: [PATCH 120/358] thermal: renesas: Add emergency shutdown support in
+ DT documentation
+
+This patch adds description about emergency shutdown support
+in RCar gen 3 and RZ/G2 SoC.
+
+This patch refers from horms/renesas-bsp repository with commits:
+- <831876202b1672e6eedf9efa9d2d95c5947b9cc9>
+- <957b800af000df9cf99ffeca7e03dd62ed453032>
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ .../bindings/thermal/rcar-gen3-thermal.txt         | 36 ++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+index 11dab17..52db03a 100644
+--- a/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
++++ b/Documentation/devicetree/bindings/thermal/rcar-gen3-thermal.txt
+@@ -57,3 +57,39 @@ Example:
+ 			};
+ 		};
+ 	};
++
++* Emergency shutdown for R-CAR Gen3 and RZ/G2
++Emergency shutdown functionality provides the specific cooling mechanism
++for R-CAR Gen3 and RZ/G2. In case of high temperature(e.g over 100 degrees),
++it has the ability to rapidly cool down the system.
++
++Required property:
++- polling-delay:	The maximum number of milliseconds to wait between polls
++  Type: unsigned	when checking temperature for emergency shutdown.
++  Size: one cell
++
++- on-temperature:       This value indicate the emergency temperature and
++  Type: unsigned	invokes emergency shutdown functionality when exceeding
++  Size: one cell	this temperature.
++
++- off-temperature:	This value indicates the temperature to disable
++  Type: unsigned	emergency shutdown.
++  Size: one cell
++
++- status:		Should be "disabled" always.
++  Type: string
++
++- target_cpus:		This property indicates which CPU will be targeted for
++  Type: phandle		shutdown.
++
++thermal-zones {
++	emergency {
++		polling-delay = <1000>;    /* milliseconds */
++		on-temperature = <110000>; /* millicelsius */
++		off-temperature = <95000>; /* millicelsius */
++		target_cpus = <&a57_1>,
++			      <&a57_2>,
++			      <&a57_3>;
++		status = "disabled";
++	};
++};
+-- 
+2.7.4
+

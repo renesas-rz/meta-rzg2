@@ -1,0 +1,44 @@
+From b8800b03421ad31257c8db9e5e0396a2e220b1a8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 14:50:32 +0700
+Subject: [PATCH 050/358] arm64: dts: renesas: hihope-common: enable vspm_if,
+ vspi, vspb
+
+This commit enables vspb, vspi, vspm_if support
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 2cd6778..77cdf47 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -113,6 +113,10 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <25000000>;
+ 	};
++
++	vspm_if {
++		compatible = "renesas,vspm_if";
++	};
+ };
+ 
+ &audio_clk_a {
+@@ -431,3 +435,11 @@
+ &tmu4 {
+ 	status = "okay";
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
+-- 
+2.7.4
+

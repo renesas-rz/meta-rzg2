@@ -1,0 +1,33 @@
+From f0592fb8c9632ec73f0854dd6a1da3d603388dcb Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Mon, 1 Jul 2019 17:30:16 +0700
+Subject: [PATCH 024/358] arm64: dts: r8a774c0: Add optee node
+
+This commit adds op-tee node for the R8A774c0 SoC.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index a8d4a24..ea31860 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -139,6 +139,13 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	firmware {
++		optee {
++			compatible = "linaro,optee-tz";
++			method = "smc";
++		};
++	};
++
+ 	gsx_opp_table: gsx_opp_table {
+ 		compatible = "operating-points-v2";
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,30 @@
+From dc876ae7a3960e8d41590fe70bff2a7d77a9f891 Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Thu, 30 Jul 2020 11:41:29 +0700
+Subject: [PATCH 308/358] dt-binding: usb: renesas_usbhs: Add r8a774a3 support
+
+Document RZ/G2M v3.0 (R8A774A3) SoC bindings and update for
+RZ/G2M v1.3 (R8A774A1)
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ Documentation/devicetree/bindings/usb/renesas,usbhs.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/usb/renesas,usbhs.txt b/Documentation/devicetree/bindings/usb/renesas,usbhs.txt
+index 032bc67..42c3957 100644
+--- a/Documentation/devicetree/bindings/usb/renesas,usbhs.txt
++++ b/Documentation/devicetree/bindings/usb/renesas,usbhs.txt
+@@ -5,7 +5,8 @@ Required properties:
+ 
+ 	- "renesas,usbhs-r8a7743" for r8a7743 (RZ/G1M) compatible device
+ 	- "renesas,usbhs-r8a7745" for r8a7745 (RZ/G1E) compatible device
+-	- "renesas,usbhs-r8a774a1" for r8a774a1 (RZ/G2M) compatible device
++	- "renesas,usbhs-r8a774a1" for r8a774a1 (RZ/G2M v1.3) compatible device
++	- "renesas,usbhs-r8a774a3" for r8a774a3 (RZ/G2M v3.0) compatible device
+ 	- "renesas,usbhs-r8a774b1" for r8a774b1 (RZ/G2N) compatible device
+ 	- "renesas,usbhs-r8a774c0" for r8a774c0 (RZ/G2E) compatible device
+ 	- "renesas,usbhs-r8a774e1" for r8a774e1 (RZ/G2H) compatible device
+-- 
+2.7.4
+

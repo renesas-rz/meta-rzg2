@@ -1,0 +1,32 @@
+From 7c60e8dff39ccefcc1517b3e389c0bbf54fedc68 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 30 Jul 2020 12:17:47 +0700
+Subject: [PATCH 316/358] gpu: drm: rcar-du: Add R8A774A3 support
+
+Add support for the R8A774A3 DU.
+It has one DRGB output, one LVDS output and one HDMI output.
+
+Since the block diagram of the DU for RZ/G2M v1.3 and RZ/G2M
+ v3.0 is the same. So, re-use rcar_du_r8a774a1_info in
+ rcar_du_of_table for RZ/G2M v3.0 (a.k.a R8A774A3 SoC)
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_drv.c b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+index 8537041..3722043 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_drv.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_drv.c
+@@ -424,6 +424,7 @@ static const struct of_device_id rcar_du_of_table[] = {
+ 	{ .compatible = "renesas,du-r8a7743", .data = &rzg1_du_r8a7743_info },
+ 	{ .compatible = "renesas,du-r8a7745", .data = &rzg1_du_r8a7745_info },
+ 	{ .compatible = "renesas,du-r8a774a1", .data = &rcar_du_r8a774a1_info },
++	{ .compatible = "renesas,du-r8a774a3", .data = &rcar_du_r8a774a1_info },
+ 	{ .compatible = "renesas,du-r8a774b1", .data = &rcar_du_r8a774b1_info },
+ 	{ .compatible = "renesas,du-r8a774c0", .data = &rcar_du_r8a774c0_info },
+ 	{ .compatible = "renesas,du-r8a774e1", .data = &rcar_du_r8a774e1_info },
+-- 
+2.7.4
+

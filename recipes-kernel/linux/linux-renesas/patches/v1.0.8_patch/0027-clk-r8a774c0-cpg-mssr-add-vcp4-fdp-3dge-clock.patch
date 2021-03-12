@@ -1,0 +1,38 @@
+From 900399a25679ee99d5322a6a0628edfbd7efbbcc Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Mon, 1 Jul 2019 17:38:10 +0700
+Subject: [PATCH 027/358] clk: r8a774c0-cpg-mssr: add vcp4, fdp, 3dge clock
+
+This commit adds:
+- VCP4(VCPLF), VCP4(VDPB) clocks
+- fdp clock
+- 3dge clock
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ drivers/clk/renesas/r8a774c0-cpg-mssr.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/clk/renesas/r8a774c0-cpg-mssr.c b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+index 190dfdf..6c0b77e 100644
+--- a/drivers/clk/renesas/r8a774c0-cpg-mssr.c
++++ b/drivers/clk/renesas/r8a774c0-cpg-mssr.c
+@@ -132,11 +132,15 @@ static const struct cpg_core_clk r8a774c0_core_clks[] __initconst = {
+ };
+ 
+ static const struct mssr_mod_clk r8a774c0_mod_clks[] __initconst = {
++	DEF_MOD("3dge",			 112,	R8A774C0_CLK_ZG),
++	DEF_MOD("fdp1-0",		 119,	R8A774C0_CLK_S0D1),
+ 	DEF_MOD("tmu4",			 121,	R8A774C0_CLK_S0D6C),
+ 	DEF_MOD("tmu3",			 122,	R8A774C0_CLK_S3D2C),
+ 	DEF_MOD("tmu2",			 123,	R8A774C0_CLK_S3D2C),
+ 	DEF_MOD("tmu1",			 124,	R8A774C0_CLK_S3D2C),
+ 	DEF_MOD("tmu0",			 125,	R8A774C0_CLK_CP),
++	DEF_MOD("vcplf",		 130,	R8A774C0_CLK_S3D1),
++	DEF_MOD("vdpb",			 131,	R8A774C0_CLK_S3D1),
+ 	DEF_MOD("scif5",		 202,	R8A774C0_CLK_S3D4C),
+ 	DEF_MOD("scif4",		 203,	R8A774C0_CLK_S3D4C),
+ 	DEF_MOD("scif3",		 204,	R8A774C0_CLK_S3D4C),
+-- 
+2.7.4
+

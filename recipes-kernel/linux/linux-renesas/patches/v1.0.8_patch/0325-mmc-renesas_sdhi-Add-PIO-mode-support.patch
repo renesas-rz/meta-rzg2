@@ -1,0 +1,59 @@
+From 8cb9a12180f62a4a6f90fc849de618fea0798fa3 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Wed, 29 Jul 2020 09:20:12 +0700
+Subject: [PATCH 325/358] mmc: renesas_sdhi: Add PIO mode support
+
+This patch adds switching function of the transfer mode of PIO and DMA.
+
+Reference path:
+- Repository: https://github.com/renesas-rcar/linux-bsp
+- Branch: v4.14.75-ltsi/rcar-3.9.9
+- Commit: <840e003ce151fc2dbb339d66cf4729729dccdb91>
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ drivers/mmc/host/Kconfig                      | 10 ++++++++++
+ drivers/mmc/host/renesas_sdhi_internal_dmac.c |  6 +++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index b7f809a..97fcca3 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -630,6 +630,16 @@ config MMC_SDHI_INTERNAL_DMAC
+ 	  using on-chip bus mastering. This supports the controllers
+ 	  found in arm64 based SoCs.
+ 
++config MMC_SDHI_PIO
++	bool "Renesas SDHI PIO transfer mode setting"
++	depends on MMC_SDHI
++	help
++	  This setting switches the transfer mode of the PIO and DMA.
++
++	  Select Yes or No according to the following.
++	  When switching the transfer mode from DMA to PIO, say Y here.
++	  When switching the transfer mode from PIO to DMA, say N here.
++
+ config MMC_CB710
+ 	tristate "ENE CB710 MMC/SD Interface support"
+ 	depends on PCI
+diff --git a/drivers/mmc/host/renesas_sdhi_internal_dmac.c b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+index 33c69e0..97f5f48 100644
+--- a/drivers/mmc/host/renesas_sdhi_internal_dmac.c
++++ b/drivers/mmc/host/renesas_sdhi_internal_dmac.c
+@@ -312,7 +312,11 @@ static int renesas_sdhi_internal_dmac_probe(struct platform_device *pdev)
+ 	/* value is max of SD_SECCNT. Confirmed by HW engineers */
+ 	dma_set_max_seg_size(dev, 0xffffffff);
+ 
+-	return renesas_sdhi_probe(pdev, &renesas_sdhi_internal_dmac_dma_ops);
++	#ifndef CONFIG_MMC_SDHI_PIO
++		return renesas_sdhi_probe(pdev, &renesas_sdhi_internal_dmac_dma_ops);
++	#else
++		return renesas_sdhi_probe(pdev, NULL);
++	#endif
+ }
+ 
+ static const struct dev_pm_ops renesas_sdhi_internal_dmac_dev_pm_ops = {
+-- 
+2.7.4
+

@@ -1,0 +1,31 @@
+From 362cb08a3f3d9ed80c1502f68e1f22667caf9c8e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 10 Sep 2019 11:51:33 +0700
+Subject: [PATCH 114/358] media: rcar-vin: Add support for R8A774B1 SoC
+
+This patch adds support for R8A774B1 SoC.
+This is similar with RCar M3N SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-core.c b/drivers/media/platform/rcar-vin/rcar-core.c
+index 07a0c77..0c49d00 100644
+--- a/drivers/media/platform/rcar-vin/rcar-core.c
++++ b/drivers/media/platform/rcar-vin/rcar-core.c
+@@ -1122,6 +1122,10 @@ static const struct of_device_id rvin_of_id_table[] = {
+ 		.data = &rcar_info_r8a7796,
+ 	},
+ 	{
++		.compatible = "renesas,vin-r8a774b1",
++		.data = &rcar_info_r8a77965,
++	},
++	{
+ 		.compatible = "renesas,vin-r8a774c0",
+ 		.data = &rcar_info_r8a77990,
+ 	},
+-- 
+2.7.4
+

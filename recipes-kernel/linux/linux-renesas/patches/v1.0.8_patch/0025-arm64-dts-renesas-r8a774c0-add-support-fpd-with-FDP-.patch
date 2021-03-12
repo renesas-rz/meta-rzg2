@@ -1,0 +1,39 @@
+From 557ade33bd1114b46a169cc7fe7d38ce64a99737 Mon Sep 17 00:00:00 2001
+From: Son Lam <son.lam.ym@renesas.com>
+Date: Mon, 1 Jul 2019 17:31:47 +0700
+Subject: [PATCH 025/358] arm64: dts: renesas: r8a774c0: add support fpd with
+ FDP Manager
+
+Add device node for fdp used by fdpm.
+
+Signed-off-by: Son Lam <son.lam.ym@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+index ea31860..9509fae 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774c0.dtsi
+@@ -1794,6 +1794,18 @@
+ 			renesas,#wpf = <1>;
+ 		};
+ 
++		fdp0: fdpm@fe940000 {
++			compatible = "renesas,fdpm";
++			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
++			interrupts = <GIC_SPI 262 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 119>, <&cpg CPG_MOD 615>;
++			clock-names = "fdp", "fcp";
++			power-domains = <&sysc R8A774C0_PD_A3VC>;
++			resets = <&cpg 119>, <&cpg 615>;
++			reset-names = "fdp", "fcp";
++			renesas,#ch = <0>;
++		};
++
+ 		vspb: vspm@fe960000 {
+ 			compatible = "renesas,vspm";
+ 			reg = <0 0xfe960000 0 0x8000>, <0 0xfe96f000 0 0x200>;
+-- 
+2.7.4
+

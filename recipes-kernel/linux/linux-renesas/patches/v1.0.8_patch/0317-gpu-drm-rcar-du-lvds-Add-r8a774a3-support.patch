@@ -1,0 +1,28 @@
+From 3a126004fc7bd4b4494b6b0e11ebb9ba5f445271 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Thu, 30 Jul 2020 12:20:07 +0700
+Subject: [PATCH 317/358] gpu: drm: rcar-du: lvds: Add r8a774a3 support
+
+Add support for RZ/G2M v3.0 (R8A774A3) SoC to the LVDS
+ encoder driver.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_lvds.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_lvds.c b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+index fe39b54..fc3f6ce 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_lvds.c
++++ b/drivers/gpu/drm/rcar-du/rcar_lvds.c
+@@ -951,6 +951,7 @@ static const struct rcar_lvds_device_info rcar_lvds_r8a77995_info = {
+ static const struct of_device_id rcar_lvds_of_table[] = {
+ 	{ .compatible = "renesas,r8a7743-lvds", .data = &rcar_lvds_gen2_info },
+ 	{ .compatible = "renesas,r8a774a1-lvds", .data = &rcar_lvds_gen3_info },
++	{ .compatible = "renesas,r8a774a3-lvds", .data = &rcar_lvds_gen3_info },
+ 	{ .compatible = "renesas,r8a774b1-lvds", .data = &rcar_lvds_gen3_info },
+ 	{ .compatible = "renesas,r8a774c0-lvds", .data = &rcar_lvds_r8a77990_info },
+ 	{ .compatible = "renesas,r8a774e1-lvds", .data = &rcar_lvds_gen3_info },
+-- 
+2.7.4
+

@@ -1,0 +1,41 @@
+From b552b47c7665a00c7c273d09830d9effd95aed75 Mon Sep 17 00:00:00 2001
+From: Hoa Huynh <hoa.huynh.ud@renesas.com>
+Date: Mon, 18 Jan 2021 18:27:08 +0700
+Subject: [PATCH 358/358] arm64: dts: renensas: r8a774c0-cat874: : Add USB 3.0
+ pin for ek874 rev.D
+
+This patch adds usb3 pins for ek874 rev.D
+
+Signed-off-by: Hoa Huynh <hoa.huynh.ud@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 4246ae9..dd27381 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -68,6 +68,11 @@
+ 		groups = "usb0_b", "usb0_id";
+ 		function = "usb0";
+ 	};
++
++	usb30_pins: usb30 {
++		groups = "usb30";
++		function = "usb30";
++	};
+ };
+ 
+ &hscif2 {
+@@ -87,3 +92,8 @@
+ 	dr_mode = "otg";
+ 	status = "okay";
+ };
++
++&xhci0 {
++	pinctrl-0 = <&usb30_pins>;
++	pinctrl-names = "default";
++};
+-- 
+2.7.4
+

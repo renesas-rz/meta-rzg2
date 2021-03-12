@@ -1,0 +1,41 @@
+From 26e5893b26c08f9aa98d4cdacb26a55a1d9d1dd9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 10:54:38 +0700
+Subject: [PATCH 179/358] arm64: dts: renesas: r8a774e1-hihope-rzg2h: Enable 4
+ modules vsp.
+
+This patch enables 4 modules: vspbc, vspbd, vspi0 and vspi1.
+
+Signed-off-by: Loc Phuoc Pham.Lam <loc.lam.px@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+index 054908b..3b8c2e4 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774e1-hihope-rzg2h.dts
+@@ -49,3 +49,19 @@
+ 	clock-names = "du.0", "du.1", "du.3",
+ 		      "dclkin.0", "dclkin.1", "dclkin.3";
+ };
++
++&vspbc {
++	status = "okay";
++};
++
++&vspbd {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
++&vspi1 {
++	status = "okay";
++};
+-- 
+2.7.4
+

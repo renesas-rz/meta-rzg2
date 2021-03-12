@@ -1,0 +1,29 @@
+From 84e5f605be0cc6c20f98c8090155822bb4d82cce Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 8 Mar 2021 11:06:26 +0700
+Subject: [PATCH 256/358] dt-bindings: pci: rcar-pci: Add compatible string for
+ r8a774a3
+
+This patch adds compatible string for R8A774A3.
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/pci/rcar-pci.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/pci/rcar-pci.txt b/Documentation/devicetree/bindings/pci/rcar-pci.txt
+index 5f3b885..4a18d9f 100644
+--- a/Documentation/devicetree/bindings/pci/rcar-pci.txt
++++ b/Documentation/devicetree/bindings/pci/rcar-pci.txt
+@@ -3,6 +3,7 @@
+ Required properties:
+ compatible: "renesas,pcie-r8a7743" for the R8A7743 SoC;
+ 	    "renesas,pcie-r8a774a1" for the R8A774A1 SoC;
++	    "renesas,pcie-r8a774a3" for the R8A774A3 SoC;
+ 	    "renesas,pcie-r8a774b1" for the R8A774B1 SoC;
+ 	    "renesas,pcie-r8a774c0" for the R8A774C0 SoC;
+ 	    "renesas,pcie-r8a774e1" for the R8A774E1 SoC;
+-- 
+2.7.4
+

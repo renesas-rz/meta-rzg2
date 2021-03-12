@@ -1,0 +1,31 @@
+From 1d61a049341134ba11b6f2c1c524a8529190438b Mon Sep 17 00:00:00 2001
+From: hoahuynh <hoa.huynh.ud@renesas.com>
+Date: Tue, 28 Jul 2020 17:51:26 +0700
+Subject: [PATCH 305/358] phy: rcar-gen3-usb2: Add compatible string for
+ r8a774a3
+
+This patch adds compatible string for RZ/G2M v3.0 (R8A774A3) SoC.
+
+Signed-off-by: hoahuynh <hoa.huynh.ud@renesas.com>
+---
+ drivers/phy/renesas/phy-rcar-gen3-usb2.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/phy/renesas/phy-rcar-gen3-usb2.c b/drivers/phy/renesas/phy-rcar-gen3-usb2.c
+index e584041..3a98c28 100644
+--- a/drivers/phy/renesas/phy-rcar-gen3-usb2.c
++++ b/drivers/phy/renesas/phy-rcar-gen3-usb2.c
+@@ -533,6 +533,10 @@ static const struct of_device_id rcar_gen3_phy_usb2_match_table[] = {
+ 		.data = &rcar_gen3_phy_usb2_ops,
+ 	},
+ 	{
++		.compatible = "renesas,usb2-phy-r8a774a3",
++		.data = &rcar_gen3_phy_usb2_ops,
++	},
++	{
+ 		.compatible = "renesas,usb2-phy-r8a774b1",
+ 		.data = &rcar_gen3_phy_usb2_ops,
+ 	},
+-- 
+2.7.4
+

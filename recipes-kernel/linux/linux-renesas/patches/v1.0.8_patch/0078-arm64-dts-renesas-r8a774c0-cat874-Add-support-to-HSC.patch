@@ -1,0 +1,56 @@
+From 0077f0af1c779251e2237b5b3d9940fc26d5b921 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 3 Mar 2020 15:06:00 +0700
+Subject: [PATCH 078/358] arm64: dts: renesas: r8a774c0-cat874: Add support to
+ HSCIF4
+
+This patch adds pincontrol support to HSCIF4
+
+Signed-off-by: Son Lam <son.lam.ym@rvc.renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+index 771ff70..556eb36 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774c0-cat874.dts
+@@ -18,6 +18,7 @@
+ 		serial0 = &scif2;
+ 		serial1 = &hscif2;
+ 		serial2 = &hscif3;
++		serial3 = &hscif4;
+ 	};
+ 
+ 	chosen {
+@@ -220,6 +221,14 @@
+ 	status = "okay";
+ };
+ 
++&hscif4 {
++	pinctrl-0 = <&hscif4_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
+ &i2c0 {
+ 	status = "okay";
+ 	clock-frequency = <100000>;
+@@ -333,6 +342,11 @@
+ 		function = "hscif3";
+ 	};
+ 
++	hscif4_pins: hscif4 {
++		groups = "hscif4_data_b";
++		function = "hscif4";
++	};
++
+ 	i2c1_pins: i2c1 {
+ 		groups = "i2c1_b";
+ 		function = "i2c1";
+-- 
+2.7.4
+

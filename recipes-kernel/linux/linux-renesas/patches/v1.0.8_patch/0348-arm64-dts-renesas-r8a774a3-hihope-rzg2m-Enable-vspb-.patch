@@ -1,0 +1,36 @@
+From cc8fa2753674e30ef42c3724c34069844be6d1f8 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Mon, 14 Dec 2020 08:58:53 +0700
+Subject: [PATCH 348/358] arm64: dts: renesas: r8a774a3-hihope-rzg2m: Enable
+ vspb and vspi
+
+This patch enables vspb and vspi for RZ/G2M v3.0 board.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+index 2edbd4d..908dae8 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
++++ b/arch/arm64/boot/dts/renesas/r8a774a3-hihope-rzg2m.dts
+@@ -72,6 +72,14 @@
+ 		      "dclkin.0", "dclkin.1", "dclkin.2";
+ };
+ 
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
+ &xhci0 {
+ 	memory-region = <&global_cma>;
+ };
+-- 
+2.7.4
+

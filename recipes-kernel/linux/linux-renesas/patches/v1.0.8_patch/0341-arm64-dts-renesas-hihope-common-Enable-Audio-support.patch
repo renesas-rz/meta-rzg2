@@ -1,0 +1,195 @@
+From 31f1363f9ea22082b7ac41230594424aa7c51d03 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 2 Dec 2020 15:29:50 +0700
+Subject: [PATCH 341/358] arm64: dts: renesas: hihope-common: Enable Audio
+ support in Low speed connector
+
+This patch enables sound support in Low speed connector
+for the common HiHope G2M,G2N and G2H boards by adding
+device node of the PCM5102 codec (External I2S Board
+in Low speed Connector).
+
+Therefore, we support 2 audio codecs in common plarform:
+1. HDMI audio from built-in HDMI transmitter. (default)
+2. External I2S Audio Codec PCM5102A in Low Speed Connector.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/hihope-common.dtsi | 65 +++++++++++++++++++++++++-
+ arch/arm64/boot/dts/renesas/hihope-rev2.dtsi   | 22 ---------
+ arch/arm64/boot/dts/renesas/hihope-rev4.dtsi   | 24 ----------
+ 3 files changed, 64 insertions(+), 47 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/hihope-common.dtsi b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+index 7e9df07..93952ec 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-common.dtsi
+@@ -75,7 +75,8 @@
+ 
+ 		label = "rcar-sound";
+ 
+-		dais = <&rsnd_port>;
++		dais = <&rsnd_port0	/* HDMI Audio */
++			&rsnd_port1>;	/* External PCM5102A Codec */
+ 	};
+ 
+ 	vbus0_usb2: regulator-vbus0-usb2 {
+@@ -117,6 +118,17 @@
+ 	vspm_if {
+ 		compatible = "renesas,vspm_if";
+ 	};
++
++	pcm5102a: pcm5102a {
++		compatible = "ti,pcm5102a";
++		#sound-dai-cells = <0>;
++
++		port {
++			pcm5102a_endpoint: endpoint {
++				remote-endpoint = <&rsnd_endpoint1>;
++			};
++		};
++	};
+ };
+ 
+ &audio_clk_a {
+@@ -302,6 +314,16 @@
+ 		groups = "usb30";
+ 		function = "usb30";
+ 	};
++
++	sound_clk_pins: sound_clk {
++		groups = "audio_clk_a_a";
++		function = "audio_clk";
++	};
++
++	sound_pins: sound {
++		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
++		function = "ssi";
++	};
+ };
+ 
+ &rwdt {
+@@ -440,3 +462,44 @@
+ &tmu4 {
+ 	status = "okay";
+ };
++
++&rcar_sound {
++	pinctrl-0 = <&sound_clk_pins &sound_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++
++	/* Single DAI */
++	#sound-dai-cells = <0>;
++
++	ports {
++		rsnd_port0: port@0 {
++			rsnd_endpoint: endpoint {
++				remote-endpoint = <&dw_hdmi0_snd_in>;
++
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint>;
++				frame-master = <&rsnd_endpoint>;
++
++				playback = <&ssi2>;
++			};
++		};
++
++		rsnd_port1: port@1 {
++			rsnd_endpoint1: endpoint {
++				remote-endpoint = <&pcm5102a_endpoint>;
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint1>;
++				frame-master = <&rsnd_endpoint1>;
++
++				playback = <&ssi1 &src1 &dvc0>;
++			};
++		};
++	};
++};
++
++&ssi1 {
++	shared-pin;
++};
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi b/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi
+index 9a0bd1b..e13fd0d 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rev2.dtsi
+@@ -73,28 +73,6 @@
+ 	};
+ };
+ 
+-&rcar_sound {
+-	pinctrl-0 = <&sound_clk_pins>;
+-	pinctrl-names = "default";
+-
+-	status = "okay";
+-
+-	/* Single DAI */
+-	#sound-dai-cells = <0>;
+-
+-	rsnd_port: port {
+-		rsnd_endpoint: endpoint {
+-			remote-endpoint = <&dw_hdmi0_snd_in>;
+-
+-			dai-format = "i2s";
+-			bitclock-master = <&rsnd_endpoint>;
+-			frame-master = <&rsnd_endpoint>;
+-
+-			playback = <&ssi2>;
+-		};
+-	};
+-};
+-
+ &msiof0 {
+ 	pinctrl-0 = <&msiof0_pins>;
+ 	pinctrl-names = "default";
+diff --git a/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi b/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi
+index 3046c07..393e57c 100644
+--- a/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi
++++ b/arch/arm64/boot/dts/renesas/hihope-rev4.dtsi
+@@ -72,21 +72,9 @@
+ 		groups = "audio_clk_a_a", "audio_clk_b_a", "audio_clkout_a";
+ 		function = "audio_clk";
+ 	};
+-
+-	sound_pins: sound {
+-		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
+-		function = "ssi";
+-	};
+ };
+ 
+ &rcar_sound {
+-	pinctrl-0 = <&sound_pins &sound_clk_pins>;
+-	pinctrl-names = "default";
+-	status = "okay";
+-
+-	/* Single DAI */
+-	#sound-dai-cells = <0>;
+-
+ 	/* audio_clkout0/1/2/3 */
+ 	#clock-cells = <1>;
+ 	clock-frequency = <12288000 11289600>;
+@@ -109,16 +97,4 @@
+ 		 <&audio_clk_a>, <&cs2000>,
+ 		 <&audio_clk_c>,
+ 		 <&cpg CPG_CORE CPG_AUDIO_CLK_I>;
+-
+-	rsnd_port: port {
+-		rsnd_endpoint: endpoint {
+-			remote-endpoint = <&dw_hdmi0_snd_in>;
+-
+-			dai-format = "i2s";
+-			bitclock-master = <&rsnd_endpoint>;
+-			frame-master = <&rsnd_endpoint>;
+-
+-			playback = <&ssi2>;
+-		};
+-	};
+ };
+-- 
+2.7.4
+

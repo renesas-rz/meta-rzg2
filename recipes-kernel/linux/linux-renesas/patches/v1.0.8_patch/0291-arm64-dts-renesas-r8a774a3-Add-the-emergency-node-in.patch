@@ -1,0 +1,39 @@
+From 5594d2d29c9e7c3ab6bbefdcec4bc0d589aba22a Mon Sep 17 00:00:00 2001
+From: tienle <tien.le.xw@renesas.com>
+Date: Thu, 30 Jul 2020 09:55:51 +0700
+Subject: [PATCH 291/358] arm64: dts: renesas: r8a774a3: Add the emergency node
+ in thermal-zones
+
+This patch enables emerency shutdown support for r8a774a3 SoC.
+
+Signed-off-by: tienle <tien.le.xw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774a3.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+index 70cf65d..8adf7cd 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774a3.dtsi
+@@ -2472,6 +2472,18 @@
+ 	};
+ 
+ 	thermal-zones {
++		emergency {
++			polling-delay = <1000>;
++			on-temperature = <110000>;
++			off-temperature = <95000>;
++			target_cpus =	<&a57_1>,
++					<&a53_0>,
++					<&a53_1>,
++					<&a53_2>,
++					<&a53_3>;
++			status = "disabled";
++		};
++
+ 		sensor_thermal1: sensor-thermal1 {
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <1000>;
+-- 
+2.7.4
+

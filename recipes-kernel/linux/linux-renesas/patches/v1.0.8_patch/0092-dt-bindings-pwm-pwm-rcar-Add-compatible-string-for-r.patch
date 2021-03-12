@@ -1,0 +1,28 @@
+From d59b3075790a18cc03e729467648e546fea2f4c3 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Tue, 1 Dec 2020 14:40:09 +0700
+Subject: [PATCH 092/358] dt-bindings: pwm: pwm-rcar: Add compatible string for
+ r8a774b1
+
+This patch adds compatible string for R8A774B1 SoC.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+index 6b8d831..691cae7 100644
+--- a/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
++++ b/Documentation/devicetree/bindings/pwm/renesas,pwm-rcar.txt
+@@ -5,6 +5,7 @@ Required Properties:
+  - "renesas,pwm-r8a7743": for RZ/G1M
+  - "renesas,pwm-r8a7745": for RZ/G1E
+  - "renesas,pwm-r8a774a1": for RZ/G2M
++ - "renesas,pwm-r8a774b1": for RZ/G2N
+  - "renesas,pwm-r8a774c0": for RZ/G2E
+  - "renesas,pwm-r8a774e1": for RZ/G2H
+  - "renesas,pwm-r8a7778": for R-Car M1A
+-- 
+2.7.4
+

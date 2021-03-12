@@ -1,0 +1,31 @@
+From 49c83b11b0b098cbbb206981ff1de79ca4ab2472 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 9 Apr 2020 12:02:07 +0700
+Subject: [PATCH 196/358] media: rcar-csi2: Add support for R8A774E1
+
+This patch adds support CSI2 for r8a774e1 SoC.
+RZ/G2H has similar setting with R-Car H3 Rev3.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/rcar-vin/rcar-csi2.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/media/platform/rcar-vin/rcar-csi2.c b/drivers/media/platform/rcar-vin/rcar-csi2.c
+index 174b7d3..7a5a35c 100644
+--- a/drivers/media/platform/rcar-vin/rcar-csi2.c
++++ b/drivers/media/platform/rcar-vin/rcar-csi2.c
+@@ -988,6 +988,10 @@ static const struct of_device_id rcar_csi2_of_table[] = {
+ 		.data = &rcar_csi2_info_r8a77990,
+ 	},
+ 	{
++		.compatible = "renesas,r8a774e1-csi2",
++		.data = &rcar_csi2_info_r8a7795,
++	},
++	{
+ 		.compatible = "renesas,r8a7795-csi2",
+ 		.data = &rcar_csi2_info_r8a7795,
+ 	},
+-- 
+2.7.4
+

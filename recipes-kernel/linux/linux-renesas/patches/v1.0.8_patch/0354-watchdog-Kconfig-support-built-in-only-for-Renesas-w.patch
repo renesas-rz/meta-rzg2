@@ -1,0 +1,33 @@
+From 4068f7d6a36bc6e829ff6f0a60400ab0ac5923f1 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Fri, 29 Jan 2021 11:32:09 +0700
+Subject: [PATCH 354/358] watchdog: Kconfig: support built-in only for Renesas
+ watchdog
+
+This patch changes type definition of Renesas Watchdog from
+ "tristate" to "bool". The reason is Renesas Watchdog is
+ enabled in U-boot now so that it can not get right last
+ watchdog overflow status which is implemented in previous
+ patch.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ drivers/watchdog/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/watchdog/Kconfig b/drivers/watchdog/Kconfig
+index fa7f4c6..7875240 100644
+--- a/drivers/watchdog/Kconfig
++++ b/drivers/watchdog/Kconfig
+@@ -758,7 +758,7 @@ config ATLAS7_WATCHDOG
+ 	  module will be called atlas7_wdt.
+ 
+ config RENESAS_WDT
+-	tristate "Renesas WDT Watchdog"
++	bool "Renesas WDT Watchdog"
+ 	depends on ARCH_RENESAS || COMPILE_TEST
+ 	select WATCHDOG_CORE
+ 	help
+-- 
+2.7.4
+

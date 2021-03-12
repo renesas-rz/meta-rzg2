@@ -1,0 +1,40 @@
+From 7f7c3da097d4774f877e1144bf22cf34f1df497f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 6 Mar 2020 14:55:52 +0700
+Subject: [PATCH 158/358] arm64: dts: renesas: r8a774b1: correct compatible
+ string for ipmmu vc0 and vp0
+
+This commit corrects compatible string for ipmmu-vc0 and ipmmu-vp0,
+which are implemented in mmngr driver NOT ipmmu-vmsa driver
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@renesas.com>
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+index a81f88b..e92622b 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774b1.dtsi
+@@ -990,7 +990,7 @@
+ 		};
+ 
+ 		ipmmu_vc0: mmu@fe6b0000 {
+-			compatible = "renesas,ipmmu-r8a774b1";
++			compatible = "renesas,ipmmu-mmu-r8a774b1";
+ 			reg = <0 0xfe6b0000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 12>;
+ 			power-domains = <&sysc R8A774B1_PD_A3VC>;
+@@ -1008,7 +1008,7 @@
+ 		};
+ 
+ 		ipmmu_vp0: mmu@fe990000 {
+-			compatible = "renesas,ipmmu-r8a774b1";
++			compatible = "renesas,ipmmu-mmu-r8a774b1";
+ 			reg = <0 0xfe990000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 16>;
+ 			power-domains = <&sysc R8A774B1_PD_A3VP>;
+-- 
+2.7.4
+

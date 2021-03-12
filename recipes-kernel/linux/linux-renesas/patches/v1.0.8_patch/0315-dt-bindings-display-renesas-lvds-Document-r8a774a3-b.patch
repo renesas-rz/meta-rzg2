@@ -1,0 +1,31 @@
+From 56156ebb333fbef4b560e3ca8bec27fa2e7bc875 Mon Sep 17 00:00:00 2001
+From: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+Date: Tue, 28 Jul 2020 15:01:00 +0700
+Subject: [PATCH 315/358] dt-bindings: display: renesas: lvds: Document
+ r8a774a3 bindings
+
+Document the RZ/G2M v3.0 (R8A774A3) SoC and and update name for RZ/G2M v1.3
+ (R8A774A1) in the LVDS bindings.
+
+Signed-off-by: Khoi Nguyen <khoi.nguyen.aj@renesas.com>
+---
+ Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt b/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt
+index 5b9d0fe..6399c77 100644
+--- a/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt
++++ b/Documentation/devicetree/bindings/display/bridge/renesas,lvds.txt
+@@ -8,7 +8,8 @@ Required properties:
+ 
+ - compatible : Shall contain one of
+   - "renesas,r8a7743-lvds" for R8A7743 (RZ/G1M) compatible LVDS encoders
+-  - "renesas,r8a774a1-lvds" for R8A774A1 (RZ/G2M) compatible LVDS encoders
++  - "renesas,r8a774a1-lvds" for R8A774A1 (RZ/G2M v1.3) compatible LVDS encoders
++  - "renesas,r8a774a3-lvds" for R8A774A3 (RZ/G2M v3.0) compatible LVDS encoders
+   - "renesas,r8a774b1-lvds" for R8A774B1 (RZ/G2N) compatible LVDS encoders
+   - "renesas,r8a774c0-lvds" for R8A774C0 (RZ/G2E) compatible LVDS encoders
+   - "renesas,r8a774e1-lvds" for R8A774E1 (RZ/G2H) compatible LVDS encoders
+-- 
+2.7.4
+

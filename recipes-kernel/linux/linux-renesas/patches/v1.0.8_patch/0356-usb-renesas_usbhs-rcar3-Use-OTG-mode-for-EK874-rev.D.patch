@@ -1,0 +1,37 @@
+From 685124e141ceb86ddc6eb33d8a73be79551ec38a Mon Sep 17 00:00:00 2001
+From: Hoa Huynh <hoa.huynh.ud@renesas.com>
+Date: Wed, 13 Jan 2021 13:56:52 +0700
+Subject: [PATCH 356/358] usb: renesas_usbhs: rcar3: Use OTG mode for EK874
+ rev.D
+
+Since EK874 rev.D can use OTG mode, this patch changes
+the UGCTRL2 value to UGCTRL2_USB0SEL_OTG and UGCTRL2_VBUSSEL
+like other RZ/G2 boards.
+
+Reference:
+Git repo: https://github.com/renesas-rcar/linux-bsp.git
+Branch: v4.14.75-ltsi/rcar-3.9.9
+Commit: <801abdcb3f65ae3cbbb2ada4dec72d826cd3d79d>
+
+Signed-off-by: Hoa Huynh <hoa.huynh.ud@renesas.com>
+---
+ drivers/usb/renesas_usbhs/rcar3.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/usb/renesas_usbhs/rcar3.c b/drivers/usb/renesas_usbhs/rcar3.c
+index 6f94692..8f31ab3 100644
+--- a/drivers/usb/renesas_usbhs/rcar3.c
++++ b/drivers/usb/renesas_usbhs/rcar3.c
+@@ -77,7 +77,8 @@ static int usbhs_rcar3_power_and_pll_ctrl(struct platform_device *pdev,
+ 
+ 	if (enable) {
+ 		usbhs_write32(priv, UGCTRL, 0);	/* release PLLRESET */
+-		usbhs_rcar3_set_ugctrl2(priv, UGCTRL2_USB0SEL_HSUSB);
++		usbhs_rcar3_set_ugctrl2(priv,
++					UGCTRL2_USB0SEL_OTG | UGCTRL2_VBUSSEL);
+ 		usbhs_bset(priv, LPSTS, LPSTS_SUSPM, LPSTS_SUSPM);
+ 		do {
+ 			val = usbhs_read32(priv, UGSTS);
+-- 
+2.7.4
+
