@@ -10,12 +10,7 @@ BRANCH = "master"
 SRC_URI = "${FLASH_WRITER_URL};branch=${BRANCH}"
 SRCREV = "757e29806159dc239064ea33a65012511518e635"
 
-SRC_URI_append = " \
-	${@base_conditional("SECURE_BOOT", "1", "file://0001-Add-Secure-Boot-Injection.patch", "",d)} \
-"
-
 inherit deploy
-require include/provisioning.inc
 
 S = "${WORKDIR}/git"
 
@@ -27,11 +22,7 @@ do_compile() {
         fi
         cd ${S}
 
-	if [ 1 -eq ${SECURE_BOOT} ]; then
-		oe_runmake BOARD=${BOARD} ENC_PROVISIONING_KEY=${ENCRYPTED_PROVISIONING_KEY}
-	else
 		oe_runmake BOARD=${BOARD}
-	fi
 }
 
 do_install[noexec] = "1"
