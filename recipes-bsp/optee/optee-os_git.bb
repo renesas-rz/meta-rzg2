@@ -55,7 +55,7 @@ do_deploy() {
 
     # Copy TEE OS to deploy folder
     install -m 0644 ${S}/out/arm-plat-${PLATFORM}/core/tee.elf ${DEPLOYDIR}/tee-${MACHINE}.elf
-    install -m 0644 ${S}/out/arm-plat-${PLATFORM}/core/tee.bin ${DEPLOYDIR}/tee-${MACHINE}.bin
+    install -m 0644 ${S}/out/arm-plat-${PLATFORM}/core/tee-raw.bin ${DEPLOYDIR}/tee-${MACHINE}.bin
     # SREC file is generated from RAW bin and it has start address at 0x0,
     # so we must adjust it to our address for our platform before using it.
     objcopy --adjust-vma=0x44100000 -I srec -O srec \
