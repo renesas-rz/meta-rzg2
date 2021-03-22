@@ -46,8 +46,14 @@ do_compile() {
     oe_runmake PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n CFG_CRYPTO_WITH_CE=y RZG_DRAM_ECC=${USE_ECC} RZG_ECC_FULL=${ECC_FULL}
 }
 
-# do_install() nothing
-do_install[noexec] = "1"
+do_install() {
+    #install TA devkit
+    install -d ${D}/usr/include/optee/export-user_ta/
+
+    for f in  ${B}/out/arm-plat-${PLATFORM}/export-ta_arm64/* ; do
+        cp -aR  $f  ${D}/usr/include/optee/export-user_ta/
+    done
+}
 
 do_deploy() {
     # Create deploy folder
@@ -62,3 +68,7 @@ do_deploy() {
 	${S}/out/arm-plat-${PLATFORM}/core/tee.srec ${DEPLOYDIR}/tee-${MACHINE}.srec
 }
 addtask deploy before do_build after do_compile
+
+FILES_${PN}-dev = "/usr/include/optee"
+
+INSANE_SKIP_${PN}-dev = "staticdev"
