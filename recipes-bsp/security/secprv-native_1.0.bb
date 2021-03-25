@@ -55,7 +55,7 @@ do_install() {
     fi
 
     prov_key=$(find "${DIRPATH_GEN_KEY_ROOT}" -name "${DIR_GEN_PROV_KEY}")
-    if [ ! -z ${user_key} ]; then
+    if [ ! -z ${prov_key} ]; then
         ln -nfs "${prov_key}" "${D}/${SYMLINK_NATIVE_PROV_KEY_DIR}"
     fi
 
