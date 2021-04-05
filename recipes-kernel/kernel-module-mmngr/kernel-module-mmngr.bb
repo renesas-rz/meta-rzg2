@@ -19,6 +19,7 @@ SRC_URI_append = " \
     file://0007-mmngr-module-mmngr_drv-fix-some-syntax-errors-to-avo.patch \
     file://0008-mmngr-module-mmngr_drv-add-support-IPMMU-for-RZ-G2H.patch \
     file://0009-mmngr_drv-mmngr-Add-IPMMU-support-for-RZ-G2M-v3.0.patch \
+    file://0010-mmngr_drv-mmngr-Update-PA-VA-mapping-table-for-HiHop.patch \
 "
 
 MMNGR_CFG_ek874 = "MMNGR_EBISU"
