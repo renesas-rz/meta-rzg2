@@ -20,6 +20,7 @@ SRC_URI_append = " \
     file://0008-mmngr-module-mmngr_drv-add-support-IPMMU-for-RZ-G2H.patch \
     file://0009-mmngr_drv-mmngr-Add-IPMMU-support-for-RZ-G2M-v3.0.patch \
     file://0010-mmngr_drv-mmngr-Update-PA-VA-mapping-table-for-HiHop.patch \
+    file://0011-mmngr-change-address-setting-for-H3N-Swap-mode.patch \
 "
 
 MMNGR_CFG_ek874 = "MMNGR_EBISU"
