@@ -58,3 +58,5 @@ do_install_append_aarch64 () {
 }
 
 RPROVIDES_${PN} += "optee-client"
+
+FILES_${PN} += "${libdir} ${includedir}"
