@@ -1,7 +1,7 @@
-From 05335c5a01a8b973df0210d84e77e2b609658c62 Mon Sep 17 00:00:00 2001
+From f296add5d5b1aeb05d0dd7a4ea7c639f468ceb60 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Wed, 1 Jul 2020 10:16:32 +0700
-Subject: [PATCH] arch: plat-rzg: add HW Unique Key support for TEE OTP
+Subject: [PATCH 4/5] arch: plat-rzg: add HW Unique Key support for TEE OTP
 
 This patch will add support for getting HW Unique Key, it support for
 feature TEE OTP.
@@ -16,10 +16,10 @@ Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
  create mode 100644 core/arch/arm/plat-rzg/tee_common_otp.c
 
 diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
-index 6d74a6f4..921da8a1 100644
+index ddafa4f4..28f772a4 100644
 --- a/core/arch/arm/plat-rzg/main.c
 +++ b/core/arch/arm/plat-rzg/main.c
-@@ -44,6 +44,7 @@
+@@ -17,6 +17,7 @@
  #include "rzg_common.h"
  #include "rzg_suspend_to_ram.h"
  
@@ -28,19 +28,19 @@ index 6d74a6f4..921da8a1 100644
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICD_BASE, GIC_DIST_REG_SIZE);
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICC_BASE, GIC_DIST_REG_SIZE);
 diff --git a/core/arch/arm/plat-rzg/platform_config.h b/core/arch/arm/plat-rzg/platform_config.h
-index 58de8a31..5fae9827 100644
+index eacc5a42..0638b53a 100644
 --- a/core/arch/arm/plat-rzg/platform_config.h
 +++ b/core/arch/arm/plat-rzg/platform_config.h
-@@ -34,6 +34,9 @@
+@@ -12,6 +12,9 @@
  /* Make stacks aligned to data cache line length */
- #define STACK_ALIGNMENT     64
+ #define STACK_ALIGNMENT		64
  
-+#define DEVICE0_BASE        0xE6000000
-+#define DEVICE0_SIZE        0x002FFFFF
++#define DEVICE0_BASE		0xE6000000
++#define DEVICE0_SIZE		0x002FFFFF
 +
- #define GIC_BASE            0xF1000000
- #define GICC_BASE           0xF1020000
- #define GICD_BASE           0xF1010000
+ #define GIC_BASE		0xF1000000
+ #define GICC_BASE		0xF1020000
+ #define GICD_BASE		0xF1010000
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
 index 804bf65d..22ef4ad6 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
@@ -178,4 +178,3 @@ index 00000000..3edce817
 +}
 -- 
 2.17.1
-

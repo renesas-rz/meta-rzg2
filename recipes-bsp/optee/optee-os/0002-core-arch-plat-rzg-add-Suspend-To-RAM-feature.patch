@@ -1,7 +1,7 @@
-From 9d717e881526b8e4ddca54f8ec077597ec93996b Mon Sep 17 00:00:00 2001
+From 4f8c93de9b409e0a2c8f05ae90a302a6ba3802b8 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Thu, 9 Jul 2020 18:21:37 +0700
-Subject: [PATCH 2/3] core: arch: plat-rzg: add Suspend To RAM feature
+Subject: [PATCH 2/5] core: arch: plat-rzg: add Suspend To RAM feature
 
 This patch will add Suspend to RAM feature for platform rzg
 Reference RCar repo:
@@ -10,14 +10,14 @@ https://github.com/renesas-rcar/optee_os/commit/3bc428825ee37409b3e0827e6e0b8688
 Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 ---
  core/arch/arm/plat-rzg/kern.ld.S            | 510 ++++++++++++++++++++
- core/arch/arm/plat-rzg/link.mk              | 227 ++++++++-
+ core/arch/arm/plat-rzg/link.mk              |  14 +
  core/arch/arm/plat-rzg/link_dummy.ld        |  98 ++++
- core/arch/arm/plat-rzg/main.c               |  58 ++-
+ core/arch/arm/plat-rzg/main.c               |  53 ++
  core/arch/arm/plat-rzg/rzg_common.h         |  17 +
  core/arch/arm/plat-rzg/rzg_suspend_to_ram.c | 180 +++++++
  core/arch/arm/plat-rzg/rzg_suspend_to_ram.h |  62 +++
  core/arch/arm/plat-rzg/sub.mk               |   1 +
- 8 files changed, 1150 insertions(+), 3 deletions(-)
+ 8 files changed, 935 insertions(+)
  create mode 100644 core/arch/arm/plat-rzg/kern.ld.S
  create mode 100644 core/arch/arm/plat-rzg/link_dummy.ld
  create mode 100644 core/arch/arm/plat-rzg/rzg_common.h
@@ -26,7 +26,7 @@ Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 
 diff --git a/core/arch/arm/plat-rzg/kern.ld.S b/core/arch/arm/plat-rzg/kern.ld.S
 new file mode 100644
-index 00000000..5768e195
+index 00000000..5fbe131c
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/kern.ld.S
 @@ -0,0 +1,510 @@
@@ -486,7 +486,7 @@ index 00000000..5768e195
 +		*(__keep_meta_vars*)
 +	}
 +
-+	ASSERT(__dtor_end <= OPTEE_LIMIT, "OPTEE image has exceeded its limit.")
++	ASSERT(__dtor_end <= TEE_SHMEM_START, "OPTEE image has exceeded its limit.")
 +}
 +
 +/* Unpaged read-only memories */
@@ -541,244 +541,27 @@ index 00000000..5768e195
 +__asan_map_size = __asan_map_end - __asan_map_start;
 +#endif /*CFG_CORE_SANITIZE_KADDRESS*/
 diff --git a/core/arch/arm/plat-rzg/link.mk b/core/arch/arm/plat-rzg/link.mk
-index 24af140a..9f59285d 100644
+index 229c4b70..3d4b3425 100644
 --- a/core/arch/arm/plat-rzg/link.mk
 +++ b/core/arch/arm/plat-rzg/link.mk
-@@ -1,4 +1,194 @@
--include core/arch/arm/kernel/link.mk
-+link-out-dir = $(out-dir)/core
-+
-+link-script-dummy = $(platform-dir)/link_dummy.ld
-+link-script = $(if $(wildcard $(platform-dir)/kern.ld.S), \
-+		$(platform-dir)/kern.ld.S, \
-+		core/arch/arm/kernel/kern.ld.S)
-+link-script-pp = $(link-out-dir)/kern.ld
-+link-script-dep = $(link-out-dir)/.kern.ld.d
-+
-+AWK	 = awk
-+
-+link-ldflags  = $(LDFLAGS)
-+ifeq ($(CFG_CORE_ASLR),y)
-+link-ldflags += -pie -Bsymbolic -z notext -z norelro $(ldflag-apply-dynamic-relocs)
-+endif
-+link-ldflags += -T $(link-script-pp) -Map=$(link-out-dir)/tee.map
-+link-ldflags += --sort-section=alignment
-+link-ldflags += --fatal-warnings
-+link-ldflags += --gc-sections
-+
-+link-ldadd  = $(LDADD)
-+link-ldadd += $(libdeps)
-+link-objs := $(filter-out \
-+	       $(out-dir)/core/arch/arm/kernel/link_dummies_paged.o \
-+	       $(out-dir)/core/arch/arm/kernel/link_dummies_init.o, \
-+	       $(objs))
-+link-objs-init := $(filter-out \
-+		    $(out-dir)/core/arch/arm/kernel/link_dummies_init.o, \
-+		    $(objs))
-+ldargs-tee.elf := $(link-ldflags) $(link-objs) $(link-out-dir)/version.o \
-+		  $(link-ldadd) $(libgcccore)
-+
-+link-script-cppflags := \
-+	$(filter-out $(CPPFLAGS_REMOVE) $(cppflags-remove), \
-+		$(nostdinccore) $(CPPFLAGS) \
-+		$(addprefix -I,$(incdirscore) $(link-out-dir)) \
-+		$(cppflagscore))
-+
-+ldargs-all_objs := -T $(link-script-dummy) --no-check-sections \
-+		   $(link-objs) $(link-ldadd) $(libgcccore)
-+cleanfiles += $(link-out-dir)/all_objs.o
-+$(link-out-dir)/all_objs.o: $(objs) $(libdeps) $(MAKEFILE_LIST)
-+	@$(cmd-echo-silent) '  LD      $@'
-+	$(q)$(LDcore) $(ldargs-all_objs) -o $@
-+
-+cleanfiles += $(link-out-dir)/unpaged_entries.txt
-+$(link-out-dir)/unpaged_entries.txt: $(link-out-dir)/all_objs.o
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(NMcore) $< | \
-+		$(AWK) '/ ____keep_pager/ { printf "-u%s ", $$3 }' > $@
-+
-+unpaged-ldargs = -T $(link-script-dummy) --no-check-sections --gc-sections
-+unpaged-ldadd := $(objs) $(link-ldadd) $(libgcccore)
-+cleanfiles += $(link-out-dir)/unpaged.o
-+$(link-out-dir)/unpaged.o: $(link-out-dir)/unpaged_entries.txt
-+	@$(cmd-echo-silent) '  LD      $@'
-+	$(q)$(LDcore) $(unpaged-ldargs) \
-+		`cat $(link-out-dir)/unpaged_entries.txt` \
-+		$(unpaged-ldadd) -o $@
-+
-+cleanfiles += $(link-out-dir)/text_unpaged.ld.S
-+$(link-out-dir)/text_unpaged.ld.S: $(link-out-dir)/unpaged.o
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(READELFcore) -S -W $< | \
-+		./scripts/gen_ld_sects.py .text. > $@
-+
-+cleanfiles += $(link-out-dir)/rodata_unpaged.ld.S
-+$(link-out-dir)/rodata_unpaged.ld.S: $(link-out-dir)/unpaged.o
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(READELFcore) -S -W $< | \
-+		./scripts/gen_ld_sects.py .rodata. > $@
-+
-+
-+cleanfiles += $(link-out-dir)/init_entries.txt
-+$(link-out-dir)/init_entries.txt: $(link-out-dir)/all_objs.o
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(NMcore) $< | \
-+		$(AWK) '/ ____keep_init/ { printf "-u%s ", $$3 }' > $@
-+
-+init-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections
-+init-ldadd := $(link-objs-init) $(link-out-dir)/version.o  $(link-ldadd) \
-+	      $(libgcccore)
-+cleanfiles += $(link-out-dir)/init.o
-+$(link-out-dir)/init.o: $(link-out-dir)/init_entries.txt
-+	$(call gen-version-o)
-+	@$(cmd-echo-silent) '  LD      $@'
-+	$(q)$(LDcore) $(init-ldargs) \
-+		`cat $(link-out-dir)/init_entries.txt` \
-+		$(init-ldadd) -o $@
-+
-+cleanfiles += $(link-out-dir)/text_init.ld.S
-+$(link-out-dir)/text_init.ld.S: $(link-out-dir)/init.o
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(READELFcore) -S -W $< | \
-+		./scripts/gen_ld_sects.py .text. > $@
-+
-+cleanfiles += $(link-out-dir)/rodata_init.ld.S
-+$(link-out-dir)/rodata_init.ld.S: $(link-out-dir)/init.o
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(READELFcore) -S -W $< | ./scripts/gen_ld_sects.py .rodata. > $@
-+
-+-include $(link-script-dep)
-+
-+link-script-extra-deps += $(link-out-dir)/text_unpaged.ld.S
-+link-script-extra-deps += $(link-out-dir)/rodata_unpaged.ld.S
-+link-script-extra-deps += $(link-out-dir)/text_init.ld.S
-+link-script-extra-deps += $(link-out-dir)/rodata_init.ld.S
-+link-script-extra-deps += $(conf-file)
-+cleanfiles += $(link-script-pp) $(link-script-dep)
-+$(link-script-pp): $(link-script) $(link-script-extra-deps)
-+	@$(cmd-echo-silent) '  CPP     $@'
-+	@mkdir -p $(dir $@)
-+	$(q)$(CPPcore) -P -MT $@ -MD -MF $(link-script-dep) \
-+		$(link-script-cppflags) $< -o $@
-+
-+define update-buildcount
-+	@$(cmd-echo-silent) '  UPD     $(1)'
-+	$(q)if [ ! -f $(1) ]; then \
-+		mkdir -p $(dir $(1)); \
-+		echo 1 >$(1); \
-+	else \
-+		expr 0`cat $(1)` + 1 >$(1); \
-+	fi
-+endef
-+
-+# filter-out to workaround objdump warning
-+version-o-cflags = $(filter-out -g3,$(core-platform-cflags) \
-+			$(platform-cflags) $(cflagscore))
-+# SOURCE_DATE_EPOCH defined for reproducible builds
-+ifneq ($(SOURCE_DATE_EPOCH),)
-+DATE_STR = `date -u -d @$(SOURCE_DATE_EPOCH)`
-+else
-+DATE_STR = `date -u`
-+endif
-+BUILD_COUNT_STR = `cat $(link-out-dir)/.buildcount`
-+CORE_CC_VERSION = `$(CCcore) -v 2>&1 | grep "version " | sed 's/ *$$//'`
-+define gen-version-o
-+	$(call update-buildcount,$(link-out-dir)/.buildcount)
-+	@$(cmd-echo-silent) '  GEN     $(link-out-dir)/version.o'
-+	$(q)echo -e "const char core_v_str[] =" \
-+		"\"$(TEE_IMPL_VERSION) \"" \
-+		"\"($(CORE_CC_VERSION)) \"" \
-+		"\"#$(BUILD_COUNT_STR) \"" \
-+		"\"$(DATE_STR) \"" \
-+		"\"$(CFG_KERN_LINKER_ARCH)\";\n" \
-+		| $(CCcore) $(version-o-cflags) \
-+			-xc - -c -o $(link-out-dir)/version.o
-+endef
-+$(link-out-dir)/version.o:
-+	$(call gen-version-o)
-+
-+-include $(link-out-dir)/.tee.elf.cmd
-+define check-link-objs
-+$(if $(strip $(filter-out $(link-objs), $(old-link-objs))
-+	     $(filter-out $(old-link-objs), $(link-objs))), FORCE_LINK := FORCE)
-+endef
-+$(eval $(call check-link-objs))
-+
-+all: $(link-out-dir)/tee.elf
-+cleanfiles += $(link-out-dir)/tee.elf $(link-out-dir)/tee.map
-+cleanfiles += $(link-out-dir)/version.o
-+cleanfiles += $(link-out-dir)/.buildcount
-+cleanfiles += $(link-out-dir)/.tee.elf.cmd
-+$(link-out-dir)/tee.elf: $(link-objs) $(libdeps) $(link-script-pp) $(FORCE_LINK)
-+	@echo "old-link-objs := $(link-objs)" >$(link-out-dir)/.tee.elf.cmd
-+	@$(cmd-echo-silent) '  LD      $@'
-+	$(q)$(LDcore) $(ldargs-tee.elf) -o $@
-+
-+all: $(link-out-dir)/tee.dmp
-+cleanfiles += $(link-out-dir)/tee.dmp
-+$(link-out-dir)/tee.dmp: $(link-out-dir)/tee.elf
-+	@$(cmd-echo-silent) '  OBJDUMP $@'
-+	$(q)$(OBJDUMPcore) -l -x -d $< > $@
-+
-+cleanfiles += $(link-out-dir)/tee-pager.bin
-+$(link-out-dir)/tee-pager.bin: $(link-out-dir)/tee.elf scripts/gen_tee_bin.py
-+	@echo Warning: $@ is deprecated
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)scripts/gen_tee_bin.py --input $< --out_tee_pager_bin $@
-+
-+cleanfiles += $(link-out-dir)/tee-pageable.bin
-+$(link-out-dir)/tee-pageable.bin: $(link-out-dir)/tee.elf scripts/gen_tee_bin.py
-+	@echo Warning: $@ is deprecated
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)scripts/gen_tee_bin.py --input $< --out_tee_pageable_bin $@
-+
-+all: $(link-out-dir)/tee.bin
-+cleanfiles += $(link-out-dir)/tee.bin
-+$(link-out-dir)/tee.bin: $(link-out-dir)/tee.elf scripts/gen_tee_bin.py
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)scripts/gen_tee_bin.py --input $< --out_tee_bin $@
+@@ -1,3 +1,17 @@
+ include core/arch/arm/kernel/link.mk
  
++link-script-dummy ::= $(platform-dir)/link_dummy.ld
++ldargs-all_objs := -T $(link-script-dummy) --no-check-sections \
++                   $(link-objs) $(link-ldadd) $(libgcccore)
++unpaged-ldargs = -T $(link-script-dummy) --no-check-sections --gc-sections
++init-ldargs := -T $(link-script-dummy) --no-check-sections --gc-sections
++
  all: $(link-out-dir)/tee.srec
- cleanfiles += $(link-out-dir)/tee.srec
-@@ -12,3 +202,38 @@ cleanfiles += $(link-out-dir)/tee.srec
- $(link-out-dir)/tee.srec: $(link-out-dir)/tee-raw.bin
- 	@$(cmd-echo-silent) '  SREC    $@'
- 	$(q)$(OBJCOPYcore) -I binary -O srec $< $@
-+
-+all: $(link-out-dir)/tee-header_v2.bin
-+cleanfiles += $(link-out-dir)/tee-header_v2.bin
-+$(link-out-dir)/tee-header_v2.bin: $(link-out-dir)/tee.elf \
-+				   scripts/gen_tee_bin.py
++cleanfiles += $(link-out-dir)/tee.srec
++$(link-out-dir)/tee.srec: $(link-out-dir)/tee-raw.bin
++	@$(cmd-echo-silent) '  SREC    $@'
++	$(q)$(OBJCOPYcore) -I binary -O srec $< $@
++cleanfiles += $(link-out-dir)/tee-raw.bin
++$(link-out-dir)/tee-raw.bin: $(link-out-dir)/tee.elf scripts/gen_tee_bin.py
 +	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)scripts/gen_tee_bin.py --input $< --out_header_v2 $@
-+
-+all: $(link-out-dir)/tee-pager_v2.bin
-+cleanfiles += $(link-out-dir)/tee-pager_v2.bin
-+$(link-out-dir)/tee-pager_v2.bin: $(link-out-dir)/tee.elf scripts/gen_tee_bin.py
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)scripts/gen_tee_bin.py --input $< --out_pager_v2 $@
-+
-+all: $(link-out-dir)/tee-pageable_v2.bin
-+cleanfiles += $(link-out-dir)/tee-pageable_v2.bin
-+$(link-out-dir)/tee-pageable_v2.bin: $(link-out-dir)/tee.elf \
-+				     scripts/gen_tee_bin.py
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)scripts/gen_tee_bin.py --input $< --out_pageable_v2 $@
-+
-+all: $(link-out-dir)/tee.symb_sizes
-+cleanfiles += $(link-out-dir)/tee.symb_sizes
-+$(link-out-dir)/tee.symb_sizes: $(link-out-dir)/tee.elf
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)$(NMcore) --print-size --reverse-sort --size-sort $< > $@
-+
-+cleanfiles += $(link-out-dir)/tee.mem_usage
-+ifneq ($(filter mem_usage,$(MAKECMDGOALS)),)
-+mem_usage: $(link-out-dir)/tee.mem_usage
-+
-+$(link-out-dir)/tee.mem_usage: $(link-out-dir)/tee.elf
-+	@$(cmd-echo-silent) '  GEN     $@'
-+	$(q)./scripts/mem_usage.py $< > $@
-+endif
++	$(q)scripts/gen_tee_bin.py --input $< --out_tee_raw_bin $@
 diff --git a/core/arch/arm/plat-rzg/link_dummy.ld b/core/arch/arm/plat-rzg/link_dummy.ld
 new file mode 100644
 index 00000000..1efc585f
@@ -884,12 +667,19 @@ index 00000000..1efc585f
 +PROVIDE(tee_svc_handler = 0);
 +PROVIDE(init_teecore = 0);
 diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
-index a407c852..6d74a6f4 100644
+index 31dfd084..b5489950 100644
 --- a/core/arch/arm/plat-rzg/main.c
 +++ b/core/arch/arm/plat-rzg/main.c
-@@ -39,6 +39,11 @@
- #include <drivers/scif.h>
+@@ -5,12 +5,18 @@
+  */
+ 
+ #include <console.h>
++#include <kernel/boot.h>
  #include <drivers/gic.h>
+ #include <drivers/scif.h>
+ #include <kernel/panic.h>
+ #include <mm/core_memprot.h>
+ #include <platform_config.h>
  
 +#include <kernel/spinlock.h>
 +
@@ -899,17 +689,16 @@ index a407c852..6d74a6f4 100644
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, CONSOLE_UART_BASE, SCIF_REG_SIZE);
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICD_BASE, GIC_DIST_REG_SIZE);
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICC_BASE, GIC_DIST_REG_SIZE);
-@@ -54,11 +59,60 @@ register_dynamic_shm(NSEC_DDR_2_BASE, NSEC_DDR_2_SIZE);
+@@ -26,6 +32,53 @@ register_dynamic_shm(NSEC_DDR_2_BASE, NSEC_DDR_2_SIZE);
  register_dynamic_shm(NSEC_DDR_3_BASE, NSEC_DDR_3_SIZE);
  #endif
  
 +static uint32_t suspend_to_ram_save_flag = 0U;
 +static uint32_t main_cpu_lock = (uint32_t)SPINLOCK_UNLOCK;
 +
-+static unsigned long main_cpu_suspend(unsigned long a0,
-+                                unsigned long a1 __unused)
++unsigned long thread_cpu_suspend_handler(unsigned long a0,
++					 unsigned long a1 __unused)
 +{
-+
 +	uint32_t exceptions;
 +
 +	exceptions = cpu_spin_lock_xsave(&main_cpu_lock);
@@ -931,7 +720,7 @@ index a407c852..6d74a6f4 100644
 +	return 0U;
 +}
 +
-+static unsigned long main_cpu_resume(unsigned long a0 __unused,
++unsigned long thread_cpu_resume_handler(unsigned long a0 __unused,
 +                                unsigned long a1 __unused)
 +{
 +	uint32_t exceptions;
@@ -944,24 +733,16 @@ index a407c852..6d74a6f4 100644
 +		suspend_to_ram_save_flag = 0U;
 +		DMSG("END suspend_to_ram_restore");
 +	} else {
-+	        /* no operation */
++		/* no operation */
 +	}
 +
 +	cpu_spin_unlock_xrestore(&main_cpu_lock, exceptions);
 +	return 0U;
 +}
 +
-+
- static const struct thread_handlers handlers __nex_data = {
-     .cpu_on = cpu_on_handler,
-     .cpu_off = pm_do_nothing,
--    .cpu_suspend = pm_do_nothing,
--    .cpu_resume = pm_do_nothing,
-+    .cpu_suspend = main_cpu_suspend,
-+    .cpu_resume = main_cpu_resume,
-     .system_off = pm_do_nothing,
-     .system_reset = pm_do_nothing,
- };
+ static struct scif_uart_data console_data __nex_bss;
+ 
+ void console_init(void)
 diff --git a/core/arch/arm/plat-rzg/rzg_common.h b/core/arch/arm/plat-rzg/rzg_common.h
 new file mode 100644
 index 00000000..57c6b8a8
@@ -1249,4 +1030,3 @@ index 8ddc2fd4..804bf65d 100644
 +srcs-y += rzg_suspend_to_ram.c
 -- 
 2.17.1
-

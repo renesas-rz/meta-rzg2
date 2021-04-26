@@ -1,92 +1,165 @@
-From 81de48dee20cf7f4182924bd0512c1b0b4d77083 Mon Sep 17 00:00:00 2001
+From fdc47c350f617da10e606275100e782d48746857 Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
-Date: Tue, 18 Aug 2020 09:15:11 +0700
-Subject: [PATCH] core: arm: plat-rzg: Add ECC mode checking for shared memory
- region
+Date: Fri, 22 Jan 2021 10:56:52 +0700
+Subject: [PATCH 5/5] core: arm: plat-rzg: Add ECC mode checking for shared
+ memory region
 
 When we use ECC setting, the memory and size
 of DDR we can use may be changed. So that we must modify them to
-compatible with the system(and un-trusted OS)
+compatible with the system(and un-trusted OS).
+
+Otherwise, these macros are used in our platform source only, so that
+move to platform private header to avoid warning of undefined macro
+value when other source use these pre-define.
 
 Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 ---
- core/arch/arm/plat-rzg/conf.mk           |  3 +++
- core/arch/arm/plat-rzg/platform_config.h | 31 ++++++++++++++++++++++++
+ core/arch/arm/plat-rzg/conf.mk           |  2 +
+ core/arch/arm/plat-rzg/platform_config.h | 29 ---------
+ core/arch/arm/plat-rzg/rzg_common.h      | 81 ++++++++++++++++++++++++
  core/arch/arm/plat-rzg/sub.mk            |  2 +-
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ 4 files changed, 84 insertions(+), 30 deletions(-)
 
 diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
-index a9621ffa..a13d3b5f 100644
+index e3fa8538..cd3d04af 100644
 --- a/core/arch/arm/plat-rzg/conf.mk
 +++ b/core/arch/arm/plat-rzg/conf.mk
-@@ -48,3 +48,6 @@ endif
+@@ -44,3 +44,5 @@ $(call force,CFG_ARM32_core,y)
+ endif
  
- CFG_WITH_STACK_CANARIES ?= y
- CFG_CORE_HEAP_SIZE ?= 0x20000
-+
+ CFG_DT ?= y
 +RZG_DRAM_ECC ?= 0
 +RZG_ECC_FULL ?= 0
 diff --git a/core/arch/arm/plat-rzg/platform_config.h b/core/arch/arm/plat-rzg/platform_config.h
-index 7bd99011..4315b918 100644
+index 0638b53a..0a0a2b47 100644
 --- a/core/arch/arm/plat-rzg/platform_config.h
 +++ b/core/arch/arm/plat-rzg/platform_config.h
-@@ -46,25 +46,56 @@
+@@ -21,35 +21,6 @@
  
- #if defined(PLATFORM_FLAVOR_ek874)
- #define NSEC_DDR_0_BASE     0x47E00000U
-+#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)	//Apply ECC Full Single setting
-+#define NSEC_DDR_0_SIZE     0x3C200000
-+#else //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
- #define NSEC_DDR_0_SIZE     0x78200000
-+#endif //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
- #endif
-+
- #if defined(PLATFORM_FLAVOR_hihope_rzg2m)
-+#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 1)	//Apply ECC Full Dual setting
- #define NSEC_DDR_0_BASE     0x47E00000U
- #define NSEC_DDR_0_SIZE     0x78200000
-+#elif (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)	//Apply ECC Full Single setting
-+#define NSEC_DDR_0_BASE     0x47E00000U
-+#define NSEC_DDR_0_SIZE     0x4C200000
- #define NSEC_DDR_1_BASE     0x600000000U
-+#define NSEC_DDR_1_SIZE     0x40000000
-+#else
-+#define NSEC_DDR_0_BASE     0x47E00000U
-+#define NSEC_DDR_0_SIZE     0x78200000
-+#define NSEC_DDR_1_BASE     0x600000000U
- #define NSEC_DDR_1_SIZE     0x80000000
-+#endif //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 1)
- #endif
-+
- #if defined(PLATFORM_FLAVOR_hihope_rzg2n)
- #define NSEC_DDR_0_BASE     0x47E00000U
- #define NSEC_DDR_0_SIZE     0x78200000
- #define NSEC_DDR_1_BASE     0x480000000U
-+#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)	//Apply ECC Full Single setting
-+#define NSEC_DDR_1_SIZE     0x14000000
-+#else //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
- #define NSEC_DDR_1_SIZE     0x80000000
-+#endif //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
- #endif
-+
- #if defined(PLATFORM_FLAVOR_hihope_rzg2h)
-+#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 1)	//Apply ECC Full Dual setting
-+#define NSEC_DDR_0_BASE     0x47E00000U
-+#define NSEC_DDR_0_SIZE     0x78200000
-+#elif (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)	//Apply ECC Full Single setting
-+#define NSEC_DDR_0_BASE     0x47E00000U
-+#define NSEC_DDR_0_SIZE     0x4C200000
-+#define NSEC_DDR_1_BASE     0x600000000U
-+#define NSEC_DDR_1_SIZE     0x40000000
-+#else
- #define NSEC_DDR_0_BASE     0x47E00000U
- #define NSEC_DDR_0_SIZE     0x78200000
- #define NSEC_DDR_1_BASE     0x500000000U
- #define NSEC_DDR_1_SIZE     0x80000000
-+#endif //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 1)
- #endif
+ #define CONSOLE_UART_BASE	0xE6E88000
  
- /* Full GlobalPlatform test suite requires TEE_SHMEM_SIZE to be at least 2MB */
+-#if defined(PLATFORM_FLAVOR_ek874)
+-#define NSEC_DDR_0_BASE		0x47E00000U
+-#define NSEC_DDR_0_SIZE		0x78200000
+-
+-#elif defined(PLATFORM_FLAVOR_hihope_rzg2h)
+-
+-#define NSEC_DDR_0_BASE		0x47E00000U
+-#define NSEC_DDR_0_SIZE		0x78200000
+-#define NSEC_DDR_1_BASE		0x500000000U
+-#define NSEC_DDR_1_SIZE		0x80000000
+-
+-#elif defined(PLATFORM_FLAVOR_hihope_rzg2m)
+-
+-#define NSEC_DDR_0_BASE		0x47E00000U
+-#define NSEC_DDR_0_SIZE		0x78200000
+-#define NSEC_DDR_1_BASE		0x600000000U
+-#define NSEC_DDR_1_SIZE		0x80000000
+-
+-#elif defined(PLATFORM_FLAVOR_hihope_rzg2n)
+-
+-#define NSEC_DDR_0_BASE		0x47E00000U
+-#define NSEC_DDR_0_SIZE		0x78200000
+-#define NSEC_DDR_1_BASE		0x480000000U
+-#define NSEC_DDR_1_SIZE		0x80000000
+-
+-#else
+-#error "Unknown platform flavor"
+-#endif
+-
+ #define TEE_SHMEM_START		(TZDRAM_BASE + TZDRAM_SIZE)
+ #define TEE_SHMEM_SIZE		0x100000
+ 
+diff --git a/core/arch/arm/plat-rzg/rzg_common.h b/core/arch/arm/plat-rzg/rzg_common.h
+index 57c6b8a8..35365f05 100644
+--- a/core/arch/arm/plat-rzg/rzg_common.h
++++ b/core/arch/arm/plat-rzg/rzg_common.h
+@@ -14,4 +14,85 @@
+ /* Parameters value passed from ARM Trusted FW */
+ #define TFW_ARG_CPU_SUSPEND	(0x0UL)
+ #define TFW_ARG_SYSTEM_SUSPEND	(0x1UL)
++
++#if defined(PLATFORM_FLAVOR_ek874)
++#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
++/* Apply for ECC Full Single setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x3C200000
++#else //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
++/* Apply for non-ECC or Partial ECC setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#endif //(RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
++
++#elif defined(PLATFORM_FLAVOR_hihope_rzg2h)
++#if (RZG_DRAM_ECC == 1)
++#if (RZG_ECC_FULL == 1)
++/* Apply for ECC Full Dual setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#elif (RZG_ECC_FULL == 2)
++/* Apply for ECC Full Single setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x4C200000
++#define NSEC_DDR_1_BASE		0x600000000U
++#define NSEC_DDR_1_SIZE		0x40000000
++#else //(RZG_ECC_FULL)
++/* Apply for ECC Partial setting */
++/* Define full of DDR0/DDR1 memory map*/
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#define NSEC_DDR_1_BASE		0x600000000U
++#define NSEC_DDR_1_SIZE		0x80000000
++#endif
++#else //(RZG_DRAM_ECC == 1)
++/* Define original memory*/
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#define NSEC_DDR_1_BASE		0x500000000U
++#define NSEC_DDR_1_SIZE		0x80000000
++#endif //(RZG_DRAM_ECC == 1
++
++#elif defined(PLATFORM_FLAVOR_hihope_rzg2m)
++
++#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 1)
++/* Apply for ECC Full Dual setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#elif (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
++/* Apply for ECC Full Single setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x4C200000
++#define NSEC_DDR_1_BASE		0x600000000U
++#define NSEC_DDR_1_SIZE		0x40000000
++#else
++/* Apply for non-ECC or Partial ECC setting */
++/* Define original memory*/
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#define NSEC_DDR_1_BASE		0x600000000U
++#define NSEC_DDR_1_SIZE		0x80000000
++#endif
++
++#elif defined(PLATFORM_FLAVOR_hihope_rzg2n)
++
++#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
++/* Apply for ECC Full Single setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#define NSEC_DDR_1_BASE		0x480000000U
++#define NSEC_DDR_1_SIZE		0x18000000
++#else
++/* Apply for non-ECC or Partial ECC setting */
++#define NSEC_DDR_0_BASE		0x47E00000U
++#define NSEC_DDR_0_SIZE		0x78200000
++#define NSEC_DDR_1_BASE		0x480000000U
++#define NSEC_DDR_1_SIZE		0x80000000
++#endif
++
++#else
++#error "Unknown platform flavor"
++#endif
++
+ #endif
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
 index 22ef4ad6..c40bd652 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
@@ -97,5 +170,5 @@ index 22ef4ad6..c40bd652 100644
  
 -cppflags-y += -DLTC_NO_PROTOTYPES
 +cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL)
---
+-- 
 2.17.1

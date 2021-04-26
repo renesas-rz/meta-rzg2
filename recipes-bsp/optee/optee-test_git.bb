@@ -6,10 +6,10 @@ inherit deploy python3native
 LICENSE = "BSD & GPLv2"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
-#TAG: 3.10.0
-PV = "3.10.0+git${SRCPV}"
+#TAG: 3.12.0
+PV = "3.12.0+git${SRCPV}"
 BRANCH = "master"
-SRCREV = "30efcbeaf8864d0f2a5c4be593a5411001fab31b"
+SRCREV = "7be42398e8848f09995abf8a9e9d8bb8840cc19a"
 
 SRC_URI = " \
 	git://github.com/OP-TEE/optee_test.git;branch=${BRANCH} \
@@ -22,6 +22,7 @@ OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
 TA_DEV_KIT_DIR = "${STAGING_INCDIR}/optee/export-user_ta/"
 
 EXTRA_OEMAKE = " \
+	LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
 	TA_DEV_KIT_DIR=${TA_DEV_KIT_DIR} \
 	OPTEE_CLIENT_EXPORT=${OPTEE_CLIENT_EXPORT} \
 	CROSS_COMPILE=${TARGET_PREFIX} \

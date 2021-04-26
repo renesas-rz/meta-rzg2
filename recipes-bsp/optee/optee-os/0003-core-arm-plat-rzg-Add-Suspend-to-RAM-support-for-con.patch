@@ -1,7 +1,8 @@
-From 4e5f9c00287a49239d97a43eeed435a1d6daff71 Mon Sep 17 00:00:00 2001
+From eb0ff6c88fbb6035c78462aa747e21f3402d72ce Mon Sep 17 00:00:00 2001
 From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
 Date: Wed, 19 Aug 2020 16:51:41 +0700
-Subject: [PATCH] core: arm: plat-rzg: Add Suspend to RAM support for console
+Subject: [PATCH 3/5] core: arm: plat-rzg: Add Suspend to RAM support for
+ console
 
 This patch will add support suspend to RAM for console.
 It also fix the address to setting register when init console.
@@ -13,12 +14,12 @@ Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
  2 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
-index 921da8a1..5fc71cc6 100644
+index b5489950..ddafa4f4 100644
 --- a/core/arch/arm/plat-rzg/main.c
 +++ b/core/arch/arm/plat-rzg/main.c
-@@ -130,3 +130,17 @@ void console_init(void)
-     scif_uart_init(&console_data, CONSOLE_UART_BASE);
-     register_serial_console(&console_data.chip);
+@@ -86,3 +86,17 @@ void console_init(void)
+ 	scif_uart_init(&console_data, CONSOLE_UART_BASE);
+ 	register_serial_console(&console_data.chip);
  }
 +
 +static void scif_backup_cb(enum suspend_to_ram_state state,
@@ -52,4 +53,3 @@ index ff33ea3a..ac0a48ca 100644
  }
 -- 
 2.17.1
-

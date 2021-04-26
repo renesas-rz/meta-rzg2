@@ -9,21 +9,18 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit deploy python3native
 require include/ecc-control.inc
 
-PV = "3.10.0+renesas+git${SRCPV}"
+PV = "3.12.0+git${SRCPV}"
 BRANCH = "master"
-#TAG: 3.10.0
-SRCREV = "d1c635434c55b7d75eadf471bde04926bd1e50a7"
+#TAG: 3.12.0
+SRCREV = "3d47a131bca1d9ed511bfd516aa5e70269e12c1d"
 
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
-    file://0001-arch-arm-plat-rzg-Add-platform-rzg2.patch \
+    file://0001-mk-gcc-allow-setting-sysroot-lookup.patch \
     file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
-    file://0003-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
-    file://0004-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
+    file://0003-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
+    file://0004-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
     file://0005-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
-    file://0006-core-arm-plat-rzg-Re-structure-for-compatible-with-v.patch \
-    file://0007-mk-gcc-allow-setting-sysroot-for-libgcc-lookup.patch \
-    file://0008-core-arm-plat-rzg-platform-config-Re-configure-memor.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
@@ -42,8 +39,16 @@ libdir[unexport] = "1"
 
 S = "${WORKDIR}/git"
 
+EXTRA_OEMAKE = " \
+	PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} \
+	CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n CFG_CRYPTO_WITH_CE=y \
+	RZG_DRAM_ECC=${USE_ECC} RZG_ECC_FULL=${ECC_FULL} \
+	LIBGCC_LOCATE_CFLAGS=--sysroot=${STAGING_DIR_HOST} \
+	CROSS_COMPILE=${TARGET_PREFIX} \
+"
+
 do_compile() {
-    oe_runmake PLATFORM=${PLATFORM} PLATFORM_FLAVOR=${PLATFORM_FLAVOR} CFG_ARM64_core=y CFG_REE_FS=y CFG_RPMB_FS=n CFG_CRYPTO_WITH_CE=y RZG_DRAM_ECC=${USE_ECC} RZG_ECC_FULL=${ECC_FULL}
+    oe_runmake
 }
 
 do_install() {
