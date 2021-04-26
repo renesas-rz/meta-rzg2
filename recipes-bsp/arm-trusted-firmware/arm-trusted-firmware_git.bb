@@ -14,45 +14,16 @@ require include/ecc-control.inc
 
 S = "${WORKDIR}/git"
 
-BRANCH = "master"
+BRANCH = "v2.4/rzg2"
 BRANCH_mbedtls = "mbedtls-2.16"
 
 SRC_URI = " \
-	git://git.trustedfirmware.org/TF-A/trusted-firmware-a.git;branch=${BRANCH};protocol=https \
+	git://github.com/renesas-rz/rzg_trusted-firmware-a.git;branch=${BRANCH};protocol=https \
 	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
 "
 
-#Tag v2.4
-SRCREV = "e2c509a39c6cc4dda8734e6509cdbe6e3603cdfc"
+SRCREV = "44427a77380296d24dfe97417fbbdb4599579900"
 SRCREV_mbedtls = "04a049bda1ceca48060b57bc4bcf5203ce591421"
-
-SRC_URI += " \
-	file://0001-rzg-initial-commit-for-the-RZG-gen2-boards.patch \
-	file://0002-rzg-drivers-add-staging-drivers.patch \
-	file://0003-rzg-drivers-authentication.patch \
-	file://0004-rzg-drivers-add-board-identification.patch \
-	file://0005-rzg-drivers-add-delay-driver.patch \
-	file://0006-rzg2-drivers-add-dma-support.patch \
-	file://0007-rzg-drivers-add-emmc-support.patch \
-	file://0008-rzg-drivers-add-i2c-for-dvfs.patch \
-	file://0009-rzg-drivers-add-io-drivers-for-emmc-mem.patch \
-	file://0010-rzg-drivers-add-console-and-serial-controller-interf.patch \
-	file://0011-plat-rzg-add-common-file.patch \
-	file://0012-rzg-drivers-add-power-controller-driver.patch \
-	file://0013-rzg-drivers-add-rom-api.patch \
-	file://0014-rzg-drivers-SPI-multi-I-O-bus-controller.patch \
-	file://0015-rzg-drivers-add-watchdog-support.patch \
-	file://0016-plat-renesas-rzg-Add-ECC-support-for-RZ-G2-platform.patch \
-	file://0018-rzg-plat-Zero-terminate-the-string-in-unsigned_num_p.patch \
-	file://0019-Don-t-return-error-information-from-console_flush.patch \
-	file://0020-rzg-drivers-console-Treat-log-as-device-memory.patch \
-	file://0021-rzg-ddr-Update-DDR-setting-for-G2H-G2M-and-G2N.patch \
-	file://0022-plat-rzg-Update-IPL-and-Secure-Monitor-Rev.2.0.7.patch \
-	file://0023-rzg-g2e-add-support-for-identifying-board-revision.patch \
-	file://0024-drivers-renesas-rzg-wdt-Create-init-counter-function.patch \
-	file://0025-plat-rzg-bl2_fusa-re-work-initialize-memory-of-FUSA-.patch \
-	file://0026-plat-renesas-Implement-SiP-Service-Call.patch \
-"
 
 PV = "v2.4+git"
 
