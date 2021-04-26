@@ -1,0 +1,85 @@
+From e60080cf635074bc403f39dfe4caba977ae6e346 Mon Sep 17 00:00:00 2001
+From: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
+Date: Mon, 22 Mar 2021 15:28:54 +0900
+Subject: [PATCH 2/2] core: arm: plat-rzg: Add HW RNG by Secure IP driver
+
+This commit adds a hardware random number generator by Secure IP driver.
+
+Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
+---
+ core/arch/arm/plat-rzg/conf.mk   |  8 ++++++++
+ core/arch/arm/plat-rzg/rzg_rng.c | 31 +++++++++++++++++++++++++++++++
+ core/arch/arm/plat-rzg/sub.mk    |  1 +
+ 3 files changed, 40 insertions(+)
+ create mode 100644 core/arch/arm/plat-rzg/rzg_rng.c
+
+diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
+index 2561687..9cf6a14 100755
+--- a/core/arch/arm/plat-rzg/conf.mk
++++ b/core/arch/arm/plat-rzg/conf.mk
+@@ -50,6 +50,14 @@ CFG_WITH_STACK_CANARIES ?= y
+ CFG_CORE_HEAP_SIZE ?= 0x20000
+ 
+ CFG_RZG_SEC_IP_DRV ?= n
++CFG_RZG_SEC_IP_RNG ?= n
++
++ifeq ($(CFG_RZG_SEC_IP_DRV),n)
++$(call force,CFG_RZG_SEC_IP_RNG,n)
++endif
++ifeq ($(CFG_RZG_SEC_IP_RNG),y)
++$(call force,CFG_WITH_SOFTWARE_PRNG,n)
++endif
+ 
+ RZG_DRAM_ECC ?= 0
+ RZG_ECC_FULL ?= 0
+diff --git a/core/arch/arm/plat-rzg/rzg_rng.c b/core/arch/arm/plat-rzg/rzg_rng.c
+new file mode 100644
+index 0000000..d16d1a2
+--- /dev/null
++++ b/core/arch/arm/plat-rzg/rzg_rng.c
+@@ -0,0 +1,31 @@
++// SPDX-License-Identifier: BSD-2-Clause
++/*
++ * Copyright (c) 2018, Linaro Limited
++ * Copyright (c) 2021, Renesas Electronics Corporation
++ */
++
++#include <compiler.h>
++#include <crypto/crypto.h>
++#include <rng_support.h>
++#include <tee/tee_cryp_utl.h>
++#include <types_ext.h>
++
++#include <string.h>
++
++#include "drivers/secip_drv.h"
++
++TEE_Result crypto_rng_read(void *buf, size_t blen)
++{
++    if (!buf)
++        return TEE_ERROR_BAD_PARAMETERS;
++    
++    memset(buf, 0, blen);
++
++    return secip_rng(buf, blen);
++}
++
++uint8_t hw_get_random_byte(void)
++{
++    return 0;
++}
++
+diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
+index ded5712..e85840c 100755
+--- a/core/arch/arm/plat-rzg/sub.mk
++++ b/core/arch/arm/plat-rzg/sub.mk
+@@ -3,6 +3,7 @@ global-incdirs-y += include
+ srcs-y += main.c
+ srcs-y += rzg_suspend_to_ram.c
+ srcs-y += tee_common_otp.c
++srcs-$(CFG_RZG_SEC_IP_RNG) += rzg_rng.c
+ 
+ cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL)
+ 
+-- 
+2.7.4
