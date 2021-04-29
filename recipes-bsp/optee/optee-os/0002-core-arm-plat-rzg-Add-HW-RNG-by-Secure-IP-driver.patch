@@ -1,4 +1,4 @@
-From e60080cf635074bc403f39dfe4caba977ae6e346 Mon Sep 17 00:00:00 2001
+From b5119e8ca761269e5965229a09c450e8f7d2d728 Mon Sep 17 00:00:00 2001
 From: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
 Date: Mon, 22 Mar 2021 15:28:54 +0900
 Subject: [PATCH 2/2] core: arm: plat-rzg: Add HW RNG by Secure IP driver
@@ -14,14 +14,14 @@ Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
  create mode 100644 core/arch/arm/plat-rzg/rzg_rng.c
 
 diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
-index 2561687..9cf6a14 100755
+index 869d28f..654a2a9 100644
 --- a/core/arch/arm/plat-rzg/conf.mk
 +++ b/core/arch/arm/plat-rzg/conf.mk
-@@ -50,6 +50,14 @@ CFG_WITH_STACK_CANARIES ?= y
- CFG_CORE_HEAP_SIZE ?= 0x20000
+@@ -49,3 +49,11 @@ RZG_DRAM_ECC ?= 0
+ RZG_ECC_FULL ?= 0
  
  CFG_RZG_SEC_IP_DRV ?= n
-+CFG_RZG_SEC_IP_RNG ?= n
+++CFG_RZG_SEC_IP_RNG ?= n
 +
 +ifeq ($(CFG_RZG_SEC_IP_DRV),n)
 +$(call force,CFG_RZG_SEC_IP_RNG,n)
@@ -29,12 +29,9 @@ index 2561687..9cf6a14 100755
 +ifeq ($(CFG_RZG_SEC_IP_RNG),y)
 +$(call force,CFG_WITH_SOFTWARE_PRNG,n)
 +endif
- 
- RZG_DRAM_ECC ?= 0
- RZG_ECC_FULL ?= 0
 diff --git a/core/arch/arm/plat-rzg/rzg_rng.c b/core/arch/arm/plat-rzg/rzg_rng.c
 new file mode 100644
-index 0000000..d16d1a2
+index 0000000..9d4f8e5
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/rzg_rng.c
 @@ -0,0 +1,31 @@
@@ -58,7 +55,7 @@ index 0000000..d16d1a2
 +{
 +    if (!buf)
 +        return TEE_ERROR_BAD_PARAMETERS;
-+    
++
 +    memset(buf, 0, blen);
 +
 +    return secip_rng(buf, blen);
@@ -70,16 +67,17 @@ index 0000000..d16d1a2
 +}
 +
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
-index ded5712..e85840c 100755
+index f6bd050..199068b 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
 +++ b/core/arch/arm/plat-rzg/sub.mk
-@@ -3,6 +3,7 @@ global-incdirs-y += include
+@@ -2,6 +2,7 @@ global-incdirs-y += .
+ global-incdirs-y += include
  srcs-y += main.c
- srcs-y += rzg_suspend_to_ram.c
  srcs-y += tee_common_otp.c
 +srcs-$(CFG_RZG_SEC_IP_RNG) += rzg_rng.c
  
- cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL)
- 
+ ifeq (${PLATFORM_FLAVOR_hihope_rzg2n},y)
+   ifeq (${PMIC_ROHM_BD9571},1)
 -- 
 2.7.4
+

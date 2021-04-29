@@ -1,4 +1,4 @@
-From 30f2aa4a490a9db2da329cdd0d7a591d97657ee8 Mon Sep 17 00:00:00 2001
+From 120e2fd7caf5ff49ad773dfe3646b95810b18a17 Mon Sep 17 00:00:00 2001
 From: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
 Date: Mon, 22 Mar 2021 15:28:14 +0900
 Subject: [PATCH 1/2] core: arm: plat-rzg: Add Secure IP driver
@@ -35,9 +35,8 @@ Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
  .../tsip/wrapper/TSIP_Wrapper_SecureUpdate_API.c   | 165 +++++
  .../tsip/wrapper/TSIP_Wrapper_SecureUpdate_API.h   |  44 ++
  core/arch/arm/plat-rzg/include/drivers/secip_drv.h |  12 +
- core/arch/arm/plat-rzg/sub.mk                      |   3 +
- 29 files changed, 3388 insertions(+)
- mode change 100644 => 100755 core/arch/arm/plat-rzg/conf.mk
+ core/arch/arm/plat-rzg/sub.mk                      |   2 +
+ 29 files changed, 3387 insertions(+)
  create mode 100644 core/arch/arm/plat-rzg/drivers/secip_drv.c
  create mode 100644 core/arch/arm/plat-rzg/drivers/sub.mk
  create mode 100644 core/arch/arm/plat-rzg/drivers/tsip/R_TSIP_Core_Lib.h
@@ -65,22 +64,17 @@ Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
  create mode 100644 core/arch/arm/plat-rzg/drivers/tsip/wrapper/TSIP_Wrapper_SecureUpdate_API.c
  create mode 100644 core/arch/arm/plat-rzg/drivers/tsip/wrapper/TSIP_Wrapper_SecureUpdate_API.h
  create mode 100644 core/arch/arm/plat-rzg/include/drivers/secip_drv.h
- mode change 100644 => 100755 core/arch/arm/plat-rzg/sub.mk
 
 diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
-old mode 100644
-new mode 100755
-index a13d3b5..2561687
+index 71e4048..869d28f 100644
 --- a/core/arch/arm/plat-rzg/conf.mk
 +++ b/core/arch/arm/plat-rzg/conf.mk
-@@ -49,5 +49,7 @@ endif
- CFG_WITH_STACK_CANARIES ?= y
- CFG_CORE_HEAP_SIZE ?= 0x20000
- 
-+CFG_RZG_SEC_IP_DRV ?= n
-+
+@@ -47,3 +47,5 @@ endif
+ CFG_DT ?= y
  RZG_DRAM_ECC ?= 0
  RZG_ECC_FULL ?= 0
++
++CFG_RZG_SEC_IP_DRV ?= n
 diff --git a/core/arch/arm/plat-rzg/drivers/secip_drv.c b/core/arch/arm/plat-rzg/drivers/secip_drv.c
 new file mode 100644
 index 0000000..948e52c
@@ -3627,20 +3621,20 @@ index 0000000..29cb9f2
 +
 +#endif
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
-old mode 100644
-new mode 100755
-index c40bd65..ded5712
+index fa699ea..f6bd050 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
 +++ b/core/arch/arm/plat-rzg/sub.mk
-@@ -1,6 +1,9 @@
+@@ -1,4 +1,5 @@
  global-incdirs-y += .
 +global-incdirs-y += include
  srcs-y += main.c
- srcs-y += rzg_suspend_to_ram.c
  srcs-y += tee_common_otp.c
  
- cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL)
-+
+@@ -9,3 +10,4 @@ ifeq (${PLATFORM_FLAVOR_hihope_rzg2n},y)
+ endif
+ 
+ cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL) -DPMIC_ROHM_BD9571=$(PMIC_ROHM_BD9571)
 +subdirs-y += drivers
 -- 
 2.7.4
+
