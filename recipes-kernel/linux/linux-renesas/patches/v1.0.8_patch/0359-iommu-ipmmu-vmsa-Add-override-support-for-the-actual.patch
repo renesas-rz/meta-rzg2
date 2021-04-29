@@ -1,0 +1,64 @@
+From 5417e1e0621cfd32e949eab93161151deaff64da Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Fri, 2 Apr 2021 16:20:34 +0700
+Subject: [PATCH 359/364] iommu/ipmmu-vmsa: Add override support for the actual
+ number of MMU contexts
+
+[commit a6619e66fb39 iommu/ipmmu-vmsa: Add override support for the]
+[https://git.kernel.org/pub/scm/linux/kernel/git/horms/renesas-bsp.git]
+
+Add a IPMMU_VMSA_CTX_NUM to override the number of MMUs contexts that
+you want to use.
+
+The specified number of MMU contexts are used for the Renesas
+IPMMU driver and the remaining contexts are unused.
+
+SoCs, which is not R-Car Gen3, have no effect on IPMMU_VMSA_CTX_NUM.
+
+Signed-off-by: Tomoharu Fukawa <tomoharu.fukawa.eb@renesas.com>
+Signed-off-by: Kazuya Mizuguchi <kazuya.mizuguchi.ks@renesas.com>
+Signed-off-by: Hai Nguyen Pham <hai.pham.ud@renesas.com>
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ drivers/iommu/Kconfig      | 11 +++++++++++
+ drivers/iommu/ipmmu-vmsa.c |  2 +-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index c60395b..b9c8b0e 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -322,6 +322,17 @@ config IPMMU_VMSA
+ 
+ 	  If unsure, say N.
+ 
++config IPMMU_VMSA_CTX_NUM
++	int "Input MMU number of MMU's really used"
++	depends on IPMMU_VMSA
++	range 1 8
++	default 8
++	help
++	  Specify the number of MMU contexts that you want to use.
++
++	  The specified number of MMU contexts are used for the Renesas
++	  IPMMU driver and the remaining contexts are unused.
++
+ config SPAPR_TCE_IOMMU
+ 	bool "sPAPR TCE IOMMU Support"
+ 	depends on PPC_POWERNV || PPC_PSERIES
+diff --git a/drivers/iommu/ipmmu-vmsa.c b/drivers/iommu/ipmmu-vmsa.c
+index 1c888a3..b5e293a 100644
+--- a/drivers/iommu/ipmmu-vmsa.c
++++ b/drivers/iommu/ipmmu-vmsa.c
+@@ -959,7 +959,7 @@ static const struct ipmmu_features ipmmu_features_default = {
+ static const struct ipmmu_features ipmmu_features_rcar_gen3 = {
+ 	.use_ns_alias_offset = false,
+ 	.has_cache_leaf_nodes = true,
+-	.number_of_contexts = 8,
++	.number_of_contexts = CONFIG_IPMMU_VMSA_CTX_NUM,
+ 	.setup_imbuscr = false,
+ 	.twobit_imttbcr_sl0 = true,
+ 	.reserved_context = true,
+-- 
+2.7.4
+

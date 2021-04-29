@@ -356,3 +356,9 @@ patch patches/v1.0.8_patch/0355-Revert-usb-renesas_usbhs-set-the-mode-by-using-e
 patch patches/v1.0.8_patch/0356-usb-renesas_usbhs-rcar3-Use-OTG-mode-for-EK874-rev.D.patch
 patch patches/v1.0.8_patch/0357-arm64-dts-renensas-r8a774c0-cat874-Add-USB-2.0-perip.patch
 patch patches/v1.0.8_patch/0358-arm64-dts-renensas-r8a774c0-cat874-Add-USB-3.0-pin-f.patch
+patch patches/v1.0.8_patch/0359-iommu-ipmmu-vmsa-Add-override-support-for-the-actual.patch
+patch patches/v1.0.8_patch/0360-pci-pcie-rcar-host-Enable-Legacy-Interrupt-Support.patch
+patch patches/v1.0.8_patch/0361-arm64-dts-r8a774e1-Add-support-for-ipmmu-mmu.patch
+patch patches/v1.0.8_patch/0362-arm64-dts-r8a774a1-move-ipmmu_vi0-node-to-supported-.patch
+patch patches/v1.0.8_patch/0363-arm64-dts-r8a774a3-move-ipmmu_vi0-node-to-supported-.patch
+patch patches/v1.0.8_patch/0364-arm64-dts-renesas-r8a774e1-Un-tie-IPMMU-with-devices.patch

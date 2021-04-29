@@ -1,0 +1,58 @@
+From b6f4d220f594e14733a7cd23fdce6cd4b78a5139 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Tue, 20 Apr 2021 18:04:12 +0700
+Subject: [PATCH 361/364] arm64: dts: r8a774e1: Add support for ipmmu-mmu
+
+On RZ/G2H, vc0/1, vp0/1 support multimedia. They are implemented in
+mmngr driver.
+This commit change compatible string of the nodes to be supported in
+mmngr driver when IPMMU enabled.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+index 1376408..4bb140b 100644
+--- a/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
++++ b/arch/arm64/boot/dts/renesas/r8a774e1.dtsi
+@@ -1201,7 +1201,7 @@
+ 		};
+ 
+ 		ipmmu_vc0: iommu@fe6b0000 {
+-			compatible = "renesas,ipmmu-r8a774e1";
++			compatible = "renesas,ipmmu-mmu-r8a774e1";
+ 			reg = <0 0xfe6b0000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 12>;
+ 			power-domains = <&sysc R8A774E1_PD_A3VC>;
+@@ -1209,7 +1209,7 @@
+ 		};
+ 
+ 		ipmmu_vc1: iommu@fe6f0000 {
+-			compatible = "renesas,ipmmu-r8a774e1";
++			compatible = "renesas,ipmmu-mmu-r8a774e1";
+ 			reg = <0 0xfe6f0000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 13>;
+ 			power-domains = <&sysc R8A774E1_PD_A3VC>;
+@@ -1233,7 +1233,7 @@
+ 		};
+ 
+ 		ipmmu_vp0: iommu@fe990000 {
+-			compatible = "renesas,ipmmu-r8a774e1";
++			compatible = "renesas,ipmmu-mmu-r8a774e1";
+ 			reg = <0 0xfe990000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 16>;
+ 			power-domains = <&sysc R8A774E1_PD_A3VP>;
+@@ -1241,7 +1241,7 @@
+ 		};
+ 
+ 		ipmmu_vp1: iommu@fe980000 {
+-			compatible = "renesas,ipmmu-r8a774e1";
++			compatible = "renesas,ipmmu-mmu-r8a774e1";
+ 			reg = <0 0xfe980000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 17>;
+ 			power-domains = <&sysc R8A774E1_PD_A3VP>;
+-- 
+2.7.4
+
