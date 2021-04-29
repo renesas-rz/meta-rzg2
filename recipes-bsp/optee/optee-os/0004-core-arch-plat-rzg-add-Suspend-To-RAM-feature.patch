@@ -1,32 +1,45 @@
-From 4f8c93de9b409e0a2c8f05ae90a302a6ba3802b8 Mon Sep 17 00:00:00 2001
-From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
-Date: Thu, 9 Jul 2020 18:21:37 +0700
-Subject: [PATCH 2/5] core: arch: plat-rzg: add Suspend To RAM feature
+From 95f2716be1b5e1e40d2f86411c621e1c246d9928 Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Thu, 29 Apr 2021 14:40:19 +0700
+Subject: [PATCH 4/5] core: arch: plat-rzg: add Suspend To RAM feature
 
 This patch will add Suspend to RAM feature for platform rzg
 Reference RCar repo:
 https://github.com/renesas-rcar/optee_os/commit/3bc428825ee37409b3e0827e6e0b8688d1b2ab81
 
 Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
 ---
- core/arch/arm/plat-rzg/kern.ld.S            | 510 ++++++++++++++++++++
+ core/arch/arm/plat-rzg/conf.mk              |   1 +
+ core/arch/arm/plat-rzg/kern.ld.S            | 510 ++++++++++++++++++++++++++++
  core/arch/arm/plat-rzg/link.mk              |  14 +
- core/arch/arm/plat-rzg/link_dummy.ld        |  98 ++++
- core/arch/arm/plat-rzg/main.c               |  53 ++
- core/arch/arm/plat-rzg/rzg_common.h         |  17 +
- core/arch/arm/plat-rzg/rzg_suspend_to_ram.c | 180 +++++++
- core/arch/arm/plat-rzg/rzg_suspend_to_ram.h |  62 +++
- core/arch/arm/plat-rzg/sub.mk               |   1 +
- 8 files changed, 935 insertions(+)
+ core/arch/arm/plat-rzg/link_dummy.ld        |  98 ++++++
+ core/arch/arm/plat-rzg/main.c               |  60 ++++
+ core/arch/arm/plat-rzg/rzg_common.h         |   8 +
+ core/arch/arm/plat-rzg/rzg_suspend_to_ram.c | 180 ++++++++++
+ core/arch/arm/plat-rzg/rzg_suspend_to_ram.h |  62 ++++
+ core/arch/arm/plat-rzg/sub.mk               |   8 +-
+ 9 files changed, 940 insertions(+), 1 deletion(-)
  create mode 100644 core/arch/arm/plat-rzg/kern.ld.S
  create mode 100644 core/arch/arm/plat-rzg/link_dummy.ld
- create mode 100644 core/arch/arm/plat-rzg/rzg_common.h
  create mode 100644 core/arch/arm/plat-rzg/rzg_suspend_to_ram.c
  create mode 100644 core/arch/arm/plat-rzg/rzg_suspend_to_ram.h
 
+diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
+index cd3d04a..71e4048 100644
+--- a/core/arch/arm/plat-rzg/conf.mk
++++ b/core/arch/arm/plat-rzg/conf.mk
+@@ -28,6 +28,7 @@ $(call force,CFG_CORE_CLUSTER_SHIFT,1)
+ endif
+ ifeq ($(PLATFORM_FLAVOR),hihope_rzg2n)
+ $(call force,CFG_TEE_CORE_NB_CORE,2)
++PMIC_ROHM_BD9571 ?= 0
+ endif
+ ifeq ($(PLATFORM_FLAVOR),hihope_rzg2h)
+ $(call force,CFG_TEE_CORE_NB_CORE,8)
 diff --git a/core/arch/arm/plat-rzg/kern.ld.S b/core/arch/arm/plat-rzg/kern.ld.S
 new file mode 100644
-index 00000000..5fbe131c
+index 0000000..5fbe131
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/kern.ld.S
 @@ -0,0 +1,510 @@
@@ -541,7 +554,7 @@ index 00000000..5fbe131c
 +__asan_map_size = __asan_map_end - __asan_map_start;
 +#endif /*CFG_CORE_SANITIZE_KADDRESS*/
 diff --git a/core/arch/arm/plat-rzg/link.mk b/core/arch/arm/plat-rzg/link.mk
-index 229c4b70..3d4b3425 100644
+index 229c4b7..3d4b342 100644
 --- a/core/arch/arm/plat-rzg/link.mk
 +++ b/core/arch/arm/plat-rzg/link.mk
 @@ -1,3 +1,17 @@
@@ -564,7 +577,7 @@ index 229c4b70..3d4b3425 100644
 +	$(q)scripts/gen_tee_bin.py --input $< --out_tee_raw_bin $@
 diff --git a/core/arch/arm/plat-rzg/link_dummy.ld b/core/arch/arm/plat-rzg/link_dummy.ld
 new file mode 100644
-index 00000000..1efc585f
+index 0000000..1efc585
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/link_dummy.ld
 @@ -0,0 +1,98 @@
@@ -667,32 +680,31 @@ index 00000000..1efc585f
 +PROVIDE(tee_svc_handler = 0);
 +PROVIDE(init_teecore = 0);
 diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
-index 31dfd084..b5489950 100644
+index 0409ef8..853a126 100644
 --- a/core/arch/arm/plat-rzg/main.c
 +++ b/core/arch/arm/plat-rzg/main.c
-@@ -5,12 +5,18 @@
-  */
- 
- #include <console.h>
-+#include <kernel/boot.h>
- #include <drivers/gic.h>
- #include <drivers/scif.h>
- #include <kernel/panic.h>
+@@ -11,6 +11,15 @@
  #include <mm/core_memprot.h>
  #include <platform_config.h>
  
++#if defined(PLATFORM_FLAVOR_hihope_rzg2n)
++#if (PMIC_ROHM_BD9571)
 +#include <kernel/spinlock.h>
++#include <kernel/boot.h>
 +
-+#include "rzg_common.h"
 +#include "rzg_suspend_to_ram.h"
++#endif
++#endif
 +
- register_phys_mem_pgdir(MEM_AREA_IO_SEC, CONSOLE_UART_BASE, SCIF_REG_SIZE);
- register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICD_BASE, GIC_DIST_REG_SIZE);
- register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICC_BASE, GIC_DIST_REG_SIZE);
-@@ -26,6 +32,53 @@ register_dynamic_shm(NSEC_DDR_2_BASE, NSEC_DDR_2_SIZE);
+ #include "rzg_common.h"
+ 
+ register_phys_mem_pgdir(MEM_AREA_IO_SEC, DEVICE0_BASE, DEVICE0_SIZE);
+@@ -29,6 +38,57 @@ register_dynamic_shm(NSEC_DDR_2_BASE, NSEC_DDR_2_SIZE);
  register_dynamic_shm(NSEC_DDR_3_BASE, NSEC_DDR_3_SIZE);
  #endif
  
++#if defined(PLATFORM_FLAVOR_hihope_rzg2n)
++#if (PMIC_ROHM_BD9571)
 +static uint32_t suspend_to_ram_save_flag = 0U;
 +static uint32_t main_cpu_lock = (uint32_t)SPINLOCK_UNLOCK;
 +
@@ -702,13 +714,13 @@ index 31dfd084..b5489950 100644
 +	uint32_t exceptions;
 +
 +	exceptions = cpu_spin_lock_xsave(&main_cpu_lock);
-+	DMSG("a0=0x%lX, a1=0x%lX", a0, a1);
++	FMSG("a0=0x%lX, a1=0x%lX", a0, a1);
 +
 +	if (a0 >= TFW_ARG_SYSTEM_SUSPEND) {
 +		if (suspend_to_ram_save_flag == 0U) {
 +			suspend_to_ram_save();
 +			suspend_to_ram_save_flag = 1U;
-+			DMSG("END suspend_to_ram_save");
++			FMSG("END suspend_to_ram_save");
 +		} else {
 +			/* no operation */
 +		}
@@ -726,12 +738,12 @@ index 31dfd084..b5489950 100644
 +	uint32_t exceptions;
 +
 +	exceptions = cpu_spin_lock_xsave(&main_cpu_lock);
-+	DMSG("a0=0x%lX, a1=0x%lX", a0, a1);
++	FMSG("a0=0x%lX, a1=0x%lX", a0, a1);
 +
 +	if (suspend_to_ram_save_flag == 1U) {
 +		suspend_to_ram_restore();
 +		suspend_to_ram_save_flag = 0U;
-+		DMSG("END suspend_to_ram_restore");
++		FMSG("END suspend_to_ram_restore");
 +	} else {
 +		/* no operation */
 +	}
@@ -739,36 +751,32 @@ index 31dfd084..b5489950 100644
 +	cpu_spin_unlock_xrestore(&main_cpu_lock, exceptions);
 +	return 0U;
 +}
++#endif
++#endif
 +
  static struct scif_uart_data console_data __nex_bss;
  
  void console_init(void)
 diff --git a/core/arch/arm/plat-rzg/rzg_common.h b/core/arch/arm/plat-rzg/rzg_common.h
-new file mode 100644
-index 00000000..57c6b8a8
---- /dev/null
+index 7b41df9..5c3a03c 100644
+--- a/core/arch/arm/plat-rzg/rzg_common.h
 +++ b/core/arch/arm/plat-rzg/rzg_common.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: BSD-2-Clause */
-+/*
-+ * Copyright (c) 2020, Renesas Electronics Corporation
-+ */
-+
-+#ifndef RZG_COMMON_H
-+#define RZG_COMMON_H
-+
-+#include <string.h>
-+#include <kernel/misc.h>
-+#include <kernel/panic.h>
-+#include <arm.h>
-+
+@@ -91,4 +91,12 @@
+ #error "Unknown platform flavor"
+ #endif
+ 
++#if defined(PLATFORM_FLAVOR_hihope_rzg2n)
++#if (PMIC_ROHM_BD9571)
 +/* Parameters value passed from ARM Trusted FW */
 +#define TFW_ARG_CPU_SUSPEND	(0x0UL)
 +#define TFW_ARG_SYSTEM_SUSPEND	(0x1UL)
 +#endif
++#endif
++
+ #endif /* RZG_COMMON_H */
 diff --git a/core/arch/arm/plat-rzg/rzg_suspend_to_ram.c b/core/arch/arm/plat-rzg/rzg_suspend_to_ram.c
 new file mode 100644
-index 00000000..3861b6db
+index 0000000..3861b6d
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/rzg_suspend_to_ram.c
 @@ -0,0 +1,180 @@
@@ -954,7 +962,7 @@ index 00000000..3861b6db
 +}
 diff --git a/core/arch/arm/plat-rzg/rzg_suspend_to_ram.h b/core/arch/arm/plat-rzg/rzg_suspend_to_ram.h
 new file mode 100644
-index 00000000..aa5a5399
+index 0000000..aa5a539
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/rzg_suspend_to_ram.h
 @@ -0,0 +1,62 @@
@@ -1021,12 +1029,21 @@ index 00000000..aa5a5399
 +
 +#endif /* RZG_SUSPEND_TO_RAM_H */
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
-index 8ddc2fd4..804bf65d 100644
+index 796befd..88201c7 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
 +++ b/core/arch/arm/plat-rzg/sub.mk
-@@ -1,2 +1,3 @@
- global-incdirs-y += .
+@@ -2,4 +2,10 @@ global-incdirs-y += .
  srcs-y += main.c
-+srcs-y += rzg_suspend_to_ram.c
+ srcs-y += tee_common_otp.c
+ 
+-cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL)
++ifeq (${PLATFORM_FLAVOR_hihope_rzg2n},y)
++  ifeq (${PMIC_ROHM_BD9571},1)
++    srcs-y += rzg_suspend_to_ram.c
++  endif
++endif
++
++cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL) -DPMIC_ROHM_BD9571=$(PMIC_ROHM_BD9571)
 -- 
-2.17.1
+2.7.4
+

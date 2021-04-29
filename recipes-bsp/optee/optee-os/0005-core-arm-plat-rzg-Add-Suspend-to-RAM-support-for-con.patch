@@ -1,27 +1,30 @@
-From eb0ff6c88fbb6035c78462aa747e21f3402d72ce Mon Sep 17 00:00:00 2001
-From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
-Date: Wed, 19 Aug 2020 16:51:41 +0700
-Subject: [PATCH 3/5] core: arm: plat-rzg: Add Suspend to RAM support for
+From 0c45071c6e02d361078c843ad6dde54a0a2bd756 Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Thu, 29 Apr 2021 14:43:56 +0700
+Subject: [PATCH 5/5] core: arm: plat-rzg: Add Suspend to RAM support for
  console
 
 This patch will add support suspend to RAM for console.
 It also fix the address to setting register when init console.
 
 Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
 ---
- core/arch/arm/plat-rzg/main.c | 14 ++++++++++++++
+ core/arch/arm/plat-rzg/main.c | 18 ++++++++++++++++++
  core/drivers/scif.c           |  5 ++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
-index b5489950..ddafa4f4 100644
+index 853a126..bab5075 100644
 --- a/core/arch/arm/plat-rzg/main.c
 +++ b/core/arch/arm/plat-rzg/main.c
-@@ -86,3 +86,17 @@ void console_init(void)
+@@ -96,3 +96,21 @@ void console_init(void)
  	scif_uart_init(&console_data, CONSOLE_UART_BASE);
  	register_serial_console(&console_data.chip);
  }
 +
++#if defined(PLATFORM_FLAVOR_hihope_rzg2n)
++#if (PMIC_ROHM_BD9571)
 +static void scif_backup_cb(enum suspend_to_ram_state state,
 +			   uint32_t cpu_id __unused)
 +{
@@ -35,8 +38,10 @@ index b5489950..ddafa4f4 100644
 +}
 +
 +suspend_to_ram_cbfunc(scif_backup_cb);
++#endif
++#endif
 diff --git a/core/drivers/scif.c b/core/drivers/scif.c
-index ff33ea3a..ac0a48ca 100644
+index ff33ea3..ac0a48c 100644
 --- a/core/drivers/scif.c
 +++ b/core/drivers/scif.c
 @@ -85,7 +85,10 @@ void scif_uart_init(struct scif_uart_data *pd, paddr_t base)
@@ -52,4 +57,5 @@ index ff33ea3a..ac0a48ca 100644
  	scif_uart_flush(&pd->chip);
  }
 -- 
-2.17.1
+2.7.4
+

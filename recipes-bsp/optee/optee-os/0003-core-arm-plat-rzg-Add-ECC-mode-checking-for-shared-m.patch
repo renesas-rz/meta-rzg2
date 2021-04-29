@@ -1,7 +1,7 @@
-From fdc47c350f617da10e606275100e782d48746857 Mon Sep 17 00:00:00 2001
-From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
-Date: Fri, 22 Jan 2021 10:56:52 +0700
-Subject: [PATCH 5/5] core: arm: plat-rzg: Add ECC mode checking for shared
+From ebe29fd9cc0d8eaed4ffb652c128f25ca0e78c0f Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Thu, 29 Apr 2021 13:33:24 +0700
+Subject: [PATCH 3/3] core: arm: plat-rzg: Add ECC mode checking for shared
  memory region
 
 When we use ECC setting, the memory and size
@@ -13,15 +13,18 @@ move to platform private header to avoid warning of undefined macro
 value when other source use these pre-define.
 
 Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
 ---
  core/arch/arm/plat-rzg/conf.mk           |  2 +
- core/arch/arm/plat-rzg/platform_config.h | 29 ---------
- core/arch/arm/plat-rzg/rzg_common.h      | 81 ++++++++++++++++++++++++
+ core/arch/arm/plat-rzg/main.c            |  2 +
+ core/arch/arm/plat-rzg/platform_config.h | 29 ----------
+ core/arch/arm/plat-rzg/rzg_common.h      | 94 ++++++++++++++++++++++++++++++++
  core/arch/arm/plat-rzg/sub.mk            |  2 +-
- 4 files changed, 84 insertions(+), 30 deletions(-)
+ 5 files changed, 99 insertions(+), 30 deletions(-)
+ create mode 100644 core/arch/arm/plat-rzg/rzg_common.h
 
 diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
-index e3fa8538..cd3d04af 100644
+index e3fa853..cd3d04a 100644
 --- a/core/arch/arm/plat-rzg/conf.mk
 +++ b/core/arch/arm/plat-rzg/conf.mk
 @@ -44,3 +44,5 @@ $(call force,CFG_ARM32_core,y)
@@ -30,8 +33,21 @@ index e3fa8538..cd3d04af 100644
  CFG_DT ?= y
 +RZG_DRAM_ECC ?= 0
 +RZG_ECC_FULL ?= 0
+diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
+index 6a1021b..0409ef8 100644
+--- a/core/arch/arm/plat-rzg/main.c
++++ b/core/arch/arm/plat-rzg/main.c
+@@ -11,6 +11,8 @@
+ #include <mm/core_memprot.h>
+ #include <platform_config.h>
+ 
++#include "rzg_common.h"
++
+ register_phys_mem_pgdir(MEM_AREA_IO_SEC, DEVICE0_BASE, DEVICE0_SIZE);
+ register_phys_mem_pgdir(MEM_AREA_IO_SEC, CONSOLE_UART_BASE, SCIF_REG_SIZE);
+ register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICD_BASE, GIC_DIST_REG_SIZE);
 diff --git a/core/arch/arm/plat-rzg/platform_config.h b/core/arch/arm/plat-rzg/platform_config.h
-index 0638b53a..0a0a2b47 100644
+index 0638b53..0a0a2b4 100644
 --- a/core/arch/arm/plat-rzg/platform_config.h
 +++ b/core/arch/arm/plat-rzg/platform_config.h
 @@ -21,35 +21,6 @@
@@ -71,13 +87,23 @@ index 0638b53a..0a0a2b47 100644
  #define TEE_SHMEM_SIZE		0x100000
  
 diff --git a/core/arch/arm/plat-rzg/rzg_common.h b/core/arch/arm/plat-rzg/rzg_common.h
-index 57c6b8a8..35365f05 100644
---- a/core/arch/arm/plat-rzg/rzg_common.h
+new file mode 100644
+index 0000000..7b41df9
+--- /dev/null
 +++ b/core/arch/arm/plat-rzg/rzg_common.h
-@@ -14,4 +14,85 @@
- /* Parameters value passed from ARM Trusted FW */
- #define TFW_ARG_CPU_SUSPEND	(0x0UL)
- #define TFW_ARG_SYSTEM_SUSPEND	(0x1UL)
+@@ -0,0 +1,94 @@
++/* SPDX-License-Identifier: BSD-2-Clause */
++/*
++ * Copyright (c) 2020, Renesas Electronics Corporation
++ */
++
++#ifndef RZG_COMMON_H
++#define RZG_COMMON_H
++
++#include <string.h>
++#include <kernel/misc.h>
++#include <kernel/panic.h>
++#include <arm.h>
 +
 +#if defined(PLATFORM_FLAVOR_ek874)
 +#if (RZG_DRAM_ECC == 1 && RZG_ECC_FULL == 2)
@@ -159,16 +185,17 @@ index 57c6b8a8..35365f05 100644
 +#error "Unknown platform flavor"
 +#endif
 +
- #endif
++#endif /* RZG_COMMON_H */
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
-index 22ef4ad6..c40bd652 100644
+index b194244..796befd 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
 +++ b/core/arch/arm/plat-rzg/sub.mk
-@@ -3,4 +3,4 @@ srcs-y += main.c
- srcs-y += rzg_suspend_to_ram.c
+@@ -2,4 +2,4 @@ global-incdirs-y += .
+ srcs-y += main.c
  srcs-y += tee_common_otp.c
  
 -cppflags-y += -DLTC_NO_PROTOTYPES
 +cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL)
 -- 
-2.17.1
+2.7.4
+

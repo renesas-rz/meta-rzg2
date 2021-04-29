@@ -17,10 +17,10 @@ SRCREV = "3d47a131bca1d9ed511bfd516aa5e70269e12c1d"
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
     file://0001-mk-gcc-allow-setting-sysroot-lookup.patch \
-    file://0002-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
-    file://0003-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
-    file://0004-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
-    file://0005-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
+    file://0002-arch-plat-rzg-add-HW-Unique-Key-support-for-TEE-OTP.patch \
+    file://0003-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
+    file://0004-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
+    file://0005-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"

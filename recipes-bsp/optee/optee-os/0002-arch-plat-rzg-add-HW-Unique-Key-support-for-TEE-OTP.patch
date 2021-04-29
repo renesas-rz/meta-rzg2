@@ -1,34 +1,35 @@
-From f296add5d5b1aeb05d0dd7a4ea7c639f468ceb60 Mon Sep 17 00:00:00 2001
-From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
-Date: Wed, 1 Jul 2020 10:16:32 +0700
-Subject: [PATCH 4/5] arch: plat-rzg: add HW Unique Key support for TEE OTP
+From 392c3b4fc71e6b26a5e47e604e664ff5923ac49f Mon Sep 17 00:00:00 2001
+From: hienhuynh <hien.huynh.px@renesas.com>
+Date: Thu, 29 Apr 2021 13:18:57 +0700
+Subject: [PATCH 2/3] arch: plat-rzg: add HW Unique Key support for TEE OTP
 
 This patch will add support for getting HW Unique Key, it support for
 feature TEE OTP.
 
 Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
 ---
  core/arch/arm/plat-rzg/main.c            |   1 +
  core/arch/arm/plat-rzg/platform_config.h |   3 +
  core/arch/arm/plat-rzg/sub.mk            |   3 +
- core/arch/arm/plat-rzg/tee_common_otp.c  | 118 +++++++++++++++++++++++
+ core/arch/arm/plat-rzg/tee_common_otp.c  | 118 +++++++++++++++++++++++++++++++
  4 files changed, 125 insertions(+)
  create mode 100644 core/arch/arm/plat-rzg/tee_common_otp.c
 
 diff --git a/core/arch/arm/plat-rzg/main.c b/core/arch/arm/plat-rzg/main.c
-index ddafa4f4..28f772a4 100644
+index 31dfd08..6a1021b 100644
 --- a/core/arch/arm/plat-rzg/main.c
 +++ b/core/arch/arm/plat-rzg/main.c
-@@ -17,6 +17,7 @@
- #include "rzg_common.h"
- #include "rzg_suspend_to_ram.h"
+@@ -11,6 +11,7 @@
+ #include <mm/core_memprot.h>
+ #include <platform_config.h>
  
 +register_phys_mem_pgdir(MEM_AREA_IO_SEC, DEVICE0_BASE, DEVICE0_SIZE);
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, CONSOLE_UART_BASE, SCIF_REG_SIZE);
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICD_BASE, GIC_DIST_REG_SIZE);
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, GICC_BASE, GIC_DIST_REG_SIZE);
 diff --git a/core/arch/arm/plat-rzg/platform_config.h b/core/arch/arm/plat-rzg/platform_config.h
-index eacc5a42..0638b53a 100644
+index eacc5a4..0638b53 100644
 --- a/core/arch/arm/plat-rzg/platform_config.h
 +++ b/core/arch/arm/plat-rzg/platform_config.h
 @@ -12,6 +12,9 @@
@@ -42,19 +43,18 @@ index eacc5a42..0638b53a 100644
  #define GICC_BASE		0xF1020000
  #define GICD_BASE		0xF1010000
 diff --git a/core/arch/arm/plat-rzg/sub.mk b/core/arch/arm/plat-rzg/sub.mk
-index 804bf65d..22ef4ad6 100644
+index 8ddc2fd..b194244 100644
 --- a/core/arch/arm/plat-rzg/sub.mk
 +++ b/core/arch/arm/plat-rzg/sub.mk
-@@ -1,3 +1,6 @@
+@@ -1,2 +1,5 @@
  global-incdirs-y += .
  srcs-y += main.c
- srcs-y += rzg_suspend_to_ram.c
 +srcs-y += tee_common_otp.c
 +
 +cppflags-y += -DLTC_NO_PROTOTYPES
 diff --git a/core/arch/arm/plat-rzg/tee_common_otp.c b/core/arch/arm/plat-rzg/tee_common_otp.c
 new file mode 100644
-index 00000000..3edce817
+index 0000000..43c00aa
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/tee_common_otp.c
 @@ -0,0 +1,118 @@
@@ -76,7 +76,7 @@ index 00000000..3edce817
 +
 +#include "tomcrypt.h"
 +
-+#define LIFEC_BASE	(0xE6110000U)	/* Life Cycle base address	*/
++#define LIFEC_BASE	(0xE6110000U)	/* Life Cycle base address */
 +
 +static void read_uid_reg(uint8_t *read_uid, uint32_t read_num);
 +
@@ -177,4 +177,5 @@ index 00000000..3edce817
 +	return rc;
 +}
 -- 
-2.17.1
+2.7.4
+
