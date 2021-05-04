@@ -93,9 +93,9 @@ Prepare default configuration files. :
     #MACHINE_FEATURES_append = " docker"
 ```
 
-**(Optional)** If you would like to use Realtime BSP, please uncomment the below line inside file _"./conf/local.conf"_:
+**(Optional)** If you would like to use Realtime BSP, please add the below line inside file _"./conf/local.conf"_:
 ```
-    #IS_RT_BSP = "1"
+    IS_RT_BSP = "1"
 ```
 Build the target file system image using bitbake:
 ```bash
