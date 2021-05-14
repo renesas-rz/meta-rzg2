@@ -1,0 +1,38 @@
+From a2906efafc49181855024a87f42b4314b10bc5c2 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Thu, 15 Apr 2021 10:41:17 +0700
+Subject: [PATCH 173/180] arch: arm64: renesas: r9a07g044l: Add GPU device node
+
+This patch add GPU device node for RZ/G2L SoC
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r9a07g044l.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi b/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi
+index eabeb47..b8957bf 100644
+--- a/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi
++++ b/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi
+@@ -787,6 +787,18 @@
+ 			resets = <&cpg R9A07G044L_CLK_WDT2>;
+ 			status = "disabled";
+ 		};
++
++		gpu: mali@11840000 {
++			compatible = "arm,mali-midgard";
++			reg = <0x0 0x11840000 0x0 0x10000>;
++			interrupts =    <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 154 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 155 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "GPU", "JOB", "MMU";
++			system-coherency = <31>;
++			clocks = <&cpg CPG_MOD R9A07G044L_CLK_GPU>;
++			resets = <&cpg R9A07G044L_CLK_GPU>;
++		};
+ 	};
+ 
+ 	thermal-zones {
+-- 
+2.7.4
+

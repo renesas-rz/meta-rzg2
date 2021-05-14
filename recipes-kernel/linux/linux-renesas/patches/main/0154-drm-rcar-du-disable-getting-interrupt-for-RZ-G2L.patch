@@ -1,0 +1,73 @@
+From 8a4c38bc16875999d75712ed68f82f4195772ddb Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 2 Apr 2021 14:43:35 +0700
+Subject: [PATCH 154/180] drm: rcar-du: disable getting interrupt for RZ/G2L
+
+This commit is created to disable getting interrupt for RZ/G2L.
+Currently, interrupt will raise when underflow occurs. However, we do
+not have any implementation for this underflow issue and it will raise
+continuously that preempt other interrupts to cause hang.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c | 42 ++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+index e4cfce1..6fd41ab9 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+@@ -1187,28 +1187,30 @@ int rcar_du_crtc_create(struct rcar_du_group *rgrp, unsigned int swindex,
+ 	/* Start with vertical blanking interrupt reporting disabled. */
+ 	drm_crtc_vblank_off(crtc);
+ 
+-	/* Register the interrupt handler. */
+-	if (rcar_du_has(rcdu, RCAR_DU_FEATURE_CRTC_IRQ_CLOCK)) {
+-		/* The IRQ's are associated with the CRTC (sw)index. */
+-		irq = platform_get_irq(pdev, swindex);
+-		irqflags = 0;
+-	} else {
+-		irq = platform_get_irq(pdev, 0);
+-		irqflags = IRQF_SHARED;
+-	}
++	if (!rcar_du_has(rcdu, RCAR_DU_FEATURE_RZG2L)) {
++		/* Register the interrupt handler. */
++		if (rcar_du_has(rcdu, RCAR_DU_FEATURE_CRTC_IRQ_CLOCK)) {
++			/* The IRQ's are associated with the CRTC (sw)index. */
++			irq = platform_get_irq(pdev, swindex);
++			irqflags = 0;
++		} else {
++			irq = platform_get_irq(pdev, 0);
++			irqflags = IRQF_SHARED;
++		}
+ 
+-	if (irq < 0) {
+-		dev_err(rcdu->dev, "no IRQ for CRTC %u\n", swindex);
+-		return irq;
+-	}
++		if (irq < 0) {
++			dev_err(rcdu->dev, "no IRQ for CRTC %u\n", swindex);
++			return irq;
++		}
+ 
+-	ret = devm_request_irq(rcdu->dev, irq, rcar_du_crtc_irq, irqflags,
+-			       dev_name(rcdu->dev), rcrtc);
+-	if (ret < 0) {
+-		dev_err(rcdu->dev,
+-			"failed to register IRQ for CRTC %u\n", swindex);
+-		return ret;
++		ret = devm_request_irq(rcdu->dev, irq, rcar_du_crtc_irq,
++				       irqflags, dev_name(rcdu->dev), rcrtc);
++		if (ret < 0) {
++			dev_err(rcdu->dev,
++				"failed to register IRQ for CRTC %u\n",
++								swindex);
++			return ret;
++		}
+ 	}
+-
+ 	return 0;
+ }
+-- 
+2.7.4
+

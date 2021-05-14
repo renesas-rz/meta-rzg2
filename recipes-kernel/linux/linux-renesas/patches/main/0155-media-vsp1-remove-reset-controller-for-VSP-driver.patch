@@ -1,0 +1,61 @@
+From d63a069422922d1999d360675a85d6ad84c189b9 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 14 Apr 2021 15:14:02 +0700
+Subject: [PATCH 155/180] media: vsp1: remove reset controller for VSP driver
+
+Reset controller is applied for RZ/G2L in previous patches to release
+reset state for LCDC hardware module.
+However, we will move this implementation to Display Unit driver to
+control reset state of LCDC in next patches. Therefore, remove it now.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/media/platform/vsp1/vsp1.h     |  2 --
+ drivers/media/platform/vsp1/vsp1_drv.c | 11 -----------
+ 2 files changed, 13 deletions(-)
+
+diff --git a/drivers/media/platform/vsp1/vsp1.h b/drivers/media/platform/vsp1/vsp1.h
+index b41ec73..56c6212 100644
+--- a/drivers/media/platform/vsp1/vsp1.h
++++ b/drivers/media/platform/vsp1/vsp1.h
+@@ -103,8 +103,6 @@ struct vsp1_device {
+ 	struct media_entity_operations media_ops;
+ 
+ 	struct vsp1_drm *drm;
+-
+-	struct reset_control *rstc;
+ };
+ 
+ int vsp1_device_get(struct vsp1_device *vsp1);
+diff --git a/drivers/media/platform/vsp1/vsp1_drv.c b/drivers/media/platform/vsp1/vsp1_drv.c
+index a4cdffc2..fd3dfed 100644
+--- a/drivers/media/platform/vsp1/vsp1_drv.c
++++ b/drivers/media/platform/vsp1/vsp1_drv.c
+@@ -17,7 +17,6 @@
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/videodev2.h>
+-#include <linux/reset.h>
+ #include <linux/sys_soc.h>
+ 
+ #include <media/rcar-fcp.h>
+@@ -857,16 +856,6 @@ static int vsp1_probe(struct platform_device *pdev)
+ 		vsp1->bus_master = vsp1->dev;
+ 	}
+ 
+-	if (soc_device_match(rzg2l_match)) {
+-		vsp1->rstc = devm_reset_control_get(&pdev->dev, NULL);
+-		if (IS_ERR(vsp1->rstc)) {
+-			dev_err(&pdev->dev, "failed to get cpg reset\n");
+-			return PTR_ERR(vsp1->rstc);
+-		}
+-
+-		reset_control_deassert(vsp1->rstc);
+-	}
+-
+ 	/* Configure device parameters based on the version register. */
+ 	pm_runtime_enable(&pdev->dev);
+ 
+-- 
+2.7.4
+

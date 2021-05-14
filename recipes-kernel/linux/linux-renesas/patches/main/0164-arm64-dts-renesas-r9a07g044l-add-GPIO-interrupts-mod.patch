@@ -1,0 +1,71 @@
+From 6b464432cd9bbbfeb3d9817d8d22c0be4b82e24e Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 22 Apr 2021 09:22:38 +0700
+Subject: [PATCH 164/180] arm64: dts: renesas: r9a07g044l: add GPIO interrupts
+ mode
+
+This commit is created to add support GPIO interrupts mode for
+r9a07g044l SoC.
+It can support 32 Interrupts ID for 123 GPIO pins.
+Also, it will use second registers area map of IA55 module to control
+interrupt setting.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r9a07g044l.dtsi | 36 ++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi b/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi
+index 0633cbc..eabeb47 100644
+--- a/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi
++++ b/arch/arm64/boot/dts/renesas/r9a07g044l.dtsi
+@@ -66,11 +66,45 @@
+ 
+ 		pinctrl: pin-controller@11030000 {
+ 			compatible = "renesas,r9a07g044l-pinctrl";
+-			reg = <0 0x11030000 0 0x10000>;
++			reg = <0 0x11030000 0 0x10000>, <0 0x110a0020 0 0x30>;
+ 			gpio-controller;
+ 			#gpio-cells = <2>;
+ 			gpio-ranges = <&pinctrl 0 0 392>;
+ 			clocks = <&cpg CPG_MOD R9A07G044L_CLK_GPIO>;
++			interrupt-controller;
++			#interrupt-cells = <2>;
++			interrupts =	<GIC_SPI 444 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 445 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 446 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 447 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 448 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 449 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 450 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 451 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 452 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 453 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 454 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 455 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 456 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 457 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 458 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 459 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 460 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 461 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 462 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 463 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 464 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 465 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 466 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 467 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 468 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 469 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 470 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 471 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 472 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 473 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 474 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 475 IRQ_TYPE_LEVEL_HIGH>;
+ 		};
+ 
+ 		gic: interrupt-controller@11900000 {
+-- 
+2.7.4
+

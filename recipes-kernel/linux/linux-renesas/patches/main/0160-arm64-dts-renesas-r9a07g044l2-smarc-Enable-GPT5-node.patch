@@ -1,0 +1,46 @@
+From d7a29f37b2208111b22ed1a21a229476fa9b6a18 Mon Sep 17 00:00:00 2001
+From: LongLuu <long.luu.ur@renesas.com>
+Date: Thu, 8 Apr 2021 11:04:30 +0700
+Subject: [PATCH 160/180] arm64: dts: renesas: r9a07g044l2-smarc: Enable GPT5
+ node.
+
+This commit enable GPT5 node for RZ/G2L Pro-board
+
+Signed-off-by: LongLuu <long.luu.ur@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts b/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts
+index 89c2998..1da1150 100644
+--- a/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts
++++ b/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts
+@@ -430,6 +430,11 @@
+ 		function = "scif2";
+ 	};
+ 
++	gpt5_pins: gpt5 {
++		groups = "gpt5_a_b";
++		function = "gpt5";
++	};
++
+ 	sd0_pwr_en {
+ 		gpio-hog;
+ 		gpios = <RZG2L_GPIO(4, 1) GPIO_ACTIVE_HIGH>;
+@@ -571,6 +576,13 @@
+ 	status = "okay";
+ };
+ 
++&gpt5 {
++	pinctrl-0 = <&gpt5_pins>;
++	pinctrl-names = "default";
++	channel="channel_A";
++	status = "okay";
++};
++
+ /*
+  * SW1[2] should be at position 1/HIGH to enable uSD card CN3
+  * un-comment the below node and comment out eMMC node.
+-- 
+2.7.4
+

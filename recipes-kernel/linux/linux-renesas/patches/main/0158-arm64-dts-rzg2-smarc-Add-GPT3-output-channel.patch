@@ -1,0 +1,27 @@
+From 134381ef85733e6fc289948bb2347109f60c49ca Mon Sep 17 00:00:00 2001
+From: LongLuu <long.luu.ur@renesas.com>
+Date: Wed, 7 Apr 2021 16:48:47 +0700
+Subject: [PATCH 158/180] arm64: dts: rzg2-smarc: Add GPT3 output channel.
+
+This patch add GPT3 output channel for g2l eval board
+
+Signed-off-by: LongLuu <long.luu.ur@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+index 791a133..a4b71c3 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+@@ -690,6 +690,7 @@
+ &gpt3 {
+ 	pinctrl-0 = <&gpt3_pins>;
+ 	pinctrl-names = "default";
++	channel="channel_B";
+ 	//conflict pin with SD1 WP
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

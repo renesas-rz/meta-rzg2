@@ -1,0 +1,55 @@
+From 4a15a8b939bde9a701b0ea5744608707719df528 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Tue, 20 Apr 2021 13:26:44 +0700
+Subject: [PATCH 178/180] spi: rspi: Increase bit rate accuracy on RZ/A
+
+commit feace90233a8cd44a18902216657279c3932d471 upstream.
+
+rspi_rz_set_config_register() favors high values of "brdv" over high
+values of "spbr".  As "brdv" is not a plain divider, but controls a
+power-of-two divider, this may cause the selection of non-optimal
+divider values.  E.g. on RSK+RZA1, when 3.8 MHz is requested, the actual
+configured bit rate is 2.08 MHz (spbr = 1, brdv = 3), while 3.7 MHz
+would be possible (spbr = 8, brdv = 0).
+
+Fix this by only resorting to higher "brdv" values when really needed.
+This makes the driver always pick optimal divider values on RZ/A.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Link:
+https://lore.kernel.org/r/20200819125904.20938-4-geert+renesas@glider.be
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Need to modify some variable names for to 4.19 compatible.
+Applied and tested on RZ/G2L Evaluation Kit board since RZ/G2L RSPI is
+similar with RZ/A.
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ drivers/spi/spi-rspi.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/spi/spi-rspi.c b/drivers/spi/spi-rspi.c
+index ca05de5..9927ea9 100644
+--- a/drivers/spi/spi-rspi.c
++++ b/drivers/spi/spi-rspi.c
+@@ -305,15 +305,13 @@ static int rspi_rz_set_config_register(struct rspi_data *rspi, int access_size)
+ 	rspi_write8(rspi, rspi->sppcr, RSPI_SPPCR);
+ 
+ 	clksrc = clk_get_rate(rspi->clk);
+-	while (div < 3) {
+-		if (rspi->max_speed_hz >= clksrc/4) /* 4=(CLK/2)/2 */
+-			break;
++	spbr = DIV_ROUND_UP(clksrc, 2 * rspi->max_speed_hz) - 1;
++	while (spbr > 255 && div < 3) {
+ 		div++;
+-		clksrc /= 2;
++		spbr = DIV_ROUND_UP(spbr + 1, 2) - 1;
+ 	}
+ 
+ 	/* Sets transfer bit rate */
+-	spbr = DIV_ROUND_UP(clksrc, 2 * rspi->max_speed_hz) - 1;
+ 	rspi_write8(rspi, clamp(spbr, 0, 255), RSPI_SPBR);
+ 	rspi->spcmd |= div << 2;
+ 
+-- 
+2.7.4
+

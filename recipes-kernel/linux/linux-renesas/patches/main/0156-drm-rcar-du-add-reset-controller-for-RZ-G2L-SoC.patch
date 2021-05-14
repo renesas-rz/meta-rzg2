@@ -1,0 +1,92 @@
+From 36e26f70fc5802278b2dedb67ce686271025e72f Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Wed, 14 Apr 2021 15:24:05 +0700
+Subject: [PATCH 156/180] drm: rcar-du: add reset controller for RZ/G2L SoC
+
+This commit adds reset controller for RZ/G2L SoC to control reset
+state for LCDC HW module.
+Reason:
+- LCDC includes rcar-du and vsp drivers.
+- rcar-du will be started before vsp and stopped after vsp.
+Therefore, let rcar-du be parent device to control reset state to
+ensure LCDC can work normally.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c | 18 ++++++++++++++++++
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.h |  2 ++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+index 6fd41ab9..f40fd33 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+@@ -576,6 +576,9 @@ static int rcar_du_crtc_get(struct rcar_du_crtc *rcrtc)
+ 	if (rcrtc->initialized)
+ 		return 0;
+ 
++	if (rcrtc->rstc)
++		reset_control_deassert(rcrtc->rstc);
++
+ 	ret = clk_prepare_enable(rcrtc->clock);
+ 	if (ret < 0)
+ 		return ret;
+@@ -597,6 +600,10 @@ static int rcar_du_crtc_get(struct rcar_du_crtc *rcrtc)
+ 	clk_disable_unprepare(rcrtc->extclock);
+ error_clock:
+ 	clk_disable_unprepare(rcrtc->clock);
++
++	if (rcrtc->rstc)
++		reset_control_assert(rcrtc->rstc);
++
+ 	return ret;
+ }
+ 
+@@ -607,6 +614,9 @@ static void rcar_du_crtc_put(struct rcar_du_crtc *rcrtc)
+ 	clk_disable_unprepare(rcrtc->extclock);
+ 	clk_disable_unprepare(rcrtc->clock);
+ 
++	if (rcrtc->rstc)
++		reset_control_assert(rcrtc->rstc);
++
+ 	rcrtc->initialized = false;
+ }
+ 
+@@ -1161,6 +1171,14 @@ int rcar_du_crtc_create(struct rcar_du_group *rgrp, unsigned int swindex,
+ 		return ret;
+ 	}
+ 
++	if (rcar_du_has(rcdu, RCAR_DU_FEATURE_RZG2L)) {
++		rcrtc->rstc = devm_reset_control_get(rcdu->dev, NULL);
++		if (IS_ERR(rcrtc->rstc)) {
++			dev_err(rcdu->dev, "can't get cpg reset\n");
++			return PTR_ERR(rcrtc->rstc);
++		}
++	}
++
+ 	init_waitqueue_head(&rcrtc->flip_wait);
+ 	init_waitqueue_head(&rcrtc->vblank_wait);
+ 	spin_lock_init(&rcrtc->vblank_lock);
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.h b/drivers/gpu/drm/rcar-du/rcar_du_crtc.h
+index 9366da0..31ae033 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.h
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.h
+@@ -17,6 +17,7 @@
+ #include <linux/mutex.h>
+ #include <linux/spinlock.h>
+ #include <linux/wait.h>
++#include <linux/reset.h>
+ 
+ #include <drm/drmP.h>
+ #include <drm/drm_crtc.h>
+@@ -50,6 +51,7 @@ struct rcar_du_crtc {
+ 
+ 	struct clk *clock;
+ 	struct clk *extclock;
++	struct reset_control *rstc;
+ 	unsigned int mmio_offset;
+ 	unsigned int index;
+ 	bool initialized;
+-- 
+2.7.4
+

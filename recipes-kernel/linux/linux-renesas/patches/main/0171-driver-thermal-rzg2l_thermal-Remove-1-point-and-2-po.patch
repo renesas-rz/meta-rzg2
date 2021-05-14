@@ -1,0 +1,63 @@
+From b2440b511754537ad1c3d92947e6dca1c95d4e8d Mon Sep 17 00:00:00 2001
+From: Tien Le <tien.le.xw@renesas.com>
+Date: Wed, 12 May 2021 15:21:33 +0700
+Subject: [PATCH 171/180] driver: thermal: rzg2l_thermal: Remove 1-point and
+ 2-point calibaration
+
+Due to apply new formula So we need to remove 1-point and 2-point
+calibaration when unused.
+
+Signed-off-by: Tien Le <tien.le.xw@renesas.com>
+---
+ drivers/thermal/rzg2l_thermal.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/drivers/thermal/rzg2l_thermal.c b/drivers/thermal/rzg2l_thermal.c
+index 6bae87b..96332f8 100644
+--- a/drivers/thermal/rzg2l_thermal.c
++++ b/drivers/thermal/rzg2l_thermal.c
+@@ -47,16 +47,9 @@
+ #define CAP_TIMES	8	/* Capture  times */
+ #define RZG2L_THERMAL_GRAN	500 /* mili Celsius */
+ 
+-typedef enum
+-{
+-		THERMAL_1_POINT_CAL = 0,							 /* 1-Point calibration */
+-		THERMAL_2_POINT_CAL = 1									 /* 2-Point calibration */
+-} r_thermal_calibration_t;
+-
+ struct rzg2l_thermal_tsc {
+ 	void __iomem *base;
+ 	struct thermal_zone_device *zone;
+-		r_thermal_calibration_t cal;
+ 	int low;
+ 	int high;
+ 	int tj_t;
+@@ -217,8 +210,6 @@ static int rzg2l_thermal_probe(struct platform_device *pdev)
+ 
+ 	{
+ 		struct rzg2l_thermal_tsc *tsc;
+-		struct device_node *np = dev->of_node;
+-				u32 cal;
+ 
+ 		res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 		if (!res)
+@@ -230,14 +221,12 @@ static int rzg2l_thermal_probe(struct platform_device *pdev)
+ 			goto error_unregister;
+ 		}
+ 
+-				of_property_read_u32(np, "thermal-cal", &cal);
+-
+ 		tsc->base = devm_ioremap_resource(dev, res);
+ 		if (IS_ERR(tsc->base)) {
+ 			ret = PTR_ERR(tsc->base);
+ 			goto error_unregister;
+ 		}
+-				tsc->cal = cal;
++
+ 		priv->tsc = tsc;
+ 
+ 		priv->thermal_init(tsc);
+-- 
+2.7.4
+

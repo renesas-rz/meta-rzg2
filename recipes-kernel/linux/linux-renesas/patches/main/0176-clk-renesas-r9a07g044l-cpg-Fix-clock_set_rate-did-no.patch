@@ -1,0 +1,101 @@
+From e71af97211aaf23480186abed7e9c67b9c48c0e6 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Fri, 7 May 2021 18:04:02 +0700
+Subject: [PATCH 176/180] clk: renesas: r9a07g044l-cpg: Fix clock_set_rate did
+ not reflex on HW
+
+All SEL and DIV bits have high word mask need to be set to enable
+writing to these bits. So need to add flags CLK_MUX_HIWORD_MASK and
+CLK_DIV_HIWORD_MASK to module clock flags.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ drivers/clk/renesas/r9a07g044l-cpg.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/clk/renesas/r9a07g044l-cpg.c b/drivers/clk/renesas/r9a07g044l-cpg.c
+index 5e8d0a6..5dbd4df 100644
+--- a/drivers/clk/renesas/r9a07g044l-cpg.c
++++ b/drivers/clk/renesas/r9a07g044l-cpg.c
+@@ -174,13 +174,13 @@ static const struct cpg_core_clk r9a07g044l_core_clks[] __initconst = {
+ 	DEF_FIXED(".clk800fix_cdiv2", CLK800FIX_CDIV2, CLK800FIX_C, 1, 2),
+ 	DEF_FIXED(".clk200fix_c", CLK200FIX_C, CLK800FIX_C, 1, 4),
+ 	DEF_DIV(".clk200_c", CLK200_C, CLK200FIX_C,
+-			DIVPL2B, dtable_3b, 0),
++			DIVPL2B, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_FIXED(".clk100fix_c", CLK100FIX_C, CLK200FIX_C, 1, 2),
+ 	DEF_FIXED(".pll2_2", CLK_PLL2_2, CLK_PLL2, 1, 6),
+ 	DEF_MUX(".sel_pll2_2", CLK_SEL_PLL2_2, SEL_PLL2_2,
+ 			sel_pll2_2, 2, CLK_MUX_READ_ONLY),
+ 	DEF_DIV(".clk533_c", CLK533_C, CLK_SEL_PLL2_2,
+-			DIVPL2C, dtable_3b, 0),
++			DIVPL2C, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_FIXED(".clk533_cdiv2", CLK533_CDIV2, CLK533_C, 1, 2),
+ 	DEF_FIXED(".clk533fix_c", CLK533FIX_C, CLK_SEL_PLL2_2, 1, 1),
+ 	DEF_FIXED(".clk533fix_cdiv2", CLK533FIX_CDIV2, CLK533FIX_C, 1, 2),
+@@ -199,7 +199,7 @@ static const struct cpg_core_clk r9a07g044l_core_clks[] __initconst = {
+ 	DEF_MUX(".sel_pll3_3", CLK_SEL_PLL3_3, SEL_PLL3_3,
+ 			sel_pll3_3, 2, CLK_MUX_READ_ONLY),
+ 	DEF_DIV(".clk533_cd", CLK533_CD, CLK_SEL_PLL3_3,
+-			DIVPL3C, dtable_3b, 0),
++			DIVPL3C, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_FIXED(".clk533fix_cd", CLK533FIX_CD, CLK_SEL_PLL3_2, 1, 1),
+ 	DEF_MUX(".sel_pll4", CLK_SEL_PLL4, SEL_PLL4,
+ 			sel_pll4, 2, 0),
+@@ -225,39 +225,42 @@ static const struct cpg_core_clk r9a07g044l_core_clks[] __initconst = {
+ 			sel_g2, 2, 0),
+ 	DEF_FIXED(".pll6_div2", CLK_PLL6_DIV2, CLK_PLL6, 1, 2),
+ 	DEF_MUX(".sel_pll6_2", CLK_SEL_PLL6_2, SEL_PLL6_2,
+-			sel_pll6_2, 2, 0),
++			sel_pll6_2, 2, CLK_MUX_HIWORD_MASK),
+ 
+ 	/* Core output clk*/
+ 	DEF_DIV("I", R9A07G044L_CLK_I, CLK_SEL_PLL1,
+-			DIVPL1, NULL, CLK_DIVIDER_POWER_OF_TWO),
++			DIVPL1, NULL, CLK_DIVIDER_POWER_OF_TWO
++				    | CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_DIV("I2", R9A07G044L_CLK_I2, CLK200FIX_CD,
+-		DIVPL3CLK200FIX, dtable_3b, 0),
++		DIVPL3CLK200FIX, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_DIV("G", R9A07G044L_CLK_G, CLK_SEL_G2,
+-			DIVGPU, NULL, CLK_DIVIDER_POWER_OF_TWO),
++			DIVGPU, NULL, CLK_DIVIDER_POWER_OF_TWO
++				    | CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_FIXED("S0", R9A07G044L_CLK_S0, CLK_SEL_PLL4, 1, 2),
+ 	DEF_FIXED("S1", R9A07G044L_CLK_S0, CLK_SEL_PLL4, 1, 4),
+ 	DEF_FIXED("SPI0", R9A07G044L_CLK_SPI0, CLK533_CD, 1, 2),
+ 	DEF_FIXED("SPI1", R9A07G044L_CLK_SPI1, CLK533_CD, 1, 4),
+ 	DEF_MUX("SD0", R9A07G044L_CLK_SD0, SEL_SDHI0,
+-			sel_shdi, 4, 0),
++			sel_shdi, 4, CLK_MUX_HIWORD_MASK),
+ 	DEF_MUX("SD1", R9A07G044L_CLK_SD1, SEL_SDHI1,
+-			sel_shdi, 4, 0),
++			sel_shdi, 4, CLK_MUX_HIWORD_MASK),
+ 	DEF_FIXED("M0", R9A07G044L_CLK_M0, CLK200FIX_CD, 1, 1),
+ 	DEF_FIXED("M1", R9A07G044L_CLK_M1, CLK_SEL_PLL5_1, 1, 1),
+ 	DEF_FIXED("M2", R9A07G044L_CLK_M2, CLK533FIX_CD, 1, 2),
+ 	DEF_2DIV("M3", R9A07G044L_CLK_M3, CLK_SEL_PLL5_4,
+ 		DIVDSIA, DIVDSIB, dtable_2b, dtable_4b, 0),
+ 	DEF_DIV("M4", R9A07G044L_CLK_M4, CLK533FIX_LPCLK,
+-			DIVDSILPCL, divdsilpcl, 0),
+-	DEF_MUX("HP", R9A07G044L_CLK_HP, SEL_ETH, sel_eth, 2, 0),
++			DIVDSILPCL, divdsilpcl, CLK_DIVIDER_HIWORD_MASK),
++	DEF_MUX("HP", R9A07G044L_CLK_HP, SEL_ETH,
++			sel_eth, 2, CLK_MUX_HIWORD_MASK),
+ 	DEF_FIXED("TSU", R9A07G044L_CLK_TSU, CLK800FIX_C, 1, 10),
+ 	DEF_FIXED("ZT", R9A07G044L_CLK_ZT, CLK100FIX_CD, 1, 1),
+ 	DEF_DIV("P0", R9A07G044L_CLK_P0, CLK100FIX_C,
+-			DIVPL2A, dtable_3b, 0),
++			DIVPL2A, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_DIV("P1", R9A07G044L_CLK_P1, CLK200FIX_CD,
+-			DIVPL3B, dtable_3b, 0),
++			DIVPL3B, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_DIV("P2", R9A07G044L_CLK_P2, CLK100FIX_CD,
+-			DIVPL3A, dtable_3b, 0),
++			DIVPL3A, dtable_3b, CLK_DIVIDER_HIWORD_MASK),
+ 	DEF_FIXED("AT", R9A07G044L_CLK_AT, CLK800FIX_CD, 1, 2),
+ };
+ 
+-- 
+2.7.4
+

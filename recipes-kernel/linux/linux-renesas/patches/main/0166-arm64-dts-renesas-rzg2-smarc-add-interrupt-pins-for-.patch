@@ -1,0 +1,62 @@
+From 080025329fc9b9c2064fd4a0eee374e492835854 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 22 Apr 2021 09:33:25 +0700
+Subject: [PATCH 166/180] arm64: dts: renesas: rzg2-smarc: add interrupt pins
+ for Ethernet PHYs
+
+This commit is created to add support interrupt pins for Ethernet PHYs
+in RZ/G2L Dev Board.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+index 76ab2ba..fb8ab28 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+@@ -239,20 +239,6 @@
+ };
+ 
+ &pinctrl {
+-	eth0_irq_pin {
+-		gpio-hog;
+-		gpios = <RZG2L_GPIO(1, 0) GPIO_ACTIVE_HIGH>;
+-		input;
+-		line-name = "eth0_irq_pin";
+-	};
+-
+-	eth0_irq_pin {
+-		gpio-hog;
+-		gpios = <RZG2L_GPIO(1, 1) GPIO_ACTIVE_HIGH>;
+-		input;
+-		line-name = "eth1_irq_pin";
+-	};
+-
+ 	i2c3_pins: i2c3 {
+ 		groups = "i2c3_b";
+ 		function = "i2c3";
+@@ -533,6 +519,9 @@
+ 		txd1-skew-psec = <0>;
+ 		txd2-skew-psec = <0>;
+ 		txd3-skew-psec = <0>;
++
++		interrupt-parent = <&pinctrl>;
++		interrupts = <RZG2L_GPIO(1, 0) IRQ_TYPE_EDGE_FALLING>;
+ 	};
+ };
+ 
+@@ -557,6 +546,9 @@
+ 		txd1-skew-psec = <0>;
+ 		txd2-skew-psec = <0>;
+ 		txd3-skew-psec = <0>;
++
++		interrupt-parent = <&pinctrl>;
++		interrupts = <RZG2L_GPIO(1, 1) IRQ_TYPE_EDGE_FALLING>;
+ 	};
+ };
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,49 @@
+From c58342a03eb7f57ada395fe8e9b0754e72642855 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Thu, 22 Apr 2021 09:28:07 +0700
+Subject: [PATCH 165/180] arm64: dts: renesas: add interrupt pin support for
+ ADV7535 HDMI transmitter.
+
+This commit is created to add interrupt pin support for ADB7535 HDMI
+transmitter in RZ/G2L Dev and Smarc board.
+All of them uses P2_1 to trigger interrupt signal.
+Currently, GPIO interrupt does not support level detection so that we
+set falling edge detection instead.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts | 3 +++
+ arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi       | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts b/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts
+index 1da1150..cf62aba 100644
+--- a/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts
++++ b/arch/arm64/boot/dts/renesas/r9a07g044l2-smarc.dts
+@@ -306,6 +306,9 @@
+ 		v3p3-supply = <&reg_3p3v>;
+ 		v1p2-supply = <&reg_1p8v>;
+ 
++		interrupt-parent = <&pinctrl>;
++		interrupts = <RZG2L_GPIO(2, 1) IRQ_TYPE_EDGE_FALLING>;
++
+ 		adi,dsi-lanes = <4>;
+ 		#sound-dai-cells = <0>;
+ 
+diff --git a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+index a4b71c3..76ab2ba 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+@@ -723,6 +723,9 @@
+ 		v3p3-supply = <&reg_3p3v>;
+ 		v1p2-supply = <&reg_1p8v>;
+ 
++		interrupt-parent = <&pinctrl>;
++		interrupts = <RZG2L_GPIO(2, 1) IRQ_TYPE_EDGE_FALLING>;
++
+ 		adi,dsi-lanes = <4>;
+ 		#sound-dai-cells = <0>;
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,56 @@
+From 93beec4780e89ce316fd44f4733b451b726493f6 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Fri, 7 May 2021 18:23:15 +0700
+Subject: [PATCH 177/180] clk: renesas: r9a07g044l-cpg: change SDHI0/1 to use
+ SD0/1 div4 clock
+
+SDHI0/1 use IMCLKs as main clock for output clock. And IMCLKs are
+supplied by SD0/1 divided by 4.
+
+This commit add internal core clocks SD0_DIV4 and SD1_DVI4 and let them
+as parent clocks of SDHI0/1 module clocks.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ drivers/clk/renesas/r9a07g044l-cpg.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/clk/renesas/r9a07g044l-cpg.c b/drivers/clk/renesas/r9a07g044l-cpg.c
+index 5dbd4df..1f2d3ab 100644
+--- a/drivers/clk/renesas/r9a07g044l-cpg.c
++++ b/drivers/clk/renesas/r9a07g044l-cpg.c
+@@ -77,6 +77,8 @@ enum clk_ids {
+ 	CLK_SEL_G2,
+ 	CLK_PLL6_DIV2,
+ 	CLK_SEL_PLL6_2,
++	CLK_SD0_DIV4,
++	CLK_SD1_DIV4,
+ 
+ 	/* Module Clocks */
+ 	CLK_MODE_BASE,
+@@ -244,6 +246,8 @@ static const struct cpg_core_clk r9a07g044l_core_clks[] __initconst = {
+ 			sel_shdi, 4, CLK_MUX_HIWORD_MASK),
+ 	DEF_MUX("SD1", R9A07G044L_CLK_SD1, SEL_SDHI1,
+ 			sel_shdi, 4, CLK_MUX_HIWORD_MASK),
++	DEF_FIXED("SD0_DIV4", CLK_SD0_DIV4, R9A07G044L_CLK_SD0, 1, 4),
++	DEF_FIXED("SD1_DIV4", CLK_SD1_DIV4, R9A07G044L_CLK_SD1, 1, 4),
+ 	DEF_FIXED("M0", R9A07G044L_CLK_M0, CLK200FIX_CD, 1, 1),
+ 	DEF_FIXED("M1", R9A07G044L_CLK_M1, CLK_SEL_PLL5_1, 1, 1),
+ 	DEF_FIXED("M2", R9A07G044L_CLK_M2, CLK533FIX_CD, 1, 2),
+@@ -332,11 +336,11 @@ static struct mssr_mod_clk r9a07g044l_mod_clks[] = {
+ 				MSSR(38, BIT(0),
+ 					(BIT(0) | BIT(1) | BIT(2)))),
+ 	DEF_MOD("sdhi0",	R9A07G044L_CLK_SDHI0,
+-				R9A07G044L_CLK_SD0,
++				CLK_SD0_DIV4,
+ 				MSSR(21, (BIT(0) | BIT(1) | BIT(2) | BIT(3)),
+ 					 BIT(0))),
+ 	DEF_MOD("sdhi1",	R9A07G044L_CLK_SDHI1,
+-				R9A07G044L_CLK_SD1,
++				CLK_SD1_DIV4,
+ 				MSSR(21, (BIT(4) | BIT(5) | BIT(6) | BIT(7)),
+ 					 BIT(1))),
+ 	DEF_MOD("usb0",		R9A07G044L_CLK_USB0,
+-- 
+2.7.4
+

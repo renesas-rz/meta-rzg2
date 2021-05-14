@@ -1,0 +1,79 @@
+From 3523668fab621b857928da1235f1848d5399a76b Mon Sep 17 00:00:00 2001
+From: Tien Le <tien.le.xw@renesas.com>
+Date: Mon, 10 May 2021 17:06:41 +0700
+Subject: [PATCH 167/180] arm64: boot: dts: renesas: rzg2 : Add ADC_TRG_SUPPORT
+
+ADC and CAN0 only conlict pin at ADC HW Trigger mode.
+Without pin setting, ADC still can work with SW trigger mode.
+This commit change ADC_SUPPORT to ADC_TRG_SUPPORT and disable adc pin
+only when CAN0 is used.
+
+Signed-off-by: Tien Le <tien.le.xw@renesas.com>
+---
+ arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+index fb8ab28..88deedd 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2-smarc.dtsi
+@@ -50,9 +50,10 @@
+ #define DISP_DSI_HDMI		1
+ #define DISP_DSI_PANEL		0
+ 
+-/* CAN and ADC have pin conflict. When Can is enabled, disable ADC
++/* CAN and ADC hardware Trigger have pin conflict.
++ * When Can is enabled, disable ADC_HWTRG_SUPPORT
+  */
+-#define ADC_SUPPORT		0
++#define ADC_HWTRG_SUPPORT		0
+ #else
+ /* Parallel display is supported as default if not support CAN.
+  * Please choose one of two interfaces (HDMI or panel) based on your board
+@@ -68,9 +69,10 @@
+ #define DISP_DSI_HDMI		0
+ #define DISP_DSI_PANEL		0
+ 
+-/* CAN and ADC have pin conflict. When Can is disabled, enable ADC
++/* CAN and ADC hardware Trigger have pin conflict.
++ * When Can is disabled, enable ADC_HWTRG_SUPPORT
+  */
+-#define ADC_SUPPORT		1
++#define ADC_HWTRG_SUPPORT		1
+ #endif
+ 
+ /* Below macros are created to check which video interface is supporting
+@@ -383,12 +385,10 @@
+ 	};
+ #endif
+ 
+-#if (ADC_SUPPORT)
+ 	adc_pins: adc {
+ 		groups = "adc_d";
+ 		function = "adc";
+ 	};
+-#endif
+ 
+ 	i2c1_pins: i2c1 {
+ 		pins = "RIIC1_SDA", "RIIC1_SCL";
+@@ -688,14 +688,14 @@
+ };
+ #endif
+ 
+-#if (ADC_SUPPORT)
+ &adc {
++#if (ADC_HWTRG_SUPPORT)
++	//conflict pin with CAN0 pin
+ 	pinctrl-0 = <&adc_pins>;
++#endif
+ 	pinctrl-names = "default";
+-	//conflict pin with CAN0 pin
+ 	status = "okay";
+ };
+-#endif
+ 
+ &i2c1 {
+ 	pinctrl-0 = <&i2c1_pins>;
+-- 
+2.7.4
+
