@@ -1,0 +1,530 @@
+diff -uprN git_org/drivers/renesas/rzg/auth/auth_mod.c git_mod/drivers/renesas/rzg/auth/auth_mod.c
+--- git_org/drivers/renesas/rzg/auth/auth_mod.c	2021-06-23 12:45:02.342749114 +0900
++++ git_mod/drivers/renesas/rzg/auth/auth_mod.c	2021-06-15 16:04:56.000000000 +0900
+@@ -92,6 +92,7 @@ int auth_mod_verify_img(unsigned int img
+ 	case BL336_IMAGE_ID:
+ 	case BL337_IMAGE_ID:
+ 	case BL338_IMAGE_ID:
++	case SEC_TRIGGER_ID:
+ 		return ret;
+ 
+ 	case SEC_MODULE_ID:
+@@ -117,6 +118,8 @@ int auth_mod_verify_img(unsigned int img
+ 	case BL31_IMAGE_ID:
+ 	case BL32_IMAGE_ID:
+ 	case BL33_IMAGE_ID:
++	case SEC_UPDATER_ID:
++
+ 
+ 		/* Authenticate the loaded program with Security Module. */
+ 		if (NULL == secure_boot_arg) {
+diff -uprN git_org/drivers/renesas/rzg/io/io_rzg.c git_mod/drivers/renesas/rzg/io/io_rzg.c
+--- git_org/drivers/renesas/rzg/io/io_rzg.c	2021-06-23 12:45:02.614752550 +0900
++++ git_mod/drivers/renesas/rzg/io/io_rzg.c	2021-06-07 11:54:15.000000000 +0900
+@@ -79,8 +79,8 @@ typedef struct {
+ #define RZG_FLASH_CERT_HEADER		RZG_GET_FLASH_ADR(6U, 0U)
+ #define RZG_EMMC_CERT_HEADER		(0x00030000U)
+ 
+-#define RZG_COUNT_LOAD_BL31		(2U)
+-#define RZG_COUNT_LOAD_BL33		(4U)
++#define RZG_COUNT_LOAD_BL31		(4U)
++#define RZG_COUNT_LOAD_BL33		(6U)
+ 
+ #define RZG_MAX_LOAD_IMAGE		(RZG_MAX_BL3X_IMAGE + RZG_COUNT_LOAD_BL33)
+ 
+@@ -88,6 +88,8 @@ static const plat_rzg_name_offset_t name
+ 
+ 	{SEC_MODULE_ID,  0U, RZG_ATTR_SET_ALL(0, 0, 0)},
+ 	{SEC_KEYRING_ID, 0U, RZG_ATTR_SET_ALL(1, 0, 1)},
++	{SEC_TRIGGER_ID, 0U, RZG_ATTR_SET_ALL(2, 0, 2)},
++	{SEC_UPDATER_ID, 0U, RZG_ATTR_SET_ALL(3, 0, 3)},
+ 
+ 	{BL31_IMAGE_ID, 0U, RZG_ATTR_SET_ALL(RZG_COUNT_LOAD_BL31,    0, RZG_COUNT_LOAD_BL31)  },
+ 
+diff -uprN git_org/plat/renesas/rzg/aarch64/plat_helpers.S git_mod/plat/renesas/rzg/aarch64/plat_helpers.S
+--- git_org/plat/renesas/rzg/aarch64/plat_helpers.S	2021-06-23 12:45:07.826818311 +0900
++++ git_mod/plat/renesas/rzg/aarch64/plat_helpers.S	2021-06-07 11:56:38.000000000 +0900
+@@ -221,6 +221,13 @@ endfunc platform_mem_init
+ 	 * ---------------------------------------------
+ 	 */
+ func plat_report_exception
++	/* Temp smc handler for fwu_done function */
++	/* Expect only SMC exceptions */
++	mrs	x30, esr_el3
++	ubfx	x30, x30, #ESR_EC_SHIFT, #ESR_EC_LENGTH
++	cmp	x30, #EC_AARCH64_SMC
++	b.eq	bl2_plat_fmu_smc_handler
++
+ 	/* Switch to SP_EL0 */
+ 	msr	spsel, #0
+ #if IMAGE_BL2
+diff -uprN git_org/plat/renesas/rzg/bl2_plat_fwu.c git_mod/plat/renesas/rzg/bl2_plat_fwu.c
+--- git_org/plat/renesas/rzg/bl2_plat_fwu.c	1970-01-01 09:00:00.000000000 +0900
++++ git_mod/plat/renesas/rzg/bl2_plat_fwu.c	2021-04-27 08:59:48.000000000 +0900
+@@ -0,0 +1,148 @@
++
++/*
++ * bl2_plat_fwu.c -
++ *
++ * Copyright (C) 2021 Renesas Electronics Corporation.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++#include <string.h>
++#include <assert.h>
++#include <libfdt.h>
++
++#include <platform_def.h>
++
++#include <arch_helpers.h>
++#include <common/bl_common.h>
++#include <common/debug.h>
++#include <common/desc_image_load.h>
++#include <drivers/console.h>
++#include <drivers/io/io_storage.h>
++#include <lib/mmio.h>
++#include <lib/xlat_tables/xlat_tables_defs.h>
++#include <lib/el3_runtime/context_mgmt.h>
++#include <plat/common/platform.h>
++#include <context.h>
++#include <tools_share/firmware_image_package.h>
++
++#define FWU_SMC_UPDATE_DONE	0x15
++#define BIT_SOFTRESET	(1U << 15)
++#define TOC_HEADER_NAME_EMPTY	0xFFFFFFFF
++
++void el3_exit(void);
++extern void rzg_micro_delay(uint64_t micro_sec);
++extern void bl2_secure_setting(void);
++extern void bl2_run_next_image(const struct entry_point_info *bl_ep_info);
++static void bl2_prepare_next_ns_image(entry_point_info_t *next_ep_info);
++static void bl2_plat_fwu_done(void);
++static void bl2_load_fw_updater(bl_mem_params_node_t *bl_mem_params);
++
++/*
++ * Following array will be used for context management.
++ * There are 2 instances, for the Secure and Non-Secure contexts.
++ */
++static cpu_context_t cpu_context[2];
++
++/* Following contains the cpu context pointers. */
++static void *cpu_context_ptr[2];
++
++void bl2_plat_fmu_smc_handler(
++	u_register_t x0,
++	unsigned int smc_fid,
++	u_register_t x2,
++	u_register_t x3,
++	u_register_t x4,
++	u_register_t x5,
++	u_register_t x6,
++	u_register_t x7)
++{
++	switch (smc_fid)
++	{
++	case FWU_SMC_UPDATE_DONE:
++		bl2_plat_fwu_done();
++	default:
++		ERROR("BL2: unknown smc call functions\n");
++		panic();
++		break;
++	}
++}
++
++void *cm_get_context(uint32_t security_state)
++{
++	assert(sec_state_is_valid(security_state));
++	return cpu_context_ptr[security_state];
++}
++
++void cm_set_context(void *context, uint32_t security_state)
++{
++	assert(sec_state_is_valid(security_state));
++	cpu_context_ptr[security_state] = context;
++}
++
++static void bl2_plat_fwu_done(void)
++{
++	NOTICE("BL2: *******FWU Process Completed*******\n");
++    /* delay time for console output */
++	rzg_micro_delay(10000);
++
++	/* reset the system by Soft Power On Reset Control Register */
++	mmio_write_32(RZG_SRESCR, 0x5AA50000U | BIT_SOFTRESET);
++}
++
++static void bl2_prepare_next_ns_image(entry_point_info_t *next_ep_info)
++{
++	unsigned int security_state = NON_SECURE;
++
++	/* Setup the Secure/Non-Secure context if not done already. */
++	if (cm_get_context(security_state) == NULL)
++		cm_set_context(&cpu_context[security_state], security_state);
++
++	/* Prepare the context for the next BL image. */
++	cm_init_my_context(next_ep_info);
++	cm_prepare_el3_exit(security_state);
++
++	print_entry_point_info(next_ep_info);
++}
++
++static void bl2_load_fw_updater(bl_mem_params_node_t *bl_mem_params)
++{
++	int err;
++
++	err = load_auth_image(bl_mem_params->image_id, &bl_mem_params->image_info);
++	if (0 != err)
++	{
++		ERROR("BL2: Failed to load image (%i)\n", err);
++		plat_error_handler(err);
++		panic();
++	}
++	return;
++}
++
++void bl2_plat_firmware_update_execute(uint32_t *trigger_ptr)
++{
++	unsigned int image_id;
++	uint32_t reg;
++	bl_mem_params_node_t *bl_mem_params;
++
++	fip_toc_header_t *toc_header = (fip_toc_header_t *)trigger_ptr;
++
++	reg = mmio_read_32(RZG_MODEMR);
++	if ((reg & MODEMR_BOOT_CPU_MASK) == MODEMR_BOOT_CPU_CR7)
++		return;
++
++	if (TOC_HEADER_NAME_EMPTY == toc_header->name)
++		return;
++
++	image_id = SEC_UPDATER_ID;
++	bl_mem_params = get_bl_mem_params_node(image_id);
++
++	bl2_load_fw_updater(bl_mem_params);
++
++	INFO("BL2: Preparing for EL3 exit to normal world\n");
++	bl2_prepare_next_ns_image(&bl_mem_params->ep_info);
++
++	bl2_secure_setting();
++	el3_exit();
++	/* should never reach here */
++	panic();
++}
+diff -uprN git_org/plat/renesas/rzg/bl2_plat_mem_params_desc.c git_mod/plat/renesas/rzg/bl2_plat_mem_params_desc.c
+--- git_org/plat/renesas/rzg/bl2_plat_mem_params_desc.c	2021-06-23 12:45:08.054821188 +0900
++++ git_mod/plat/renesas/rzg/bl2_plat_mem_params_desc.c	2021-06-07 12:01:00.000000000 +0900
+@@ -53,6 +53,36 @@ static bl_mem_params_node_t bl2_mem_para
+ 
+ 		.next_handoff_image_id = INVALID_IMAGE_ID,
+ 	},
++	{
++		.image_id = SEC_TRIGGER_ID,
++		
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP, VERSION_2,
++			entry_point_info_t, SECURE | NON_EXECUTABLE),
++
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_IMAGE_BINARY, VERSION_2,
++			image_info_t, 0),
++
++		.image_info.image_base = SEC_TRIGGER_BASE,
++		.image_info.image_max_size = SEC_TRIGGER_LIMIT - SEC_TRIGGER_BASE,
++
++		.next_handoff_image_id = INVALID_IMAGE_ID,
++	},
++	{
++		.image_id = SEC_UPDATER_ID,
++		
++		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP, VERSION_2,
++			entry_point_info_t, NON_SECURE | EXECUTABLE),
++		.ep_info.pc = SEC_UPDATER_BASE,
++		.ep_info.spsr = SPSR_64(MODE_EL1, MODE_SP_ELX,
++			DISABLE_ALL_EXCEPTIONS),
++		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP, VERSION_2,
++			image_info_t, IMAGE_ATTRIB_SKIP_LOADING),
++
++		.image_info.image_base = SEC_UPDATER_BASE,
++		.image_info.image_max_size = SEC_UPDATER_LIMIT - SEC_UPDATER_BASE,
++
++		.next_handoff_image_id = INVALID_IMAGE_ID,
++	},
+ #endif
+ 
+ 	{
+diff -uprN git_org/plat/renesas/rzg/bl2_plat_setup.c git_mod/plat/renesas/rzg/bl2_plat_setup.c
+--- git_org/plat/renesas/rzg/bl2_plat_setup.c	2021-06-23 12:45:07.786817805 +0900
++++ git_mod/plat/renesas/rzg/bl2_plat_setup.c	2021-06-07 12:02:43.000000000 +0900
+@@ -67,6 +67,8 @@ extern void rzg_rpc_init(void);
+ extern void rzg_pfc_init(void);
+ extern void rzg_dma_init(void);
+ extern void bl2_ecc_init(uint32_t major, uint32_t minor);
++extern void rpc_init_read_ext_mode(void);
++extern void bl2_plat_firmware_update_execute(uint32_t * trigger_ptr);
+ 
+ static void bl2_init_generic_timer(void);
+ 
+@@ -326,6 +328,9 @@ int bl2_plat_handle_pre_image_load(unsig
+ 	u_register_t *boot_kind = (void *) BOOT_KIND_BASE;
+ 	bl_mem_params_node_t *bl_mem_params;
+ 
++	if (SEC_TRIGGER_ID == image_id)
++		rpc_init_read_ext_mode();
++
+ 	if (image_id != BL31_IMAGE_ID)
+ 		return 0;
+ 
+@@ -373,6 +378,10 @@ int bl2_plat_handle_post_image_load(unsi
+ 		memcpy(&params->bl33_ep_info, &bl_mem_params->ep_info,
+ 			sizeof(entry_point_info_t));
+ 		break;
++	case SEC_TRIGGER_ID:
++		/* may not return. */
++		bl2_plat_firmware_update_execute((uint32_t *)(bl_mem_params->image_info).image_base);
++		break;
+ 	}
+ 
+ 	return 0;
+diff -uprN git_org/plat/renesas/rzg/include/platform_def.h git_mod/plat/renesas/rzg/include/platform_def.h
+--- git_org/plat/renesas/rzg/include/platform_def.h	2021-06-23 12:45:07.994820430 +0900
++++ git_mod/plat/renesas/rzg/include/platform_def.h	2021-06-07 12:00:22.000000000 +0900
+@@ -70,6 +70,8 @@
+ #define BL338_CERT_ID		(NS_BL2U_IMAGE_ID + 21)
+ #define SEC_MODULE_ID		(NS_BL2U_IMAGE_ID + 22)
+ #define SEC_KEYRING_ID		(NS_BL2U_IMAGE_ID + 23)
++#define SEC_TRIGGER_ID		(NS_BL2U_IMAGE_ID + 24)
++#define SEC_UPDATER_ID		(NS_BL2U_IMAGE_ID + 25)
+ 
+ /* io drivers id */
+ #define FLASH_DEV_ID		U(0)
+@@ -159,6 +161,15 @@
+ #define SEC_MODULE_HEAP		U(0x50100000)
+ 
+ /*******************************************************************************
++ * Firmware Updater
++ ******************************************************************************/
++#define SEC_UPDATER_BASE	U(0x48000000)
++#define SEC_UPDATER_LIMIT	(SEC_UPDATER_BASE + 0x1E000)
++
++#define SEC_TRIGGER_BASE	U(0x44300000)
++#define SEC_TRIGGER_LIMIT	(SEC_TRIGGER_BASE + 0x1000)
++
++/*******************************************************************************
+  * Platform specific page table and MMU setup constants
+  ******************************************************************************/
+ #if IMAGE_BL1
+diff -uprN git_org/plat/renesas/rzg/platform.mk git_mod/plat/renesas/rzg/platform.mk
+--- git_org/plat/renesas/rzg/platform.mk	2021-06-23 12:45:08.062821289 +0900
++++ git_mod/plat/renesas/rzg/platform.mk	2021-06-07 12:05:02.000000000 +0900
+@@ -330,11 +330,14 @@ RZG_GIC_SOURCES		:=	drivers/arm/gic/comm
+ BL2_SOURCES	+=	${RZG_GIC_SOURCES}				\
+ 			lib/cpus/aarch64/cortex_a53.S			\
+ 			lib/cpus/aarch64/cortex_a57.S			\
++			lib/el3_runtime/aarch64/context_mgmt.c	\
++			lib/el3_runtime/aarch64/context.S \
+ 			${LIBFDT_SRCS}					\
+ 			common/desc_image_load.c			\
+ 			plat/renesas/rzg/aarch64/platform_common.c	\
+ 			plat/renesas/rzg/aarch64/plat_helpers.S		\
+ 			plat/renesas/rzg/bl2_interrupt_error.c		\
++			plat/renesas/rzg/bl2_plat_fwu.c     \
+ 			plat/renesas/rzg/bl2_secure_setting.c		\
+ 			plat/renesas/rzg/bl2_plat_setup.c		\
+ 			plat/renesas/rzg/plat_storage.c			\
+diff -uprN git_org/plat/renesas/rzg/plat_storage.c git_mod/plat/renesas/rzg/plat_storage.c
+--- git_org/plat/renesas/rzg/plat_storage.c	2021-06-23 12:45:08.054821188 +0900
++++ git_mod/plat/renesas/rzg/plat_storage.c	2021-06-07 12:17:23.000000000 +0900
+@@ -82,6 +82,14 @@ static const io_block_spec_t secmod_file
+ static const io_block_spec_t seckey_file_spec = {
+ 	.offset = SEC_KEYRING_ID,
+ };
++
++static const io_block_spec_t trigger_file_spec = {
++	.offset = SEC_TRIGGER_ID,
++};
++
++static const io_block_spec_t updater_file_spec = {
++	.offset = SEC_UPDATER_ID,
++};
+ #endif
+ 
+ static int32_t open_emmcdrv(const uintptr_t spec);
+@@ -152,6 +160,14 @@ static const struct plat_io_policy polic
+ 			    &rzg_dev_handle,
+ 			    (uintptr_t) &seckey_file_spec,
+ 			    &open_rzg},
++	[SEC_TRIGGER_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &trigger_file_spec,
++			    &open_rzg},
++	[SEC_UPDATER_ID] = {
++			    &rzg_dev_handle,
++			    (uintptr_t) &updater_file_spec,
++			    &open_rzg},
+ #endif
+ 			{
+ 			    0, 0, 0
+diff -uprN git_org/tools/renesas/rzg_layout_create/sa6.c git_mod/tools/renesas/rzg_layout_create/sa6.c
+--- git_org/tools/renesas/rzg_layout_create/sa6.c	2021-06-23 12:45:09.206835722 +0900
++++ git_mod/tools/renesas/rzg_layout_create/sa6.c	2021-06-15 16:06:16.000000000 +0900
+@@ -55,6 +55,15 @@
+ /* Reserved */
+ #define RZG_BL338_PARTITION		(0x00000000U)
+ 
++/* Source address on Security Trigger */
++#define FWU_TRGSRC_ADDRESS		(0x03000000U) 
++/* Reserved */
++#define FWU_TRG_PARTITION			(0x00000000U) 
++/* Source address on Secure Updater */
++#define FWU_NSBL2USRC_ADDRESS			(0x00600000U) 
++/* Reserved */
++#define FWU_NSBL2U_PARTITION			(0x00000000U)
++
+ #else /* RZG_SA6_TYPE == RZG_SA6_TYPE_HYPERFLASH */
+ 
+ /* Number of content cert for Non-secure Target Program(BL33x) */
+@@ -106,6 +115,17 @@
+ /* Destination size for Secure Keys */
+ #define SEC_KEYDST_SIZE			(0x00000400U)
+ 
++/* Destination address for Security Trigger */
++#define FWU_TRGDST_ADDRESS		(0x44300000U)
++#define FWU_TRGDST_ADDRESSH		(0x00000000U)
++/* Destination size for Security Trigger */
++#define FWU_TRGDST_SIZE			(0x00000400U) 
++/* Destination address for Secure Updater */
++#define FWU_BL2UDST_ADDRESS		(0x48000000U)
++#define FWU_BL2UDST_ADDRESSH	(0x00000000U)
++/* Destination size for Secure Updater */
++#define FWU_BL2UDST_SIZE		(0x00007800U)
++
+ /* Destination address for BL31 */
+ #define RZG_BL31DST_ADDRESS		(0x44000000U)
+ #define RZG_BL31DST_ADDRESSH		(0x00000000U)
+@@ -176,6 +196,10 @@ const uint64_t __attribute__ ((section (
+ const uint64_t __attribute__ ((section (".sa6_bl337partition")))bl337partition	= RZG_BL337_PARTITION;
+ const uint64_t __attribute__ ((section (".sa6_bl338src_addr")))	bl338src_addr	= RZG_BL338SRC_ADDRESS;
+ const uint64_t __attribute__ ((section (".sa6_bl338partition")))bl338partition	= RZG_BL338_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_fwutrgsrc_addr")))fwutrgsrc_addr	= FWU_TRGSRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_fwutrgpartition")))fwutrgpartition= FWU_TRG_PARTITION;
++const uint64_t __attribute__ ((section (".sa6_nsbl2usrc_addr"))) nsbl2usrc_addr	= FWU_NSBL2USRC_ADDRESS;
++const uint64_t __attribute__ ((section (".sa6_nsbl2upartition")))nsbl2upartition= FWU_NSBL2U_PARTITION;
+ const uint32_t __attribute__ ((section (".sa6_secmoddst_addr"))) secmoddst_addr = SEC_MODDST_ADDRESS;
+ const uint32_t __attribute__ ((section (".sa6_secmoddst_addrh")))secmoddst_addrh= SEC_MODDST_ADDRESSH;
+ const uint32_t __attribute__ ((section (".sa6_secmoddst_size"))) secmoddst_size = SEC_MODDST_SIZE;
+@@ -212,3 +236,9 @@ const uint32_t __attribute__ ((section (
+ const uint32_t __attribute__ ((section (".sa6_bl338dst_addr")))	bl338dst_addr	= RZG_BL338DST_ADDRESS;
+ const uint32_t __attribute__ ((section (".sa6_bl338dst_addrh")))bl338dst_addrh	= RZG_BL338DST_ADDRESSH;
+ const uint32_t __attribute__ ((section (".sa6_bl338dst_size")))	bl338dst_size	= RZG_BL338DST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_fwutrgdst_addr"))) fwutrgdst_addr	= FWU_TRGDST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_fwutrgdst_addrh")))fwutrgdst_addrh= FWU_TRGDST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_fwutrgdst_size"))) fwutrgdst_size	= FWU_TRGDST_SIZE;
++const uint32_t __attribute__ ((section (".sa6_nsbl2udst_addr"))) nsbl2udst_addr	= FWU_BL2UDST_ADDRESS;
++const uint32_t __attribute__ ((section (".sa6_nsbl2udst_addrh")))nsbl2udst_addrh= FWU_BL2UDST_ADDRESSH;
++const uint32_t __attribute__ ((section (".sa6_nsbl2udst_size"))) nsbl2udst_size	= FWU_BL2UDST_SIZE;
+\ No newline at end of file
+diff -uprN git_org/tools/renesas/rzg_layout_create/sa6.ld.S git_mod/tools/renesas/rzg_layout_create/sa6.ld.S
+--- git_org/tools/renesas/rzg_layout_create/sa6.ld.S	2021-06-23 12:45:09.206835722 +0900
++++ git_mod/tools/renesas/rzg_layout_create/sa6.ld.S	2021-06-07 12:09:52.000000000 +0900
+@@ -21,6 +21,14 @@ SECTIONS
+ 		. = 0x000000018;
+ 		KEEP(*(.sa6_seckeypartition))
+ 		. = 0x00000020;
++		KEEP(*(.sa6_fwutrgsrc_addr))
++		. = 0x00000028;
++		KEEP(*(.sa6_fwutrgpartition))
++		. = 0x00000030;
++		KEEP(*(.sa6_nsbl2usrc_addr))
++		. = 0x00000038;
++		KEEP(*(.sa6_nsbl2upartition))
++		. = 0x00000040;
+ 	}
+ 
+ 	.src_addr : {
+@@ -80,6 +88,18 @@ SECTIONS
+ 		. = 0x00000910;
+ 		KEEP(*(.sa6_seckeydst_size))
+ 		. = 0x00001000;
++		KEEP(*(.sa6_fwutrgdst_addr))
++		. = 0x00001004;
++		KEEP(*(.sa6_fwutrgdst_addrh))
++		. = 0x00001110;
++		KEEP(*(.sa6_fwutrgdst_size))
++		. = 0x00001800;
++		KEEP(*(.sa6_nsbl2udst_addr))
++		. = 0x00001804;
++		KEEP(*(.sa6_nsbl2udst_addrh))
++		. = 0x00001910;
++		KEEP(*(.sa6_nsbl2udst_size))
++		. = 0x00002000;
+ 	}
+ 
+ 	.dst_addr : {
+diff -uprN git_org/tools/renesas/rzg_security_tools/fiptool/Makefile git_mod/tools/renesas/rzg_security_tools/fiptool/Makefile
+--- git_org/tools/renesas/rzg_security_tools/fiptool/Makefile	2021-06-23 12:45:09.454838852 +0900
++++ git_mod/tools/renesas/rzg_security_tools/fiptool/Makefile	2021-06-07 12:13:28.000000000 +0900
+@@ -12,8 +12,9 @@ include ${MAKE_HELPERS_DIRECTORY}build_e
+ TARGET1 := keyring
+ TARGET2 := fw_ipl
+ TARGET3 := boot_fw
++TARGET4 := fwu_ns
+ 
+-TARGETS := $(TARGET1) $(TARGET2) $(TARGET3)
++TARGETS := $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4)
+ SOURCES := ./src/tbbr_config.c ./src/fiptool.c
+ OBJ_DIR := ./obj
+ V ?= 0
+@@ -23,6 +24,7 @@ override CPPFLAGS += -D_GNU_SOURCE -D_XO
+ ${TARGET1}: CPPFLAGS += -D_PKG_KEYRING
+ ${TARGET2}: CPPFLAGS += -D_PKG_FW_IPL
+ ${TARGET3}: CPPFLAGS += -D_PKG_BOOT_FW
++${TARGET4}: CPPFLAGS += -D_PKG_FWU_NS
+ 
+ HOSTCCFLAGS := -Wall -Werror -pedantic -std=c99
+ ifeq (${DEBUG},1)
+@@ -38,18 +40,6 @@ else
+   Q :=
+ endif
+ 
+-# Process RCAR_SA6_TYPE flag
+-ifndef RCAR_SA6_TYPE
+-RCAR_SA6_TYPE := 0
+-else
+-ifeq (${RCAR_SA6_TYPE},0)
+-RCAR_SA6_TYPE := 0
+-else
+-RCAR_SA6_TYPE := 1
+-endif
+-endif
+-$(eval $(call add_define,RCAR_SA6_TYPE))
+-
+ INCLUDE_PATHS := -I./src -I../include  -I../../../../include/tools_share
+ VPATH := $(subst ,:,$(sort $(dir $(SOURCES))))
+ 
+diff -uprN git_org/tools/renesas/rzg_security_tools/fiptool/src/rzg_firmware_image_package.h git_mod/tools/renesas/rzg_security_tools/fiptool/src/rzg_firmware_image_package.h
+--- git_org/tools/renesas/rzg_security_tools/fiptool/src/rzg_firmware_image_package.h	2021-06-23 12:45:09.506839509 +0900
++++ git_mod/tools/renesas/rzg_security_tools/fiptool/src/rzg_firmware_image_package.h	2021-06-07 12:10:47.000000000 +0900
+@@ -19,6 +19,8 @@
+ 	#define TOC_HEADER_NAME	0xAA640002
+ #elif defined(_PKG_BOOT_FW)
+ 	#define TOC_HEADER_NAME	0xAA640003
++#elif defined(_PKG_FWU_NS)
++	#define TOC_HEADER_NAME	0xAA640004
+ #else
+ 	#error "The package definition cannot be found."
+ #endif
+diff -uprN git_org/tools/renesas/rzg_security_tools/fiptool/src/tbbr_config.c git_mod/tools/renesas/rzg_security_tools/fiptool/src/tbbr_config.c
+--- git_org/tools/renesas/rzg_security_tools/fiptool/src/tbbr_config.c	2021-06-23 12:45:09.506839509 +0900
++++ git_mod/tools/renesas/rzg_security_tools/fiptool/src/tbbr_config.c	2021-06-07 12:12:22.000000000 +0900
+@@ -142,6 +142,13 @@ toc_entry_t toc_entries[] = {
+ 		.cmdline_name = "nt-fw-extra8",
+ 		.nvm_offset = 0xFFFFFFFFU
+ 	},
++#elif defined(_PKG_FWU_NS)
++	{
++		.name = "Firmware Updater NS_BL2U",
++		.uuid = UUID_TRUSTED_UPDATE_FIRMWARE_NS_BL2U,
++		.cmdline_name = "nt-fwu",
++		.nvm_offset = 0x00600000U
++	},
+ #else
+ 	#error "The package definition cannot be found."
+ #endif

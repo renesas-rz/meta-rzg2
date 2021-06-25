@@ -33,7 +33,7 @@ do_newkey() {
 addtask update after do_configure
 do_update[dirs] = "${S}"
 do_update() {
-    sh ./sec_keygen.sh -t ${DIRPATH_GEN_KEY_ROOT} -u -d ${DIR_V_MAJOR}
+    sh ./sec_keygen.sh -t ${DIRPATH_GEN_KEY_ROOT} -u -d ${DIR_V_MAJOR}.${DIR_V_MINOR}
 }
 
 # do_compile() nothing
