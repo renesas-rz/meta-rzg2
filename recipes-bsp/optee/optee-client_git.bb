@@ -3,15 +3,14 @@ LICENSE = "BSD-2-Clause"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 PR = "r0"
-PV = "3.12.0+git${SRCPV}"
+PV = "3.13.0+git${SRCPV}"
 BRANCH = "master"
 SRC_URI = "git://github.com/OP-TEE/optee_client.git;branch=${BRANCH}"
-# Tag 3.12.0
-SRCREV = "347144b79964233e718347e3f0fbe89ab5be46ae"
+# Tag 3.13.0
+SRCREV = "7c9c423d00e96bf51debd5fe10fd70dce83be5cc"
 
 SRC_URI += " \
     file://optee.service \
-    file://0001-tee-supplicant-use-MMC_IOC_MULTI_CMD-for-RPMB-access.patch \
 "
 
 inherit pythonnative systemd

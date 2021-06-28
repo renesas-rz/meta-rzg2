@@ -9,10 +9,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit deploy python3native
 require include/ecc-control.inc
 
-PV = "3.12.0+git${SRCPV}"
+PV = "3.13.0+git${SRCPV}"
 BRANCH = "master"
-#TAG: 3.12.0
-SRCREV = "3d47a131bca1d9ed511bfd516aa5e70269e12c1d"
+#TAG: 3.13.0
+SRCREV = "30c13f9e2ff178c9a299e409de75d50529cf5064"
 
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
@@ -21,6 +21,7 @@ SRC_URI = " \
     file://0003-core-arm-plat-rzg-Add-ECC-mode-checking-for-shared-m.patch \
     file://0004-core-arch-plat-rzg-add-Suspend-To-RAM-feature.patch \
     file://0005-core-arm-plat-rzg-Add-Suspend-to-RAM-support-for-con.patch \
+    file://0006-plat-rzg-add-some-missing-reference-functions.patch \
 "
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
