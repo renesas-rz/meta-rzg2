@@ -1,4 +1,4 @@
-From b5119e8ca761269e5965229a09c450e8f7d2d728 Mon Sep 17 00:00:00 2001
+From 6c075e444d99814c72f23d9c8edf284691900b88 Mon Sep 17 00:00:00 2001
 From: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
 Date: Mon, 22 Mar 2021 15:28:54 +0900
 Subject: [PATCH 2/2] core: arm: plat-rzg: Add HW RNG by Secure IP driver
@@ -14,14 +14,14 @@ Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
  create mode 100644 core/arch/arm/plat-rzg/rzg_rng.c
 
 diff --git a/core/arch/arm/plat-rzg/conf.mk b/core/arch/arm/plat-rzg/conf.mk
-index 869d28f..654a2a9 100644
+index 869d28f..f324320 100644
 --- a/core/arch/arm/plat-rzg/conf.mk
 +++ b/core/arch/arm/plat-rzg/conf.mk
 @@ -49,3 +49,11 @@ RZG_DRAM_ECC ?= 0
  RZG_ECC_FULL ?= 0
  
  CFG_RZG_SEC_IP_DRV ?= n
-++CFG_RZG_SEC_IP_RNG ?= n
++CFG_RZG_SEC_IP_RNG ?= n
 +
 +ifeq ($(CFG_RZG_SEC_IP_DRV),n)
 +$(call force,CFG_RZG_SEC_IP_RNG,n)

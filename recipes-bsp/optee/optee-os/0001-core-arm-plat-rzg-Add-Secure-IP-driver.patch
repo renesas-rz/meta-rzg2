@@ -1,4 +1,4 @@
-From 120e2fd7caf5ff49ad773dfe3646b95810b18a17 Mon Sep 17 00:00:00 2001
+From 840d0d383de51ac0c3b2b50fe3678044b1fee0d7 Mon Sep 17 00:00:00 2001
 From: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
 Date: Mon, 22 Mar 2021 15:28:14 +0900
 Subject: [PATCH 1/2] core: arm: plat-rzg: Add Secure IP driver
@@ -8,7 +8,7 @@ This commit adds Secure IP driver to the platform.
 Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
 ---
  core/arch/arm/plat-rzg/conf.mk                     |   2 +
- core/arch/arm/plat-rzg/drivers/secip_drv.c         |  76 +++
+ core/arch/arm/plat-rzg/drivers/secip_drv.c         |  64 ++
  core/arch/arm/plat-rzg/drivers/sub.mk              |   5 +
  .../arm/plat-rzg/drivers/tsip/R_TSIP_Core_Lib.h    |  83 +++
  .../drivers/tsip/common/TSIP_Common_Define.h       | 196 ++++++
@@ -36,7 +36,7 @@ Signed-off-by: Takunori Otsuka <takunori.otsuka.ur@renesas.com>
  .../tsip/wrapper/TSIP_Wrapper_SecureUpdate_API.h   |  44 ++
  core/arch/arm/plat-rzg/include/drivers/secip_drv.h |  12 +
  core/arch/arm/plat-rzg/sub.mk                      |   2 +
- 29 files changed, 3387 insertions(+)
+ 29 files changed, 3375 insertions(+)
  create mode 100644 core/arch/arm/plat-rzg/drivers/secip_drv.c
  create mode 100644 core/arch/arm/plat-rzg/drivers/sub.mk
  create mode 100644 core/arch/arm/plat-rzg/drivers/tsip/R_TSIP_Core_Lib.h
@@ -77,10 +77,10 @@ index 71e4048..869d28f 100644
 +CFG_RZG_SEC_IP_DRV ?= n
 diff --git a/core/arch/arm/plat-rzg/drivers/secip_drv.c b/core/arch/arm/plat-rzg/drivers/secip_drv.c
 new file mode 100644
-index 0000000..948e52c
+index 0000000..4a00195
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/drivers/secip_drv.c
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,64 @@
 +// SPDX-License-Identifier: BSD-2-Clause
 +/*
 + * Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
@@ -102,8 +102,6 @@ index 0000000..948e52c
 +register_phys_mem_pgdir(MEM_AREA_IO_SEC, TSIP_BASE_ADDR, TSIP_SIZE);
 +register_phys_mem_pgdir(MEM_AREA_IO_SEC, S_INST_DATA_ADDR, S_INST_DATA_SIZE);
 +
-+static uint32_t rng_cnt = 0;
-+
 +TEE_Result secip_rng(void *buf, size_t blen)
 +{
 +    uint32_t err;
@@ -114,13 +112,11 @@ index 0000000..948e52c
 +    }
 +
 +    if (0 < blen) {
-+		DMSG("R_TSIP_BCF_GenerateRandom Call %d", rng_cnt++);
 +        err = R_TSIP_BCF_GenerateRandom(blen, 0, buf);
 +        if (R_PASS != err) {
 +            EMSG("Failed to generate a random number (0x%08x).", err);
 +            return TEE_ERROR_GENERIC;
 +        }
-+		DMSG("R_TSIP_BCF_GenerateRandom Return %d", rng_cnt);
 +    }
 +
 +    return TEE_SUCCESS;
@@ -131,7 +127,6 @@ index 0000000..948e52c
 +    uint32_t err;
 +    vaddr_t tsip_base_address;
 +    vaddr_t mstp_base_address;
-+	uint8_t buf[4];
 +
 +    tsip_base_address = (vaddr_t)phys_to_virt_io(TSIP_BASE_ADDR);
 +    mstp_base_address = (vaddr_t)phys_to_virt_io(MSTP_BASE_ADDR);
@@ -146,13 +141,6 @@ index 0000000..948e52c
 +        panic();
 +    }
 +    
-+	err = R_TSIP_BCF_GenerateRandom(4, 0, buf);
-+	if (R_PASS != err) {
-+		EMSG("Failed to generate a random number (0x%08x).", err);
-+		return TEE_ERROR_GENERIC;
-+	}
-+	DMSG("Random value %02x %02x %02x %02x", buf[0],buf[1],buf[2],buf[3]);
-+	
 +    return TEE_SUCCESS;
 +}
 +
