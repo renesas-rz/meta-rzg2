@@ -6,7 +6,7 @@ SRC_URI_append += " \
 "
 
 ATFW_OPT_append += " \
-    ${@base_conditional("RZG2_SECURE_BOOT", "ENABLE", "RZG2_SECURE_BOOT=1", "",d)} \
+    ${@base_conditional("RZG2_SECURE_BOOT", "ENABLE", "RCAR_SECURE_BOOT=1", "",d)} \
 "
 
 DEPENDS += " \
