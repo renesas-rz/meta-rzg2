@@ -1,6 +1,6 @@
 update_issue() {
     # Set BSP version
-    BSP_VERSION="${@base_conditional("IS_RT_BSP", "1", "1.0.8-RT", "1.0.8",d)}"
+    BSP_VERSION="${@base_conditional("IS_RT_BSP", "1", "1.0.9-RT-rc", "1.0.9-rc",d)}"
 
     # Set SoC and Board info
     case "${MACHINE}" in
