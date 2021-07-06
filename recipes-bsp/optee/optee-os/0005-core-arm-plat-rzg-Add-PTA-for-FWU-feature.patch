@@ -1,6 +1,6 @@
 diff -uprN git_org/core/arch/arm/plat-rzg/include/pta/flash_pta.h git_mod/core/arch/arm/plat-rzg/include/pta/flash_pta.h
 --- git_org/core/arch/arm/plat-rzg/include/pta/flash_pta.h	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/include/pta/flash_pta.h	2021-06-23 13:05:06.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/include/pta/flash_pta.h	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,27 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
@@ -32,7 +32,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/include/pta/flash_pta.h git_mod/core/a
 \ No newline at end of file
 diff -uprN git_org/core/arch/arm/plat-rzg/include/pta/tsip_pta.h git_mod/core/arch/arm/plat-rzg/include/pta/tsip_pta.h
 --- git_org/core/arch/arm/plat-rzg/include/pta/tsip_pta.h	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/include/pta/tsip_pta.h	2021-06-23 16:14:35.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/include/pta/tsip_pta.h	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,51 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
@@ -88,7 +88,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/include/pta/tsip_pta.h git_mod/core/ar
 \ No newline at end of file
 diff -uprN git_org/core/arch/arm/plat-rzg/pta/flash.c git_mod/core/arch/arm/plat-rzg/pta/flash.c
 --- git_org/core/arch/arm/plat-rzg/pta/flash.c	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/pta/flash.c	2021-06-23 15:51:47.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/pta/flash.c	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,98 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
@@ -190,13 +190,13 @@ diff -uprN git_org/core/arch/arm/plat-rzg/pta/flash.c git_mod/core/arch/arm/plat
 +                   .invoke_command_entry_point = invoke_command);
 diff -uprN git_org/core/arch/arm/plat-rzg/pta/sub.mk git_mod/core/arch/arm/plat-rzg/pta/sub.mk
 --- git_org/core/arch/arm/plat-rzg/pta/sub.mk	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/pta/sub.mk	2021-06-23 13:05:06.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/pta/sub.mk	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,2 @@
 +srcs-$(CFG_RZG_SEC_IP_DRV) += tsip.c
 +srcs-$(CFG_RZG_SPI_DRV) += flash.c
 diff -uprN git_org/core/arch/arm/plat-rzg/pta/tsip.c git_mod/core/arch/arm/plat-rzg/pta/tsip.c
 --- git_org/core/arch/arm/plat-rzg/pta/tsip.c	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/pta/tsip.c	2021-06-23 14:36:43.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/pta/tsip.c	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,222 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
@@ -422,8 +422,8 @@ diff -uprN git_org/core/arch/arm/plat-rzg/pta/tsip.c git_mod/core/arch/arm/plat-
 +                   .invoke_command_entry_point = invoke_command);
 \ No newline at end of file
 diff -uprN git_org/core/arch/arm/plat-rzg/sub.mk git_mod/core/arch/arm/plat-rzg/sub.mk
---- git_org/core/arch/arm/plat-rzg/sub.mk	2021-06-23 16:13:26.436540599 +0900
-+++ git_mod/core/arch/arm/plat-rzg/sub.mk	2021-06-23 13:05:06.000000000 +0900
+--- git_org/core/arch/arm/plat-rzg/sub.mk	2021-07-06 12:28:43.214533462 +0900
++++ git_mod/core/arch/arm/plat-rzg/sub.mk	2021-07-05 15:20:06.000000000 +0900
 @@ -12,3 +12,4 @@ endif
  
  cppflags-y += -DLTC_NO_PROTOTYPES -DRZG_DRAM_ECC=$(RZG_DRAM_ECC) -DRZG_ECC_FULL=$(RZG_ECC_FULL) -DPMIC_ROHM_BD9571=$(PMIC_ROHM_BD9571)

@@ -1,6 +1,6 @@
 diff -uprN git_org/core/arch/arm/plat-rzg/conf.mk git_mod/core/arch/arm/plat-rzg/conf.mk
---- git_org/core/arch/arm/plat-rzg/conf.mk	2021-06-23 16:08:06.744472026 +0900
-+++ git_mod/core/arch/arm/plat-rzg/conf.mk	2021-06-23 14:38:01.000000000 +0900
+--- git_org/core/arch/arm/plat-rzg/conf.mk	2021-07-06 12:23:36.986422121 +0900
++++ git_mod/core/arch/arm/plat-rzg/conf.mk	2021-07-05 15:20:06.000000000 +0900
 @@ -57,3 +57,7 @@ endif
  ifeq ($(CFG_RZG_SEC_IP_RNG),y)
  $(call force,CFG_WITH_SOFTWARE_PRNG,n)
@@ -11,7 +11,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/conf.mk git_mod/core/arch/arm/plat-rzg
 +CFG_MMAP_REGIONS ?= 15
 diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c git_mod/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c
 --- git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c	2021-06-23 15:40:12.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c	2021-07-06 12:07:03.000000000 +0900
 @@ -0,0 +1,400 @@
 +
 +/*
@@ -209,7 +209,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c git_mod/cor
 +    rpc_wait_trans_end();
 +}
 +
-+void rzg_rpc_write_buff(uint32_t addr, uint32_t source_addr)
++void rzg_rpc_write_buff(uint32_t addr, uint64_t source_addr)
 +{
 +    uintptr_t i = 0;
 +    uint32_t product;
@@ -415,7 +415,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.c git_mod/cor
 +}
 diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h git_mod/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h
 --- git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h	2021-06-23 14:34:59.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h	2021-07-06 10:22:03.000000000 +0900
 @@ -0,0 +1,102 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
@@ -512,7 +512,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h git_mod/cor
 +void rzg_rpc_read_ext_mode_init(void);
 +void rzg_rpc_reset(void);
 +void rzg_rpc_erase_sector(uint32_t sector_addr);
-+void rzg_rpc_write_buff(uint32_t addr, uint32_t source_addr);
++void rzg_rpc_write_buff(uint32_t addr, uint64_t source_addr);
 +void rzg_rpc_read_status(uint32_t *readData);
 +void rzg_rpc_write_cmd(uint32_t command);
 +void rzg_rpc_power_on(void);
@@ -522,8 +522,8 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/rpc_accessor.h git_mod/cor
 \ No newline at end of file
 diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/spi.c git_mod/core/arch/arm/plat-rzg/drivers/spi/spi.c
 --- git_org/core/arch/arm/plat-rzg/drivers/spi/spi.c	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/drivers/spi/spi.c	2021-06-23 14:35:26.000000000 +0900
-@@ -0,0 +1,143 @@
++++ git_mod/core/arch/arm/plat-rzg/drivers/spi/spi.c	2021-07-06 12:07:29.000000000 +0900
+@@ -0,0 +1,145 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
 + *
@@ -538,7 +538,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/spi.c git_mod/core/arch/ar
 +
 +static void spi_write_buff(uint64_t buff, uint32_t spi_addr, uint32_t len);
 +static void spi_erase_1sector(uint32_t sec_addr);
-+uint8_t page_fraction_buff[QSPI_PAGE_SIZE] = {0};
++uint32_t page_fraction_buff[QSPI_PAGE_SIZE/4] = {0};
 +
 +int32_t rzg_spi_init_driver(void)
 +{
@@ -629,25 +629,27 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/spi.c git_mod/core/arch/ar
 +{
 +    uint32_t flash_addr;
 +    uint32_t status;
-+    uint32_t page_fraction_len;
++    uint32_t fraction_len;
++    uint8_t *fraction_buff;
 +
-+    page_fraction_len = len;
-+
-+    for (int i = 0; i < QSPI_PAGE_SIZE; i++)
++    for (int i = 0; i < (QSPI_PAGE_SIZE/4); i++)
 +    {
-+        page_fraction_buff[i] = 0xFF;
++        page_fraction_buff[i] = 0xFFFFFFFF;
 +    }
++
++    fraction_buff = &page_fraction_buff;
++    fraction_len = len;
 +
 +    for (flash_addr = spi_addr; flash_addr < (spi_addr + len); flash_addr += 256)
 +    {
-+        if (256 > page_fraction_len)
++        if (QSPI_PAGE_SIZE > fraction_len)
 +        {
-+            for (uint32_t i = 0; i < page_fraction_len; i++)
++            for (uint32_t i = 0; i < fraction_len; i++)
 +            {
-+                page_fraction_buff[i] = *(volatile uint8_t *)(buff + i);
++                fraction_buff[i] = *(volatile uint8_t *)(buff + i);
 +            }
 +            rzg_rpc_write_cmd(0x00060000);
-+            rzg_rpc_write_buff(flash_addr, (uint64_t)page_fraction_buff);
++            rzg_rpc_write_buff(flash_addr, (uint64_t)fraction_buff);
 +        }
 +        else
 +        {
@@ -664,20 +666,20 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/spi.c git_mod/core/arch/ar
 +            }
 +        }
 +        buff = buff + 256;
-+        page_fraction_len = page_fraction_len - 256;
++        fraction_len = fraction_len - 256;
 +    }
 +}
 diff -uprN git_org/core/arch/arm/plat-rzg/drivers/spi/sub.mk git_mod/core/arch/arm/plat-rzg/drivers/spi/sub.mk
 --- git_org/core/arch/arm/plat-rzg/drivers/spi/sub.mk	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/drivers/spi/sub.mk	2021-06-23 13:05:06.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/drivers/spi/sub.mk	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,4 @@
 +incdirs-y += .
 +
 +srcs-y += rpc_accessor.c
 +srcs-y += spi.c
 diff -uprN git_org/core/arch/arm/plat-rzg/drivers/sub.mk git_mod/core/arch/arm/plat-rzg/drivers/sub.mk
---- git_org/core/arch/arm/plat-rzg/drivers/sub.mk	2021-06-23 16:08:06.744472026 +0900
-+++ git_mod/core/arch/arm/plat-rzg/drivers/sub.mk	2021-06-23 13:05:06.000000000 +0900
+--- git_org/core/arch/arm/plat-rzg/drivers/sub.mk	2021-07-06 12:23:36.986422121 +0900
++++ git_mod/core/arch/arm/plat-rzg/drivers/sub.mk	2021-07-05 15:20:06.000000000 +0900
 @@ -3,3 +3,7 @@ ifeq ($(CFG_RZG_SEC_IP_DRV),y)
  srcs-y += tsip_init.c
  subdirs-y += tsip
@@ -689,7 +691,7 @@ diff -uprN git_org/core/arch/arm/plat-rzg/drivers/sub.mk git_mod/core/arch/arm/p
 \ No newline at end of file
 diff -uprN git_org/core/arch/arm/plat-rzg/include/drivers/spi/spi.h git_mod/core/arch/arm/plat-rzg/include/drivers/spi/spi.h
 --- git_org/core/arch/arm/plat-rzg/include/drivers/spi/spi.h	1970-01-01 09:00:00.000000000 +0900
-+++ git_mod/core/arch/arm/plat-rzg/include/drivers/spi/spi.h	2021-06-23 15:23:52.000000000 +0900
++++ git_mod/core/arch/arm/plat-rzg/include/drivers/spi/spi.h	2021-07-05 15:20:06.000000000 +0900
 @@ -0,0 +1,27 @@
 +/*
 + * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
@@ -720,8 +722,8 @@ diff -uprN git_org/core/arch/arm/plat-rzg/include/drivers/spi/spi.h git_mod/core
 +#endif /* SPI_H_ */
 \ No newline at end of file
 diff -uprN git_org/core/arch/arm/plat-rzg/main.c git_mod/core/arch/arm/plat-rzg/main.c
---- git_org/core/arch/arm/plat-rzg/main.c	2021-06-23 16:08:06.744472026 +0900
-+++ git_mod/core/arch/arm/plat-rzg/main.c	2021-06-23 13:05:06.000000000 +0900
+--- git_org/core/arch/arm/plat-rzg/main.c	2021-07-06 12:23:36.986422121 +0900
++++ git_mod/core/arch/arm/plat-rzg/main.c	2021-07-05 15:20:06.000000000 +0900
 @@ -32,6 +32,11 @@ register_phys_mem_pgdir(MEM_AREA_IO_SEC,
  register_phys_mem_pgdir(MEM_AREA_IO_SEC, S_INST_DATA_ADDR, S_INST_DATA_SIZE);
  #endif
@@ -735,8 +737,8 @@ diff -uprN git_org/core/arch/arm/plat-rzg/main.c git_mod/core/arch/arm/plat-rzg/
  #ifdef NSEC_DDR_1_BASE
  register_dynamic_shm(NSEC_DDR_1_BASE, NSEC_DDR_1_SIZE);
 diff -uprN git_org/core/arch/arm/plat-rzg/platform_config.h git_mod/core/arch/arm/plat-rzg/platform_config.h
---- git_org/core/arch/arm/plat-rzg/platform_config.h	2021-06-23 16:08:06.744472026 +0900
-+++ git_mod/core/arch/arm/plat-rzg/platform_config.h	2021-06-23 13:05:06.000000000 +0900
+--- git_org/core/arch/arm/plat-rzg/platform_config.h	2021-07-06 12:23:36.986422121 +0900
++++ git_mod/core/arch/arm/plat-rzg/platform_config.h	2021-07-05 15:20:06.000000000 +0900
 @@ -19,6 +19,10 @@
  #define GICC_BASE		0xF1020000
  #define GICD_BASE		0xF1010000
