@@ -5,6 +5,7 @@ SRC_URI_append += " \
     ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0002-plat-rzg-add-the-security-tools-for-SECURE-BOOT.patch", "",d)} \
     ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0003-plat-rzg-add-read-extern-mode-init-function-on-rpc-driver.patch", "",d)} \
     ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0004-plat-rzg-add-support-SECURE-FIRMWARE-UPDATE-for-RZ-G2-Platform.patch", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0005-plat-rzg-fix-SECURE-BOOT-for-RZ-G2-Platform.patch", "",d)} \
 "
 
 ATFW_OPT_append += " \
