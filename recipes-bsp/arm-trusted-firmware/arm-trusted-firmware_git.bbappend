@@ -1,21 +1,23 @@
 require include/rzg2-security-config.inc
 
 SRC_URI_append += " \
-    ${@base_conditional("RZG2_SECURE_BOOT", "ENABLE", "file://0001-plat-rzg-add-support-SECURE-BOOT-for-RZ-G2-Platform.patch", "",d)} \
-    ${@base_conditional("RZG2_SECURE_BOOT", "ENABLE", "file://0002-plat-rzg-add-the-security-tools-for-SECURE-BOOT.patch", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0001-plat-rzg-add-support-SECURE-BOOT-for-RZ-G2-Platform.patch", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0002-plat-rzg-add-the-security-tools-for-SECURE-BOOT.patch", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0003-renesas-rpc-add-read-extern-mode-function.patch", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0004-plat-rzg-add-support-SECURE-FIRMWARE-UPDATE.patch", "",d)} \
 "
 
 ATFW_OPT_append += " \
-    ${@base_conditional("RZG2_SECURE_BOOT", "ENABLE", "RCAR_SECURE_BOOT=1", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "RCAR_SECURE_BOOT=1", "",d)} \
 "
 
 DEPENDS += " \
-    ${@base_conditional("RZG2_SECURE_BOOT", "ENABLE", "secprv-native secmod optee-os u-boot", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "secprv-native secmod optee-ta-fwu ns-bl2u optee-os u-boot", "",d)} \
 "
 
 do_compile_append() {
 
-    if [ "ENABLE" = "${RZG2_SECURE_BOOT}" ] ; then
+    if [ "ENABLE" = "${RZG2_SECURITY_FEATURE}" ] ; then
         oe_runmake -C tools/renesas/rzg_security_tools/fiptool clean
         oe_runmake -C tools/renesas/rzg_security_tools/fiptool
 
@@ -29,7 +31,7 @@ do_compile_append() {
 
 do_deploy_append() {
 
-    if [ "ENABLE" = "${RZG2_SECURE_BOOT}" ] ; then
+    if [ "ENABLE" = "${RZG2_SECURITY_FEATURE}" ] ; then
         ./tools/renesas/rzg_security_tools/fiptool/fiptool_fw_ipl create --align 16 \
             --tb-fw-cert  ${S}/tools/renesas/rzg_layout_create/bootparam_sa0.bin \
             --soc-fw-cert ${S}/tools/renesas/rzg_layout_create/cert_header_sa6.bin \
@@ -55,12 +57,19 @@ do_deploy_append() {
                 ./tools/renesas/rzg_security_tools/fiptool/fip_boot_fw.bin
         fi
 
-        ./tools/renesas/rzg_security_tools/fiptool/fiptool_boot_fw update --align 16 \
-            --plat-toc-flags ${FIP_FLAGS_END_OF_PACKAGE} ./tools/renesas/rzg_security_tools/fiptool/fip_boot_fw.bin
+        temp_encrypt ${DEPLOY_DIR_IMAGE}/ns_bl2u-${MACHINE}.bin ${DEPLOYDIR}/ns_bl2u-${MACHINE}_Enc.bin
+        ./tools/renesas/rzg_security_tools/fiptool/fiptool_fwu_ns create --align 16 \
+        --nt-fwu ${DEPLOYDIR}/ns_bl2u-${MACHINE}_Enc.bin \
+        ./tools/renesas/rzg_security_tools/fiptool/fip_fwu_ns.bin
 
-        cat ./tools/renesas/rzg_security_tools/fiptool/fip_fw_ipl.bin  >  ./tools/renesas/rzg_security_tools/fiptool/fip.bin
+       ./tools/renesas/rzg_security_tools/fiptool/fiptool_fwu_ns update --align 16 \
+            --plat-toc-flags ${FIP_FLAGS_END_OF_PACKAGE} ./tools/renesas/rzg_security_tools/fiptool/fip_fwu_ns.bin
+
+        cat > ./tools/renesas/rzg_security_tools/fiptool/fip.bin
+        cat ./tools/renesas/rzg_security_tools/fiptool/fip_fw_ipl.bin  >> ./tools/renesas/rzg_security_tools/fiptool/fip.bin
         cat ./tools/renesas/rzg_security_tools/fiptool/fip_keyring.bin >> ./tools/renesas/rzg_security_tools/fiptool/fip.bin
         cat ./tools/renesas/rzg_security_tools/fiptool/fip_boot_fw.bin >> ./tools/renesas/rzg_security_tools/fiptool/fip.bin
+        cat ./tools/renesas/rzg_security_tools/fiptool/fip_fwu_ns.bin  >> ./tools/renesas/rzg_security_tools/fiptool/fip.bin
 
         install -m 0633 ./tools/renesas/rzg_security_tools/fiptool/fip.bin ${DEPLOYDIR}/fip-${MACHINE}.bin
 
