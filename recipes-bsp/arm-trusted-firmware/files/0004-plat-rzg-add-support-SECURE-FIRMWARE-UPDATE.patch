@@ -1,7 +1,7 @@
-From f1df84dc1f5a07d640da0a4088c9b0a4caeef159 Mon Sep 17 00:00:00 2001
+From dceaf51a7b590e7b3ecab45863d7063172fe8182 Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Thu, 15 Jul 2021 11:44:34 +0700
-Subject: [PATCH 2/2] plat: rzg: add support SECURE FIRMWARE UPDATE
+Subject: [PATCH] plat: rzg: add support SECURE FIRMWARE UPDATE
 
 This commit is created to add support SECURE FIRMWARE UPDATE for RZ/G2
 platform.
@@ -11,10 +11,10 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  drivers/renesas/common/auth/auth_mod.c             |   2 +
  drivers/renesas/common/io/io_rcar.c                |  38 +++---
  plat/renesas/common/aarch64/plat_helpers.S         |   7 +
- plat/renesas/common/bl2_plat_mem_params_desc.c     |  30 +++++
+ plat/renesas/common/bl2_plat_mem_params_desc.c     |  30 ++++
  plat/renesas/common/include/platform_def.h         |  11 ++
  plat/renesas/common/plat_storage.c                 |  16 +++
- plat/renesas/rzg/bl2_plat_fwu.c                    | 147 +++++++++++++++++++++
+ plat/renesas/rzg/bl2_plat_fwu.c                    | 151 +++++++++++++++++++++
  plat/renesas/rzg/bl2_plat_setup.c                  |   9 ++
  plat/renesas/rzg/platform.mk                       |   5 +-
  tools/renesas/rzg_layout_create/sa6.c              |  39 ++++++
@@ -22,7 +22,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  tools/renesas/rzg_security_tools/fiptool/Makefile  |  16 +--
  .../fiptool/src/rzg_firmware_image_package.h       |   2 +
  .../rzg_security_tools/fiptool/src/tbbr_config.c   |   7 +
- 14 files changed, 317 insertions(+), 32 deletions(-)
+ 14 files changed, 321 insertions(+), 32 deletions(-)
  create mode 100644 plat/renesas/rzg/bl2_plat_fwu.c
 
 diff --git a/drivers/renesas/common/auth/auth_mod.c b/drivers/renesas/common/auth/auth_mod.c
@@ -255,10 +255,10 @@ index 5fbaca1..b86c8ca 100644
  					 0, 0, 0}
 diff --git a/plat/renesas/rzg/bl2_plat_fwu.c b/plat/renesas/rzg/bl2_plat_fwu.c
 new file mode 100644
-index 0000000..fd7e044
+index 0000000..336618a
 --- /dev/null
 +++ b/plat/renesas/rzg/bl2_plat_fwu.c
-@@ -0,0 +1,147 @@
+@@ -0,0 +1,151 @@
 +/*
 + * bl2_plat_fwu.c -
 + *
@@ -369,6 +369,10 @@ index 0000000..fd7e044
 +	int err;
 +
 +	err = load_auth_image(bl_mem_params->image_id, &bl_mem_params->image_info);
++
++	/* delay time for console output */
++	rcar_micro_delay(10000);
++
 +	if (0 != err)
 +	{
 +		ERROR("BL2: Failed to load image (%i)\n", err);

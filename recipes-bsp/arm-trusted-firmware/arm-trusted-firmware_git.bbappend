@@ -5,6 +5,7 @@ SRC_URI_append += " \
     ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0002-plat-rzg-add-the-security-tools-for-SECURE-BOOT.patch", "",d)} \
     ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0003-renesas-rpc-add-read-extern-mode-function.patch", "",d)} \
     ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0004-plat-rzg-add-support-SECURE-FIRMWARE-UPDATE.patch", "",d)} \
+    ${@base_conditional("RZG2_SECURITY_FEATURE", "ENABLE", "file://0005-tools-rzg-change-Security-Module-address-in-boot-dev.patch", "",d)} \
 "
 
 ATFW_OPT_append += " \
