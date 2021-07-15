@@ -6,7 +6,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE.txt;md5=64d0b525014dc2f5318d56db69fd314e"
 
 BRANCH = "master"
-SRCREV = "3a9b07d29c322731326836facc31b74694bf6559"
+SRCREV = "e8e742054444feb0ef24a688c473568446b847b7"
 
 SRC_URI = "git://github.com/renesas-rz/rzg_security-module.git;branch=${BRANCH};protocol=https"
 

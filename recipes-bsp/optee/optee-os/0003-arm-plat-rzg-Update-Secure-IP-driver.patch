@@ -1,7 +1,7 @@
-From 513cdf9edf471677e891c11510d4137cf260661d Mon Sep 17 00:00:00 2001
+From cd066ab9bcf8a176ffe506df1b0d5e5b9a4640b4 Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Thu, 15 Jul 2021 14:49:38 +0700
-Subject: [PATCH 1/3] arm: plat: rzg: Update Secure IP driver
+Subject: [PATCH] arm: plat: rzg: Update Secure IP driver
 
 This commit is created to update secure IP driver.
 
@@ -10,13 +10,14 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  core/arch/arm/plat-rzg/drivers/secip_drv.c         | 64 -----------------
  core/arch/arm/plat-rzg/drivers/sub.mk              |  2 +-
  .../arm/plat-rzg/drivers/tsip/R_TSIP_Core_Lib.h    | 83 ----------------------
+ .../drivers/tsip/core/TSIP_Core_Proc_API.c         | 14 ++--
  core/arch/arm/plat-rzg/drivers/tsip_init.c         | 40 +++++++++++
  core/arch/arm/plat-rzg/include/drivers/secip_drv.h | 12 ----
  .../include/drivers/tsip/R_TSIP_Core_Lib.h         | 83 ++++++++++++++++++++++
  core/arch/arm/plat-rzg/main.c                      |  5 ++
  core/arch/arm/plat-rzg/platform_config.h           |  5 ++
  core/arch/arm/plat-rzg/rzg_rng.c                   | 19 ++++-
- 9 files changed, 150 insertions(+), 163 deletions(-)
+ 10 files changed, 157 insertions(+), 170 deletions(-)
  delete mode 100644 core/arch/arm/plat-rzg/drivers/secip_drv.c
  delete mode 100644 core/arch/arm/plat-rzg/drivers/tsip/R_TSIP_Core_Lib.h
  create mode 100644 core/arch/arm/plat-rzg/drivers/tsip_init.c
@@ -193,9 +194,53 @@ index 638e354..0000000
 -
 -
 -#endif  /* R_TSIP_CORE_LIB_H_ */
+diff --git a/core/arch/arm/plat-rzg/drivers/tsip/core/TSIP_Core_Proc_API.c b/core/arch/arm/plat-rzg/drivers/tsip/core/TSIP_Core_Proc_API.c
+index b45c052..12036cd 100644
+--- a/core/arch/arm/plat-rzg/drivers/tsip/core/TSIP_Core_Proc_API.c
++++ b/core/arch/arm/plat-rzg/drivers/tsip/core/TSIP_Core_Proc_API.c
+@@ -27,13 +27,13 @@
+ #include "proc/TSIP_Procedure.h"
+ #include "stub/TSIP_Stub_API.h"
+ 
+-static unsigned char OutPut_S_INST[1296U];
++static uint32_t OutPut_S_INST[324U];
+ 
+ /*! @var TSIP_Core_Share_InData_IV
+     @brief IV for Keyring injection
+ */
+-static const uint8_t TSIP_Core_Share_InData_IV[] = {
+-    0x85, 0xc1, 0x67, 0x34, 0x83, 0xd5, 0xd2, 0x91,  0xf0, 0xd0, 0x71, 0x3e,  0x3e, 0xa4, 0x34, 0xa3,
++static const uint32_t TSIP_Core_Share_InData_IV[] = {
++	0x3467c185, 0x91d2d583, 0x3e71d0f0, 0xa334a43e,
+ };
+ 
+ /*! *****************************************************************************
+@@ -190,9 +190,9 @@ uint32_t TSIP_Core_Prc_p04(const uint32_t *InData_CustomerKeyOperationCode, cons
+     uint32_t  InData_SharedKeyIndex[1];
+     uint32_t  InData_SessionKey[8];
+     uint32_t  i;
+-    uint8_t   *workp;
++    uint32_t  *workp;
+     
+-    for(i = 0; i < sizeof(OutPut_S_INST); i++) {
++    for(i = 0; i < (sizeof(OutPut_S_INST)) / 4; i++) {
+         OutPut_S_INST[i] = 0U;
+     }
+     InData_SharedKeyIndex[0] = InData_CustomerKeyOperationCode[0];
+@@ -202,8 +202,8 @@ uint32_t TSIP_Core_Prc_p04(const uint32_t *InData_CustomerKeyOperationCode, cons
+     Ret = TSIPPrc_p04(InData_SharedKeyIndex, InData_SessionKey, (const uint32_t *)TSIP_Core_Share_InData_IV, InData_KeyRingOperationCode, (uint32_t *)OutPut_S_INST);  /* PRQA S 3305 */
+     if(Ret == RETURN_OK) {
+         RetCode = R_PASS;
+-        workp = (uint8_t *)S_INST;
+-        for(i = 0; i < sizeof(OutPut_S_INST); i++) {
++	workp = (uint32_t *)S_INST;
++        for(i = 0; i < (sizeof(OutPut_S_INST)) / 4; i++) {
+              workp[i] = OutPut_S_INST[i];
+         }
+     }
 diff --git a/core/arch/arm/plat-rzg/drivers/tsip_init.c b/core/arch/arm/plat-rzg/drivers/tsip_init.c
 new file mode 100644
-index 0000000..11e4b24
+index 0000000..4bea08f
 --- /dev/null
 +++ b/core/arch/arm/plat-rzg/drivers/tsip_init.c
 @@ -0,0 +1,40 @@
@@ -213,7 +258,7 @@ index 0000000..11e4b24
 +
 +#define S_INST_DATA_ADDR    (0x440FE000)
 +
-+static uint8_t s_ram_data[480];
++static uint32_t s_ram_data[120];
 +vaddr_t s_inst_data = (vaddr_t)NULL;
 +
 +static TEE_Result init_tsip(void)

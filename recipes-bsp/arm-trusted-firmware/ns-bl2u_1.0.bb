@@ -8,7 +8,7 @@ NS_BL2U_URL = "git://github.com/renesas-rz/rzg_tf-a_ns-bl2u.git"
 BRANCH = "main"
 
 SRC_URI = "${NS_BL2U_URL};branch=${BRANCH};protocol=https"
-SRCREV = "590c64982a277c4356ac99af1c7f1bc6c7cc1ed4"
+SRCREV = "b7a9f96c5ba81ab920cd46d96a89a248e1cb9ff5"
 
 inherit deploy
 
