@@ -9,10 +9,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit deploy python3native
 require include/ecc-control.inc
 
-PV = "3.13.0+git${SRCPV}"
+PV = "3.14.0+git${SRCPV}"
 BRANCH = "master"
-#TAG: 3.13.0
-SRCREV = "30c13f9e2ff178c9a299e409de75d50529cf5064"
+#TAG: 3.14.0
+SRCREV = "d21befa5e53eae9db469eba1685f5aa5c6f92c2f"
 
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \

@@ -3,11 +3,11 @@ LICENSE = "BSD-2-Clause"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 PR = "r0"
-PV = "3.13.0+git${SRCPV}"
+PV = "3.14.0+git${SRCPV}"
 BRANCH = "master"
 SRC_URI = "git://github.com/OP-TEE/optee_client.git;branch=${BRANCH}"
-# Tag 3.13.0
-SRCREV = "7c9c423d00e96bf51debd5fe10fd70dce83be5cc"
+# Tag 3.14.0
+SRCREV = "06e1b32f6a7028e039c625b07cfc25fda0c17d53"
 
 SRC_URI += " \
     file://optee.service \
