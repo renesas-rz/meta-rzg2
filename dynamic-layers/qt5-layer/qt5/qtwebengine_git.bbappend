@@ -15,3 +15,5 @@ QT_MODULE_BRANCH_CHROMIUM = "49-based"
 
 SRCREV_qtwebengine = "fad625e0ba39e855817bbf206ab9a846d07aeeec"
 SRCREV_chromium = "cb094c05c5f06489fa64412e7f5d9e194a3f9495"
+
+COMPATIBLE_MACHINE_append = "|hihope-rzg2h|hihope-rzg2m|hihope-rzg2n|ek874"
