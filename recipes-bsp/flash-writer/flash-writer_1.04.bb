@@ -8,7 +8,7 @@ FLASH_WRITER_URL = "git://github.com/renesas-rz/rzg2_flash_writer.git"
 BRANCH = "master"
 
 SRC_URI = "${FLASH_WRITER_URL};branch=${BRANCH}"
-SRCREV = "c7acdfd26226e625683835dd05a81d2b266d7147"
+SRCREV = "6606c4f4351f56fb3bd84d7836c01c8932a4f884"
 
 inherit deploy
 
