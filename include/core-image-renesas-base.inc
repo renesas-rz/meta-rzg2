@@ -34,11 +34,16 @@ IMAGE_INSTALL_append = " \
     yavta \
     kernel-module-uvcvideo \
 "
+
 # Support secure environment
 IMAGE_INSTALL_append = " \
     optee-client \
 "
 
+DOCKER_PKGS = "docker ca-certificates ntpdate kernel-module-nf-conntrack-netlink "
+IMAGE_INSTALL_append = " \
+    ${@oe.utils.conditional("DOCKER_ENABLE", "1", "${DOCKER_PKGS}", "", d)} \
+"
 IMAGE_FEATURES_remove = " ssh-server-dropbear"
 IMAGE_FEATURES_append = " ssh-server-openssh"
 

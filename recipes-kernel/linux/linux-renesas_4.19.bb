@@ -14,6 +14,10 @@ SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 SRC_URI_append = "\
 	file://patches.scc \
 "
+SRC_URI_append = "\
+    ${@oe.utils.conditional("DOCKER_ENABLE", "1", "file://docker.cfg", "", d)} \
+"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 LINUX_VERSION ?= "4.19.198"
 
