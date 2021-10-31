@@ -39,8 +39,9 @@ RDEPENDS_${PN} += " \
 	qtgraphicaleffects-qmlplugins \
 	qtconnectivity \
 	qtconnectivity-qmlplugins \
-	qtlocation-plugins \
-	qtlocation-qmlplugins \
+	qtlocation-plugins-position \
+	qtlocation-qmlplugins-positioning \
+	qtlocation-positioning \
 	qtmultimedia \
 	qtmultimedia-plugins \
 	qtmultimedia-qmlplugins \
