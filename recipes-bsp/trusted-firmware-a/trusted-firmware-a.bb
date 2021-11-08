@@ -4,7 +4,7 @@ require trusted-firmware-a.inc
 
 URL = "git://git@github.com/renesas-rz/rzg_trusted-firmware-a.git"
 BRANCH = "v2.5/rzg2l"
-SRCREV = "4de5d6042cecbe7319d559dd8062309e53ca6e43"
+SRCREV = "d4c55f30cca4c7f6682f70530eda52e28555230f"
 
 SRC_URI += "${URL};protocol=ssh;branch=${BRANCH}"
 
