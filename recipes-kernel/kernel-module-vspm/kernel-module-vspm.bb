@@ -28,6 +28,7 @@ SRC_URI_append = " \
         file://0006-Support-MUTUAL-mode-for-ISU.patch \
         file://0007-Update-and-fix-some-small-bugs-of-ISU-driver.patch \
         file://0008-Correcting-variable-type.patch \
+        file://0009-Wrong-initialize-value-of-clip.patch \
 "
 
 S = "${WORKDIR}/git"
