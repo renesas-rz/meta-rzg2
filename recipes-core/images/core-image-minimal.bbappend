@@ -1,6 +1,9 @@
 require include/core-image-renesas-base.inc
 
-IMAGE_INSTALL_append = " util-linux glib-2.0"
+IMAGE_INSTALL_append = " util-linux glib-2.0 \
+		packagegroup-multimedia-libs \
+		packagegroup-multimedia-kernel-modules \
+"
 
 # Environment setup, support building kernel modules with kernel src in SDK
 export KERNELSRC="$SDKTARGETSYSROOT/usr/src/kernel"
