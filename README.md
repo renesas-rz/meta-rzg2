@@ -3,7 +3,8 @@
 This is a Yocto build layer(version:dunfell) that provides support for the RZ/G2L Group of 64bit Arm-based MPUs from Renesas Electronics.
 Currently the following boards and MPUs are supported:
 
-- Board: RZG2L SMARC Evaluation Kit / MPU: R9A77G044L2 (RZ/G2L)
+- Board: RZ/G2L SMARC with/without PMIC Evaluation Kit / MPU: R9A77G044L2 (RZ/G2L).
+- Board: RZ/G2LC SMARC Evaluation Kit / MPU: R9A77G044C2 (RZ/G2LC). This board only has PMIC version. 
 
 ## Patches
 
@@ -41,10 +42,10 @@ Below git configuration is required:
     $ git config --global user.name "Your Name"
 ```
 
-Download proprietary graphics and multimedia drivers from Renesas, include:
-- proprietary_mmp.tar.gz
-- vspmfilter.tar.xz
-(Graphic drivers are required for Wayland. Multimedia drivers are optional)
+To build with hardware-assisted video codec, graphic(Mali G31), please download meta-rz-features layer from Renesas webpage!  
+You can refer the below links:
+- [RZ/G2L](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-arm-based-high-end-32-64-bit-mpus/rzg2l-general-purpose-microprocessors-dual-core-arm-cortex-a55-12-ghz-cpus-3d-graphics-and-video-codec)
+- [RZ/G2LC](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-arm-based-high-end-32-64-bit-mpus/rzg2lc-general-purpose-microprocessors-dual-core-arm-cortex-a55-12-ghz-cpus-3d-graphics)
 
 You can get all Yocto build environment from Renesas, or download all Yocto related public source to prepare the build environment as below.
 ```bash
@@ -62,25 +63,16 @@ You can get all Yocto build environment from Renesas, or download all Yocto rela
     $ git clone https://git.yoctoproject.org/git/meta-gplv2
     $ cd meta-gplv2 
     $ git checkout 60b251c25ba87e946a0ca4cdc8d17b1cb09292ac
+    $ cd ..
     $
     $ git clone  https://github.com/renesas-rz/meta-rzg2.git
     $ cd meta-rzg2
     $ git checkout <tag>
     $ cd ..
 ```
-\<tag\> can be selected in any tags of meta-rzg2.
-Now the latest version is **rzg2l_bsp_v1.1**
 
-[Optional] If you need GPU/Codec support, or build Weston image, this step helps to copy them to build environment. Copy file proprietary_mmp.tar.gz and vspmfilter.tar.xz to $WORK and do below commands.
-```bash
-    $ tar -xf proprietary_mmp.tar.gz
-    $ cd proprietary_mmp
-    $ ./copy_gfx_mmp.sh ../meta-rzg2
-    $ cd ..
-    $
-    $ cp vspmfilter.tar.xz meta-rzg2/recipes-multimedia/gstreamer/gstreamer1.0-plugin-vspmfilter
-    $ 
-```
+\<tag\> can be selected in any tags of meta-rzg2. For example, **rzg2l_bsp_v1.1**, **rzg2l_bsp_v1.2**, **rzg2l_bsp_v1.3-update1**...   
+Assuming that you already has meta-rz-features in the same folder as meta-rzg2.
 
 Initialize a build using the 'oe-init-build-env' script in Poky. e.g.:
 ```bash
@@ -91,14 +83,16 @@ Prepare default configuration files. :
 ```bash
     $ cp $WORK/meta-rzg2/docs/template/conf/<board>/*.conf ./conf/
 ```
-\<board\> : smarc-rzg2l, rzg2l-dev
+\<board\> : smarc-rzg2l, rzg2l-dev, smarc-rzg2lc, rzg2lc-dev
+- Board RZ/G2L SMARC with/without PMIC Evaluation Kit: please apply "smarc-rzg2l" as \<board\>.
+- Board RZ/G2LC SMARC Evaluation Kit: please apply "smarc-rzg2lc" as \<board\>
 
 Build the target file system image using bitbake:
 ```bash
     $ bitbake core-image-<target>
 ```
 \<target\>:minimal,weston
-
+(If you just build core-image-minimal, you don't need meta-rz-features)
 After completing the images for the target machine will be available in the output
 directory _'tmp/deploy/images/\<supported board name\>'_.
 
