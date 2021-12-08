@@ -30,6 +30,7 @@ SRC_URI_append = " \
         file://0008-Correcting-variable-type.patch \
         file://0009-Wrong-initialize-value-of-clip.patch \
         file://0010-Fix-wrong-output-size-in-setting-case-rs_par-is-NULL.patch \
+        file://0011-Fix-error-cannot-detect-NOOUT-in-case-rs_par-NULL.patch \
 "
 
 S = "${WORKDIR}/git"
