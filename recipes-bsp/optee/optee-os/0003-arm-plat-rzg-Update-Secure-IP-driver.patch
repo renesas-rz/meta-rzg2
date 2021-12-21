@@ -77,10 +77,10 @@ index 4a00195..0000000
 -    vaddr_t tsip_base_address;
 -    vaddr_t mstp_base_address;
 -
--    tsip_base_address = (vaddr_t)phys_to_virt_io(TSIP_BASE_ADDR);
--    mstp_base_address = (vaddr_t)phys_to_virt_io(MSTP_BASE_ADDR);
+-    tsip_base_address = (vaddr_t)phys_to_virt_io(TSIP_BASE_ADDR, TSIP_SIZE);
+-    mstp_base_address = (vaddr_t)phys_to_virt_io(MSTP_BASE_ADDR, MSTP_SIZE);
 -
--    s_inst_data = (vaddr_t)phys_to_virt_io(S_INST_DATA_ADDR);
+-    s_inst_data = (vaddr_t)phys_to_virt_io(S_INST_DATA_ADDR, S_INST_DATA_SIZE);
 -
 -    err = R_TSIP_Lib_Init((uint8_t *)s_ram_data, (uint8_t *)s_inst_data, 
 -                          (uint8_t *)tsip_base_address, (uint8_t *)mstp_base_address);
@@ -267,10 +267,10 @@ index 0000000..4bea08f
 +    vaddr_t tsip_base_address;
 +    vaddr_t mstp_base_address;
 +
-+    tsip_base_address = (vaddr_t)phys_to_virt_io(TSIP_BASE_ADDR);
-+    mstp_base_address = (vaddr_t)phys_to_virt_io(MSTP_BASE_ADDR);
++    tsip_base_address = (vaddr_t)phys_to_virt_io(TSIP_BASE_ADDR, TSIP_SIZE);
++    mstp_base_address = (vaddr_t)phys_to_virt_io(MSTP_BASE_ADDR, MSTP_SIZE);
 +
-+    s_inst_data = (vaddr_t)phys_to_virt_io(S_INST_DATA_ADDR);
++    s_inst_data = (vaddr_t)phys_to_virt_io(S_INST_DATA_ADDR, S_INST_DATA_SIZE);
 +
 +    err = R_TSIP_Lib_Init((uint8_t *)s_ram_data, (uint8_t *)s_inst_data, 
 +                          (uint8_t *)tsip_base_address, (uint8_t *)mstp_base_address);

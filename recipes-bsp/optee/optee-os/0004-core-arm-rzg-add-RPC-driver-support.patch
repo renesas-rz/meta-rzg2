@@ -413,28 +413,28 @@ index 0000000..237e945
 +
 +static void convert_pa_to_va(void)
 +{
-+    prr_vaddr = (vaddr_t)phys_to_virt(PRR,MEM_AREA_IO_SEC);
++    prr_vaddr = (vaddr_t)phys_to_virt(PRR,MEM_AREA_IO_SEC,PRR_REG_SIZE);
 +
 +    if (prr_vaddr == 0U) {
-+        prr_vaddr = (vaddr_t)phys_to_virt(PRR,MEM_AREA_IO_NSEC);
++        prr_vaddr = (vaddr_t)phys_to_virt(PRR,MEM_AREA_IO_NSEC,PRR_REG_SIZE);
 +        if (prr_vaddr == 0U) {
 +            EMSG("Convert error! phys_to_virt reg_paddr=%08X",PRR);
 +        }
 +    }
 +
-+    base_rpc_vaddr = (vaddr_t)phys_to_virt(RPC_BASE,MEM_AREA_IO_SEC);
++    base_rpc_vaddr = (vaddr_t)phys_to_virt(RPC_BASE,MEM_AREA_IO_SEC,RPC_REG_SIZE);
 +
 +    if (base_rpc_vaddr == 0U) {
-+        base_rpc_vaddr = (vaddr_t)phys_to_virt(RPC_BASE,MEM_AREA_IO_NSEC);
++        base_rpc_vaddr = (vaddr_t)phys_to_virt(RPC_BASE,MEM_AREA_IO_NSEC,RPC_REG_SIZE);
 +        if (base_rpc_vaddr == 0U) {
 +            EMSG("Convert error! phys_to_virt reg_paddr=%08X",RPC_BASE);
 +        }
 +    }
 +
-+    base_cpg_vaddr = (vaddr_t)phys_to_virt(CPG_BASE,MEM_AREA_IO_SEC);
++    base_cpg_vaddr = (vaddr_t)phys_to_virt(CPG_BASE,MEM_AREA_IO_SEC,0x0bb0);
 +
 +    if (base_cpg_vaddr == 0U) {
-+        base_cpg_vaddr = (vaddr_t)phys_to_virt(CPG_BASE,MEM_AREA_IO_NSEC);
++        base_cpg_vaddr = (vaddr_t)phys_to_virt(CPG_BASE,MEM_AREA_IO_NSEC,0x0bb0);
 +        if (base_cpg_vaddr == 0U) {
 +            EMSG("Convert error! phys_to_virt reg_paddr=%08X",CPG_BASE);
 +        }
