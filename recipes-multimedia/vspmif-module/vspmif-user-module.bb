@@ -13,6 +13,9 @@ EXTRA_OEMAKE = "ARCH=${TARGET_ARCH}"
 
 includedir = "${RENESAS_DATADIR}/include"
 
+WS_aarch64 = ""
+WS_virtclass-multilib-lib32 = "32"
+
 SRC_URI_append = " \
 	file://0001-Modify-vspm_public.h-for-ISUM.patch \
 	file://0002-Modify-Makefile-for-building-vspm_api_isu.patch \
@@ -22,10 +25,8 @@ SRC_URI_append = " \
 
 do_compile() {
     export VSPM_LEGACY_IF="1"
+
     if [ X${WS} = "X32" ]; then
-	cp ${STAGING_KERNEL_DIR}/include/vsp_drv.h ${S}/${VSPMIF_LIB_DIR}/include
-	cp ${STAGING_KERNEL_DIR}/include/fdp_drv.h ${S}/${VSPMIF_LIB_DIR}/include
-	cp ${STAGING_KERNEL_DIR}/include/vspm_cmn.h ${S}/${VSPMIF_LIB_DIR}/include
         export VSPM32="1"
     fi
 
