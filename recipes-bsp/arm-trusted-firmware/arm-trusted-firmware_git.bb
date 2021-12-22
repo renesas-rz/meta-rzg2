@@ -2,7 +2,7 @@ DESCRIPTION = "ARM Trusted Firmware"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = " \
-   file://${WORKDIR}/git/docs/license.rst;md5=713afe122abbe07f067f939ca3c480c5 \
+   file://${WORKDIR}/git/docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde \
    file://${WORKDIR}/mbedtls/LICENSE;md5=302d50a6369f5f22efdb674db908167a \
 "
 
@@ -14,7 +14,7 @@ require include/ecc-control.inc
 
 S = "${WORKDIR}/git"
 
-BRANCH = "v2.5/rzg2"
+BRANCH = "v2.6/rzg2"
 BRANCH_mbedtls = "mbedtls-2.16"
 
 SRC_URI = " \
@@ -22,10 +22,10 @@ SRC_URI = " \
 	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
 "
 
-SRCREV = "afdf8061f1192ed31900cdcfca8a08bc3e70f206"
+SRCREV = "7faef7375ddf77748af8adda77804d31e1b0d1f8"
 SRCREV_mbedtls = "04a049bda1ceca48060b57bc4bcf5203ce591421"
 
-PV = "v2.5+git"
+PV = "v2.6+git"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
