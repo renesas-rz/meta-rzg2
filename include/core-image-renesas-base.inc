@@ -40,7 +40,7 @@ IMAGE_FEATURES_append = " ssh-server-openssh"
 
 update_issue() {
     # Set BSP version
-    BSP_VERSION="1.3"
+    BSP_VERSION="1.4"
 
     # Set SoC and Board info
     case "${MACHINE}" in
@@ -59,6 +59,18 @@ update_issue() {
     rzg2lc-dev)
       BSP_SOC="RZG2LC"
       BSP_BOARD="RZG2LC-DEV"
+      ;;
+    rzg2ul-dev)
+      BSP_SOC="RZG2UL"
+      BSP_BOARD="RZG2UL-DEV"
+      ;;
+    rzg2ul-ddr3l-dev)
+      BSP_SOC="RZG2UL"
+      BSP_BOARD="RZG2UL-DDR3L-DEV"
+      ;;
+    smarc-rzg2ul)
+      BSP_SOC="RZG2UL"
+      BSP_BOARD="RZG2UL-SMARC-EVK"
       ;;
     esac
 
