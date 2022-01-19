@@ -15,12 +15,16 @@ IMAGE_FSTYPES_append = " tar.bz2 ext4"
 
 SERIAL_CONSOLES = "115200;ttySC0"
 
-# Device tree: support multiple dtb files for all variant RZ/G2L and RZ/G2LC
+# Device tree: support multiple dtb files for all variant RZ/G2L, RZ/G2LC and RZ/G2UL
 KERNEL_DEVICETREE = " \
    renesas/r9a07g044l2-dev.dtb \
    renesas/r9a07g044l2-smarc.dtb \
    renesas/r9a07g044c2-dev.dtb \
    renesas/r9a07g044c2-smarc.dtb \
+   renesas/r9a07g043u11-dev.dtb \
+   renesas/r9a07g043u11-ddr3l-dev.dtb \
+   renesas/r9a07g043u11-smarc.dtb \
+   renesas/r9a07g043u12-dev.dtb \
 "
 
 # Configuration for ARM Trusted Firmware
