@@ -1001,8 +1001,8 @@ index 2d8f277..a92e111
  /**********************
  * COMMAND_UNITE       *
  ***********************/
--#define		COMMAND_UNIT		20
-+#define		COMMAND_UNIT		22
+-#define		COMMAND_UNIT		21
++#define		COMMAND_UNIT		23
  #define		NORMAL_END		0
  #define		ERROR_END		1
  
