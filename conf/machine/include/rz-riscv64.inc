@@ -8,7 +8,6 @@ require conf/machine/include/riscv/tune-rz-rv64.inc
 
 KERNEL_CLASSES = "kernel-fitimage"
 KERNEL_IMAGETYPE = "Image"
-# KERNEL_ALT_IMAGETYPE = "vmlinux"
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-renesas"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot"
@@ -16,38 +15,25 @@ PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot"
 PREFERRED_VERSION_openocd-native = "riscv"
 PREFERRED_VERSION_openocd = "riscv"
 
-EXTRA_IMAGEDEPENDS += "opensbi"
 # Platform setting to build OpenSBI. TODO: edit
-RISCV_SBI_PLAT = "andes/ae350"
+RISCV_SBI_PLAT = "renesas/rzf-dev"
 
 ## This sets u-boot as the default OpenSBI payload
 RISCV_SBI_PAYLOAD ?= "u-boot.bin"
-## This will set the kernel as the OpenSBI payload. This is not recommended,
-##  you can use U-Boot's MMC loading instead.
-# RISCV_SBI_PAYLOAD ?= "${KERNEL_IMAGETYPE}-${MACHINE}.bin"
 
 SERIAL_CONSOLES = "115200;ttySC0"
 
 MACHINE_EXTRA_RRECOMMENDS += " kernel-modules"
 
-IMAGE_FSTYPES += "ext4"
-#TODO: add device tree
-#KERNEL_DEVICETREE ?= "r9a07xx.dtb"
+IMAGE_FSTYPES += " ext4 tar.bz2"
+KERNEL_DEVICETREE ?= " \
+	renesas/r9a07g043f-dev.dtb \
+"
 
 ## Do not update fstab file when using wic images
 WIC_CREATE_EXTRA_ARGS ?= "--no-fstab-update"
 
-EXTRA_IMAGEDEPENDS += "u-boot"
-#TODO: edit rzfive defconfig
-UBOOT_MACHINE = "ae350_rv64_spl_xip_defconfig"
-
-UBOOT_ENTRYPOINT = "0x600000"
-UBOOT_DTB_LOADADDRESS = "0x20000000"
-
-## Set this to "mmc-boot" to generate a boot.scr file which should be included
-##  in the boot partition. It will try to load a kernel image by TFTP and if that
-##  fails it will fall back to local images in the boot partition.
-UBOOT_ENV ?= "mmc-boot"
+UBOOT_MACHINE = "rzf-dev_ddr4_defconfig"
 
 # U-Boot SPL
 SPL_BINARY ?= "spl/u-boot-spl.bin"
@@ -57,16 +43,12 @@ UBOOT_SUFFIX ?= "itb"
 
 # boot partition
 IMAGE_BOOT_FILES ?= " \
-    ae350_c4_64_d.dtb \
-    Image \
-    boot.scr \
     u-boot.itb \
     u-boot-spl.bin \
+    fip.srec \
 "
 
 MACHINE_FEATURES = "screen keyboard ext2 ext3 ext4serial"
 
-IMAGE_FSTYPES_append = " tar.bz2 ext4"
+EXTRA_IMAGEDEPENDS += " opensbi u-boot"
 
-#TODO: some other config for RZ
-#TODO: Support meta-gplv2

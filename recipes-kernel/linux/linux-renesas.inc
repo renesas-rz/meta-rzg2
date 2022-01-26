@@ -14,7 +14,7 @@ KCONFIG_MODE="--alldefconfig"
 
 KBUILD_DEFCONFIG_qemuriscv32 = "rv32_defconfig"
 KBUILD_DEFCONFIG_qemuriscv64 = "defconfig"
-KBUILD_DEFCONFIG_rzfive-dev = "defconfig"
+KBUILD_DEFCONFIG_rzfive-dev = "r9a07g043f_defconfig"
 
 COMPATIBLE_MACHINE = "(qemuriscv32|qemuriscv64|rzfive-dev)"
 

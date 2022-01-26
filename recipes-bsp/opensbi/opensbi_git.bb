@@ -7,31 +7,21 @@ inherit autotools-brokensep deploy
 
 PV = "0.9+git${SRCPV}"
 
-BRANCH = "master"
-SRCREV="234ed8e427f4d92903123199f6590d144e0d9351"
+BRANCH = "work/OpenSBI"
+SRCREV="b55f52e09f9f4529fdb837ee2836cd1650bfefa6"
 
-SRC_URI = "git://github.com/riscv-software-src/opensbi.git;branch=${BRANCH} \
-           file://0001-Disable-PIC-explicitly-for-assembling.patch \
-           file://0002-Enable-cache-for-opensbi-jump-mode.patch \
-          "
+# User can set local git folder:
+# SRC_URI = "git:///local/host/git/source/dir;branch=${BRANCH}"
+SRC_URI = " \
+	https://github.com/renesas-rz/rz_opensbi_private.git;branch=${BRANCH} \
+"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE += "PLATFORM=${RISCV_SBI_PLAT} I=${D} INSTALL_LIB_PATH=lib FW_PIC=n"
-
-do_install:append() {
-	# In the future these might be required as a dependency for other packages.
-	# At the moment just delete them to avoid warnings
-	find ${D}
-	rm -r ${D}/include
-	rm -r ${D}/lib
-	rm -r ${D}/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/payloads
-}
+EXTRA_OEMAKE += "PLATFORM=${RISCV_SBI_PLAT} "
 
 do_deploy () {
-	install -m 755 ${D}/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_payload.* ${DEPLOYDIR}/
-	install -m 755 ${D}/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_jump.* ${DEPLOYDIR}/
-	install -m 755 ${D}/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_dynamic.* ${DEPLOYDIR}/
+	install -m 755 ${S}/build/platform/${RISCV_SBI_PLAT}/firmware/fw_dynamic.* ${DEPLOYDIR}/
 }
 
 addtask deploy before do_build after do_install
