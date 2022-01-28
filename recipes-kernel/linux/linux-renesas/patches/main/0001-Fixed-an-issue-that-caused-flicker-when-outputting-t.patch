@@ -1,13 +1,16 @@
-From 13d085292463b0954477aa9d917d905653d2bca6 Mon Sep 17 00:00:00 2001
-From: Shinji Hirai <shinji.hirai.zn@renesas.com>
-Date: Thu, 29 Jul 2021 14:26:01 +0900
+From 98a20a6da72142c9cc64c44813f6cab906d6c3d2 Mon Sep 17 00:00:00 2001
+From: Hien Huynh <hien.huynh.px@renesas.com>
+Date: Fri, 28 Jan 2022 11:30:38 +0700
 Subject: [PATCH] Fixed an issue that caused flicker when outputting the screen
 
+This commit is created to fix flickerring issue.
+
+Signed-off-by: Hien Huynh <hien.huynh.px@renesas.com>
 ---
  drivers/gpu/drm/bridge/adv7511/adv7533.c |   5 +
- drivers/gpu/drm/rcar-du/rcar_du_crtc.c   | 309 +++++++++++++++--------
- drivers/gpu/drm/rcar-du/rzg2l_mipi_dsi.c |   9 +-
- 3 files changed, 210 insertions(+), 113 deletions(-)
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c   | 287 ++++++++++++++++-------
+ drivers/gpu/drm/rcar-du/rzg2l_mipi_dsi.c |   6 +-
+ 3 files changed, 209 insertions(+), 89 deletions(-)
 
 diff --git a/drivers/gpu/drm/bridge/adv7511/adv7533.c b/drivers/gpu/drm/bridge/adv7511/adv7533.c
 index 185b6d842166..a36fdd878da8 100644
@@ -26,26 +29,19 @@ index 185b6d842166..a36fdd878da8 100644
  		return;
  
 diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
-index c9f6b9217792..1f9571d27a37 100644
+index c6d32c50bac2..81e02cbfb598 100644
 --- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
 +++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
-@@ -220,186 +220,219 @@ struct cpg_param {
- 	u32	pl5_fracin;
- 	u32	pl5_postdiv1;
- 	u32	pl5_postdiv2;
--	u32	pl5_scc_en;
--	u32	pl5_downspread;
- 	u32	pl5_divval;
- 	u32	pl5_spread;
- 	u32	dsi_div_a;
+@@ -226,157 +226,214 @@ struct cpg_param {
  	u32	dsi_div_b;
  };
  
--#define	TABLE_MAX	11
-+#define	TABLE_MAX	14
- #define reg_write(x, a)	iowrite32(a, x)
-+#define	reg_read(x)	ioread32(x)
- #define CPG_LPCLK_DIV	0
+-#define	TABLE_MAX		11
++#define	TABLE_MAX		14
+ #define	TABLE_PARALLEL_MAX	11
+ #define reg_write(x, a)		iowrite32(a, x)
++#define	reg_read(x)		ioread32(x)
+ #define CPG_LPCLK_DIV		0
  
  struct cpg_param resolution_param[TABLE_MAX] = {
  	{
@@ -60,8 +56,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	14680064,
 +		/* pl5_postdiv1		*/	5,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -83,8 +77,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	10066329,
 +		/* pl5_postdiv1		*/	3,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -106,8 +98,6 @@ index c9f6b9217792..1f9571d27a37 100644
 -		/* pl5_postdiv1		*/	1,
 +		/* pl5_postdiv1		*/	3,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -129,8 +119,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	1358954,
 +		/* pl5_postdiv1		*/	3,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -152,8 +140,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	13673431,
 +		/* pl5_postdiv1		*/	3,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -175,8 +161,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	0,
 +		/* pl5_postdiv1		*/	2,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -210,8 +194,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	0,
  		/* pl5_postdiv1		*/	1,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -232,8 +214,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	2952790,
  		/* pl5_postdiv1		*/	1,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -266,8 +246,6 @@ index c9f6b9217792..1f9571d27a37 100644
  		/* pl5_fracin		*/	8388608,
  		/* pl5_postdiv1		*/	1,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -292,7 +270,7 @@ index c9f6b9217792..1f9571d27a37 100644
  	},
  	{
 -		/* SXGA 108MHz		*/
-+		/* SXGA 108.0MHz	*/
++		/* SXGA 108.0MHz		*/
  		/* frequency		*/	108000,
 -		/* pl5_refdiv		*/	1,
 -		/* pl5_intin		*/	54,
@@ -301,8 +279,6 @@ index c9f6b9217792..1f9571d27a37 100644
  		/* pl5_fracin		*/	0,
  		/* pl5_postdiv1		*/	1,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -322,8 +298,6 @@ index c9f6b9217792..1f9571d27a37 100644
 +		/* pl5_fracin		*/	8388608,
  		/* pl5_postdiv1		*/	1,
  		/* pl5_postdiv2		*/	1,
--		/* pl5_scc_en		*/	1,
--		/* pl5_downspread	*/	1,
 -		/* pl5_divval		*/	6,
 -		/* pl5_spread		*/	5,
 -		/* dsi_div_a		*/	2,	// 1/4
@@ -351,29 +325,29 @@ index c9f6b9217792..1f9571d27a37 100644
 +#define	PLL5_MON_PLL5_LOCK	(1 << 4)
 +#define	DIVDSILPCLK_STS		(1 << 7)
 +
- static void rcar_du_crtc_set_display_timing(struct rcar_du_crtc *rcrtc)
- {
- 	const struct drm_display_mode *mode = &rcrtc->crtc.state->adjusted_mode;
-@@ -407,6 +440,7 @@ static void rcar_du_crtc_set_display_timing(struct rcar_du_crtc *rcrtc)
- 	unsigned long mode_clock = mode->clock * 1000;
- 	u32 dsmr;
- 	u32 escr;
-+	u32 val, nowLcdcClkOn;
+ struct cpg_param resolution_param_parallel[TABLE_PARALLEL_MAX] = {
+ 	{
+ 		/* VGA 25.175MHz	*/
+@@ -538,6 +595,7 @@ static void rcar_du_crtc_set_display_timing(struct rcar_du_crtc *rcrtc)
+ 		u32 parallelOut;
+ 		u32 tableMax;
+ 		struct cpg_param *paramPtr;
++		u32 val, nowLcdcClkOn;
  
- 	if (rcar_du_has(rcdu, RCAR_DU_FEATURE_RZG2L)) {
- 		u32 ditr0, ditr1, ditr2, ditr3, ditr4, ditr5, pbcr0;
-@@ -440,13 +474,64 @@ static void rcar_du_crtc_set_display_timing(struct rcar_du_crtc *rcrtc)
- 			index = TABLE_MAX - 1;
- 		}
+ 		if (of_machine_is_compatible("renesas,r9a07g043u")) {
+ 			parallelOut = 1;
+@@ -567,13 +625,66 @@ static void rcar_du_crtc_set_display_timing(struct rcar_du_crtc *rcrtc)
+ 		if (i == tableMax)
+ 			index = tableMax - 1;
  
 -		reg_write(cpg_base + 0x0204, 0x10000000 | (CPG_LPCLK_DIV<<12)); //CPG_PL2_DDIV: DIV_DSI_LPCLK
--		reg_write(cpg_base + 0x0420, 0x01010000 | (resolution_param[index].dsi_div_a<<0) | (resolution_param[index].dsi_div_b << 8)); //CPG_PL5_SDIV: DIV_DSI_A, DIV_DSI_B
--		reg_write(cpg_base + 0x0144, 0x01110000 | (resolution_param[index].pl5_postdiv1<<0) | (resolution_param[index].pl5_postdiv2<<4) | (resolution_param[index].pl5_refdiv<<8)); //CPG_PLL5_CLK1: POSTDIV1, POSTDIV2, REFDIV
--		reg_write(cpg_base + 0x014C, (resolution_param[index].pl5_divval<<0) | (resolution_param[index].pl5_fracin<<8)); //CPG_PLL5_CLK3: DIVVAL=6, FRACIN
--		reg_write(cpg_base + 0x0150, 0x000000ff | (resolution_param[index].pl5_intin<<16)); //CPG_PLL5_CLK4: INTIN
--		reg_write(cpg_base + 0x0154, (resolution_param[index].pl5_spread<<0)); //CPG_PLL5_CLK5: SPREAD
--		reg_write(cpg_base + 0x0140, 0x00150001 | (resolution_param[index].pl5_scc_en<<2) | (resolution_param[index].pl5_downspread<<4)); //CPG_PLL5_STBY: RESETB=1, SSC_EN, DOWNSPREAD
-+		if (resolution_param[i].frequency > 74250)
+-		reg_write(cpg_base + 0x0420, 0x01010000 | (paramPtr[index].dsi_div_a<<0) | (paramPtr[index].dsi_div_b << 8)); //CPG_PL5_SDIV: DIV_DSI_A, DIV_DSI_B
+-		reg_write(cpg_base + 0x0144, 0x01110000 | (paramPtr[index].pl5_postdiv1<<0) | (paramPtr[index].pl5_postdiv2<<4) | (paramPtr[index].pl5_refdiv<<8)); //CPG_PLL5_CLK1: POSTDIV1, POSTDIV2, REFDIV
+-		reg_write(cpg_base + 0x014C, (paramPtr[index].pl5_divval<<0) | (paramPtr[index].pl5_fracin<<8)); //CPG_PLL5_CLK3: DIVVAL=6, FRACIN
+-		reg_write(cpg_base + 0x0150, 0x000000ff | (paramPtr[index].pl5_intin<<16)); //CPG_PLL5_CLK4: INTIN
+-		reg_write(cpg_base + 0x0154, (paramPtr[index].pl5_spread<<0)); //CPG_PLL5_CLK5: SPREAD
+-		reg_write(cpg_base + 0x0140, 0x00150001); //CPG_PLL5_STBY: RESETB=1
++		if ((parallelOut == 0) && (paramPtr[i].frequency > 74250))
 +		{
 +			reg_write(cpg_base + CPG_SIPPL3_CLK5, 0x02);
 +		}
@@ -396,27 +370,28 @@ index c9f6b9217792..1f9571d27a37 100644
 +		}
 +
 +		reg_write(cpg_base + CPG_SIPLL5_STBY, 0x10000); // RESETB = 0 Reset State
-+		do
-+		{
++		do {
 +			val = reg_read(cpg_base + CPG_SIPLL5_MON);
 +		} while ((val & PLL5_MON_PLL5_LOCK) != 0);
-+		reg_write(cpg_base + CPG_SIPLL5_CLK1, 0x01110000 | (resolution_param[index].pl5_postdiv1<<0) | (resolution_param[index].pl5_postdiv2<<4) | (resolution_param[index].pl5_refdiv<<8)); //POSTDIV1, POSTDIV2, REFDIV
-+		reg_write(cpg_base + CPG_SIPLL5_CLK3, (resolution_param[index].pl5_divval<<0) | (resolution_param[index].pl5_fracin<<8)); //DIVVAL, FRACIN
-+		reg_write(cpg_base + CPG_SIPLL5_CLK4, 0x000000ff | (resolution_param[index].pl5_intin<<16)); //INTIN
-+		reg_write(cpg_base + CPG_SIPLL5_CLK5, (resolution_param[index].pl5_spread<<0)); //SPREAD
-+
-+		do
-+		{
-+			val = reg_read(cpg_base + CPG_CPG_CLKSTATUS);
-+		} while ((val & DIVDSILPCLK_STS) != 0);
-+		reg_write(cpg_base + CPG_PL2_DDIV, 0x10000000 | (CPG_LPCLK_DIV<<12)); //DIV_DSI_LPCLK
-+		do
-+		{
-+			val = reg_read(cpg_base + CPG_CPG_CLKSTATUS);
-+		} while ((val & DIVDSILPCLK_STS) != 0);
-+	
-+		reg_write(cpg_base + CPG_PL5_SDIV, 0x01010000 | (resolution_param[index].dsi_div_a<<0) | (resolution_param[index].dsi_div_b << 8)); //DIV_DSI_A, DIV_DSI_B
-+		reg_write(cpg_base + CPG_OTHERFUNC1_REG, 0x10001); //SEL_PLL5_3 clock
++		reg_write(cpg_base + CPG_SIPLL5_CLK1, 0x01110000 | (paramPtr[index].pl5_postdiv1<<0) | (paramPtr[index].pl5_postdiv2<<4) | (paramPtr[index].pl5_refdiv<<8)); //POSTDIV1, POSTDIV2, REFDIV
++		reg_write(cpg_base + CPG_SIPLL5_CLK3, (paramPtr[index].pl5_divval<<0) | (paramPtr[index].pl5_fracin<<8)); //DIVVAL, FRACIN
++		reg_write(cpg_base + CPG_SIPLL5_CLK4, 0x000000ff | (paramPtr[index].pl5_intin<<16)); //INTIN
++		reg_write(cpg_base + CPG_SIPLL5_CLK5, (paramPtr[index].pl5_spread<<0)); //SPREAD
++		if (parallelOut == 0) {
++			do
++			{
++				val = reg_read(cpg_base + CPG_CPG_CLKSTATUS);
++			} while ((val & DIVDSILPCLK_STS) != 0);
++			reg_write(cpg_base + CPG_PL2_DDIV, 0x10000000 | (CPG_LPCLK_DIV<<12)); //DIV_DSI_LPCLK
++			do
++			{
++				val = reg_read(cpg_base + CPG_CPG_CLKSTATUS);
++			} while ((val & DIVDSILPCLK_STS) != 0);
++			reg_write(cpg_base + CPG_OTHERFUNC1_REG, 0x10001); //SEL_PLL5_3 clock
++			reg_write(cpg_base + CPG_PL5_SDIV, 0x01010000 | (paramPtr[index].dsi_div_a<<0) | (paramPtr[index].dsi_div_b << 8)); //DIV_DSI_A, DIV_DSI_B
++		} else {
++			reg_write(cpg_base + CPG_PL5_SDIV, 0x01010000 | (paramPtr[index].dsi_div_a<<0) | (paramPtr[index].dsi_div_b << 8)); //DIV_DSI_A, DIV_DSI_B
++		}
 +		reg_write(cpg_base + CPG_SIPLL5_STBY, 0x00050001);
 +		do
 +		{
@@ -431,29 +406,27 @@ index c9f6b9217792..1f9571d27a37 100644
 +				val = reg_read(cpg_base + CPG_CLKMON_LCDC);
 +			} while(val == 0);
 +		}
++
  		iounmap(cpg_base);
  
  		ditr0 = (DU_DITR0_DEMD_HIGH
 diff --git a/drivers/gpu/drm/rcar-du/rzg2l_mipi_dsi.c b/drivers/gpu/drm/rcar-du/rzg2l_mipi_dsi.c
-index 8a8f13fd37e1..f656d830a45a 100644
+index 521141364e16..5aaf9772441d 100644
 --- a/drivers/gpu/drm/rcar-du/rzg2l_mipi_dsi.c
 +++ b/drivers/gpu/drm/rcar-du/rzg2l_mipi_dsi.c
-@@ -173,7 +173,14 @@ static int rzg2l_mipi_dsi_startup(struct rzg2l_mipi_dsi *mipi_dsi)
+@@ -173,7 +173,11 @@ static int rzg2l_mipi_dsi_startup(struct rzg2l_mipi_dsi *mipi_dsi)
  		timings.ths_settle = 9;
  		timings.ths_exit = 13;
  		timings.ths_trail = 17;
 -		timings.ths_zero = 23;
-+		if (IS_ENABLED(CONFIG_DRM_I2C_ADV7511))
-+		{
++		if (IS_ENABLED(CONFIG_DRM_I2C_ADV7511)) {
 +			timings.ths_zero = 25;
-+		}
-+		else
-+		{
++		} else {
 +			timings.ths_zero = 23;
 +		}
  	}
  
  	dphytim0 = DSIDPHYTIM0_TCLK_MISS(timings.tclk_miss) |
 -- 
-2.25.1
+2.17.1
 
