@@ -1,0 +1,68 @@
+From decc62c5e981c20fc726244113e18cab19442c1b Mon Sep 17 00:00:00 2001
+From: Nhat Thieu <nhat.thieu.xr@renesas.com>
+Date: Wed, 16 Feb 2022 09:09:30 +0700
+Subject: [PATCH 12/12] workaround for ISU HW issue
+
+In case of image reduction, one pixel in the lower right corner
+of the image reduction area is displayed in the PADDING area.
+
+Signed-off-by: Nhat Thieu <nhat.thieu.xr@renesas.com>
+---
+ vspm-module/files/vspm/drv/isu/isu_drv_par.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/vspm-module/files/vspm/drv/isu/isu_drv_par.c b/vspm-module/files/vspm/drv/isu/isu_drv_par.c
+index 32a6eb1..c877480 100755
+--- a/vspm-module/files/vspm/drv/isu/isu_drv_par.c
++++ b/vspm-module/files/vspm/drv/isu/isu_drv_par.c
+@@ -163,6 +163,8 @@ static long isu_ins_check_rs_param(struct isu_ch_info *ch_info,
+ {
+ 	struct isu_rpf_info *rpf_info = &ch_info->rpf_info;
+ 	struct isu_rs_info *rs_info = &ch_info->rs_info;
++	int result,tmp;
++	unsigned int VMANT,VFRAC;
+ 
+ 	if (rs_param){
+ 		 /* Check start position after resize */
+@@ -215,7 +217,6 @@ static long isu_ins_check_rs_param(struct isu_ch_info *ch_info,
+ 		/* Check pad mode */
+ 		switch(rs_param->pad_mode){
+ 		case ISU_PAD_IN:
+-			break;
+ 		case ISU_PAD_P:
+ 			rs_info->pad_mode = rs_param->pad_mode;
+ 			rs_info->pad_val  = rs_param->pad_val;
+@@ -226,7 +227,7 @@ static long isu_ins_check_rs_param(struct isu_ch_info *ch_info,
+ 		/* Check ratio scale */
+ 		if((rs_param->x_ratio & 0x0000F000)&&(rs_param->y_ratio & 0x0000F000)) {
+ 			rs_info->x_scale = ((unsigned int)rs_param->x_ratio >> 12) << 16;
+-			rs_info->x_scale |= ((unsigned int)rs_param->x_ratio);
++			rs_info->x_scale |= ((unsigned int)rs_param->x_ratio & 0x00000FFF);
+ 			rs_info->y_scale = ((unsigned int)rs_param->y_ratio >> 12) << 16;
+ 			rs_info->y_scale |= ((unsigned int)rs_param->y_ratio & 0x00000FFF);
+ 		} else
+@@ -272,6 +273,21 @@ static long isu_ins_check_rs_param(struct isu_ch_info *ch_info,
+ 		rs_info->pad_mode=0;
+ 		rs_info->pad_val=0;
+ 	}
++
++	/* Padding issue in case of image reduction */
++	if((rs_info->pad_mode==ISU_PAD_IN)&&
++	   ((rs_info->x_scale != ISU_RS_NO_RESIZE)||
++	    (rs_info->y_scale != ISU_RS_NO_RESIZE))){
++		VMANT = (unsigned int)rs_info->y_scale >> 16;
++		VFRAC = (unsigned int)rs_info->y_scale & 0x00000FFF;
++		tmp = (rpf_info->height - rs_info->start_y - 1)*4096 - rs_info->tune_y;
++		result = tmp/(4096*VMANT+VFRAC);
++		if((result*(4096*VMANT+VFRAC)) == tmp){
++			if(rs_info->tune_y==0xFFF)
++				rs_info->tune_y=0xFFE;
++			else rs_info->tune_y=rs_info->tune_y+0x001;
++		}
++	}
+ 	return 0;
+ }
+ 
+-- 
+2.7.4
+
