@@ -34,6 +34,10 @@ IMAGE_INSTALL_append = " \
     yavta \
     kernel-module-uvcvideo \
 "
+# Support secure environment
+IMAGE_INSTALL_append = " \
+    optee-client \
+"
 
 IMAGE_FEATURES_remove = " ssh-server-dropbear"
 IMAGE_FEATURES_append = " ssh-server-openssh"
