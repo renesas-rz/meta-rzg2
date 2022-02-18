@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE = "(smarc-rzg2l|rzg2l-dev|rzg2lc-dev|smarc-rzg2lc|rzg2ul-dev|
 KERNEL_URL = " \
     git://github.com/renesas-rz/rz_linux-cip.git"
 BRANCH = "rzg2l-cip54"
-SRCREV = "c9960e2a9046a5ade079dd18f9f0c9a185dbec4a"
+SRCREV = "5757ca3b1fffda38c514ae1aa4d7561c16e77cba"
 
 SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 SRC_URI_append = "\
