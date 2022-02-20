@@ -14,8 +14,6 @@ IMAGE_INSTALL_append = " \
     can-utils \
     ethtool \
     iperf3 \
-    openssh \
-    openssh-sshd \
     usbutils \
     mtd-utils \
     dosfstools \
@@ -44,8 +42,6 @@ DOCKER_PKGS = "docker ca-certificates ntpdate kernel-module-nf-conntrack-netlink
 IMAGE_INSTALL_append = " \
     ${@oe.utils.conditional("DOCKER_ENABLE", "1", "${DOCKER_PKGS}", "", d)} \
 "
-IMAGE_FEATURES_remove = " ssh-server-dropbear"
-IMAGE_FEATURES_append = " ssh-server-openssh"
 
 update_issue() {
     # Set BSP version
