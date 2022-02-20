@@ -4,7 +4,7 @@ require fiptool-native.inc
 
 URL = "git://git@github.com/renesas-rz/rzg_trusted-firmware-a.git"
 BRANCH = "v2.5/rzg2l"
-SRCREV = "e59139eefdcb27ccc47a9c7bfb9b6b6adf5a3158"
+SRCREV = "1939ffd728e1af90fd76b083ee471feef9128db6"
 
 SRC_URI = "${URL};protocol=ssh;branch=${BRANCH}"
 
