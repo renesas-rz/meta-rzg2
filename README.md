@@ -17,19 +17,24 @@ This layer depends on:
     URI: git://git.yoctoproject.org/poky
     layers: meta, meta-poky, meta-yocto-bsp
     branch: dunfell
-    revision: e32d854e33bc86c2a616df8708e021a098afcf73
-    (tag: dunfell-23.0.5)
-    (Need to cherry-pick a commit: git cherry-pick 9e444)
+    revision: 795339092f87672e4f68e4d3bc4cfd0e252d1831
+    (tag: dunfell-23.0.13)
 
     URI: git://git.openembedded.org/meta-openembedded
     layers: meta-oe, meta-python, meta-multimedia
     branch: dunfell
-    revision: cc6fc6b1641ab23089c1e3bba11e0c6394f0867c
+    revision: ab9fca485e13f6f2f9761e1d2810f87c2e4f060a
     
     URI:http://git.yoctoproject.org/cgit.cgi/meta-gplv2/
     layers: meta-gplv2
     branch: dunfell
     revision: 60b251c25ba87e946a0ca4cdc8d17b1cb09292ac
+
+    (Optional) 
+    URI:https://git.yoctoproject.org/git/meta-virtualization
+    layers: meta-virtualization
+    branch: dunfell
+    commitID: 9e9868ef3d6e5da7f0ecd0680fcd69324593842b
 
 ## Build Instructions
 
@@ -51,13 +56,12 @@ You can get all Yocto build environment from Renesas, or download all Yocto rela
 ```bash
     $ git clone https://git.yoctoproject.org/git/poky
     $ cd poky
-    $ git checkout dunfell-23.0.5
-    $ git cherry-pick 9e444
+    $ git checkout dunfell-23.0.13
     $ cd ..
     $     
     $ git clone https://github.com/openembedded/meta-openembedded
     $ cd meta-openembedded
-    $ git checkout cc6fc6b1641ab23089c1e3bba11e0c6394f0867c
+    $ git checkout ab9fca485e13f6f2f9761e1d2810f87c2e4f060a
     $ cd ..
     $    
     $ git clone https://git.yoctoproject.org/git/meta-gplv2
@@ -69,10 +73,17 @@ You can get all Yocto build environment from Renesas, or download all Yocto rela
     $ cd meta-rzg2
     $ git checkout <tag>
     $ cd ..
+    $
+    $ git clone https://git.yoctoproject.org/git/meta-virtualization -b dunfell
+    $ cd meta-virtualization
+    $ git checkout 9e9868ef3d6e5da7f0ecd0680fcd69324593842b
+    $ cd ..
+
 ```
 
-\<tag\> can be selected in any tags of meta-rzg2. For example, **rzg2l_bsp_v1.1**, **rzg2l_bsp_v1.2**, **rzg2l_bsp_v1.3-update1**...   
+\<tag\> can be selected in any tags of meta-rzg2. For example, **rzg2l_bsp_v1.1**, **rzg2l_bsp_v1.2**, **rzg2l_bsp_v1.3-update1**, **rzg2l_bsp_v1.4**...   
 Assuming that you already has meta-rz-features in the same folder as meta-rzg2.
+The layer meta-virtualization is optional, just need if docker is set.
 
 Initialize a build using the 'oe-init-build-env' script in Poky. e.g.:
 ```bash
@@ -83,9 +94,10 @@ Prepare default configuration files. :
 ```bash
     $ cp $WORK/meta-rzg2/docs/template/conf/<board>/*.conf ./conf/
 ```
-\<board\> : smarc-rzg2l, rzg2l-dev, smarc-rzg2lc, rzg2lc-dev
+\<board\> : smarc-rzg2l, rzg2l-dev, smarc-rzg2lc, rzg2lc-dev, smarc-rzg2ul
 - Board RZ/G2L SMARC with/without PMIC Evaluation Kit: please apply "smarc-rzg2l" as \<board\>.
 - Board RZ/G2LC SMARC Evaluation Kit: please apply "smarc-rzg2lc" as \<board\>
+- Board RZ/G2UL SMARC Evaluation Kit: please apply "smarc-rzg2ul" as \<board\>
 
 Build the target file system image using bitbake:
 ```bash
@@ -138,4 +150,8 @@ It is possible to change some build configs as below:
 * CIP Core: choose the version of CIP Core to build with. CIP Core are software packages that are maintained for long term by CIP community. You can select the value "1" or "0" for CIP_CORE variable
   ```
   CIP_CORE = "1"
+  ```
+* Docker support: support Docker, with meta-virtualization layer. You can select the value "1" or "0" for DOCKER_ENABLE variable in file template local.conf. Default value is '0'(disable).
+  ```
+  DOCKER_ENABLE = "1"
   ```
