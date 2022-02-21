@@ -38,6 +38,7 @@ IMAGE_INSTALL_append = " \
     optee-client \
 "
 
+DOCKER_ENABLE ?= "0"
 DOCKER_PKGS = "docker ca-certificates ntpdate kernel-module-nf-conntrack-netlink "
 IMAGE_INSTALL_append = " \
     ${@oe.utils.conditional("DOCKER_ENABLE", "1", "${DOCKER_PKGS}", "", d)} \
