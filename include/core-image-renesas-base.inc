@@ -43,6 +43,9 @@ DOCKER_PKGS = "docker ca-certificates ntpdate kernel-module-nf-conntrack-netlink
 IMAGE_INSTALL_append = " \
     ${@oe.utils.conditional("DOCKER_ENABLE", "1", "${DOCKER_PKGS}", "", d)} \
 "
+DISTRO_FEATURES_append = " \
+    ${@oe.utils.conditional("DOCKER_ENABLE", "1", " virtualization", "", d)} \
+"
 
 update_issue() {
     # Set BSP version
