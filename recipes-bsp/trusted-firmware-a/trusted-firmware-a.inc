@@ -45,7 +45,7 @@ FLASH_ADDRESS_BL2_BP_rzg2ul-ddr3l-dev = "00000"
 FLASH_ADDRESS_FIP_rzg2ul-ddr3l-dev = "1D200"
 
 PLATFORM_smarc-rzg2ul = "g2ul"
-EXTRA_FLAGS_smarc-rzg2ul = "BOARD=g2ul_smarc SOC_TYPE=1"
+EXTRA_FLAGS_smarc-rzg2ul = "BOARD=g2ul_smarc SOC_TYPE=1 SPI_FLASH=AT25QL128A"
 FLASH_ADDRESS_BL2_BP_smarc-rzg2ul = "00000"
 FLASH_ADDRESS_FIP_smarc-rzg2ul = "1D200"
 
