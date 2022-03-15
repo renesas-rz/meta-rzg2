@@ -9,10 +9,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit deploy python3native
 require include/ecc-control.inc
 
-PV = "3.15.0+git${SRCPV}"
+PV = "3.16.0+git${SRCPV}"
 BRANCH = "master"
-#TAG: 3.15.0
-SRCREV = "6be0dbcaa11394a2ad5a46ac77e2f76e31a41722"
+#TAG: 3.16.0
+SRCREV = "d0b742d1564834dac903f906168d7357063d5459"
 
 SRC_URI = " \
     git://github.com/OP-TEE/optee_os.git;branch=${BRANCH} \
@@ -28,7 +28,7 @@ COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
 PLATFORM_FLAVOR = "${@d.getVar("MACHINE", False).replace("-", "_")}"
 
-DEPENDS = "python3-pyelftools-native python3-pycryptodome-native python3-pycryptodomex-native"
+DEPENDS = "python3-pyelftools-native python3-cryptography-native python3-idna-native"
 export CROSS_COMPILE64="${TARGET_PREFIX}"
 
 # Let the Makefile handle setting up the flags as it is a standalone application
