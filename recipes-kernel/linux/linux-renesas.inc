@@ -1,7 +1,7 @@
 DESCRIPTION = "Renesas Linux Kernel"
 SECTION = "kernel"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
@@ -12,11 +12,12 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 
 KCONFIG_MODE="--alldefconfig"
 
-KBUILD_DEFCONFIG_qemuriscv32 = "rv32_defconfig"
-KBUILD_DEFCONFIG_qemuriscv64 = "defconfig"
-KBUILD_DEFCONFIG_rzfive-dev = "r9a07g043f_defconfig"
+KBUILD_DEFCONFIG = "renesas_defconfig"
 
-COMPATIBLE_MACHINE = "(qemuriscv32|qemuriscv64|rzfive-dev)"
+COMPATIBLE_MACHINE = "(rzfive-dev|smarc-rzfive)"
 
-KERNEL_FEATURES_remove = "features/debug/printk.scc"
-KERNEL_FEATURES_remove = "features/kernel-sample/kernel-sample.scc"
+KERNEL_DEVICETREE = " \
+   renesas/r9a07g043f01-dev.dtb \
+   renesas/r9a07g043f01-smarc.dtb \
+"
+
