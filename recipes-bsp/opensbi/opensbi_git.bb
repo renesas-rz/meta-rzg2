@@ -7,13 +7,13 @@ inherit autotools-brokensep deploy
 
 PV = "0.9+git${SRCPV}"
 
-BRANCH = "work/OpenSBI"
-SRCREV="b55f52e09f9f4529fdb837ee2836cd1650bfefa6"
+BRANCH = "work/OpenSBI-PMA"
+SRCREV="c440f1a14ca20d4d5a50cfde8bfbff91f9551680"
 
 # User can set local git folder:
 # SRC_URI = "git:///local/host/git/source/dir;branch=${BRANCH}"
 SRC_URI = " \
-	https://github.com/renesas-rz/rz_opensbi_private.git;branch=${BRANCH} \
+	git://github.com/renesas-rz/rz_opensbi.git;protocol=https;branch=${BRANCH} \
 "
 
 S = "${WORKDIR}/git"
