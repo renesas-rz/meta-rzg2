@@ -15,8 +15,8 @@ SRC_URI = " \
 	file://BootLoaderHeader.bin \
     "
 
-UBOOT_CONFIG[rzg2l-dev] = "rzfive-dev_defconfig"
-UBOOT_CONFIG[smarc-rzg2l] = "smarc-rzfive_defconfig"
+UBOOT_CONFIG_rzfive-dev = "rzf-dev_ddr4_defconfig"
+UBOOT_CONFIG_smarc-rzfive = "smarc-rzf_defconfig"
 
 do_compile:prepend() {
     export OPENSBI=${DEPLOY_DIR_IMAGE}/fw_dynamic.bin
@@ -32,7 +32,7 @@ do_compile:append() {
 
 	cat ${WORKDIR}/BootLoaderHeader.bin  ${B}/spl/u-boot-spl.bin > ${B}/u-boot-spl_bp.bin
 	objcopy -I binary -O srec --adjust-vma=0x00011E00 --srec-forceS3 ${B}/u-boot-spl_bp.bin ${B}/u-boot-spl_bp-${MACHINE}.srec
-	objcopy -I binary -O srec --adjust-vma=0x00011E00 --srec-forceS3 ${B}/u-boot.itb ${B}/fit-${MACHINE}.srec
+	objcopy -I binary -O srec --adjust-vma=0 --srec-forceS3 ${B}/u-boot.itb ${B}/fit-${MACHINE}.srec
 }
 
 do_deploy:append() {

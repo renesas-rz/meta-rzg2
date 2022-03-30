@@ -33,7 +33,7 @@ KERNEL_DEVICETREE ?= " \
 ## Do not update fstab file when using wic images
 WIC_CREATE_EXTRA_ARGS ?= "--no-fstab-update"
 
-UBOOT_MACHINE = "rzf-dev_ddr4_defconfig"
+UBOOT_CONFIG ?= "smarc-rzf_defconfig"
 
 # U-Boot SPL
 SPL_BINARY ?= "spl/u-boot-spl.bin"
