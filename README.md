@@ -22,17 +22,17 @@ This layer depends on:
 ## Quick Start
 
 ```text
-git clone git://github.com/openembedded/meta-openembedded.git
+git clone https://github.com/openembedded/meta-openembedded.git
 cd meta-openembedded/
 git checkout -f 7889158dcd187546fc5e99fd81d0779cad3e8d17
 cd ../
 
-git clone git://github.com/openembedded/openembedded-core.git
+git clone https://github.com/openembedded/openembedded-core.git
 cd openembedded-core/
 git checkout -f 44b1970c40e9d73f6e63fb10cdc55837a26f5921
 cd ../
 
-git clone git://github.com/openembedded/bitbake.git
+git clone https://github.com/openembedded/bitbake.git
 cd bitbake
 git checkout -f c0348de8121c3a842bf44906f7e2f79e93f7275b
 cd ../
@@ -50,7 +50,7 @@ git clone https://github.com/renesas-rz/meta-rzg2.git -b dunfell/rzfive meta-rzf
 git checkout <tag>
 
 source openembedded-core/oe-init-build-env
-cp ../docs/template/conf/smarc-rzfive/* ./conf/
+cp ../meta-rzfive/docs/template/conf/smarc-rzfive/* ./conf/
 bitbake core-image-minimal
 ```
 
