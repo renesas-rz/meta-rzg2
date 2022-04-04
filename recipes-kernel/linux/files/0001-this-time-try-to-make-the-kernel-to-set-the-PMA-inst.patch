@@ -1,0 +1,186 @@
+From e8b7dbc50658e288922a6df9c9824f4871462da4 Mon Sep 17 00:00:00 2001
+From: linaqin <naqin.li.nx@renesas.com>
+Date: Wed, 9 Mar 2022 23:09:14 +0900
+Subject: [PATCH 1/2] this time try to make the kernel to set the PMA instead
+ of Uboot, please use the original uboot for dev and smarc
+
+---
+ drivers/soc/renesas/rzfive/Makefile |  1 +
+ drivers/soc/renesas/rzfive/cache.c  | 57 +++++++++++++++++++++++++++++
+ drivers/soc/renesas/rzfive/pma.c    | 24 ++++++++++++
+ drivers/soc/renesas/rzfive/pma.h    | 19 ++++++++++
+ 4 files changed, 101 insertions(+)
+ create mode 100644 drivers/soc/renesas/rzfive/pma.c
+ create mode 100644 drivers/soc/renesas/rzfive/pma.h
+
+diff --git a/drivers/soc/renesas/rzfive/Makefile b/drivers/soc/renesas/rzfive/Makefile
+index 006188aad9d5..95694d736d48 100644
+--- a/drivers/soc/renesas/rzfive/Makefile
++++ b/drivers/soc/renesas/rzfive/Makefile
+@@ -2,4 +2,5 @@
+ # Generic, must be first because of soc_device_register()
+ 
+ obj-$(CONFIG_ARCH_R9A07G043F) += cache.o
++obj-$(CONFIG_ARCH_R9A07G043F) += pma.o
+ obj-$(CONFIG_ARCH_R9A07G043F) += noncache_dma.o
+diff --git a/drivers/soc/renesas/rzfive/cache.c b/drivers/soc/renesas/rzfive/cache.c
+index c795835bbda5..2b242af0bf2d 100644
+--- a/drivers/soc/renesas/rzfive/cache.c
++++ b/drivers/soc/renesas/rzfive/cache.c
+@@ -16,6 +16,7 @@
+ #include <asm/csr.h>
+ 
+ #include "proc.h"
++#include "pma.h"
+ #include "csr.h"
+ 
+ /* Register */
+@@ -51,12 +52,20 @@ struct v5l2_plat {
+ 	u32		dram_ctl[2];
+ };
+ 
++struct rzf_pma_plat {
++	unsigned long id;
++	u32 start;
++	u32 size;
++	u32 vaddr;
++};
++
+ #define MAX_CACHE_LINE_SIZE 256
+ #define EVSEL_MASK	0xff
+ #define SEL_PER_CTL	8
+ #define SEL_OFF(id)	(8 * (id % 8))
+ 
+ static void __iomem *l2c_base;
++static struct rzf_pma_plat pma_area[3];
+ 
+ DEFINE_PER_CPU(struct andesv5_cache_info, cpu_cache_info) = {
+ 	.init_done = 0,
+@@ -263,6 +272,23 @@ void cpu_dma_wb_range(unsigned long start, unsigned long end)
+ }
+ EXPORT_SYMBOL(cpu_dma_wb_range);
+ 
++unsigned long cpu_nocache_area_set(unsigned long start, unsigned long size, unsigned long vaddr, unsigned long entry_id)
++{
++	struct pma_arg_t pma_arg;
++	unsigned long ret = 0;
++
++	// set the pma setting
++	pma_arg.offset = start;
++	pma_arg.vaddr = vaddr;
++	pma_arg.size = size;
++	pma_arg.entry_id = entry_id;
++	ret = sbi_set_pma(&pma_arg);
++
++	pr_info("Set PMA, ID: %02lu, [0x%08lx-0x%08lx] (size: 0x%08lx), SBIRET: 0x%08lx\n", \
++			entry_id, start, start + size, size, ret);
++
++	return ret;
++}
+ 
+ int cpu_l1c_status(void)
+ {
+@@ -459,6 +485,10 @@ void cpu_l2c_enable(struct v5l2_plat *priv)
+ static void cpu_l2c_of_to_plat(struct v5l2_plat *priv,
+ 			    struct device_node *np)
+ {
++	int i;
++	struct device_node *cma_np;
++	struct resource res;
++
+ 	priv->iprefetch = -EINVAL;
+ 	priv->dprefetch = -EINVAL;
+ 	priv->tram_ctl[0] = -EINVAL;
+@@ -472,6 +502,33 @@ static void cpu_l2c_of_to_plat(struct v5l2_plat *priv,
+ 	of_property_read_u32_array(np, "andes,tag-ram-ctl", priv->tram_ctl, 2);
+ 	of_property_read_u32_array(np, "andes,data-ram-ctl", priv->dram_ctl, 2);
+ 
++	for (i = 0 ; i < 2 ; i++) {
++		of_property_read_u32_index(np, "pma-area", (i << 1), &(pma_area[i].start));
++		of_property_read_u32_index(np, "pma-area", (i << 1) + 1, &(pma_area[i].size));
++		pma_area[i].vaddr = pma_area[i].start + pma_area[i].size;
++		pma_area[i].id = i;
++		cpu_nocache_area_set(pma_area[i].start, pma_area[i].size, \
++							pma_area[i].vaddr, pma_area[i].id);
++	}
++
++	// The last pma is used for CMA.
++	cma_np = of_find_compatible_node(NULL, NULL, "shared-dma-pool");
++	if(!cma_np){
++		pr_info("no CMA area found in device tree\n");
++		goto no_cma;
++	}
++	if (of_address_to_resource(cma_np, 0, &res)){
++		pr_err("NO reg found in shared-dma-pool\n");
++		goto no_cma;
++	}
++	pma_area[2].start = res.start;
++	pma_area[2].size = (res.end - res.start) + 1;
++	pma_area[2].vaddr = res.end + 1;
++	pma_area[2].id = 2;
++	cpu_nocache_area_set(pma_area[i].start, pma_area[i].size, \
++						pma_area[i].vaddr, pma_area[i].id);
++
++no_cma:
+ 	pr_info("L2CACHE: prefetch: %u\n", priv->iprefetch);
+ 	pr_info("L2CACHE: data: %u\n", priv->dprefetch);
+ 	pr_info("L2CACHE: tram: %u %u\n", priv->tram_ctl[0], priv->tram_ctl[1]);
+diff --git a/drivers/soc/renesas/rzfive/pma.c b/drivers/soc/renesas/rzfive/pma.c
+new file mode 100644
+index 000000000000..4648c4ca363c
+--- /dev/null
++++ b/drivers/soc/renesas/rzfive/pma.c
+@@ -0,0 +1,24 @@
++#include <asm/sbi.h>
++#include <asm/csr.h>
++
++#include "pma.h"
++#include "proc.h"
++#include "csr.h"
++
++long sbi_set_pma(void *arg)
++{
++	struct sbiret ret;
++
++	phys_addr_t offset = ((struct pma_arg_t*)arg)->offset;
++	unsigned long vaddr = ((struct pma_arg_t*)arg)->vaddr;
++	size_t size = ((struct pma_arg_t*)arg)->size;
++	size_t entry_id = ((struct pma_arg_t*)arg)->entry_id;
++	ret = sbi_ecall(SBI_EXT_ANDES, SBI_EXT_ANDES_SET_PMA, offset, vaddr, size, entry_id, 0, 0);
++	
++	return ret.value;
++}
++
++void sbi_free_pma(unsigned long entry_id)
++{
++	sbi_ecall(SBI_EXT_ANDES, SBI_EXT_ANDES_FREE_PMA, entry_id, 0, 0, 0, 0, 0);
++}
+diff --git a/drivers/soc/renesas/rzfive/pma.h b/drivers/soc/renesas/rzfive/pma.h
+new file mode 100644
+index 000000000000..6f354771537b
+--- /dev/null
++++ b/drivers/soc/renesas/rzfive/pma.h
+@@ -0,0 +1,19 @@
++
++
++#ifndef _RISCV_PMA_H
++#define _RISCV_PMA_H
++
++#include <linux/types.h>
++
++struct pma_arg_t {
++	phys_addr_t offset;
++	unsigned long vaddr;
++	size_t size;
++	size_t entry_id;
++};
++
++long sbi_set_pma(void *arg);
++void sbi_free_pma(unsigned long entry_id);
++long sbi_probe_pma(void);
++
++#endif
+\ No newline at end of file
+-- 
+2.25.1
+
