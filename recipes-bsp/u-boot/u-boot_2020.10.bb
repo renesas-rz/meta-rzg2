@@ -5,13 +5,13 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=5a7450c57ffe5ae63fd732446b988025"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 DEPENDS:append = " bc dtc opensbi u-boot-tools-native"
 
-SRCREV="f72e0c1f04635c9e0ee5f1033cb5e7bf6925aa9c"
-BRANCH="v2020.10/rzf-dev"
+SRCREV="02047d83af0ba53c04f13c54d6d2623c3ddcb298"
+BRANCH="v2021.12/rzf-smarc"
 
 # User can set local git folder:
 # SRC_URI = "git:///local/host/git/source/dir;branch=${BRANCH}"
 SRC_URI = " \
-	git://github.com/renesas-rz/renesas-u-boot-cip.git;protocol=https;branch=${BRANCH} \
+	git://github.com/renesas-rz/rzg_u-boot_private.git;protocol=https;branch=${BRANCH} \
 	file://BootLoaderHeader.bin \
     "
 
