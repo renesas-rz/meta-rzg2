@@ -3,7 +3,7 @@ require recipes-bsp/u-boot/u-boot.inc
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=5a7450c57ffe5ae63fd732446b988025"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-DEPENDS:append = " bc dtc opensbi u-boot-tools-native"
+DEPENDS:append = " bc dtc-native opensbi u-boot-tools-native"
 
 SRCREV="02047d83af0ba53c04f13c54d6d2623c3ddcb298"
 BRANCH="v2021.12/rzf-smarc"
