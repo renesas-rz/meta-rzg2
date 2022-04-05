@@ -47,7 +47,9 @@ cd ../
 # User can select the corresponding tag, for example "rzfive_v0.8".
 # It's better to select the latest tag. Or just use the latest commitID from branch if you don't checkout tag.
 git clone https://github.com/renesas-rz/meta-rzg2.git -b dunfell/rzfive meta-rzfive
+cd meta-rzfive
 git checkout <tag>
+cd ../
 
 source openembedded-core/oe-init-build-env
 cp ../meta-rzfive/docs/template/conf/smarc-rzfive/* ./conf/
