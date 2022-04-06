@@ -11,7 +11,7 @@ BRANCH="v2021.12/rzf-smarc"
 # User can set local git folder:
 # SRC_URI = "git:///local/host/git/source/dir;branch=${BRANCH}"
 SRC_URI = " \
-	git://github.com/renesas-rz/rzg_u-boot_private.git;protocol=https;branch=${BRANCH} \
+	git://github.com/renesas-rz/renesas-u-boot-cip.git;protocol=https;branch=${BRANCH} \
 	file://BootLoaderHeader.bin \
     "
 
