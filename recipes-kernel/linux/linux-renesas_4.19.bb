@@ -10,7 +10,7 @@ COMPATIBLE_MACHINE = "ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h"
 KERNEL_URL = " \
     git://github.com/renesas-rz/rz_linux-cip.git"
 BRANCH = "${@base_conditional("IS_RT_BSP", "1", "rzg2-cip69-rt24", "rzg2-cip69",d)}"
-SRCREV = "${@base_conditional("IS_RT_BSP", "1", "cb1898f01b97660fd134119e4bb3a02f37819db9", "c13c08d3b05c328930dcb755ada03efa5181bfc2",d)}"
+SRCREV = "${@base_conditional("IS_RT_BSP", "1", "d3e5ce824e3474363b5139be70dffe86c09d5a69", "3d551a0e0829eae5f87d81c8e85e22750024d0c0",d)}"
 
 SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
