@@ -14,7 +14,7 @@ SRCREV = "f8ba5724eeb74e76228c05983f4d5c0f86bc5e38"
 inherit deploy python3native
 
 DEPENDS = "optee-os optee-client"
-DEPENDS += "python3-pyelftools-native python3-pycryptodome-native python3-pycryptodomex-native"
+DEPENDS += "python3-pyelftools-native python3-cryptography-native python3-idna-native"
 
 OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
 TEEC_EXPORT = "${STAGING_DIR_HOST}${prefix}"
