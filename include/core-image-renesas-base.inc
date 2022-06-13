@@ -31,4 +31,5 @@ IMAGE_INSTALL_append = " \
     libdrm-tests \
     yavta \
     kernel-module-uvcvideo \
+    libstdc++ \
 "
