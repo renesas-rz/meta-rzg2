@@ -3,7 +3,7 @@ DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = " \
    file://${WORKDIR}/git/docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde \
-   file://${WORKDIR}/mbedtls/LICENSE;md5=302d50a6369f5f22efdb674db908167a \
+   file://${WORKDIR}/mbedtls/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -14,18 +14,18 @@ require include/ecc-control.inc
 
 S = "${WORKDIR}/git"
 
-BRANCH = "v2.6/rzg2"
-BRANCH_mbedtls = "mbedtls-2.16"
+BRANCH = "v2.7/rzg2"
+BRANCH_mbedtls = "mbedtls-2.28"
 
 SRC_URI = " \
 	git://github.com/renesas-rz/rzg_trusted-firmware-a.git;branch=${BRANCH};protocol=https \
 	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
 "
 
-SRCREV = "7faef7375ddf77748af8adda77804d31e1b0d1f8"
-SRCREV_mbedtls = "04a049bda1ceca48060b57bc4bcf5203ce591421"
+SRCREV = "4a8654a92a15424220c9d415987d7b2016a21eec"
+SRCREV_mbedtls = "7e163d796c7a8d3dd1a48884fb48ee4398da3137"
 
-PV = "v2.6+git"
+PV = "v2.7+git"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
