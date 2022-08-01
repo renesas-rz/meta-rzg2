@@ -32,7 +32,7 @@ This layer depends on:
     branch: rocko
     revision: 352531015014d1957d6444d114f4451e241c4d23
     
-    URI:http://git.yoctoproject.org/cgit.cgi/meta-gplv2/
+    URI:https://git.yoctoproject.org/git/meta-gplv2
     layers: meta-gplv2
     branch: rocko
     revision: f875c60ecd6f30793b80a431a2423c4b98e51548
