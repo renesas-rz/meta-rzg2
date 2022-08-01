@@ -1,0 +1,29 @@
+From 770749a9d49c48f6e188c115b67e8c9a1dfbc9de Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Tue, 12 Jul 2022 14:03:57 +0700
+Subject: [PATCH 3/5] rcar-gen3-common.h: increase limit size for Uboot
+
+After enable more configs suggested by ARM SystemReady, the Uboot size
+increase more than 1MB. So, set it to 2MB for now.
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ include/configs/rcar-gen3-common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/rcar-gen3-common.h b/include/configs/rcar-gen3-common.h
+index 9ea0b39..e912d04 100644
+--- a/include/configs/rcar-gen3-common.h
++++ b/include/configs/rcar-gen3-common.h
+@@ -56,7 +56,7 @@
+ #define CONFIG_SYS_BOOTM_LEN		(64 << 20)
+ 
+ /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
+-#define CONFIG_BOARD_SIZE_LIMIT		1048576
++#define CONFIG_BOARD_SIZE_LIMIT		2097152
+ 
+ /* ENV setting */
+ 
+-- 
+2.7.4
+

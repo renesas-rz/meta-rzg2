@@ -1,0 +1,1136 @@
+From 6560ce837eb8f09e99ce889402a8be6514538f0e Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Mon, 1 Aug 2022 22:05:59 +0700
+Subject: [PATCH 5/5] arm: dts: update dts from current upstream kernel
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ arch/arm/dts/hihope-common.dtsi           | 149 ++++++++++++-
+ arch/arm/dts/hihope-rev4.dtsi             |  26 +--
+ arch/arm/dts/r8a774a1-hihope-rzg2m-ex.dts |   2 +-
+ arch/arm/dts/r8a774a1-hihope-rzg2m.dts    |  66 +++++-
+ arch/arm/dts/r8a774a1-u-boot.dtsi         |   3 +-
+ arch/arm/dts/r8a774a1.dtsi                | 345 ++++++++++++++++++++++--------
+ arch/arm/dts/r8a774b1-u-boot.dtsi         |  41 ----
+ arch/arm/dts/r8a774e1-u-boot.dtsi         |  47 ----
+ 8 files changed, 459 insertions(+), 220 deletions(-)
+
+diff --git a/arch/arm/dts/hihope-common.dtsi b/arch/arm/dts/hihope-common.dtsi
+index 0515a0d..7f659f3 100644
+--- a/arch/arm/dts/hihope-common.dtsi
++++ b/arch/arm/dts/hihope-common.dtsi
+@@ -3,7 +3,7 @@
+  * Device Tree Source for the HiHope RZ/G2H Rev.4.0 and
+  * HiHope RZ/G2[MN] Rev.[2.0/3.0/4.0] main board common parts
+  *
+- * Copyright (C) 2021 Renesas Electronics Corp.
++ * Copyright (C) 2019 Renesas Electronics Corp.
+  */
+ 
+ #include <dt-bindings/gpio/gpio.h>
+@@ -12,6 +12,11 @@
+ 	aliases {
+ 		serial0 = &scif2;
+ 		serial1 = &hscif0;
++		serial2 = &hscif1;
++		serial3 = &scif0;
++		mmc0 = &sdhi3;
++		mmc1 = &sdhi0;
++		mmc2 = &sdhi2;
+ 	};
+ 
+ 	chosen {
+@@ -73,7 +78,8 @@
+ 
+ 		label = "rcar-sound";
+ 
+-		dais = <&rsnd_port>;
++		dais = <&rsnd_port0	/* HDMI Audio */
++			&rsnd_port1>;	/* External PCM5102A Codec */
+ 	};
+ 
+ 	vbus0_usb2: regulator-vbus0-usb2 {
+@@ -110,6 +116,21 @@
+ 		#clock-cells = <0>;
+ 		clock-frequency = <25000000>;
+ 	};
++
++	vspm_if {
++		compatible = "renesas,vspm_if";
++	};
++
++	pcm5102a: pcm5102a {
++		compatible = "ti,pcm5102a";
++		#sound-dai-cells = <0>;
++
++		port {
++			pcm5102a_endpoint: endpoint {
++				remote-endpoint = <&rsnd_endpoint1>;
++			};
++		};
++	};
+ };
+ 
+ &audio_clk_a {
+@@ -172,6 +193,21 @@
+ 	status = "okay";
+ };
+ 
++&hscif1 {
++	pinctrl-0 = <&hscif1_pins>;
++	pinctrl-names = "default";
++
++	uart-has-rtscts;
++	status = "okay";
++};
++
++&scif0 {
++	pinctrl-0 = <&scif0_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++};
++
+ &hsusb {
+ 	dr_mode = "otg";
+ 	status = "okay";
+@@ -181,13 +217,6 @@
+ 	clock-frequency = <400000>;
+ 	status = "okay";
+ 
+-	pca9654: gpio@20 {
+-		compatible = "onnn,pca9654";
+-		reg = <0x20>;
+-		gpio-controller;
+-		#gpio-cells = <2>;
+-	};
+-
+ 	versaclock5: clock-generator@6a {
+ 		compatible = "idt,5p49v5923";
+ 		reg = <0x6a>;
+@@ -228,6 +257,16 @@
+ 		function = "scif_clk";
+ 	};
+ 
++	hscif1_pins: hscif1 {
++		groups = "hscif1_data_a", "hscif1_ctrl_a";
++		function = "hscif1";
++	};
++
++	scif0_pins: scif0 {
++		groups = "scif0_data";
++		function = "scif0";
++	};
++
+ 	sdhi0_pins: sd0 {
+ 		groups = "sdhi0_data4", "sdhi0_ctrl";
+ 		function = "sdhi0";
+@@ -267,12 +306,26 @@
+ 			pins = "GP_6_27";
+ 			bias-pull-up;
+ 		};
++
++		pwen {
++			pins = "GP_6_26";
++		};
+ 	};
+ 
+ 	usb30_pins: usb30 {
+ 		groups = "usb30";
+ 		function = "usb30";
+ 	};
++
++	sound_clk_pins: sound_clk {
++		groups = "audio_clk_a_a";
++		function = "audio_clk";
++	};
++
++	sound_pins: sound {
++		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
++		function = "ssi";
++	};
+ };
+ 
+ &rwdt {
+@@ -335,6 +388,7 @@
+ 	vqmmc-supply = <&reg_1p8v>;
+ 	bus-width = <8>;
+ 	mmc-hs200-1_8v;
++	mmc-hs400-1_8v;
+ 	non-removable;
+ 	fixed-emmc-driver-type = <1>;
+ 	status = "okay";
+@@ -382,3 +436,80 @@
+ 
+ 	status = "okay";
+ };
++
++&cmt0 {
++	status = "okay";
++};
++
++&cmt1 {
++	status = "okay";
++};
++
++&cmt2 {
++	status = "okay";
++};
++
++&cmt3 {
++	status = "okay";
++};
++
++&tmu0 {
++	status = "okay";
++};
++
++&tmu1 {
++	status = "okay";
++};
++
++&tmu2 {
++	status = "okay";
++};
++
++&tmu3 {
++	status = "okay";
++};
++
++&tmu4 {
++	status = "okay";
++};
++
++&rcar_sound {
++	pinctrl-0 = <&sound_clk_pins &sound_pins>;
++	pinctrl-names = "default";
++
++	status = "okay";
++
++	/* Single DAI */
++	#sound-dai-cells = <0>;
++
++	ports {
++		rsnd_port0: port@0 {
++			rsnd_endpoint: endpoint {
++				remote-endpoint = <&dw_hdmi0_snd_in>;
++
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint>;
++				frame-master = <&rsnd_endpoint>;
++
++				playback = <&ssi2>;
++			};
++		};
++
++		rsnd_port1: port@1 {
++			rsnd_endpoint1: endpoint {
++				remote-endpoint = <&pcm5102a_endpoint>;
++
++				dai-format = "i2s";
++				bitclock-master = <&rsnd_endpoint1>;
++				frame-master = <&rsnd_endpoint1>;
++
++				playback = <&ssi1 &src1 &dvc0>;
++			};
++		};
++	};
++};
++
++&ssi1 {
++	shared-pin;
++};
+diff --git a/arch/arm/dts/hihope-rev4.dtsi b/arch/arm/dts/hihope-rev4.dtsi
+index 30e9299..393e57c 100644
+--- a/arch/arm/dts/hihope-rev4.dtsi
++++ b/arch/arm/dts/hihope-rev4.dtsi
+@@ -3,7 +3,7 @@
+  * Device Tree Source for the HiHope RZ/G2H Rev.4.0 and
+  * HiHope RZ/G2[MN] Rev.3.0/4.0 main board common parts
+  *
+- * Copyright (C) 2021 Renesas Electronics Corp.
++ * Copyright (C) 2020 Renesas Electronics Corp.
+  */
+ 
+ #include <dt-bindings/gpio/gpio.h>
+@@ -72,21 +72,9 @@
+ 		groups = "audio_clk_a_a", "audio_clk_b_a", "audio_clkout_a";
+ 		function = "audio_clk";
+ 	};
+-
+-	sound_pins: sound {
+-		groups = "ssi01239_ctrl", "ssi0_data", "ssi1_data_a";
+-		function = "ssi";
+-	};
+ };
+ 
+ &rcar_sound {
+-	pinctrl-0 = <&sound_pins &sound_clk_pins>;
+-	pinctrl-names = "default";
+-	status = "okay";
+-
+-	/* Single DAI */
+-	#sound-dai-cells = <0>;
+-
+ 	/* audio_clkout0/1/2/3 */
+ 	#clock-cells = <1>;
+ 	clock-frequency = <12288000 11289600>;
+@@ -109,16 +97,4 @@
+ 		 <&audio_clk_a>, <&cs2000>,
+ 		 <&audio_clk_c>,
+ 		 <&cpg CPG_CORE CPG_AUDIO_CLK_I>;
+-
+-	rsnd_port: port {
+-		rsnd_endpoint: endpoint {
+-			remote-endpoint = <&dw_hdmi0_snd_in>;
+-
+-			dai-format = "i2s";
+-			bitclock-master = <&rsnd_endpoint>;
+-			frame-master = <&rsnd_endpoint>;
+-
+-			playback = <&ssi2>;
+-		};
+-	};
+ };
+diff --git a/arch/arm/dts/r8a774a1-hihope-rzg2m-ex.dts b/arch/arm/dts/r8a774a1-hihope-rzg2m-ex.dts
+index f0e4a1f..a5ca861 100644
+--- a/arch/arm/dts/r8a774a1-hihope-rzg2m-ex.dts
++++ b/arch/arm/dts/r8a774a1-hihope-rzg2m-ex.dts
+@@ -3,7 +3,7 @@
+  * Device Tree Source for the HiHope RZ/G2M Rev.3.0/4.0 connected to
+  * sub board
+  *
+- * Copyright (C) 2021 Renesas Electronics Corp.
++ * Copyright (C) 2020 Renesas Electronics Corp.
+  */
+ 
+ #include "r8a774a1-hihope-rzg2m.dts"
+diff --git a/arch/arm/dts/r8a774a1-hihope-rzg2m.dts b/arch/arm/dts/r8a774a1-hihope-rzg2m.dts
+index a574c85..ff80684 100644
+--- a/arch/arm/dts/r8a774a1-hihope-rzg2m.dts
++++ b/arch/arm/dts/r8a774a1-hihope-rzg2m.dts
+@@ -2,7 +2,7 @@
+ /*
+  * Device Tree Source for the HiHope RZ/G2M Rev.3.0/4.0 main board
+  *
+- * Copyright (C) 2021 Renesas Electronics Corp.
++ * Copyright (C) 2020 Renesas Electronics Corp.
+  */
+ 
+ /dts-v1/;
+@@ -23,6 +23,42 @@
+ 		device_type = "memory";
+ 		reg = <0x6 0x00000000 0x0 0x80000000>;
+ 	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		/* device specific region for Lossy Decompression */
++		lossy_decompress: linux,lossy_decompress@54000000 {
++			no-map;
++			reg = <0x00000000 0x54000000 0x0 0x03000000>;
++		};
++
++		/* global autoconfigured region for contiguous allocations */
++		global_cma: linux,cma@58000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x58000000 0x0 0x20000000>;
++			linux,cma-default;
++		};
++
++		/* device specific region for contiguous allocations */
++		mmp_reserved: linux,multimedia@70000000 {
++			compatible = "shared-dma-pool";
++			reusable;
++			reg = <0x00000000 0x78000000 0x0 0x10000000>;
++		};
++	};
++
++	mmngr {
++		compatible = "renesas,mmngr";
++		memory-region = <&mmp_reserved>, <&lossy_decompress>;
++	};
++
++	mmngrbuf {
++		compatible = "renesas,mmngrbuf";
++	};
+ };
+ 
+ &du {
+@@ -35,3 +71,31 @@
+ 	clock-names = "du.0", "du.1", "du.2",
+ 		      "dclkin.0", "dclkin.1", "dclkin.2";
+ };
++
++&vspb {
++	status = "okay";
++};
++
++&vspi0 {
++	status = "okay";
++};
++
++&xhci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci0 {
++	memory-region = <&global_cma>;
++};
++
++&ohci0 {
++	memory-region = <&global_cma>;
++};
++
++&ehci1 {
++	memory-region = <&global_cma>;
++};
++
++&ohci1 {
++	memory-region = <&global_cma>;
++};
+diff --git a/arch/arm/dts/r8a774a1-u-boot.dtsi b/arch/arm/dts/r8a774a1-u-boot.dtsi
+index f826c41..3c2358f 100644
+--- a/arch/arm/dts/r8a774a1-u-boot.dtsi
++++ b/arch/arm/dts/r8a774a1-u-boot.dtsi
+@@ -10,7 +10,7 @@
+ &extalr_clk {
+ 	u-boot,dm-pre-reloc;
+ };
+-
++/*
+ /delete-node/ &audma0;
+ /delete-node/ &audma1;
+ /delete-node/ &can0;
+@@ -53,3 +53,4 @@
+ 		/delete-node/ fdp1@fe940000;
+ 	};
+ };
++*/
+diff --git a/arch/arm/dts/r8a774a1.dtsi b/arch/arm/dts/r8a774a1.dtsi
+index d64fb8b..5a0896e 100644
+--- a/arch/arm/dts/r8a774a1.dtsi
++++ b/arch/arm/dts/r8a774a1.dtsi
+@@ -76,6 +76,7 @@
+ 			opp-hz = /bits/ 64 <1500000000>;
+ 			opp-microvolt = <820000>;
+ 			clock-latency-ns = <300000>;
++			opp-suspend;
+ 		};
+ 	};
+ 
+@@ -137,6 +138,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA57_CPU0>;
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
++			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			dynamic-power-coefficient = <854>;
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+@@ -151,6 +153,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA57_CPU1>;
+ 			next-level-cache = <&L2_CA57>;
+ 			enable-method = "psci";
++			cpu-idle-states = <&CPU_SLEEP_0>;
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z>;
+ 			operating-points-v2 = <&cluster0_opp>;
+ 			capacity-dmips-mhz = <1024>;
+@@ -164,6 +167,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU0>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			#cooling-cells = <2>;
+ 			dynamic-power-coefficient = <277>;
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z2>;
+@@ -178,6 +182,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU1>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			capacity-dmips-mhz = <560>;
+@@ -190,6 +195,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU2>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			capacity-dmips-mhz = <560>;
+@@ -202,6 +208,7 @@
+ 			power-domains = <&sysc R8A774A1_PD_CA53_CPU3>;
+ 			next-level-cache = <&L2_CA53>;
+ 			enable-method = "psci";
++			cpu-idle-states = <&CPU_SLEEP_1>;
+ 			clocks = <&cpg CPG_CORE R8A774A1_CLK_Z2>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			capacity-dmips-mhz = <560>;
+@@ -220,6 +227,30 @@
+ 			cache-unified;
+ 			cache-level = <2>;
+ 		};
++
++		idle-states {
++			entry-method = "psci";
++
++			CPU_SLEEP_0: cpu-sleep-0 {
++				compatible = "arm,idle-state";
++				arm,psci-suspend-param = <0x0010000>;
++				local-timer-stop;
++				entry-latency-us = <400>;
++				exit-latency-us = <500>;
++				min-residency-us = <4000>;
++				status = "okay";
++			};
++
++			CPU_SLEEP_1: cpu-sleep-1 {
++				compatible = "arm,idle-state";
++				arm,psci-suspend-param = <0x0010000>;
++				local-timer-stop;
++				entry-latency-us = <700>;
++				exit-latency-us = <700>;
++				min-residency-us = <5000>;
++				status = "okay";
++			};
++		};
+ 	};
+ 
+ 	extal_clk: extal {
+@@ -236,6 +267,34 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	firmware {
++		optee {
++			compatible = "linaro,optee-tz";
++			method = "smc";
++		};
++	};
++
++	gsx_opp0: gsx_opp_table0 {
++		compatible = "operating-points-v2";
++
++		opp-200000000 {
++			opp-hz = /bits/ 64 <200000000>;
++			opp-microvolt = <830000>;
++		};
++		opp-300000000 {
++			opp-hz = /bits/ 64 <300000000>;
++			opp-microvolt = <830000>;
++		};
++		opp-400000000 {
++			opp-hz = /bits/ 64 <400000000>;
++			opp-microvolt = <830000>;
++		};
++		opp-600000000 {
++			opp-hz = /bits/ 64 <600000000>;
++			opp-microvolt = <830000>;
++		};
++	};
++
+ 	/* External PCIe clock - can be overridden by the board */
+ 	pcie_bus_clk: pcie_bus {
+ 		compatible = "fixed-clock";
+@@ -271,6 +330,13 @@
+ 		clock-frequency = <0>;
+ 	};
+ 
++	/* MSIOF reference clock - to be overridden by boards that provide it */
++	msiof_ref_clk: msiof-ref-clock {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <0>;
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		interrupt-parent = <&gic>;
+@@ -278,6 +344,11 @@
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		qos@e67e0000 {
++			compatible = "renesas,qos";
++			reg = <0 0xe67e0000 0 0x10090>;
++		};
++
+ 		rwdt: watchdog@e6020000 {
+ 			compatible = "renesas,r8a774a1-wdt",
+ 				     "renesas,rcar-gen3-wdt";
+@@ -923,14 +994,6 @@
+ 			resets = <&cpg 219>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds0 0>, <&ipmmu_ds0 1>,
+-			       <&ipmmu_ds0 2>, <&ipmmu_ds0 3>,
+-			       <&ipmmu_ds0 4>, <&ipmmu_ds0 5>,
+-			       <&ipmmu_ds0 6>, <&ipmmu_ds0 7>,
+-			       <&ipmmu_ds0 8>, <&ipmmu_ds0 9>,
+-			       <&ipmmu_ds0 10>, <&ipmmu_ds0 11>,
+-			       <&ipmmu_ds0 12>, <&ipmmu_ds0 13>,
+-			       <&ipmmu_ds0 14>, <&ipmmu_ds0 15>;
+ 		};
+ 
+ 		dmac1: dma-controller@e7300000 {
+@@ -965,14 +1028,6 @@
+ 			resets = <&cpg 218>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds1 0>, <&ipmmu_ds1 1>,
+-			       <&ipmmu_ds1 2>, <&ipmmu_ds1 3>,
+-			       <&ipmmu_ds1 4>, <&ipmmu_ds1 5>,
+-			       <&ipmmu_ds1 6>, <&ipmmu_ds1 7>,
+-			       <&ipmmu_ds1 8>, <&ipmmu_ds1 9>,
+-			       <&ipmmu_ds1 10>, <&ipmmu_ds1 11>,
+-			       <&ipmmu_ds1 12>, <&ipmmu_ds1 13>,
+-			       <&ipmmu_ds1 14>, <&ipmmu_ds1 15>;
+ 		};
+ 
+ 		dmac2: dma-controller@e7310000 {
+@@ -1007,14 +1062,6 @@
+ 			resets = <&cpg 217>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_ds1 16>, <&ipmmu_ds1 17>,
+-			       <&ipmmu_ds1 18>, <&ipmmu_ds1 19>,
+-			       <&ipmmu_ds1 20>, <&ipmmu_ds1 21>,
+-			       <&ipmmu_ds1 22>, <&ipmmu_ds1 23>,
+-			       <&ipmmu_ds1 24>, <&ipmmu_ds1 25>,
+-			       <&ipmmu_ds1 26>, <&ipmmu_ds1 27>,
+-			       <&ipmmu_ds1 28>, <&ipmmu_ds1 29>,
+-			       <&ipmmu_ds1 30>, <&ipmmu_ds1 31>;
+ 		};
+ 
+ 		ipmmu_ds0: iommu@e6740000 {
+@@ -1075,7 +1122,7 @@
+ 		};
+ 
+ 		ipmmu_vc0: iommu@fe6b0000 {
+-			compatible = "renesas,ipmmu-r8a774a1";
++			compatible = "renesas,ipmmu-mmu-r8a774a1";
+ 			reg = <0 0xfe6b0000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 8>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+@@ -1083,7 +1130,7 @@
+ 		};
+ 
+ 		ipmmu_vi0: iommu@febd0000 {
+-			compatible = "renesas,ipmmu-r8a774a1";
++			compatible = "renesas,ipmmu-mmu-r8a774a1";
+ 			reg = <0 0xfebd0000 0 0x1000>;
+ 			renesas,ipmmu-main = <&ipmmu_mm 9>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+@@ -1265,6 +1312,16 @@
+ 			status = "disabled";
+ 		};
+ 
++		tpu: pwm@e6e80000 {
++			compatible = "renesas,tpu";
++			reg = <0 0xe6e80000 0 0x148>;
++			clocks = <&cpg CPG_MOD 304>;
++			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
++			resets = <&cpg 304>;
++			#pwm-cells = <3>;
++			status = "disabled";
++		};
++
+ 		scif0: serial@e6e60000 {
+ 			compatible = "renesas,scif-r8a774a1",
+ 				     "renesas,rcar-gen3-scif", "renesas,scif";
+@@ -1370,7 +1427,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6e90000 0 0x0064>;
+ 			interrupts = <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 211>;
++			clocks = <&cpg CPG_MOD 211>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac1 0x41>, <&dmac1 0x40>,
+ 			       <&dmac2 0x41>, <&dmac2 0x40>;
+ 			dma-names = "tx", "rx", "tx", "rx";
+@@ -1386,7 +1444,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6ea0000 0 0x0064>;
+ 			interrupts = <GIC_SPI 157 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 210>;
++			clocks = <&cpg CPG_MOD 210>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac1 0x43>, <&dmac1 0x42>,
+ 			       <&dmac2 0x43>, <&dmac2 0x42>;
+ 			dma-names = "tx", "rx", "tx", "rx";
+@@ -1402,7 +1461,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6c00000 0 0x0064>;
+ 			interrupts = <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 209>;
++			clocks = <&cpg CPG_MOD 209>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac0 0x45>, <&dmac0 0x44>;
+ 			dma-names = "tx", "rx";
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+@@ -1417,7 +1477,8 @@
+ 				     "renesas,rcar-gen3-msiof";
+ 			reg = <0 0xe6c10000 0 0x0064>;
+ 			interrupts = <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 208>;
++			clocks = <&cpg CPG_MOD 208>, <&msiof_ref_clk>;
++			clock-names = "msiof_clk", "msiof_ref_clk";
+ 			dmas = <&dmac0 0x47>, <&dmac0 0x46>;
+ 			dma-names = "tx", "rx";
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+@@ -2122,14 +2183,6 @@
+ 			resets = <&cpg 502>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_mp 0>, <&ipmmu_mp 1>,
+-			       <&ipmmu_mp 2>, <&ipmmu_mp 3>,
+-			       <&ipmmu_mp 4>, <&ipmmu_mp 5>,
+-			       <&ipmmu_mp 6>, <&ipmmu_mp 7>,
+-			       <&ipmmu_mp 8>, <&ipmmu_mp 9>,
+-			       <&ipmmu_mp 10>, <&ipmmu_mp 11>,
+-			       <&ipmmu_mp 12>, <&ipmmu_mp 13>,
+-			       <&ipmmu_mp 14>, <&ipmmu_mp 15>;
+ 		};
+ 
+ 		audma1: dma-controller@ec720000 {
+@@ -2164,14 +2217,6 @@
+ 			resets = <&cpg 501>;
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+-			iommus = <&ipmmu_mp 16>, <&ipmmu_mp 17>,
+-			       <&ipmmu_mp 18>, <&ipmmu_mp 19>,
+-			       <&ipmmu_mp 20>, <&ipmmu_mp 21>,
+-			       <&ipmmu_mp 22>, <&ipmmu_mp 23>,
+-			       <&ipmmu_mp 24>, <&ipmmu_mp 25>,
+-			       <&ipmmu_mp 26>, <&ipmmu_mp 27>,
+-			       <&ipmmu_mp 28>, <&ipmmu_mp 29>,
+-			       <&ipmmu_mp 30>, <&ipmmu_mp 31>;
+ 		};
+ 
+ 		xhci0: usb@ee000000 {
+@@ -2262,6 +2307,7 @@
+ 			compatible = "renesas,usb2-phy-r8a774a1",
+ 				     "renesas,rcar-gen3-usb2-phy";
+ 			reg = <0 0xee0a0200 0 0x700>;
++			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&cpg CPG_MOD 702>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 702>;
+@@ -2319,10 +2365,10 @@
+ 
+ 		rpc: spi@ee200000 {
+ 			compatible = "renesas,r8a774a1-rpc-if",
+-				     "renesas,rcar-gen3-rpc-if";
++						"renesas,rcar-gen3-rpc-if";
+ 			reg = <0 0xee200000 0 0x200>,
+-			      <0 0x08000000 0 0x4000000>,
+-			      <0 0xee208000 0 0x100>;
++				<0 0x08000000 0 0x4000000>,
++				<0 0xee208000 0 0x100>;
+ 			reg-names = "regs", "dirmap", "wbuf";
+ 			interrupts = <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&cpg CPG_MOD 917>;
+@@ -2351,6 +2397,16 @@
+ 			resets = <&cpg 408>;
+ 		};
+ 
++		gsx: gsx@fd000000 {
++			compatible = "renesas,gsx";
++			reg = <0 0xfd000000 0 0x40000>;
++			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 112>;
++			operating-points-v2 = <&gsx_opp0>;
++			power-domains = <&sysc R8A774A1_PD_3DG_B>;
++			resets = <&cpg 112>;
++		};
++
+ 		pciec0: pcie@fe000000 {
+ 			compatible = "renesas,pcie-r8a774a1",
+ 				     "renesas,pcie-rcar-gen3";
+@@ -2443,30 +2499,71 @@
+ 			status = "disabled";
+ 		};
+ 
+-		fdp1@fe940000 {
+-			compatible = "renesas,fdp1";
+-			reg = <0 0xfe940000 0 0x2400>;
+-			interrupts = <GIC_SPI 262 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 119>;
++		fcpci0: vcp4@fe8df000 {
++			compatible = "renesas,vcp4-fcpci0";
++			reg = <0 0xfe8df000 0 0x200>;
++			clocks = <&cpg CPG_MOD 617>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 119>;
+-			renesas,fcp = <&fcpf0>;
++			resets = <&cpg 617>;
++			renesas,#ch = <1>;
+ 		};
+ 
+-		fcpf0: fcp@fe950000 {
+-			compatible = "renesas,fcpf";
+-			reg = <0 0xfe950000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 615>;
++		fcpcs: vcp4@fe90f000 {
++			compatible = "renesas,vcp4-fcpcs";
++			reg = <0 0xfe90f000 0 0x200>;
++			clocks = <&cpg CPG_MOD 619>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 615>;
+-		};
+-
+-		fcpvb0: fcp@fe96f000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe96f000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 607>;
++			resets = <&cpg 619>;
++			renesas,#ch = <0>;
++		};
++
++		ivdp1c: vcp4@fe8d0000 {
++			compatible = "renesas,vcp4-ivdp1c";
++			reg = <0 0xfe8d0000 0 0x200>, <0 0xfe8d0200 0 0x200>;
++			interrupts = <GIC_SPI 380 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 381 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 128>;
++			power-domains = <&sysc R8A774A1_PD_A2VC0>;
++			resets = <&cpg 128>;
++			renesas,#ch = <2>;
++			renesas,#fcp_ch = <1>;
++		};
++
++		vcplf: vcp4@fe910000 {
++			compatible = "renesas,vcp4-vcplf";
++			reg = <0 0xfe910000 0 0x200>, <0 0xfe910200 0 0x200>;
++			interrupts = <GIC_SPI 260 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 261 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 130>;
++			power-domains = <&sysc R8A774A1_PD_A2VC1>;
++			resets = <&cpg 130>;
++			renesas,#ch = <0>;
++			renesas,#fcp_ch = <0>;
++		};
++
++		vdpb: vcp4@fe900000 {
++			compatible = "renesas,vcp4-vdpb";
++			reg = <0 0xfe900000 0 0x200>, <0 0xfe900200 0 0x200>;
++			interrupts = <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
++					<GIC_SPI 241 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 131>;
++			power-domains = <&sysc R8A774A1_PD_A2VC0>;
++			resets = <&cpg 131>;
++			renesas,#ch = <1>;
++			renesas,#fcp_ch = <0>;
++		};
++
++		fdp0: fdpm@fe940000 {
++			compatible = "renesas,fdpm";
++			reg = <0 0xfe940000 0 0x2400>, <0 0xfe950000 0 0x200>;
++			interrupts = <GIC_SPI 262 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&cpg CPG_MOD 119>, <&cpg CPG_MOD 615>;
++			clock-names = "fdp", "fcp";
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 607>;
++			resets = <&cpg 119>, <&cpg 615>;
++			reset-names = "fdp", "fcp";
++			renesas,#ch = <0>;
+ 		};
+ 
+ 		fcpvd0: fcp@fea27000 {
+@@ -2475,7 +2572,6 @@
+ 			clocks = <&cpg CPG_MOD 603>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 603>;
+-			iommus = <&ipmmu_vi0 8>;
+ 		};
+ 
+ 		fcpvd1: fcp@fea2f000 {
+@@ -2484,7 +2580,6 @@
+ 			clocks = <&cpg CPG_MOD 602>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 602>;
+-			iommus = <&ipmmu_vi0 9>;
+ 		};
+ 
+ 		fcpvd2: fcp@fea37000 {
+@@ -2493,27 +2588,40 @@
+ 			clocks = <&cpg CPG_MOD 601>;
+ 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
+ 			resets = <&cpg 601>;
+-			iommus = <&ipmmu_vi0 10>;
+ 		};
+ 
+-		fcpvi0: fcp@fe9af000 {
+-			compatible = "renesas,fcpv";
+-			reg = <0 0xfe9af000 0 0x200>;
+-			clocks = <&cpg CPG_MOD 611>;
+-			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 611>;
+-			iommus = <&ipmmu_vc0 19>;
+-		};
+-
+-		vspb: vsp@fe960000 {
+-			compatible = "renesas,vsp2";
++		vsp@fe960000 {
++			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe960000 0 0x8000>;
++			renesas,has-bru;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-hgo;
++			renesas,#rpf = <5>;
++			renesas,#uds = <0>;
++			renesas,#wpf = <1>;
++		};
++
++		vspb: vspm@fe960000 {
++			compatible = "renesas,vspm";
++			reg = <0 0xfe960000 0 0x8000>, <0 0xfe96f000 0 0x200>;
+ 			interrupts = <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 626>;
++			clocks = <&cpg CPG_MOD 626>, <&cpg CPG_MOD 607>;
++			clock-names = "vsp", "fcp";
++			renesas,#ch = <3>;
++			renesas,#rpf = <31>;
++			renesas,#rpf_clut = <6>;
++			renesas,#wpf_rot = <0>;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-bru;
++			renesas,has-hgo;
++			renesas,#read_outstanding = <0>;
++			renesas,#start_reservation = <1>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 626>;
+-
+-			renesas,fcp = <&fcpvb0>;
++			resets = <&cpg 626>, <&cpg 607>;
++			reset-names = "vsp", "fcp";
++			status = "disabled";
+ 		};
+ 
+ 		vspd0: vsp@fea20000 {
+@@ -2549,15 +2657,44 @@
+ 			renesas,fcp = <&fcpvd2>;
+ 		};
+ 
+-		vspi0: vsp@fe9a0000 {
+-			compatible = "renesas,vsp2";
++		vsp@fe9a0000 {
++			compatible = "renesas,vspm-vsp2";
+ 			reg = <0 0xfe9a0000 0 0x8000>;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-hgo;
++			renesas,has-hgt;
++			renesas,#rpf = <1>;
++			renesas,#uds = <1>;
++			renesas,#wpf = <1>;
++		};
++
++		vspi0: vspm@fe9a0000 {
++			compatible = "renesas,vspm";
++			reg = <0 0xfe9a0000 0 0x8000>, <0 0xfe9af000 0 0x200>;
++
+ 			interrupts = <GIC_SPI 444 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&cpg CPG_MOD 631>;
++			clocks = <&cpg CPG_MOD 631>, <&cpg CPG_MOD 611>;
++			clock-names = "vsp", "fcp";
++			renesas,#ch = <0>;
++			renesas,#rpf = <1>;
++			renesas,#rpf_clut = <1>;
++			renesas,#wpf_rot = <1>;
++			renesas,has-sru;
++			renesas,has-uds;
++			renesas,has-lut;
++			renesas,has-clu;
++			renesas,has-hst;
++			renesas,has-hsi;
++			renesas,has-hgo;
++			renesas,has-hgt;
++			renesas,has-shp;
++			renesas,#read_outstanding = <2>;
++			renesas,#start_reservation = <1>;
+ 			power-domains = <&sysc R8A774A1_PD_A3VC>;
+-			resets = <&cpg 631>;
+-
+-			renesas,fcp = <&fcpvi0>;
++			resets = <&cpg 631>, <&cpg 611>;
++			reset-names = "vsp", "fcp";
++			status = "disabled";
+ 		};
+ 
+ 		csi20: csi2@fea80000 {
+@@ -2774,6 +2911,18 @@
+ 	};
+ 
+ 	thermal-zones {
++		emergency {
++			polling-delay = <1000>;
++			on-temperature = <110000>;
++			off-temperature = <95000>;
++			target_cpus =	<&a57_1>,
++					<&a53_0>,
++					<&a53_1>,
++					<&a53_2>,
++					<&a53_3>;
++			status = "disabled";
++		};
++
+ 		sensor_thermal1: sensor-thermal1 {
+ 			polling-delay-passive = <250>;
+ 			polling-delay = <1000>;
+@@ -2782,7 +2931,7 @@
+ 
+ 			trips {
+ 				sensor1_crit: sensor1-crit {
+-					temperature = <120000>;
++					temperature = <110000>;
+ 					hysteresis = <1000>;
+ 					type = "critical";
+ 				};
+@@ -2797,7 +2946,7 @@
+ 
+ 			trips {
+ 				sensor2_crit: sensor2-crit {
+-					temperature = <120000>;
++					temperature = <110000>;
+ 					hysteresis = <1000>;
+ 					type = "critical";
+ 				};
+@@ -2823,6 +2972,12 @@
+ 				};
+ 			};
+ 			trips {
++				threshold: trip-point0 {
++					temperature = <90000>;
++					hysteresis = <1000>;
++					type = "passive";
++				};
++
+ 				target: trip-point1 {
+ 					temperature = <100000>;
+ 					hysteresis = <1000>;
+@@ -2830,7 +2985,7 @@
+ 				};
+ 
+ 				sensor3_crit: sensor3-crit {
+-					temperature = <120000>;
++					temperature = <110000>;
+ 					hysteresis = <1000>;
+ 					type = "critical";
+ 				};
+diff --git a/arch/arm/dts/r8a774b1-u-boot.dtsi b/arch/arm/dts/r8a774b1-u-boot.dtsi
+index 6fab78e..2ea8b9f 100644
+--- a/arch/arm/dts/r8a774b1-u-boot.dtsi
++++ b/arch/arm/dts/r8a774b1-u-boot.dtsi
+@@ -10,44 +10,3 @@
+ &extalr_clk {
+ 	u-boot,dm-pre-reloc;
+ };
+-
+-/delete-node/ &audma0;
+-/delete-node/ &audma1;
+-/delete-node/ &can0;
+-/delete-node/ &can1;
+-/delete-node/ &canfd;
+-/delete-node/ &csi20;
+-/delete-node/ &csi40;
+-/delete-node/ &du;
+-/delete-node/ &fcpf0;
+-/delete-node/ &fcpvb0;
+-/delete-node/ &fcpvd0;
+-/delete-node/ &fcpvd1;
+-/delete-node/ &fcpvi0;
+-/delete-node/ &hdmi0;
+-/delete-node/ &lvds0;
+-/delete-node/ &rcar_sound;
+-/delete-node/ &sdhi2;
+-/delete-node/ &sound_card;
+-/delete-node/ &vin0;
+-/delete-node/ &vin1;
+-/delete-node/ &vin2;
+-/delete-node/ &vin3;
+-/delete-node/ &vin4;
+-/delete-node/ &vin5;
+-/delete-node/ &vin6;
+-/delete-node/ &vin7;
+-/delete-node/ &vspb;
+-/delete-node/ &vspd0;
+-/delete-node/ &vspd1;
+-/delete-node/ &vspi0;
+-
+-/ {
+-	/delete-node/ hdmi0-out;
+-};
+-
+-/ {
+-	soc {
+-		/delete-node/ fdp1@fe940000;
+-	};
+-};
+diff --git a/arch/arm/dts/r8a774e1-u-boot.dtsi b/arch/arm/dts/r8a774e1-u-boot.dtsi
+index 74758df..2dd4f4b 100644
+--- a/arch/arm/dts/r8a774e1-u-boot.dtsi
++++ b/arch/arm/dts/r8a774e1-u-boot.dtsi
+@@ -10,50 +10,3 @@
+ &extalr_clk {
+ 	u-boot,dm-pre-reloc;
+ };
+-
+-/delete-node/ &audma0;
+-/delete-node/ &audma1;
+-/delete-node/ &can0;
+-/delete-node/ &can1;
+-/delete-node/ &canfd;
+-/delete-node/ &csi20;
+-/delete-node/ &csi40;
+-/delete-node/ &du;
+-/delete-node/ &fcpf0;
+-/delete-node/ &fcpf1;
+-/delete-node/ &fcpvb0;
+-/delete-node/ &fcpvb1;
+-/delete-node/ &fcpvd0;
+-/delete-node/ &fcpvd1;
+-/delete-node/ &fcpvi0;
+-/delete-node/ &fcpvi1;
+-/delete-node/ &hdmi0;
+-/delete-node/ &lvds0;
+-/delete-node/ &rcar_sound;
+-/delete-node/ &sdhi2;
+-/delete-node/ &sound_card;
+-/delete-node/ &vin0;
+-/delete-node/ &vin1;
+-/delete-node/ &vin2;
+-/delete-node/ &vin3;
+-/delete-node/ &vin4;
+-/delete-node/ &vin5;
+-/delete-node/ &vin6;
+-/delete-node/ &vin7;
+-/delete-node/ &vspbc;
+-/delete-node/ &vspbd;
+-/delete-node/ &vspd0;
+-/delete-node/ &vspd1;
+-/delete-node/ &vspi0;
+-/delete-node/ &vspi1;
+-
+-/ {
+-	/delete-node/ hdmi0-out;
+-};
+-
+-/ {
+-	soc {
+-		/delete-node/ fdp1@fe940000;
+-		/delete-node/ fdp1@fe944000;
+-	};
+-};
+-- 
+2.7.4
+

@@ -1,0 +1,39 @@
+From 8ad8defe831084ed6869157893ef2183e70c6273 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Thu, 28 Jul 2022 11:57:48 +0700
+Subject: [PATCH 4/5] configs: Disable Watchdog
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ configs/hihope_rzg2_defconfig   | 3 ---
+ configs/silinux_ek874_defconfig | 3 ---
+ 2 files changed, 6 deletions(-)
+
+diff --git a/configs/hihope_rzg2_defconfig b/configs/hihope_rzg2_defconfig
+index 2d2d7ab..cdb188a 100644
+--- a/configs/hihope_rzg2_defconfig
++++ b/configs/hihope_rzg2_defconfig
+@@ -76,9 +76,6 @@ CONFIG_USB_EHCI_HCD=y
+ CONFIG_USB_EHCI_GENERIC=y
+ CONFIG_USB_STORAGE=y
+ CONFIG_OF_LIBFDT_OVERLAY=y
+-CONFIG_WDT=y
+-CONFIG_WDT_RENESAS=y
+-CONFIG_CMD_WDT=y
+ CONFIG_BOOTM_EFI=y
+ CONFIG_CMD_BOOTEFI=y
+ CONFIG_CMD_NVEDIT_EFI=y
+diff --git a/configs/silinux_ek874_defconfig b/configs/silinux_ek874_defconfig
+index 4473092..01f7ae4 100644
+--- a/configs/silinux_ek874_defconfig
++++ b/configs/silinux_ek874_defconfig
+@@ -73,6 +73,3 @@ CONFIG_USB_EHCI_HCD=y
+ CONFIG_USB_EHCI_GENERIC=y
+ CONFIG_USB_STORAGE=y
+ CONFIG_OF_LIBFDT_OVERLAY=y
+-CONFIG_WDT=y
+-CONFIG_WDT_RENESAS=y
+-CONFIG_CMD_WDT=y
+-- 
+2.7.4
+

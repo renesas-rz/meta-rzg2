@@ -20,6 +20,7 @@ BRANCH_mbedtls = "mbedtls-2.16"
 SRC_URI = " \
 	git://github.com/renesas-rz/rzg_trusted-firmware-a.git;branch=${BRANCH};protocol=https \
 	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
+	file://asr/0001-renesas-rzg_layout_create-sa6-increase-limit-size-to.patch \
 "
 
 SRCREV = "7faef7375ddf77748af8adda77804d31e1b0d1f8"

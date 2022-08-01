@@ -15,6 +15,13 @@ UBOOT_SREC ?= "u-boot-elf.${UBOOT_SREC_SUFFIX}"
 UBOOT_SREC_IMAGE ?= "u-boot-elf-${MACHINE}-${PV}-${PR}.${UBOOT_SREC_SUFFIX}"
 UBOOT_SREC_SYMLINK ?= "u-boot-elf-${MACHINE}.${UBOOT_SREC_SUFFIX}"
 
+SRC_URI_append = " \
+	file://asr/0001-efi_loader-Fix-loaded-image-alignment.patch                    \
+	file://asr/0002-hihope_rzg2_defconfig-enable-configure-suggested-for.patch     \
+	file://asr/0003-rcar-gen3-common.h-increase-limit-size-for-Uboot.patch         \
+	file://asr/0004-configs-Disable-Watchdog.patch                                 \
+	file://asr/0005-arm-dts-update-dts-from-current-upstream-kernel.patch          \
+"
 do_deploy_append() {
     if [ -n "${UBOOT_CONFIG}" ]
     then
