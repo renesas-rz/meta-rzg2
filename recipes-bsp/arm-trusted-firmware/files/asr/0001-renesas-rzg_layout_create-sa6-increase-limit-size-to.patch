@@ -1,0 +1,28 @@
+From 287330f812f45f3370ca76acab82624cbb568e8e Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.jz@renesas.com>
+Date: Tue, 12 Jul 2022 14:09:36 +0700
+Subject: [PATCH] renesas/rzg_layout_create/sa6: increase limit size to 2MB
+
+align with new size of U-boot
+
+Signed-off-by: Binh Nguyen <binh.nguyen.jz@renesas.com>
+---
+ tools/renesas/rzg_layout_create/sa6.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/renesas/rzg_layout_create/sa6.c b/tools/renesas/rzg_layout_create/sa6.c
+index 76e3dc5..1333f52 100644
+--- a/tools/renesas/rzg_layout_create/sa6.c
++++ b/tools/renesas/rzg_layout_create/sa6.c
+@@ -101,7 +101,7 @@
+ #define RCAR_BL33DST_ADDRESS		(0x50000000U)
+ #define RCAR_BL33DST_ADDRESSH		(0x00000000U)
+ /* Destination size for BL33 */
+-#define RCAR_BL33DST_SIZE		(0x00040000U)
++#define RCAR_BL33DST_SIZE		(0x00080000U)
+ /* Reserved */
+ #define RCAR_BL332DST_ADDRESS		(0x00000000U)
+ #define RCAR_BL332DST_ADDRESSH		(0x00000000U)
+-- 
+2.7.4
+
