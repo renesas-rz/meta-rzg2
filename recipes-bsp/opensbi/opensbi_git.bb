@@ -8,7 +8,7 @@ inherit autotools-brokensep deploy
 PV = "0.9+git${SRCPV}"
 
 BRANCH = "work/OpenSBI-PMA"
-SRCREV="c440f1a14ca20d4d5a50cfde8bfbff91f9551680"
+SRCREV="dc7f2b51269244bd9c942591af90d3a90b1fd3c6"
 
 # User can set local git folder:
 # SRC_URI = "git:///local/host/git/source/dir;branch=${BRANCH}"
