@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=5a7450c57ffe5ae63fd732446b988025"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 DEPENDS:append = " bc dtc-native opensbi u-boot-tools-native"
 
-SRCREV="d0abea4142ce078ab3b680b43a2f11e11c1ce68f"
+SRCREV="ea6d1659b79402a6137e7cda9620bfe956801780"
 BRANCH="v2021.12/rzf-smarc"
 
 # User can set local git folder:
