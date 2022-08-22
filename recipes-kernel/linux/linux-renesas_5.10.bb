@@ -4,7 +4,7 @@ LINUX_VERSION ?= "5.10.x"
 KERNEL_VERSION_SANITY_SKIP="1"
 
 BRANCH = "rzfive-5.10-cip1"
-SRCREV="9463bb265fcc05e1344da1e12fb1454da4cc1153"
+SRCREV="48de75691cc8f3c5fd75a784c7c42110752e268e"
 
 # User can set local git folder:
 # SRC_URI = "git:///local/host/git/source/dir;branch=${BRANCH}"
