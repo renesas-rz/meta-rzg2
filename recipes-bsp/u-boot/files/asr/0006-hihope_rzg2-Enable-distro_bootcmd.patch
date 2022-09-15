@@ -1,0 +1,109 @@
+From 111fd1cd0f39bae7e2cffae4e84b34aa01041223 Mon Sep 17 00:00:00 2001
+From: "Bang Duy. Nguyen (2)" <bang.nguyen.fv@rvc.renesas.com>
+Date: Wed, 17 Aug 2022 17:18:20 +0700
+Subject: [PATCH] hihope_rzg2: Enable distro_bootcmd
+
+Add suppport Autoboot UEFI
+
+Signed-off-by: Bang Nguyen <bang.nguyen.fv@rvc.renesas.com>
+---
+ configs/hihope_rzg2_defconfig      |  1 +
+ env/env.c                          |  2 +-
+ include/configs/rcar-gen3-common.h | 58 ++++++++++++++++++++++++++----
+ 3 files changed, 53 insertions(+), 8 deletions(-)
+
+diff --git a/configs/hihope_rzg2_defconfig b/configs/hihope_rzg2_defconfig
+index 2d2d7ab6ca..20a330ccf4 100644
+--- a/configs/hihope_rzg2_defconfig
++++ b/configs/hihope_rzg2_defconfig
+@@ -114,3 +114,4 @@ CONFIG_DOS_PARTITION=y
+ CONFIG_ISO_PARTITION=y
+ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_UUIDS=y
++CONFIG_DISTRO_DEFAULTS=y
+\ No newline at end of file
+diff --git a/env/env.c b/env/env.c
+index e534008006..73ad50951a 100644
+--- a/env/env.c
++++ b/env/env.c
+@@ -201,7 +201,7 @@ int env_load(void)
+ 		if (!ret) {
+ 			printf("OK\n");
+ 			gd->env_load_prio = prio;
+-
++			env_set_default(NULL,0);
+ #if !CONFIG_IS_ENABLED(ENV_APPEND)
+ 			return 0;
+ #endif
+diff --git a/include/configs/rcar-gen3-common.h b/include/configs/rcar-gen3-common.h
+index e912d04410..42b707d61d 100644
+--- a/include/configs/rcar-gen3-common.h
++++ b/include/configs/rcar-gen3-common.h
+@@ -61,13 +61,57 @@
+ /* ENV setting */
+ 
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
+-	"usb_pgood_delay=2000\0" \
+-	"bootm_size=0x10000000\0"
+-
+-#define CONFIG_BOOTCOMMAND	\
+-	"tftp 0x48080000 Image; " \
+-	"tftp 0x48000000 Image-"CONFIG_DEFAULT_FDT_FILE"; " \
+-	"booti 0x48080000 - 0x48000000"
++	"fdt_addr_r=0x48000000\0" \
++	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
++	"kernel_addr_r=0x48080000\0" \
++	"boot_efi_binary=efi/boot/"BOOTEFI_NAME"\0" \
++	"boot_mmc=" \
++			"if test -e mmc ${mmcdev}:1 ${boot_efi_binary}; then " \
++				"load mmc ${mmcdev}:1 " \
++				"${kernel_addr_r} ${boot_efi_binary};" \
++				"bootefi ${kernel_addr_r};" \
++			"elif test -e mmc ${mmcdev}:2 ${boot_efi_binary}; then " \
++				"load mmc ${mmcdev}:2 " \
++				"${kernel_addr_r} ${boot_efi_binary};" \
++				"bootefi ${kernel_addr_r};" \
++			"fi;\0" \
++	"boot_usb=" \
++			"if test -e usb ${usbdev}:1 ${boot_efi_binary}; then " \
++				"fatload usb ${usbdev}:1 " \
++				"${kernel_addr_r} ${boot_efi_binary};" \
++				"bootefi ${kernel_addr_r};" \
++			"elif test -e usb ${usbdev}:2 ${boot_efi_binary}; then " \
++				"fatload usb ${usbdev}:2 " \
++				"${kernel_addr_r} ${boot_efi_binary};" \
++				"bootefi ${kernel_addr_r};" \
++			"fi;\0" \
++	"load_mmc=" \
++			"setenv mmcdev 0;" \
++			"run boot_mmc;" \
++			"setenv mmcdev 1;" \
++			"run boot_mmc; \0" \
++	"load_usb=" \
++			"usb start;" \
++			"setenv usbdev 0;" \
++			"run boot_usb;"\
++			"setenv usbdev 1;" \
++			"run boot_usb;\0" \
++	"distro_bootcmd=" \
++			"run load_mmc;" \
++			"run load_usb;\0" \
++	"bootcmd=run distro_bootcmd\0" \
++
++
++
++#ifndef CONFIG_SPL_BUILD
++#define BOOT_TARGET_DEVICES(func) \
++        func(MMC, mmc, 1) \
++        func(MMC, mmc, 0) \
++        func(USB, usb, 0) \
++        func(PXE, pxe, na) \
++        func(DHCP, dhcp, na)
++#include <config_distro_bootcmd.h>
++#endif
+ 
+ /* SPL support */
+ #if defined(CONFIG_R8A7795) || defined(CONFIG_R8A7796) || defined(CONFIG_R8A77965)
+-- 
+2.17.1
+

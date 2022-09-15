@@ -21,6 +21,7 @@ SRC_URI_append = " \
 	file://asr/0003-rcar-gen3-common.h-increase-limit-size-for-Uboot.patch         \
 	file://asr/0004-configs-Disable-Watchdog.patch                                 \
 	file://asr/0005-arm-dts-update-dts-from-current-upstream-kernel.patch          \
+	file://asr/0006-hihope_rzg2-Enable-distro_bootcmd.patch                        \
 "
 do_deploy_append() {
     if [ -n "${UBOOT_CONFIG}" ]
