@@ -23,7 +23,7 @@ SRC_URI = " \
 "
 
 SRCREV = "4a8654a92a15424220c9d415987d7b2016a21eec"
-SRCREV_mbedtls = "7e163d796c7a8d3dd1a48884fb48ee4398da3137"
+SRCREV_mbedtls = "dd79db10014d85b26d11fe57218431f2e5ede6f2"
 
 PV = "v2.7+git"
 
