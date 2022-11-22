@@ -1,0 +1,30 @@
+From d57726a0bc4f700650ade6a1e8651438cf8ab96f Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Fri, 9 Dec 2022 13:17:22 +0700
+Subject: [PATCH 16/16] arch: arm: dts: r8a774a1-hihope-rzg2m-u-boot: Remove
+ HS400 for SDHI3 node
+
+We do not support HS400 of eMMC in u-boot. So we need to remove the
+self-define capability in device-node in order to let U-boot can use
+eMMC.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm/dts/r8a774a1-hihope-rzg2m-u-boot.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/dts/r8a774a1-hihope-rzg2m-u-boot.dts b/arch/arm/dts/r8a774a1-hihope-rzg2m-u-boot.dts
+index b735e97221..c85230b035 100644
+--- a/arch/arm/dts/r8a774a1-hihope-rzg2m-u-boot.dts
++++ b/arch/arm/dts/r8a774a1-hihope-rzg2m-u-boot.dts
+@@ -25,3 +25,7 @@
+ 		line-name = "wlan-reg-on";
+ 	};
+ };
++
++&sdhi3 {
++	/delete-property/mmc-hs400-1_8v;
++};
+-- 
+2.17.1
+

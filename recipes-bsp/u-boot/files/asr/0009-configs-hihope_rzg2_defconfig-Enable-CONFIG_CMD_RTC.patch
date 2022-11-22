@@ -1,0 +1,24 @@
+From 3f3b51c9a41183d8746309c478683297f14ed066 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 12 Dec 2022 10:55:05 +0700
+Subject: [PATCH 09/16] configs: hihope_rzg2_defconfig: Enable CONFIG_CMD_RTC
+
+Since we support RTC emulator, we also support the RTC command too.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ configs/hihope_rzg2_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/hihope_rzg2_defconfig b/configs/hihope_rzg2_defconfig
+index dcc3738df6..d3dd8b1730 100644
+--- a/configs/hihope_rzg2_defconfig
++++ b/configs/hihope_rzg2_defconfig
+@@ -113,3 +113,4 @@ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_UUIDS=y
+ CONFIG_DISTRO_DEFAULTS=y
+ CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_CMD_RTC=y
+-- 
+2.17.1
+

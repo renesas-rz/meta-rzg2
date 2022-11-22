@@ -1,0 +1,27 @@
+From 6cb56e65315811f087d59832451552615f499807 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Sun, 13 Nov 2022 10:57:59 +0700
+Subject: [PATCH 08/16] configs: hihope_rzg2_defconfig: enable
+ NET_RANDOM_ETHADDR
+
+When ethaddr is NULL, some application need check network status will
+fail their command.
+So randomize ethaddr in-case it's NULL to avoid issue.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ configs/hihope_rzg2_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/hihope_rzg2_defconfig b/configs/hihope_rzg2_defconfig
+index 29a0145b54..dcc3738df6 100644
+--- a/configs/hihope_rzg2_defconfig
++++ b/configs/hihope_rzg2_defconfig
+@@ -112,3 +112,4 @@ CONFIG_ISO_PARTITION=y
+ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_UUIDS=y
+ CONFIG_DISTRO_DEFAULTS=y
++CONFIG_NET_RANDOM_ETHADDR=y
+-- 
+2.17.1
+

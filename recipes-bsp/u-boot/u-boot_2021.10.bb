@@ -22,6 +22,16 @@ SRC_URI_append = " \
 	file://asr/0004-configs-Disable-Watchdog.patch                                 \
 	file://asr/0005-arm-dts-update-dts-from-current-upstream-kernel.patch          \
 	file://asr/0006-hihope_rzg2-Enable-distro_bootcmd.patch                        \
+	file://asr/0007-configs-hihope_rzg2_defconfig-Correct-SYS_MMC_ENV_DE.patch     \
+	file://asr/0008-configs-hihope_rzg2_defconfig-enable-NET_RANDOM_ETHA.patch     \
+	file://asr/0009-configs-hihope_rzg2_defconfig-Enable-CONFIG_CMD_RTC.patch      \
+	file://asr/0010-drivers-rtc-emul_rtc-Store-RTC-s-time-to-rtc_emul_ep.patch     \
+	file://asr/0011-include-configs-rcar-gen3-common.h-Update-automate-b.patch     \
+	file://asr/0012-include-configs-rcar-gen3-common.h-Add-usb_pgood_del.patch     \
+	file://asr/0013-include-configs-rcar-gen3-common.h-W-A-Second-starti.patch     \
+	file://asr/0014-env-Refactor-the-way-to-get-needed-variable.patch              \
+	file://asr/0015-arch-arm-dts-r8a774a1-Update-armv8-timer-node.patch            \
+	file://asr/0016-arch-arm-dts-r8a774a1-hihope-rzg2m-u-boot-Remove-HS4.patch     \
 "
 do_deploy_append() {
     if [ -n "${UBOOT_CONFIG}" ]

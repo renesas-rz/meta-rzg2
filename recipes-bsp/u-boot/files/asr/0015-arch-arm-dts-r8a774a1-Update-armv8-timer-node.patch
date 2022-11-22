@@ -1,0 +1,41 @@
+From a370ca704e9819d6aea8b343f4f04f525d4586db Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 22 Nov 2022 15:50:17 +0700
+Subject: [PATCH 15/16] arch: arm: dts: r8a774a1: Update armv8-timer node
+
+Update the timer node for satisfy Arm Systeam Ready's requirement:
+* Change property "interrupts-extend" to "interrupt"
+
+TODO:
+  Although Arm System Ready require "always-on" property, but we get
+issue with it. Currently will not use it.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ arch/arm/dts/r8a774a1.dtsi | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/dts/r8a774a1.dtsi b/arch/arm/dts/r8a774a1.dtsi
+index 5a0896e3f7..50f453bd8d 100644
+--- a/arch/arm/dts/r8a774a1.dtsi
++++ b/arch/arm/dts/r8a774a1.dtsi
+@@ -2995,10 +2995,12 @@
+ 
+ 	timer {
+ 		compatible = "arm,armv8-timer";
+-		interrupts-extended = <&gic GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+-				      <&gic GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+-				      <&gic GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+-				      <&gic GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>;
++		#interrupt-cells = <3>;
++		interrupt-parent = <&gic>;
++		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
++			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
++			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
++			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>;
+ 	};
+ 
+ 	/* External USB clocks - can be overridden by the board */
+-- 
+2.17.1
+

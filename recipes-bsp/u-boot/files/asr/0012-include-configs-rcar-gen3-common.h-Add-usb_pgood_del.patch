@@ -1,0 +1,33 @@
+From f12446de705d4a03e9890636111087f0e37a7e16 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Mon, 14 Nov 2022 10:48:20 +0700
+Subject: [PATCH 12/16] include: configs: rcar-gen3-common.h: Add
+ "usb_pgood_delay" to default environment variable
+
+By some mistake, the "usb_pgood_delay" variable is removed.
+We must re-add it to avoid USB can not be detected.
+
+Reference:
+`73703d17ad arm: rcar_gen3: Add "usb_pgood_delay" to the default
+environment variable`
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ include/configs/rcar-gen3-common.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/configs/rcar-gen3-common.h b/include/configs/rcar-gen3-common.h
+index eb31b7861f..b4cdf1f1fd 100644
+--- a/include/configs/rcar-gen3-common.h
++++ b/include/configs/rcar-gen3-common.h
+@@ -61,6 +61,7 @@
+ /* ENV setting */
+ 
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
++	"usb_pgood_delay=2000\0" \
+ 	"fdt_addr_r=0x48000000\0" \
+ 	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
+ 	"kernel_addr_r=0x48080000\0" \
+-- 
+2.17.1
+

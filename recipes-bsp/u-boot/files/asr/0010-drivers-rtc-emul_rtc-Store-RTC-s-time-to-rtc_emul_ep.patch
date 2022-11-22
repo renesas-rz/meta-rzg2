@@ -1,0 +1,41 @@
+From 16e783550a63a0862f38cdc87641b33db89c14d6 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Tue, 22 Nov 2022 15:45:00 +0700
+Subject: [PATCH 10/16] drivers: rtc: emul_rtc: Store RTC's time to
+ rtc_emul_epoch variable
+
+When setting time with emulator RTC, we can store it's value to 'rtc_emul_epoch'
+variable and save for usage in next starting of U-boot.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ drivers/rtc/emul_rtc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/rtc/emul_rtc.c b/drivers/rtc/emul_rtc.c
+index 8f0e1ab5ac..c39122b989 100644
+--- a/drivers/rtc/emul_rtc.c
++++ b/drivers/rtc/emul_rtc.c
+@@ -55,6 +55,9 @@ static int emul_rtc_set(struct udevice *dev, const struct rtc_time *time)
+ 	else
+ 		priv->isdst = 0;
+ 
++	env_set_ulong("rtc_emul_epoch", rtc_mktime(time));
++	env_save();
++
+ 	return 0;
+ }
+ 
+@@ -75,6 +78,9 @@ int emul_rtc_probe(struct udevice *dev)
+ 	priv->offset_us = epoch * 1000000ULL - timer_get_us();
+ 	priv->isdst = -1;
+ 
++	env_set_ulong("rtc_emul_epoch", epoch);
++	env_save();
++
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
+

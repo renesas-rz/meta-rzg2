@@ -1,0 +1,65 @@
+From d47951aca8890e8110c88ad7b32bccd25eef066c Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Sun, 13 Nov 2022 11:13:19 +0700
+Subject: [PATCH 14/16] env: Refactor the way to get needed variable
+
+Restore variable table to default will make lost for user's variables.
+We can restore the default value for needed variables only.
+Also the variable 'fdtfile' should be configured by
+CONFIG_DEFAULT_FDT_FILE of each device's config instead of static.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ board/hoperun/hihope-rzg2/hihope-rzg2.c | 4 +++-
+ env/env.c                               | 1 -
+ include/configs/rcar-gen3-common.h      | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/board/hoperun/hihope-rzg2/hihope-rzg2.c b/board/hoperun/hihope-rzg2/hihope-rzg2.c
+index 1d08ca6ab9..58ab178274 100644
+--- a/board/hoperun/hihope-rzg2/hihope-rzg2.c
++++ b/board/hoperun/hihope-rzg2/hihope-rzg2.c
+@@ -201,12 +201,14 @@ int board_fit_config_name_match(const char *name)
+ 
+ int board_late_init(void)
+ {
++	const char * const default_vars[] = {"fdt_addr_r", "kernel_addr_r", "boot_efi_binary", "distro_bootcmd", "scan_for_usb_dev", "scan_boot_efi", "mmc0", "mmc1", "usb0", "usb1", };
++
+ #ifdef CONFIG_WDT_RENESAS
+ 	reinitr_wdt();
+ #endif
+ 
+ 	env_set_hex("board_rev", board_rev);
+-
++	env_set_default_vars(10, (char * const *)default_vars, 0);
+ 	return 0;
+ }
+ 
+diff --git a/env/env.c b/env/env.c
+index 73ad50951a..0873dc4a07 100644
+--- a/env/env.c
++++ b/env/env.c
+@@ -201,7 +201,6 @@ int env_load(void)
+ 		if (!ret) {
+ 			printf("OK\n");
+ 			gd->env_load_prio = prio;
+-			env_set_default(NULL,0);
+ #if !CONFIG_IS_ENABLED(ENV_APPEND)
+ 			return 0;
+ #endif
+diff --git a/include/configs/rcar-gen3-common.h b/include/configs/rcar-gen3-common.h
+index e8369b47a4..f13c09635e 100644
+--- a/include/configs/rcar-gen3-common.h
++++ b/include/configs/rcar-gen3-common.h
+@@ -63,7 +63,7 @@
+ #define CONFIG_EXTRA_ENV_SETTINGS	\
+ 	"usb_pgood_delay=2000\0" \
+ 	"fdt_addr_r=0x48000000\0" \
+-	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
++	"fdtfile="CONFIG_DEFAULT_FDT_FILE"\0" \
+ 	"kernel_addr_r=0x48080000\0" \
+ 	"boot_efi_binary=efi/boot/"BOOTEFI_NAME"\0" \
+ 	"scan_for_usb_dev=" \
+-- 
+2.17.1
+

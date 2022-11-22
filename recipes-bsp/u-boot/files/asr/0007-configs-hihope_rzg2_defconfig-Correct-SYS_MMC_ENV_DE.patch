@@ -1,0 +1,37 @@
+From 353f3312dc5feb6f176d8f1850a83a78ab182dc5 Mon Sep 17 00:00:00 2001
+From: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+Date: Sun, 13 Nov 2022 10:55:33 +0700
+Subject: [PATCH 07/16] configs: hihope_rzg2_defconfig: Correct SYS_MMC_ENV_DEV
+ to eMMC
+
+Since eMMC is changed to mmc0 by changing in device-tree, we must update
+this variable to correct the eMMC device index.
+
+Signed-off-by: Huynh Thanh Hung <hung.huynh.wz@renesas.com>
+---
+ configs/hihope_rzg2_defconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/hihope_rzg2_defconfig b/configs/hihope_rzg2_defconfig
+index 4c1c3bd88b..29a0145b54 100644
+--- a/configs/hihope_rzg2_defconfig
++++ b/configs/hihope_rzg2_defconfig
+@@ -38,7 +38,7 @@ CONFIG_MULTI_DTB_FIT_USER_DEFINED_AREA=y
+ CONFIG_ENV_OVERWRITE=y
+ CONFIG_ENV_IS_IN_MMC=y
+ CONFIG_SYS_RELOC_GD_ENV_ADDR=y
+-CONFIG_SYS_MMC_ENV_DEV=1
++CONFIG_SYS_MMC_ENV_DEV=0
+ CONFIG_SYS_MMC_ENV_PART=2
+ CONFIG_VERSION_VARIABLE=y
+ CONFIG_REGMAP=y
+@@ -111,4 +111,4 @@ CONFIG_DOS_PARTITION=y
+ CONFIG_ISO_PARTITION=y
+ CONFIG_EFI_PARTITION=y
+ CONFIG_PARTITION_UUIDS=y
+-CONFIG_DISTRO_DEFAULTS=y
+\ No newline at end of file
++CONFIG_DISTRO_DEFAULTS=y
+-- 
+2.17.1
+
