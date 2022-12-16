@@ -9,13 +9,13 @@ COMPATIBLE_MACHINE = "ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h"
 
 KERNEL_URL = " \
     git://github.com/renesas-rz/rz_linux-cip.git"
-BRANCH = "${@base_conditional("IS_RT_BSP", "1", "rzg2-cip78-rt26", "rzg2-cip78",d)}"
-SRCREV = "${@base_conditional("IS_RT_BSP", "1", "e153869721b2823fcab8ada6742150e8e941a429", "c5ccd26ce88f1c41ddb500730e81054eb26aad60",d)}"
+BRANCH = "${@base_conditional("IS_RT_BSP", "1", "rzg2-cip85-rt27", "rzg2-cip85",d)}"
+SRCREV = "${@base_conditional("IS_RT_BSP", "1", "77ae50b9606dec1457c14aba213c7f3d3cf4ff25", "375cbe0ac68db298badbe790ea7dd26fd255bac8",d)}"
 
 SRC_URI = "${KERNEL_URL};protocol=https;nocheckout=1;branch=${BRANCH}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
-LINUX_VERSION ?= "${@base_conditional("IS_RT_BSP", "1", "4.19.252-cip78-rt26", "4.19.252-cip78",d)}"
+LINUX_VERSION ?= "${@base_conditional("IS_RT_BSP", "1", "4.19.265-cip85-rt27", "4.19.265-cip85",d)}"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 PR = "r1"
