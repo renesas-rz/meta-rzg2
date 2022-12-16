@@ -14,7 +14,7 @@ require include/ecc-control.inc
 
 S = "${WORKDIR}/git"
 
-BRANCH = "v2.7/rzg2"
+BRANCH = "v2.8/rzg2"
 BRANCH_mbedtls = "mbedtls-2.28"
 
 SRC_URI = " \
@@ -22,10 +22,10 @@ SRC_URI = " \
 	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
 "
 
-SRCREV = "4a8654a92a15424220c9d415987d7b2016a21eec"
+SRCREV = "a8e1bb593e69c8017e421ab7389815d29f706fcd"
 SRCREV_mbedtls = "dd79db10014d85b26d11fe57218431f2e5ede6f2"
 
-PV = "v2.7+git"
+PV = "v2.8+git"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
