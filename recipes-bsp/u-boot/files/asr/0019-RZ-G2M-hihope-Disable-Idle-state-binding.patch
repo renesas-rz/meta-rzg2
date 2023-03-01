@@ -1,0 +1,38 @@
+From c6fc4228d2cd3c5c6cc010bdd90938b09ae0e7bc Mon Sep 17 00:00:00 2001
+From: john vincent <john.vincent.xa@bp.renesas.com>
+Date: Wed, 1 Mar 2023 18:54:05 +0000
+Subject: [PATCH 3/3] RZ/G2M hihope: Disable Idle state binding
+
+Disable HW dynamic power management
+To fix Linux kernel hang after the BSA test
+
+Signed-off-by: john vincent <john.vincent.xa@bp.renesas.com>
+---
+ arch/arm/dts/r8a774a1.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/dts/r8a774a1.dtsi b/arch/arm/dts/r8a774a1.dtsi
+index 47679c1..4db46bb 100644
+--- a/arch/arm/dts/r8a774a1.dtsi
++++ b/arch/arm/dts/r8a774a1.dtsi
+@@ -239,7 +239,7 @@
+ 				entry-latency-us = <400>;
+ 				exit-latency-us = <500>;
+ 				min-residency-us = <4000>;
+-				status = "okay";
++				status = "disabled";
+ 			};
+ 
+ 			CPU_SLEEP_1: cpu-sleep-1 {
+@@ -249,7 +249,7 @@
+ 				entry-latency-us = <700>;
+ 				exit-latency-us = <700>;
+ 				min-residency-us = <5000>;
+-				status = "okay";
++				status = "disabled";
+ 			};
+ 		};
+ 	};
+-- 
+2.7.4
+

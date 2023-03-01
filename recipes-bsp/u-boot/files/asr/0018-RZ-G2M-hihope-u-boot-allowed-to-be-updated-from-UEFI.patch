@@ -1,0 +1,48 @@
+From 5bafa5a4af4fefb63ede788e79635c68f23e9899 Mon Sep 17 00:00:00 2001
+From: john vincent <john.vincent.xa@bp.renesas.com>
+Date: Wed, 1 Mar 2023 18:47:53 +0000
+Subject: [PATCH 2/3] RZ/G2M hihope: u-boot allowed to be updated from UEFI
+ Menu
+
+The following configurations enabled:
+Allow runtime capsule update
+Allow capsule support
+Allow capsule on disk
+Allow DFU on MMC, NAND, USB, SF and RAM
+
+Signed-off-by: john vincent <john.vincent.xa@bp.renesas.com>
+---
+ configs/hihope_rzg2_defconfig | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/configs/hihope_rzg2_defconfig b/configs/hihope_rzg2_defconfig
+index b5afcb3..86eed37 100644
+--- a/configs/hihope_rzg2_defconfig
++++ b/configs/hihope_rzg2_defconfig
+@@ -115,3 +115,22 @@ CONFIG_DISTRO_DEFAULTS=y
+ CONFIG_NET_RANDOM_ETHADDR=y
+ CONFIG_CMD_RTC=y
+ CONFIG_CMD_SF=y
++CONFIG_EFI_RUNTIME_UPDATE_CAPSULE=y
++CONFIG_EFI_HAVE_CAPSULE_SUPPORT=y
++CONFIG_EFI_CAPSULE_ON_DISK=y
++CONFIG_SPL_DFU=y
++CONFIG_DM_MTD=y
++CONFIG_DFU_MTD=y
++CONFIG_SPL_DFU_MTD=y
++CONFIG_DFU_SF=y
++CONFIG_DFU_OVER_USB=y
++CONFIG_DFU=y
++CONFIG_DFU_MMC=y
++CONFIG_DFU_NAND=y
++CONFIG_DFU_RAM=y
++CONFIG_DFU_SF_PART=y
++CONFIG_DFU_TIMEOUT=y
++CONFIG_CMD_DFU=y
++CONFIG_OF_LIBFDT=y
++CONFIG_DFU_OVER_TFTP=y
++CONFIG_DFU_TFTP=y
+\ No newline at end of file
+-- 
+2.7.4
+

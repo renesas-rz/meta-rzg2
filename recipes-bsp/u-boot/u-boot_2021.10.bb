@@ -32,6 +32,9 @@ SRC_URI_append = " \
 	file://asr/0014-env-Refactor-the-way-to-get-needed-variable.patch              \
 	file://asr/0015-arch-arm-dts-r8a774a1-Update-armv8-timer-node.patch            \
 	file://asr/0016-arch-arm-dts-r8a774a1-hihope-rzg2m-u-boot-Remove-HS4.patch     \
+	file://asr/0017-Serial-flash-capability-enable-for-highhope-RZ-G2M.patch       \
+	file://asr/0018-RZ-G2M-hihope-u-boot-allowed-to-be-updated-from-UEFI.patch     \
+	file://asr/0019-RZ-G2M-hihope-Disable-Idle-state-binding.patch                 \
 "
 do_deploy_append() {
     if [ -n "${UBOOT_CONFIG}" ]
