@@ -1,0 +1,76 @@
+From c0e8d7d0b293a43cc1c58e2089f394d3489b5771 Mon Sep 17 00:00:00 2001
+From: trungvanle <trung.le.xk@renesas.com>
+Date: Wed, 9 Aug 2023 16:37:50 +0700
+Subject: [PATCH 2/2] waylandsink: Only try SHM for single memory buffers
+
+SHM only performs correct with single memory buffers.
+Multiple memory buffers need to copy to new single
+memory buffers then re-create wl_shm's buffers.
+
+Signed-off-by: trungvanle <trung.le.xk@renesas.com>
+---
+ ext/wayland/gstwaylandsink.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 02a9d09ff..f7e5ae4f0 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -730,6 +730,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   GstWlBuffer *wlbuffer;
+   GstVideoMeta *vmeta;
+   GstVideoFormat format;
++  GstVideoInfo old_vinfo;
+   GstMemory *mem;
+   struct wl_buffer *wbuf = NULL;
+
+@@ -781,6 +782,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   /* update video info from video meta */
+   mem = gst_buffer_peek_memory (buffer, 0);
+
++  old_vinfo = sink->video_info;
+   vmeta = gst_buffer_get_video_meta (buffer);
+   if (vmeta) {
+     gint i;
+@@ -789,7 +791,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+       sink->video_info.offset[i] = vmeta->offset[i];
+       sink->video_info.stride[i] = vmeta->stride[i];
+     }
+-    sink->video_info.size = mem->size;
++    sink->video_info.size = gst_buffer_get_size (buffer);
+   }
+
+   GST_LOG_OBJECT (sink, "buffer %p does not have a wl_buffer from our "
+@@ -809,13 +811,18 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   }
+
+   if (!wbuf && gst_wl_display_check_format_for_shm (sink->display, format)) {
+-    if (gst_is_fd_memory (mem)) {
++    if (gst_buffer_n_memory (buffer) == 1 && gst_is_fd_memory (mem))
+       wbuf = gst_wl_shm_memory_construct_wl_buffer (mem, sink->display,
+           &sink->video_info);
+-    } else {
++
++     /* If nothing worked, copy into our internal pool */
++    if (!wbuf) {
+       GstVideoFrame src, dst;
+       GstVideoInfo src_info = sink->video_info;
+
++      /* rollback video info changes */
++      sink->video_info = old_vinfo;
++
+       /* we don't know how to create a wl_buffer directly from the provided
+        * memory, so we have to copy the data to shm memory that we know how
+        * to handle... */
+@@ -831,6 +838,8 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+
+         config = gst_buffer_pool_get_config (sink->pool);
+         gst_buffer_pool_config_get_params (config, &caps, NULL, NULL, NULL);
++        /* revert back to default strides and offsets */
++        gst_video_info_from_caps (&sink->video_info, caps);
+         gst_buffer_pool_config_set_params (config, caps, sink->video_info.size,
+             2, 0);
+
+--
+2.25.1
+

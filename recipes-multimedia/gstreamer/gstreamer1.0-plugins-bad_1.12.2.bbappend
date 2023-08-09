@@ -27,6 +27,7 @@ SRC_URI_append += " \
     file://0005-New-libbayersink-Bayer-to-RAW-converter-and-display-.patch \
     file://0006-ext-bayerconvert-add-bayerconvert-plugin.patch \
     file://0007-waylandsink-Add-support-for-I420-in-dmabuf.patch \
+    file://0008-waylandsink-Only-try-SHM-for-single-memory-buffer.patch \
 "
 
 RDEPENDS_gstreamer1.0-plugins-bad += "libwayland-egl"
