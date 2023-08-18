@@ -1,7 +1,7 @@
-From 65863d43a3159d3b533891c19e16a26ba5b0fe0d Mon Sep 17 00:00:00 2001
+From 292e0b3b598806f53f821c324b053fab8f08dc23 Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Wed, 30 Jun 2021 11:35:11 +0700
-Subject: [PATCH 1/5] plat: rzg: add support SECURE BOOT for RZ/G2 Platform
+Subject: [PATCH] plat: rzg: add support SECURE BOOT for RZ/G2 Platform
 
 This commit adds support SECURE BOOT for RZ/G2 Platform.
 
@@ -233,10 +233,10 @@ index 4aa86e2a4..27df99f99 100644
  #endif
  }
 diff --git a/drivers/renesas/common/io/io_rcar.c b/drivers/renesas/common/io/io_rcar.c
-index 45ef386ae..ab2d53780 100644
+index 43f9d6a7c..95c53f7c3 100644
 --- a/drivers/renesas/common/io/io_rcar.c
 +++ b/drivers/renesas/common/io/io_rcar.c
-@@ -81,22 +81,25 @@ typedef struct {
+@@ -81,8 +81,8 @@ typedef struct {
  #define RCAR_FLASH_CERT_HEADER		RCAR_GET_FLASH_ADR(6U, 0U)
  #define RCAR_EMMC_CERT_HEADER		(0x00030000U)
  
@@ -244,6 +244,11 @@ index 45ef386ae..ab2d53780 100644
 -#define RCAR_COUNT_LOAD_BL33X		(3U)
 +#define RCAR_COUNT_LOAD_BL33		(4U)
 +#define RCAR_COUNT_LOAD_BL33X		(5U)
+ 
+ #define CHECK_IMAGE_AREA_CNT (5U)
+ #define BOOT_BL2_ADDR (0xE6304000U)
+@@ -99,18 +99,21 @@ static addr_loaded_t addr_loaded[CHECK_IMAGE_AREA_CNT] = {
+ static uint32_t addr_loaded_cnt = 1;
  
  static const plat_rcar_name_offset_t name_offset[] = {
 -	{BL31_IMAGE_ID, 0U, RCAR_ATTR_SET_ALL(0, 0, 0)},
@@ -274,7 +279,7 @@ index 45ef386ae..ab2d53780 100644
  };
  
  #if TRUSTED_BOARD_BOOT
-@@ -122,8 +125,8 @@ static const plat_rcar_name_offset_t cert_offset[] = {
+@@ -136,8 +139,8 @@ static const plat_rcar_name_offset_t cert_offset[] = {
  static file_state_t current_file = { 0 };
  
  static uintptr_t rcar_handle, rcar_spec;
@@ -285,7 +290,7 @@ index 45ef386ae..ab2d53780 100644
  static uint64_t rcar_image_number = { 0U };
  static uint32_t rcar_cert_load = { 0U };
  
-@@ -167,7 +170,7 @@ static int32_t file_to_offset(const int32_t name, uintptr_t *offset,
+@@ -181,7 +184,7 @@ static int32_t file_to_offset(const int32_t name, uintptr_t *offset,
  		}
  
  		addr = RCAR_ATTR_GET_CALCADDR(name_offset[i].attr);
@@ -294,7 +299,7 @@ index 45ef386ae..ab2d53780 100644
  			continue;
  		}
  
-@@ -435,7 +438,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
+@@ -504,7 +507,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
  #endif
  
  	rcar_image_number = header[0];
@@ -303,7 +308,7 @@ index 45ef386ae..ab2d53780 100644
  		rcar_image_header[i] = header[i * 2 + 1];
  		rcar_image_header_prttn[i] = header[i * 2 + 2];
  	}
-@@ -453,7 +456,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
+@@ -522,7 +525,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
  	}
  
  	rc = io_read(handle, RCAR_SDRAM_certESS,
@@ -312,7 +317,7 @@ index 45ef386ae..ab2d53780 100644
  	if (rc != IO_SUCCESS) {
  		WARN("cert file read error.\n");
  		goto error;
-@@ -461,7 +464,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
+@@ -530,7 +533,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
  
  #if RCAR_BL2_DCACHE == 1
  	inv_dcache_range(RCAR_SDRAM_certESS,
@@ -394,7 +399,7 @@ index ab071ec08..f57456eb1 100644
   * Platform specific page table and MMU setup constants
   ******************************************************************************/
 diff --git a/plat/renesas/common/include/rcar_def.h b/plat/renesas/common/include/rcar_def.h
-index 2cd26edbf..fa5ffd779 100644
+index 68babff4b..e5766da22 100644
 --- a/plat/renesas/common/include/rcar_def.h
 +++ b/plat/renesas/common/include/rcar_def.h
 @@ -40,6 +40,9 @@
@@ -893,5 +898,5 @@ index efe40b0c8..5820d9722 100644
  	}
  
 -- 
-2.25.1
+2.17.1
 

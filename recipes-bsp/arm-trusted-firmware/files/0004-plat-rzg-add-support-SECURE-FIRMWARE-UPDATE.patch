@@ -1,7 +1,7 @@
-From 6d095a2effd93a59ad639e7714f63622cc5c13ff Mon Sep 17 00:00:00 2001
+From c212be65b3f50e7d82fa4404db011f9f6aca60f1 Mon Sep 17 00:00:00 2001
 From: hienhuynh <hien.huynh.px@renesas.com>
 Date: Thu, 20 Jan 2022 15:29:33 +0700
-Subject: [PATCH 4/5] plat: rzg: add support SECURE FIRMWARE UPDATE
+Subject: [PATCH] plat: rzg: add support SECURE FIRMWARE UPDATE
 
 This commit is created to add support SECURE FIRMWARE UPDATE for RZ/G2
 platform.
@@ -14,7 +14,7 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  .../renesas/common/bl2_plat_mem_params_desc.c |  31 ++++
  plat/renesas/common/include/platform_def.h    |  11 ++
  plat/renesas/common/plat_storage.c            |  16 ++
- plat/renesas/rzg/bl2_plat_fwu.c               | 151 ++++++++++++++++++
+ plat/renesas/rzg/bl2_plat_fwu.c               | 152 ++++++++++++++++++
  plat/renesas/rzg/bl2_plat_setup.c             |   9 ++
  plat/renesas/rzg/platform.mk                  |   7 +-
  tools/renesas/rzg_layout_create/sa6.c         |  39 +++++
@@ -22,11 +22,11 @@ Signed-off-by: hienhuynh <hien.huynh.px@renesas.com>
  .../rzg_security_tools/fiptool/Makefile       |  16 +-
  .../fiptool/src/rzg_firmware_image_package.h  |   2 +
  .../fiptool/src/tbbr_config.c                 |   7 +
- 14 files changed, 324 insertions(+), 32 deletions(-)
+ 14 files changed, 325 insertions(+), 32 deletions(-)
  create mode 100644 plat/renesas/rzg/bl2_plat_fwu.c
 
 diff --git a/drivers/renesas/common/auth/auth_mod.c b/drivers/renesas/common/auth/auth_mod.c
-index bf72426b0..03c4212c0 100644
+index 27df99f99..8584f3400 100644
 --- a/drivers/renesas/common/auth/auth_mod.c
 +++ b/drivers/renesas/common/auth/auth_mod.c
 @@ -137,6 +137,7 @@ int auth_mod_verify_img(unsigned int img_id, void *ptr, unsigned int len)
@@ -35,9 +35,9 @@ index bf72426b0..03c4212c0 100644
  	case BL338_CERT_ID:
 +	case SEC_TRIGGER_ID:
  		return ret;
- 	case BL31_IMAGE_ID:
- 	case BL32_IMAGE_ID:
-@@ -168,6 +169,7 @@ int auth_mod_verify_img(unsigned int img_id, void *ptr, unsigned int len)
+ 	case BL332_IMAGE_ID:
+ 	case BL333_IMAGE_ID:
+@@ -165,6 +166,7 @@ int auth_mod_verify_img(unsigned int img_id, void *ptr, unsigned int len)
  	case BL31_IMAGE_ID:
  	case BL32_IMAGE_ID:
  	case BL33_IMAGE_ID:
@@ -46,10 +46,10 @@ index bf72426b0..03c4212c0 100644
  		if (NULL == secure_boot_arg) {
  			ERROR("Security Module is not loaded.\n");
 diff --git a/drivers/renesas/common/io/io_rcar.c b/drivers/renesas/common/io/io_rcar.c
-index ab2d53780..a3780261d 100644
+index 95c53f7c3..9d23c8d95 100644
 --- a/drivers/renesas/common/io/io_rcar.c
 +++ b/drivers/renesas/common/io/io_rcar.c
-@@ -81,25 +81,27 @@ typedef struct {
+@@ -81,8 +81,8 @@ typedef struct {
  #define RCAR_FLASH_CERT_HEADER		RCAR_GET_FLASH_ADR(6U, 0U)
  #define RCAR_EMMC_CERT_HEADER		(0x00030000U)
  
@@ -58,6 +58,9 @@ index ab2d53780..a3780261d 100644
 +#define RCAR_COUNT_LOAD_BL33		(6U)
 +#define RCAR_COUNT_LOAD_BL33X		(7U)
  
+ #define CHECK_IMAGE_AREA_CNT (5U)
+ #define BOOT_BL2_ADDR (0xE6304000U)
+@@ -101,19 +101,21 @@ static uint32_t addr_loaded_cnt = 1;
  static const plat_rcar_name_offset_t name_offset[] = {
  	{SEC_MODULE_ID,  0U, RCAR_ATTR_SET_ALL(0, 0, 0)},
  	{SEC_KEYRING_ID, 0U, RCAR_ATTR_SET_ALL(1, 0, 1)},
@@ -89,7 +92,7 @@ index ab2d53780..a3780261d 100644
  };
  
  #if TRUSTED_BOARD_BOOT
-@@ -125,8 +127,8 @@ static const plat_rcar_name_offset_t cert_offset[] = {
+@@ -139,8 +141,8 @@ static const plat_rcar_name_offset_t cert_offset[] = {
  static file_state_t current_file = { 0 };
  
  static uintptr_t rcar_handle, rcar_spec;
@@ -100,7 +103,7 @@ index ab2d53780..a3780261d 100644
  static uint64_t rcar_image_number = { 0U };
  static uint32_t rcar_cert_load = { 0U };
  
-@@ -170,7 +172,7 @@ static int32_t file_to_offset(const int32_t name, uintptr_t *offset,
+@@ -184,7 +186,7 @@ static int32_t file_to_offset(const int32_t name, uintptr_t *offset,
  		}
  
  		addr = RCAR_ATTR_GET_CALCADDR(name_offset[i].attr);
@@ -109,7 +112,7 @@ index ab2d53780..a3780261d 100644
  			continue;
  		}
  
-@@ -438,7 +440,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
+@@ -507,7 +509,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
  #endif
  
  	rcar_image_number = header[0];
@@ -118,7 +121,7 @@ index ab2d53780..a3780261d 100644
  		rcar_image_header[i] = header[i * 2 + 1];
  		rcar_image_header_prttn[i] = header[i * 2 + 2];
  	}
-@@ -456,7 +458,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
+@@ -525,7 +527,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
  	}
  
  	rc = io_read(handle, RCAR_SDRAM_certESS,
@@ -127,7 +130,7 @@ index ab2d53780..a3780261d 100644
  	if (rc != IO_SUCCESS) {
  		WARN("cert file read error.\n");
  		goto error;
-@@ -464,7 +466,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
+@@ -533,7 +535,7 @@ static int32_t rcar_dev_init(io_dev_info_t *dev_info, const uintptr_t name)
  
  #if RCAR_BL2_DCACHE == 1
  	inv_dcache_range(RCAR_SDRAM_certESS,
@@ -137,7 +140,7 @@ index ab2d53780..a3780261d 100644
  
  	rcar_cert_load = RCAR_CERT_LOAD;
 diff --git a/plat/renesas/common/aarch64/plat_helpers.S b/plat/renesas/common/aarch64/plat_helpers.S
-index 21c3bedaf..95affda3b 100644
+index a7fdfa071..f6ba44cae 100644
 --- a/plat/renesas/common/aarch64/plat_helpers.S
 +++ b/plat/renesas/common/aarch64/plat_helpers.S
 @@ -221,6 +221,13 @@ endfunc platform_mem_init
@@ -226,7 +229,7 @@ index f57456eb1..4ee1785a1 100644
   * Platform specific page table and MMU setup constants
   ******************************************************************************/
 diff --git a/plat/renesas/common/plat_storage.c b/plat/renesas/common/plat_storage.c
-index 7a6b420fc..ebf9416a0 100644
+index 5fbaca17a..d52296617 100644
 --- a/plat/renesas/common/plat_storage.c
 +++ b/plat/renesas/common/plat_storage.c
 @@ -81,6 +81,14 @@ static const io_block_spec_t secmod_file_spec = {
@@ -244,7 +247,7 @@ index 7a6b420fc..ebf9416a0 100644
  #endif
  
  static int32_t open_emmcdrv(const uintptr_t spec);
-@@ -152,6 +160,14 @@ static const struct plat_io_policy policies[] = {
+@@ -151,6 +159,14 @@ static const struct plat_io_policy policies[] = {
  			    &rcar_dev_handle,
  			    (uintptr_t) &seckey_file_spec,
  			    &open_rcar},
@@ -261,10 +264,10 @@ index 7a6b420fc..ebf9416a0 100644
  					 0, 0, 0}
 diff --git a/plat/renesas/rzg/bl2_plat_fwu.c b/plat/renesas/rzg/bl2_plat_fwu.c
 new file mode 100644
-index 000000000..336618a22
+index 000000000..82738e0ab
 --- /dev/null
 +++ b/plat/renesas/rzg/bl2_plat_fwu.c
-@@ -0,0 +1,151 @@
+@@ -0,0 +1,152 @@
 +/*
 + * bl2_plat_fwu.c -
 + *
@@ -326,6 +329,7 @@ index 000000000..336618a22
 +	{
 +	case FWU_SMC_UPDATE_DONE:
 +		bl2_plat_fwu_done();
++		break;
 +	default:
 +		ERROR("BL2: unknown smc call functions\n");
 +		panic();
@@ -648,5 +652,5 @@ index 2f8159e09..db557dab0 100644
  	#error "The package definition cannot be found."
  #endif
 -- 
-2.25.1
+2.17.1
 
