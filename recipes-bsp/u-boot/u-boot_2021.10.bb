@@ -10,6 +10,10 @@ SRC_URI = "${UBOOT_URL};branch=${BRANCH}"
 SRCREV = "d909e2230e02e0a6251dd61e9e1f4527f6745ac1"
 PV = "v2021.10+git${SRCPV}"
 
+SRC_URI += " \
+	${@base_conditional("CIP_MODE", "Jessie", "file://0001-Ignore-using-OpenSSL-s-libcrypto-library-for-host-to.patch", "", d)} \
+"
+
 UBOOT_SREC_SUFFIX = "srec"
 UBOOT_SREC ?= "u-boot-elf.${UBOOT_SREC_SUFFIX}"
 UBOOT_SREC_IMAGE ?= "u-boot-elf-${MACHINE}-${PV}-${PR}.${UBOOT_SREC_SUFFIX}"
