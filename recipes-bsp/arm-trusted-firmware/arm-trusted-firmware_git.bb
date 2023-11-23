@@ -45,6 +45,7 @@ ATFW_OPT_append_r8a774e1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PRO
 
 ATFW_OPT_append += " RZG_DRAM_ECC_FULL=${ECC_FULL} "
 ATFW_OPT_append += " RCAR_RPC_HYPERFLASH_LOCKED=0 MBEDTLS_DIR=../mbedtls "
+ATFW_OPT_append += " ${@base_conditional("CIP_MODE", "Jessie", "ERRATA_A53_843419=0", "", d)} "
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
