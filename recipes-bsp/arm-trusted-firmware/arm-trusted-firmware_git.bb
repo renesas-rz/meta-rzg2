@@ -3,7 +3,6 @@ DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD-3-Clause & MIT & Apache-2.0"
 LIC_FILES_CHKSUM = " \
    file://${WORKDIR}/git/docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde \
-   file://${WORKDIR}/mbedtls/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -14,18 +13,15 @@ require include/ecc-control.inc
 
 S = "${WORKDIR}/git"
 
-BRANCH = "v2.9/rzg2"
-BRANCH_mbedtls = "mbedtls-2.28"
+BRANCH = "v2.10/rzg2"
 
 SRC_URI = " \
 	git://github.com/renesas-rz/rzg_trusted-firmware-a.git;branch=${BRANCH};protocol=https \
-	git://github.com/ARMmbed/mbedtls.git;branch=${BRANCH_mbedtls};name=mbedtls;destsuffix=mbedtls \
 "
 
-SRCREV = "cd35780641585eb7e9cdccb2614b583fbc4313ab"
-SRCREV_mbedtls = "dd79db10014d85b26d11fe57218431f2e5ede6f2"
+SRCREV = "eb0259294ea1d1f2cc7b5b99582e8bc717c16eb3"
 
-PV = "v2.9+git"
+PV = "v2.10+git"
 
 COMPATIBLE_MACHINE = "(ek874|hihope-rzg2m|hihope-rzg2n|hihope-rzg2h)"
 PLATFORM = "rzg"
@@ -44,7 +40,7 @@ ATFW_OPT_append_r8a774b1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PRO
 ATFW_OPT_append_r8a774e1 = "${@base_conditional("USE_ECC", "1", " LIFEC_DBSC_PROTECT_ENABLE=0 RCAR_DRAM_SPLIT=0 RZG_DRAM_ECC=1 ", " ${ATFW_OPT_LOSSY} ",d)}"
 
 ATFW_OPT_append += " RZG_DRAM_ECC_FULL=${ECC_FULL} "
-ATFW_OPT_append += " RCAR_RPC_HYPERFLASH_LOCKED=0 MBEDTLS_DIR=../mbedtls "
+ATFW_OPT_append += " RCAR_RPC_HYPERFLASH_LOCKED=0 "
 ATFW_OPT_append += " ${@base_conditional("CIP_MODE", "Jessie", "ERRATA_A53_843419=0", "", d)} "
 
 # requires CROSS_COMPILE set by hand as there is no configure script
