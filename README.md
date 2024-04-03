@@ -189,3 +189,7 @@ Package versions noted with `(debian)` mean they are CIP Core packages. The sour
 | sed                    |  4.1.2                         |  4.2.2                    | 4.1.2              | 4.2.2                       |
 
 binutils is an optional package, and due to its GPLv3 license, it cannot be added to core-image with non-GPLv3 setting.
+* Realtime Linux: choose realtime characteristic of Linux kernel to build with. You can enable this feature by setting the value "1" to IS_RT_BSP variable in local.conf:
+  ```
+  IS_RT_BSP = "1"
+  ```
